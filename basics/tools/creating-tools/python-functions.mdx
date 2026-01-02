@@ -1,0 +1,143 @@
+---
+title: Python 函数作为工具
+sidebarTitle: Python 函数作为工具
+description: 学习如何使用 Python 函数创建工具。
+---
+
+任何 Python 函数都可以被智能体用作工具。
+
+例如，以下是如何将 `get_top_hackernews_stories` 函数用作工具：
+
+```python hn_agent.py
+import json
+import httpx
+
+from agno.agent import Agent
+
+def get_top_hackernews_stories(num_stories: int = 10) -> str:
+    """
+    Use this function to get top stories from Hacker News.
+
+    Args:
+        num_stories (int): Number of stories to return. Defaults to 10.
+
+    Returns:
+        str: JSON string of top stories.
+    """
+
+    # Fetch top story IDs
+    response = httpx.get('https://hacker-news.firebaseio.com/v0/topstories.json')
+    story_ids = response.json()
+
+    # Fetch story details
+    stories = []
+    for story_id in story_ids[:num_stories]:
+        story_response = httpx.get(f'https://hacker-news.firebaseio.com/v0/item/{story_id}.json')
+        story = story_response.json()
+        if "text" in story:
+            story.pop("text", None)
+        stories.append(story)
+    return json.dumps(stories)
+
+agent = Agent(tools=[get_top_hackernews_stories], markdown=True)
+agent.print_response("Summarize the top 5 stories on hackernews?", stream=True)
+```
+
+## 在工具中访问内置参数
+
+Agno 自动向您的工具函数注入一些内置参数，因此您可以轻松地在工具中访问重要信息和对象。
+
+这些内置参数是：
+- `run_context`：运行上下文对象，您可以从中访问会话状态、依赖项、元数据等。
+- `agent`：智能体对象。
+- `team`：团队对象。
+- `images`：图像对象。
+- `videos`：视频对象。
+- `audio`：音频对象。
+- `files`：文件对象。
+
+例如，要在工具中访问智能体，您可以这样做：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+def get_agent_model(agent: Agent) -> str:
+    """Get the model of the agent."""
+    return agent.model.id
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[get_agent_model],
+)
+
+agent.print_response("What is the model of the agent?", stream=True)
+```
+
+有关 `run_context`、`agent`、`team` 和媒体参数的更多详细信息，请参阅 [工具内置参数](/basics/tools/overview#tool-built-in-parameters)。
+
+## @tool 装饰器的魔力
+
+要修改工具的行为，请使用 `@tool` 装饰器。一些值得注意的功能：
+
+- `requires_confirmation=True`：执行前需要用户确认。
+- `requires_user_input=True`：执行前需要用户输入。使用 `user_input_fields` 指定哪些字段需要用户输入。
+- `external_execution=True`：工具将在智能体控制之外执行。
+- `show_result=True`：在智能体的响应中显示工具调用的输出，默认为 `True`。没有此标志，工具调用的结果将发送给模型进行进一步处理。
+- `stop_after_tool_call=True`：在工具调用后停止智能体运行。
+- `tool_hooks`：在此工具调用前后运行自定义逻辑。
+- `cache_results=True`：缓存工具结果以避免重复相同的调用。使用 `cache_dir` 和 `cache_ttl` 配置缓存。
+
+这是一个在 `@tool` 装饰器上使用许多可能参数的示例。
+
+```python advanced_tool.py
+import httpx
+from agno.agent import Agent
+from agno.tools import tool
+from typing import Any, Callable, Dict
+
+def logger_hook(function_name: str, function_call: Callable, arguments: Dict[str, Any]):
+    """Hook function that wraps the tool execution"""
+    print(f"About to call {function_name} with arguments: {arguments}")
+    result = function_call(**arguments)
+    print(f"Function call completed with result: {result}")
+    return result
+
+@tool(
+    name="fetch_hackernews_stories",                # Custom name for the tool (otherwise the function name is used)
+    description="Get top stories from Hacker News",  # Custom description (otherwise the function docstring is used)
+    stop_after_tool_call=True,                      # Return the result immediately after the tool call and stop the agent
+    tool_hooks=[logger_hook],                       # Hook to run before and after execution
+    requires_confirmation=True,                     # Requires user confirmation before execution
+    cache_results=True,                             # Enable caching of results
+    cache_dir="/tmp/agno_cache",                    # Custom cache directory
+    cache_ttl=3600                                  # Cache TTL in seconds (1 hour)
+)
+def get_top_hackernews_stories(num_stories: int = 5) -> str:
+    """
+    Fetch the top stories from Hacker News.
+
+    Args:
+        num_stories: Number of stories to fetch (default: 5)
+
+    Returns:
+        str: The top stories in text format
+    """
+    # Fetch top story IDs
+    response = httpx.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+    story_ids = response.json()
+
+    # Get story details
+    stories = []
+    for story_id in story_ids[:num_stories]:
+        story_response = httpx.get(f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json")
+        story = story_response.json()
+        stories.append(f"{story.get('title')} - {story.get('url', 'No URL')}")
+
+    return "\n".join(stories)
+
+agent = Agent(tools=[get_top_hackernews_stories])
+agent.print_response("Show me the top news from Hacker News")
+```
+
+有关更多详细信息，请参阅 [@tool 装饰器参考](/reference/tools/decorator)。

@@ -1,0 +1,194 @@
+---
+title: "捕获团队响应作为变量"
+sidebarTitle: 响应作为变量
+description: 这个示例演示了如何将团队响应捕获为变量并使用 Pydantic 模型验证它们。
+---
+
+它展示了一个路由团队，用于分析股票和公司新闻，并为不同类型的查询提供结构化响应。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch response_as_variable.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python response_as_variable.py
+    """
+    这个示例演示了如何将团队响应捕获为变量。
+
+    展示了如何从团队获取结构化响应，并使用 Pydantic 模型
+    验证不同类型的查询。
+    """
+
+    from typing import Iterator  # noqa
+    from pydantic import BaseModel
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+    from agno.utils.pprint import pprint_run_response
+    from agno.tools.exa import ExaTools
+
+    class StockAnalysis(BaseModel):
+        """Stock analysis data structure."""
+
+        symbol: str
+        company_name: str
+        analysis: str
+
+
+    class CompanyAnalysis(BaseModel):
+        """Company analysis data structure."""
+
+        company_name: str
+        analysis: str
+
+
+    # 股价分析智能体
+    stock_searcher = Agent(
+        name="股票搜索器",
+        model=OpenAIChat("gpt-5-mini"),
+        output_schema=StockAnalysis,
+        role="搜索股价和分析师信息",
+        tools=[
+            ExaTools(
+                include_domains=["cnbc.com", "reuters.com", "bloomberg.com", "wsj.com"],
+                text=False,
+                show_results=True,
+                highlights=False,
+            )
+        ],
+        instructions=[
+            "提供详细的股价分析和价格信息",
+            "在可用时包含分析师建议",
+        ],
+    )
+
+    # 公司新闻和信息智能体
+    company_info_agent = Agent(
+        name="公司信息搜索器",
+        model=OpenAIChat("gpt-5-mini"),
+        role="搜索公司新闻和信息",
+        output_schema=CompanyAnalysis,
+        tools=[
+            ExaTools(
+                include_domains=["cnbc.com", "reuters.com", "bloomberg.com", "wsj.com"],
+                text=False,
+                show_results=True,
+                highlights=False,
+            )
+        ],
+        instructions=[
+            "专注于公司新闻和商业信息",
+            "提供公司发展的全面分析",
+        ],
+    )
+
+    # 创建路由团队
+    team = Team(
+        name="股票研究团队",
+        model=OpenAIChat("gpt-5-mini"),
+        members=[stock_searcher, company_info_agent],
+        respond_directly=True,
+        markdown=True,
+        show_members_responses=True,
+        instructions=[
+            "将股价问题路由给股票搜索器",
+            "将公司新闻和信息问题路由给公司信息搜索器",
+        ],
+    )
+
+    # 示例 1：获取股价分析作为变量
+    print("=" * 50)
+    print("股价分析")
+    print("=" * 50)
+
+    stock_response = team.run("What is the current stock price of NVDA?")
+    assert isinstance(stock_response.content, StockAnalysis)
+    print(f"响应类型： {type(stock_response.content)}")
+    print(f"Symbol: {stock_response.content.symbol}")
+    print(f"Company: {stock_response.content.company_name}")
+    print(f"Analysis: {stock_response.content.analysis}")
+    pprint_run_response(stock_response)
+
+    # 示例 2：获取公司新闻分析作为变量
+    print("\n" + "=" * 50)
+    print("公司新闻分析")
+    print("=" * 50)
+
+    news_response = team.run("What is in the news about NVDA?")
+    assert isinstance(news_response.content, CompanyAnalysis)
+    print(f"响应类型： {type(news_response.content)}")
+    print(f"Company: {news_response.content.company_name}")
+    print(f"Analysis: {news_response.content.analysis}")
+    pprint_run_response(news_response)
+
+    # 示例 3：处理多个响应
+    print("\n" + "=" * 50)
+    print("批量处理")
+    print("=" * 50)
+
+    companies = ["AAPL", "GOOGL", "MSFT"]
+    responses = []
+
+    for company in companies:
+        response = team.run(f"Analyze {company} stock")
+        responses.append(response)
+        print(f"Processed {company}: {type(response.content).__name__}")
+
+    print(f"处理的响应总数： {len(responses)}")
+    ```
+
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno openai exa_py
+    ```
+  </Step>
+
+  <Step title="设置您的 API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+export EXA_API_KEY="your_exa_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+$Env:EXA_API_KEY="your_exa_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python response_as_variable.py
+    ```
+    
+    ```bash Windows
+    python response_as_variable.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/basic_flows" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+
+
+
+

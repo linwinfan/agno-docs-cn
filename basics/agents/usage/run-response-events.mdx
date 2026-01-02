@@ -1,0 +1,90 @@
+---
+title: 运行响应事件
+---
+
+此示例演示如何在智能体运行流式传输期间处理不同类型的事件。它展示如何捕获和处理内容事件、工具调用开始事件和工具调用完成事件。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch run_response_events.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python run_response_events.py
+    from typing import Iterator, List
+
+    from agno.agent import (
+        Agent,
+        RunContentEvent,
+        RunOutputEvent,
+        ToolCallCompletedEvent,
+        ToolCallStartedEvent,
+    )
+    from agno.models.anthropic import Claude
+    from agno.tools.duckduckgo import DuckDuckGoTools
+
+    agent = Agent(
+        model=Claude(id="claude-sonnet-4-20250514"),
+        tools=[DuckDuckGoTools()],
+        markdown=True,
+    )
+    run_response: Iterator[RunOutputEvent] = agent.run(
+        "美国和加拿大正在发生什么？", stream=True
+    )
+
+    response: List[str] = []
+    for chunk in run_response:
+        if isinstance(chunk, RunContentEvent):
+            response.append(chunk.content)  # type: ignore
+        elif isinstance(chunk, ToolCallStartedEvent):
+            response.append(
+                f"工具调用开始：{chunk.tool.tool_name}，参数：{chunk.tool.tool_args}"  # type: ignore
+            )
+        elif isinstance(chunk, ToolCallCompletedEvent):
+            response.append(
+                f"工具调用完成：{chunk.tool.tool_name}，结果：{chunk.tool.result}"  # type: ignore
+            )
+
+    print("\n".join(response))
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno anthropic ddgs
+    ```
+  </Step>
+
+  <Step title="导出您的 Anthropic API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python run_response_events.py
+    ```
+
+    ```bash Windows
+    python run_response_events.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

@@ -1,0 +1,759 @@
+---
+title: 自定义中间件
+sidebarTitle: 自定义
+description: 在 AgentOS 中创建自定义中间件，用于速率限制、日志记录、安全和监控
+keywords: [自定义中间件, fastapi 中间件, starlette 中间件, 速率限制, 请求日志, 安全头部, 中间件模式, basehttpmiddleware, 请求监控, 响应头部, 错误处理, 请求 id, cors 中间件]
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.1.0" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.1.0">v2.1.0</Tooltip>
+</Badge>
+
+每个中间件包装您的应用程序以拦截请求和响应，使您能够实现身份验证、日志记录和速率限制等跨领域关注点。
+
+AgentOS 支持任何 [FastAPI/Starlette 中间件](https://fastapi.tiangolo.com/tutorial/middleware/)。您可以创建自定义中间件用于日志记录、速率限制、监控、安全等。
+
+## 创建自定义中间件
+
+AgentOS 中的中间件遵循 FastAPI/Starlette 模式，使用 `BaseHTTPMiddleware`。
+
+查看以下常见的中间件示例：
+<CodeGroup>
+    ```python 速率限制
+    """ 速率限制中间件，限制每个 IP 地址的请求数量 """
+    import time
+    from collections import defaultdict, deque
+    from fastapi import Request
+    from fastapi.responses import JSONResponse
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    class RateLimitMiddleware(BaseHTTPMiddleware):
+        def __init__(self, app, requests_per_minute: int = 60):
+            super().__init__(app)
+            self.requests_per_minute = requests_per_minute
+            self.request_history = defaultdict(lambda: deque())
+
+        async def dispatch(self, request: Request, call_next):
+            client_ip = request.client.host if request.client else "unknown"
+            current_time = time.time()
+            
+            # 清理旧请求
+            history = self.request_history[client_ip]
+            while history and current_time - history[0] > 60:
+                history.popleft()
+            
+            # 检查速率限制
+            if len(history) >= self.requests_per_minute:
+                return JSONResponse(
+                    status_code=429,
+                    content={"detail": "速率限制超出"}
+                )
+            
+            # 记录当前请求
+            history.append(current_time)
+            
+            # 继续处理请求
+            response = await call_next(request)
+            return response
+    ```
+
+    ```python 请求日志
+    """ 请求日志中间件，记录所有 HTTP 请求的详细信息 """
+    import time
+    import logging
+    from fastapi import Request
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    class RequestLoggingMiddleware(BaseHTTPMiddleware):
+        def __init__(self, app, log_level: str = "INFO"):
+            super().__init__(app)
+            self.log_level = log_level
+            self.logger = logging.getLogger(__name__)
+            
+        async def dispatch(self, request: Request, call_next):
+            start_time = time.time()
+            
+            # 记录请求开始
+            self.logger.log(
+                self.log_level,
+                f"请求开始: {request.method} {request.url.path} "
+                f"来自 {request.client.host if request.client else 'unknown'}"
+            )
+            
+            try:
+                response = await call_next(request)
+                
+                # 记录请求完成
+                processing_time = time.time() - start_time
+                self.logger.log(
+                    self.log_level,
+                    f"请求完成: {request.method} {request.url.path} "
+                    f"状态码: {response.status_code} "
+                    f"处理时间: {processing_time:.3f}s"
+                )
+                
+                return response
+                
+            except Exception as e:
+                # 记录请求错误
+                processing_time = time.time() - start_time
+                self.logger.error(
+                    f"请求失败: {request.method} {request.url.path} "
+                    f"错误: {str(e)} "
+                    f"处理时间: {processing_time:.3f}s"
+                )
+                raise
+    ```
+
+    ```python 安全头部
+    """ 安全头部中间件，添加重要的安全 HTTP 头部 """
+    from fastapi import Request, Response
+    from fastapi.responses import JSONResponse
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+        def __init__(self, app):
+            super().__init__(app)
+            self.security_headers = {
+                "X-Content-Type-Options": "nosniff",
+                "X-Frame-Options": "DENY",
+                "X-XSS-Protection": "1; mode=block",
+                "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+                "Content-Security-Policy": "default-src 'self'",
+                "Referrer-Policy": "strict-origin-when-cross-origin"
+            }
+
+        async def dispatch(self, request: Request, call_next):
+            response = await call_next(request)
+            
+            # 添加安全头部
+            for header, value in self.security_headers.items():
+                response.headers[header] = value
+            
+            return response
+    ```
+</CodeGroup>
+
+## 高级中间件模式
+
+### 1. 请求追踪中间件
+
+```python
+import uuid
+import time
+from typing import Dict, Any
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class RequestTracingMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, enable_tracing: bool = True):
+        super().__init__(app)
+        self.enable_tracing = enable_tracing
+        self.traces: Dict[str, Dict[str, Any]] = {}
+    
+    async def dispatch(self, request: Request, call_next):
+        if not self.enable_tracing:
+            return await call_next(request)
+        
+        # 生成唯一请求 ID
+        request_id = str(uuid.uuid4())
+        start_time = time.time()
+        
+        # 添加请求 ID 到请求状态
+        request.state.request_id = request_id
+        request.state.start_time = start_time
+        
+        # 创建追踪记录
+        trace = {
+            "request_id": request_id,
+            "method": request.method,
+            "url": str(request.url),
+            "headers": dict(request.headers),
+            "client_ip": request.client.host if request.client else "unknown",
+            "start_time": start_time,
+            "spans": []
+        }
+        
+        self.traces[request_id] = trace
+        
+        try:
+            # 添加开始跨度
+            self.add_span(request_id, "middleware_start", "请求进入中间件链")
+            
+            response = await call_next(request)
+            
+            # 记录响应信息
+            end_time = time.time()
+            processing_time = end_time - start_time
+            
+            trace["end_time"] = end_time
+            trace["processing_time"] = processing_time
+            trace["status_code"] = response.status_code
+            trace["response_headers"] = dict(response.headers)
+            
+            # 添加结束跨度
+            self.add_span(request_id, "middleware_end", "请求完成中间件链")
+            
+            # 添加追踪头部到响应
+            response.headers["X-Request-ID"] = request_id
+            response.headers["X-Processing-Time"] = f"{processing_time:.3f}"
+            
+            return response
+            
+        except Exception as e:
+            # 记录错误信息
+            end_time = time.time()
+            processing_time = end_time - start_time
+            
+            trace["end_time"] = end_time
+            trace["processing_time"] = processing_time
+            trace["error"] = str(e)
+            trace["error_time"] = end_time
+            
+            self.add_span(request_id, "error", f"请求处理失败: {str(e)}")
+            
+            raise
+    
+    def add_span(self, request_id: str, name: str, description: str):
+        """添加追踪跨度"""
+        if request_id in self.traces:
+            self.traces[request_id]["spans"].append({
+                "name": name,
+                "description": description,
+                "timestamp": time.time()
+            })
+    
+    def get_trace(self, request_id: str) -> Dict[str, Any]:
+        """获取追踪记录"""
+        return self.traces.get(request_id, {})
+    
+    def cleanup_old_traces(self, max_age_seconds: int = 3600):
+        """清理旧的追踪记录"""
+        current_time = time.time()
+        old_traces = [
+            trace_id for trace_id, trace in self.traces.items()
+            if current_time - trace.get("end_time", 0) > max_age_seconds
+        ]
+        
+        for trace_id in old_traces:
+            del self.traces[trace_id]
+```
+
+### 2. API 密钥认证中间件
+
+```python
+import hashlib
+import hmac
+from fastapi import Request, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class APIKeyAuthMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, api_keys: list[str], header_name: str = "X-API-Key"):
+        super().__init__(app)
+        self.valid_api_keys = set(api_keys)
+        self.header_name = header_name
+    
+    async def dispatch(self, request: Request, call_next):
+        # 检查 API 密钥
+        api_key = request.headers.get(self.header_name)
+        
+        if not api_key:
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "缺少 API 密钥"}
+            )
+        
+        # 验证 API 密钥
+        if not self.verify_api_key(api_key):
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "无效的 API 密钥"}
+            )
+        
+        # 添加用户信息到请求状态
+        request.state.api_key = api_key
+        request.state.authenticated = True
+        
+        response = await call_next(request)
+        return response
+    
+    def verify_api_key(self, api_key: str) -> bool:
+        """验证 API 密钥"""
+        # 这里可以实现更复杂的验证逻辑
+        # 例如：数据库查询、哈希验证等
+        return api_key in self.valid_api_keys
+    
+    def add_api_key(self, api_key: str):
+        """添加新的 API 密钥"""
+        self.valid_api_keys.add(api_key)
+    
+    def remove_api_key(self, api_key: str):
+        """移除 API 密钥"""
+        self.valid_api_keys.discard(api_key)
+```
+
+### 3. 动态 CORS 中间件
+
+```python
+from typing import List, Optional
+from fastapi import Request, Response
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response as StarletteResponse
+
+class DynamicCORSMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app):
+        super().__init__(app)
+        self.allowed_origins = set()
+        self.allowed_methods = set(["GET", "POST", "PUT", "DELETE"])
+        self.allowed_headers = set(["*"])
+        self.exposed_headers = set()
+    
+    async def dispatch(self, request: Request, call_next):
+        origin = request.headers.get("Origin")
+        
+        # 如果没有 Origin 头部或预检请求，跳过 CORS 处理
+        if not origin or request.method == "OPTIONS":
+            return await call_next(request)
+        
+        # 检查是否允许该源
+        if origin not in self.allowed_origins:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "CORS 策略不允许此源"}
+            )
+        
+        # 处理预检请求
+        if request.method == "OPTIONS":
+            response = StarletteResponse(
+                status_code=200,
+                headers={
+                    "Access-Control-Allow-Origin": origin,
+                    "Access-Control-Allow-Methods": ", ".join(self.allowed_methods),
+                    "Access-Control-Allow-Headers": ", ".join(self.allowed_headers),
+                    "Access-Control-Max-Age": "86400"
+                }
+            )
+            return response
+        
+        # 处理实际请求
+        response = await call_next(request)
+        
+        # 添加 CORS 头部到响应
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        
+        if self.exposed_headers:
+            response.headers["Access-Control-Expose-Headers"] = ", ".join(self.exposed_headers)
+        
+        return response
+    
+    def add_allowed_origin(self, origin: str):
+        """添加允许的源"""
+        self.allowed_origins.add(origin)
+    
+    def remove_allowed_origin(self, origin: str):
+        """移除允许的源"""
+        self.allowed_origins.discard(origin)
+    
+    def set_allowed_methods(self, methods: List[str]):
+        """设置允许的方法"""
+        self.allowed_methods = set(methods)
+    
+    def set_allowed_headers(self, headers: List[str]):
+        """设置允许的头部"""
+        self.allowed_headers = set(headers)
+```
+
+## 中间件组合和链式处理
+
+### 1. 中间件链管理器
+
+```python
+from typing import List, Callable
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class MiddlewareChain:
+    def __init__(self):
+        self.middlewares: List[BaseHTTPMiddleware] = []
+    
+    def add(self, middleware: BaseHTTPMiddleware) -> "MiddlewareChain":
+        """添加中间件到链中"""
+        self.middlewares.append(middleware)
+        return self
+    
+    def build(self) -> Callable[[Request, Callable], Response]:
+        """构建中间件链"""
+        if not self.middlewares:
+            return lambda request, call_next: call_next(request)
+        
+        # 从后往前构建链
+        chain = self.middlewares[-1]
+        
+        for middleware in reversed(self.middlewares[:-1]):
+            chain = self._wrap_middleware(middleware, chain)
+        
+        return chain
+    
+    def _wrap_middleware(self, middleware: BaseHTTPMiddleware, next_handler: Callable) -> Callable:
+        """包装中间件"""
+        async def wrapped_handler(request: Request, call_next):
+            # 临时替换中间件的 dispatch 方法
+            original_dispatch = middleware.dispatch
+            middleware.dispatch = lambda req, next_call: original_dispatch(req, next_call)
+            return await next_handler(request, call_next)
+        
+        return wrapped_handler
+
+# 使用中间件链
+chain = MiddlewareChain()
+chain.add(RateLimitMiddleware(requests_per_minute=100))
+chain.add(RequestLoggingMiddleware(log_level="INFO"))
+chain.add(SecurityHeadersMiddleware())
+
+# 应用到 AgentOS
+agent_os = AgentOS(
+    agents=[agent],
+    middleware=[chain.build()]
+)
+```
+
+### 2. 条件中间件
+
+```python
+from typing import Optional, Callable
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class ConditionalMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, condition: Callable[[Request], bool], middleware: BaseHTTPMiddleware):
+        super().__init__(app)
+        self.condition = condition
+        self.middleware = middleware
+    
+    async def dispatch(self, request: Request, call_next):
+        # 检查条件
+        if self.condition(request):
+            return await self.middleware.dispatch(request, call_next)
+        else:
+            return await call_next(request)
+
+# 使用条件中间件
+# 只对 API 路由启用速率限制
+def is_api_route(request: Request) -> bool:
+    return request.url.path.startswith("/api/")
+
+api_rate_limiter = ConditionalMiddleware(
+    app, 
+    condition=is_api_route,
+    middleware=RateLimitMiddleware(requests_per_minute=100)
+)
+```
+
+## 性能优化中间件
+
+### 1. 缓存中间件
+
+```python
+import hashlib
+import json
+from typing import Dict, Any, Optional
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class CacheMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, cache_ttl: int = 300, max_cache_size: int = 1000):
+        super().__init__(app)
+        self.cache_ttl = cache_ttl
+        self.max_cache_size = max_cache_size
+        self.cache: Dict[str, Dict[str, Any]] = {}
+        self.cache_order = []
+    
+    def _generate_cache_key(self, request: Request) -> str:
+        """生成缓存键"""
+        # 包含方法和路径，忽略查询参数
+        key_data = f"{request.method}:{request.url.path}"
+        return hashlib.md5(key_data.encode()).hexdigest()
+    
+    def _is_cacheable(self, request: Request, response: Response) -> bool:
+        """判断是否可以缓存"""
+        # 只缓存 GET 请求
+        if request.method != "GET":
+            return False
+        
+        # 只缓存成功响应
+        if response.status_code != 200:
+            return False
+        
+        # 检查缓存控制头部
+        cache_control = response.headers.get("Cache-Control", "")
+        if "no-cache" in cache_control or "private" in cache_control:
+            return False
+        
+        return True
+    
+    async def dispatch(self, request: Request, call_next):
+        cache_key = self._generate_cache_key(request)
+        current_time = time.time()
+        
+        # 检查缓存
+        cached_item = self.cache.get(cache_key)
+        if cached_item and (current_time - cached_item["timestamp"]) < self.cache_ttl:
+            # 返回缓存的响应
+            return Response(
+                content=cached_item["content"],
+                status_code=cached_item["status_code"],
+                headers=cached_item["headers"],
+                media_type=cached_item["media_type"]
+            )
+        
+        # 处理请求
+        response = await call_next(request)
+        
+        # 缓存响应
+        if self._is_cacheable(request, response):
+            await self._cache_response(cache_key, response)
+        
+        return response
+    
+    async def _cache_response(self, cache_key: str, response: Response):
+        """缓存响应"""
+        # 如果缓存已满，删除最旧的项
+        if len(self.cache) >= self.max_cache_size:
+            oldest_key = self.cache_order.pop(0)
+            del self.cache[oldest_key]
+        
+        # 添加到缓存
+        self.cache[cache_key] = {
+            "content": response.body,
+            "status_code": response.status_code,
+            "headers": dict(response.headers),
+            "media_type": response.media_type,
+            "timestamp": time.time()
+        }
+        self.cache_order.append(cache_key)
+    
+    def clear_cache(self):
+        """清空缓存"""
+        self.cache.clear()
+        self.cache_order.clear()
+    
+    def invalidate_cache(self, pattern: str):
+        """根据模式失效缓存"""
+        import re
+        keys_to_remove = [
+            key for key in self.cache.keys() 
+            if re.match(pattern, key)
+        ]
+        
+        for key in keys_to_remove:
+            del self.cache[key]
+            if key in self.cache_order:
+                self.cache_order.remove(key)
+```
+
+### 2. 压缩中间件
+
+```python
+import gzip
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response as StarletteResponse
+
+class CompressionMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, minimum_size: int = 1024):
+        super().__init__(app)
+        self.minimum_size = minimum_size
+        self.compressible_types = {
+            "application/json",
+            "text/html",
+            "text/css",
+            "text/javascript",
+            "text/plain",
+            "application/xml"
+        }
+    
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        
+        # 检查是否应该压缩
+        if self._should_compress(request, response):
+            # 压缩响应体
+            compressed_body = self._compress_body(response.body)
+            
+            # 创建新的响应对象
+            compressed_response = StarletteResponse(
+                content=compressed_body,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+                media_type=response.media_type
+            )
+            
+            # 添加压缩头部
+            compressed_response.headers["Content-Encoding"] = "gzip"
+            compressed_response.headers["Content-Length"] = str(len(compressed_body))
+            
+            return compressed_response
+        
+        return response
+    
+    def _should_compress(self, request: Request, response: Response) -> bool:
+        """判断是否应该压缩"""
+        # 检查响应大小
+        if len(response.body) < self.minimum_size:
+            return False
+        
+        # 检查内容类型
+        content_type = response.media_type
+        if content_type not in self.compressible_types:
+            return False
+        
+        # 检查客户端是否支持压缩
+        accept_encoding = request.headers.get("Accept-Encoding", "")
+        if "gzip" not in accept_encoding:
+            return False
+        
+        return True
+    
+    def _compress_body(self, body: bytes) -> bytes:
+        """压缩响应体"""
+        return gzip.compress(body)
+```
+
+## 测试中间件
+
+### 1. 中间件测试工具
+
+```python
+import pytest
+from fastapi.testclient import TestClient
+from starlette.testclient import TestClient as StarletteTestClient
+
+class MiddlewareTestHelper:
+    def __init__(self, app):
+        self.client = TestClient(app)
+    
+    def test_rate_limiting(self, middleware_class):
+        """测试速率限制中间件"""
+        app = FastAPI()
+        app.add_middleware(middleware_class, requests_per_minute=2)
+        
+        @app.get("/test")
+        async def test_endpoint():
+            return {"message": "测试成功"}
+        
+        client = TestClient(app)
+        
+        # 测试正常请求
+        response1 = client.get("/test")
+        assert response1.status_code == 200
+        
+        # 快速连续请求应该被限制
+        response2 = client.get("/test")
+        assert response2.status_code == 429
+    
+    def test_request_logging(self, middleware_class):
+        """测试请求日志中间件"""
+        app = FastAPI()
+        app.add_middleware(middleware_class, log_level="INFO")
+        
+        @app.get("/test")
+        async def test_endpoint():
+            return {"message": "测试成功"}
+        
+        client = TestClient(app)
+        
+        # 检查日志记录（需要配置日志捕获）
+        response = client.get("/test")
+        assert response.status_code == 200
+        assert response.json() == {"message": "测试成功"}
+    
+    def test_security_headers(self, middleware_class):
+        """测试安全头部中间件"""
+        app = FastAPI()
+        app.add_middleware(middleware_class)
+        
+        @app.get("/test")
+        async def test_endpoint():
+            return {"message": "测试成功"}
+        
+        client = TestClient(app)
+        
+        response = client.get("/test")
+        assert response.status_code == 200
+        
+        # 检查安全头部
+        assert "X-Content-Type-Options" in response.headers
+        assert "X-Frame-Options" in response.headers
+        assert "X-XSS-Protection" in response.headers
+
+# 使用测试工具
+test_helper = MiddlewareTestHelper()
+test_helper.test_rate_limiting(RateLimitMiddleware)
+test_helper.test_request_logging(RequestLoggingMiddleware)
+test_helper.test_security_headers(SecurityHeadersMiddleware)
+```
+
+## 最佳实践
+
+### 1. 中间件设计原则
+
+- **单一职责**: 每个中间件只处理一个特定功能
+- **可配置性**: 提供灵活的配置选项
+- **可测试性**: 编写单元测试验证中间件行为
+- **性能考虑**: 避免阻塞操作，使用异步处理
+
+### 2. 错误处理
+
+- **优雅降级**: 在中间件失败时提供备用方案
+- **详细日志**: 记录详细的错误信息用于调试
+- **异常传播**: 正确处理异常传播
+- **用户友好**: 提供用户友好的错误消息
+
+### 3. 安全考虑
+
+- **输入验证**: 验证所有输入数据
+- **输出过滤**: 过滤敏感信息
+- **访问控制**: 实施适当的访问控制
+- **审计日志**: 记录重要的安全事件
+
+## 故障排除
+
+### 常见问题
+
+#### 中间件不生效
+
+**问题**: 中间件没有按预期工作
+**解决方案**:
+1. 检查中间件添加顺序
+2. 验证中间件是否正确注册
+3. 测试中间件独立功能
+4. 检查路由配置
+
+#### 性能问题
+
+**问题**: 中间件导致响应变慢
+**解决方案**:
+1. 分析中间件执行时间
+2. 优化慢速操作
+3. 使用缓存策略
+4. 考虑异步处理
+
+#### 认证失败
+
+**问题**: 身份验证中间件认证失败
+**解决方案**:
+1. 检查认证配置
+2. 验证令牌格式
+3. 确认时钟同步
+4. 检查权限设置
+
+## 下一步
+
+- 查看[JWT 中间件](/agent-os/middleware/jwt)
+- 了解[安全功能](/agent-os/security)
+- 探索[AgentOS 配置](/agent-os/config)
+- 查看[AgentOS API](/agent-os/api)

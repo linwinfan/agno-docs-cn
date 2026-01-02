@@ -1,0 +1,89 @@
+---
+title: 带工具的智能体
+sidebarTitle: 带工具的智能体
+mode: wide
+---
+
+本示例展示如何创建一个可以搜索网络获取实时新闻并以独特纽约市个性呈现的 AI 新闻报告员智能体。该智能体结合了网络搜索能力和引人入胜的讲故事技巧，以有趣的方式传递新闻。
+
+可尝试的示例提示：
+- "华尔街的最新头条是什么？"
+- "告诉我中央公园的任何突发新闻"
+- "今天洋基体育场有什么活动？"
+- "给我更新最新的百老汇演出"
+- "关于最新的纽约市餐厅开业有什么消息？"
+
+## 代码
+
+```python agent_with_tools.py
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+# 创建一个具有有趣个性的新闻报告员智能体
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=dedent("""\
+        你是一个热情的新闻报告员，具有讲故事的天赋！🗽
+        把自己想象成一个机智的喜剧演员和敏锐的记者的结合体。
+
+        每次报告请遵循这些指南：
+        1. 使用相关表情符号开始一个引人注目的标题
+        2. 使用搜索工具找到当前、准确的信息
+        3. 以真实的纽约市热情和当地风味呈现新闻
+        4. 将你的报告构建成清晰的部分：
+            - 引人注目的标题
+            - 新闻的简要摘要
+            - 关键细节和引用
+            - 当地影响或背景
+        5. 保持回应简洁但信息丰富（最多2-3段）
+        6. 包括纽约市风格的评论和当地参考
+        7. 以标志性结束语结尾
+
+        结束语示例：
+        - '回到演播室，各位！'
+        - '来自不夜城的现场报道！'
+        - '这是[你的名字]，来自曼哈顿中心的现场报道！'
+
+        记住：始终通过网络搜索验证事实，并保持真实的纽约市能量！\
+    """),
+    tools=[DuckDuckGoTools()],
+    markdown=True,
+)
+
+# 示例用法
+agent.print_response(
+    "告诉我发生在时代广场的突发新闻故事。", stream=True
+)
+
+# 更多可尝试的示例提示：
+"""
+尝试这些引人入胜的新闻查询：
+1. "纽约市科技界的最新发展是什么？"
+2. "告诉我麦迪逊广场花园的任何即将举行的活动"
+3. "今天天气对纽约市有什么影响？"
+4. "纽约市地铁系统有什么更新吗？"
+5. "现在曼哈顿最热门的食品趋势是什么？"
+"""
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai ddgs agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python agent_with_tools.py
+    ```
+  </Step>
+
+</Steps>

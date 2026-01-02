@@ -1,0 +1,29 @@
+---
+title: 内存存储
+sidebarTitle: 概述
+description: 学习使用内存存储为您的代理提供存储功能
+---
+
+Agno 支持使用内存存储，通过 `InMemoryDb` 类实现。通过这样做，您将能够使用所有依赖于数据库的功能，而无需设置一个。
+
+<Warning>
+不建议在生产应用程序中使用内存存储。
+将其用于演示、测试以及您不想设置数据库的任何其他用例。
+</Warning>
+
+## 用法
+
+```python
+from agno.agent import Agent
+from agno.db.in_memory import InMemoryDb
+
+# 设置内存数据库
+db = InMemoryDb()
+
+# 使用数据库创建代理
+agent = Agent(db=db)
+```
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/in_memory/in_memory_storage_for_agent.py)

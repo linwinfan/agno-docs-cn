@@ -1,0 +1,42 @@
+---
+title: OpenAI-兼容 模型s
+sidebarTitle: Use OpenAI-兼容 模型s
+description: Learn how to use any OpenAI-like 兼容 endpoint with Agno
+---
+
+Many 提供商s support the OpenAI API format. Use the `OpenAILike` 模型 to access them by replacing the `base_url`.
+
+## Example
+
+<CodeGroup>
+
+```python agent.py
+from os import getenv
+from agno.agent import Agent
+from agno.models.openai.like import OpenAILike
+
+agent = Agent(
+    model=OpenAILike(
+        id="mistralai/Mixtral-8x7B-Instruct-v0.1",
+        api_key=getenv("TOGETHER_API_KEY"),
+        base_url="https://api.together.xyz/v1",
+    )
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+## Parameters
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"gpt-4o-mini"`                | The id of the 模型 to use                                            |
+| `name`       | `str`              | `"OpenAILike"`                 | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"OpenAILike"`                 | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for the 服务 (defaults to OPENAI_API_KEY env var)     |
+| `base_url`   | `Optional[str]`    | `None`                         | The base URL for the API 服务                                      |
+
+`OpenAILike` extends the OpenAI-兼容 interface and 支持 all parameters from [OpenAIChat](/integrations/models/native/openai/completion/overview). Simply change the `base_url` and `api_key` to point to your preferred OpenAI-兼容 服务.

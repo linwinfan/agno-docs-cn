@@ -1,0 +1,63 @@
+---
+title: Together
+sidebarTitle: 概览
+description: Learn how to use Together with Agno.
+---
+
+Together is a 平台 for providing endpoints for Large Language 模型s.
+See their library of 模型s [here](https://www.together.ai/模型s).
+
+We recommend experimenting to find the best-suited 模型 for your use-case.
+
+Together have tier based rate limits. See the [docs](https://docs.together.ai/docs/rate-limits) for 更多功能 information.
+
+## Authentication
+
+Set your `TOGETHER_API_KEY` environment variable. Get your key [from Together here](https://api.together.xyz/settings/api-keys).
+
+<CodeGroup>
+
+```bash Mac
+export TOGETHER_API_KEY=***
+```
+
+```bash Windows
+setx TOGETHER_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Together` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.together import Together
+
+agent = Agent(
+    model=Together(id="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/together/usage/basic-stream). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                                       | Description                                                           |
+| ------------ | ------------------ | --------------------------------------------- | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"` | The id of the Together 模型 to use                                |
+| `name`       | `str`              | `"Together"`                                 | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Together"`                                 | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                                        | The API key for Together (defaults to TOGETHER_API_KEY env var)      |
+| `base_url`   | `str`              | `"https://api.together.xyz/v1"`              | The base URL for the Together API                                     |
+
+`Together` also 支持 the params of [OpenAI](/reference/models/openai).

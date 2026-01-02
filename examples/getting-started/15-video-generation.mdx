@@ -1,0 +1,92 @@
+---
+title: 视频生成
+---
+
+本示例展示如何创建使用 ModelsLabs 生成视频的 AI 智能体。
+您可以使用此智能体创建各种类型的短视频，从动画场景
+到创意视觉故事。
+
+尝试的示例提示：
+- "创建日落时海浪拍打海滩的宁静视频"
+- "生成蝴蝶在魔法森林中飞行的神奇视频"
+- "创建花园中花朵绽放的延时视频"
+- "生成北极光在夜空中舞动的视频"
+
+## 代码
+
+```python video_generation.py
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.models_labs import ModelsLabTools
+
+# 创建创意 AI 视频导演智能体
+video_agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[ModelsLabTools()],
+    description=dedent("""\
+        您是一位经验丰富的 AI 视频导演，在各种视频风格方面具有专业知识，
+        从自然场景到艺术动画。您对运动、
+        时间和通过视频内容进行视觉叙事有深刻的理解。\
+    """),
+    instructions=dedent("""\
+        作为 AI 视频导演，请遵循以下指导原则：
+        1. 仔细分析用户的请求以理解所需的风格和情绪
+        2. 在生成之前，用关于运动、时间和氛围的细节增强提示
+        3. 使用 `generate_media` 工具配合详细、精心制作的提示
+        4. 简要解释所做的创意选择
+        5. 如果请求不清楚，请求澄清风格偏好
+
+        视频将自动在您的响应下方的 UI 中显示。
+        始终致力于创建引人入胜且有意义的视频，将用户的愿景变为现实！\
+    """),
+    markdown=True,
+)
+
+# 示例用法
+video_agent.print_response(
+    "生成穿越彩色星云的宇宙之旅", stream=True
+)
+
+# 检索和显示生成的视频
+run_response = video_agent.get_last_run_output()
+if run_response and run_response.videos:
+    for video in run_response.videos:
+        print(f"生成的视频 URL：{video.url}")
+
+# 更多示例提示尝试：
+"""
+尝试这些创意提示：
+1. "创建宁静森林中秋叶飘落的视频"
+2. "生成猫玩球的视频"
+3. "创建有涟漪水的宁静锦鲤池塘视频"
+4. "生成有舞动火焰的舒适壁炉视频"
+5. "创建魔法领域中神秘门户开启的视频"
+"""
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai agno
+    ```
+  </Step>
+
+  <Step title="设置环境变量">
+    ```bash
+    export MODELS_LAB_API_KEY=****
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python video_generation.py
+    ```
+  </Step>
+
+</Steps>

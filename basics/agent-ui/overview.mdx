@@ -1,0 +1,195 @@
+---
+title: AgentUI
+sidebarTitle: AgentUI
+description: 为您的 AgentOS 提供的开源智能体界面
+keywords: [智能体界面, agentui, 智能体接口, 自托管界面, agno ui]
+---
+
+<Frame>
+  <img
+    height="200"
+    src="/images/agent-ui.png"
+    style={{ borderRadius: '8px' }}
+  />
+</Frame>
+
+Agno 为与您的智能体交互提供了一个美观的界面，完全开源，免费使用并可在其基础上构建。它是一个简单的界面，允许您与智能体聊天、查看它们的记忆、知识等。
+
+<Note>
+AgentOS 只使用您数据库中的数据。不会向 Agno 发送任何数据。
+</Note>
+
+开源智能体界面使用 Next.js 和 TypeScript 构建，是在 [AgentOS](https://github.com/agent-os/introduction) 成功后，应社区请求开发的用于自托管的替代方案。
+
+## 开始使用 Agent UI
+
+要克隆 Agent UI，请在终端中运行以下命令：
+
+```bash
+npx create-agent-ui@latest
+```
+
+输入 `y` 创建新项目，安装依赖项，然后使用以下命令运行 agent-ui：
+
+```bash
+cd agent-ui && npm run dev
+```
+
+打开 http://localhost:3000 查看 Agent UI，但记得连接到您的本地智能体。
+
+<Frame>
+  <img
+    height="200"
+    src="/images/agent-ui-homepage.png"
+    style={{ borderRadius: '8px' }}
+  />
+</Frame>
+
+<br />
+
+<Accordion title="手动克隆仓库" icon="github">
+
+您也可以手动克隆仓库
+
+```bash
+git clone https://github.com/agno-agi/agent-ui.git
+```
+
+并使用以下命令运行 agent-ui
+
+```bash
+cd agent-ui && pnpm install && pnpm dev
+```
+
+</Accordion>
+
+## 连接您的 AgentOS
+
+Agent UI 需要连接到 AgentOS 服务器，您可以在本地或任何云提供商上运行。
+
+让我们从本地 AgentOS 服务器开始。创建一个文件 `agentos.py`
+
+```python agentos.py
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.os import AgentOS
+from agno.db.sqlite import SqliteDb
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.yfinance import YFinanceTools
+
+agent_storage: str = "tmp/agents.db"
+
+web_agent = Agent(
+    name="Web Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+    instructions=["Always include sources"],
+    # 将智能体会话存储在 sqlite 数据库中
+    db=SqliteDb(db_file=agent_storage),
+    # 将当前日期和时间添加到上下文中
+    add_datetime_to_context=True,
+    # 将对话历史添加到消息中
+    add_history_to_context=True,
+    # 要添加到消息中的历史响应数量
+    num_history_runs=5,
+    # 为消息添加 markdown 格式
+    markdown=True,
+)
+
+finance_agent = Agent(
+    name="Finance Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[YFinanceTools()],
+    instructions=["Always use tables to display data"],
+    db=SqliteDb(db_file=agent_storage),
+    add_datetime_to_context=True,
+    add_history_to_context=True,
+    num_history_runs=5,
+    markdown=True,
+)
+
+agent_os = AgentOS(agents=[web_agent, finance_agent])
+app = agent_os.get_app()
+
+if __name__ == "__main__":
+    agent_os.serve("agentos:app", reload=True)
+```
+
+在另一个终端中，运行 AgentOS 服务器：
+
+<Steps>
+  <Step title="设置您的虚拟环境">
+
+    <CodeGroup>
+    ```bash Mac
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+    ```bash Windows
+    python3 -m venv aienv
+    aienv/scripts/activate
+    ```
+    </CodeGroup>
+
+  </Step>
+  <Step title="安装依赖项">
+
+    <CodeGroup>
+    ```bash Mac
+    pip install -U openai ddgs yfinance sqlalchemy 'fastapi[standard]' agno
+    ```
+
+    ```bash Windows
+    pip install -U openai ddgs yfinance sqlalchemy 'fastapi[standard]' agno
+    ```
+    </CodeGroup>
+
+  </Step>
+  <Step title="导出您的 OpenAI 密钥">
+
+    <CodeGroup>
+    ```bash Mac
+    export OPENAI_API_KEY=sk-***
+    ```
+
+    ```bash Windows
+    setx OPENAI_API_KEY sk-***
+    ```
+    </CodeGroup>
+
+  </Step>
+  <Step title="运行 AgentOS">
+
+    ```shell
+    python agentos.py
+    ```
+
+  </Step>
+</Steps>
+
+<Tip>确保 `agent_os.serve()` 中的模块路径与您的文件名匹配（例如，对于 `agentos.py`，使用 `"agentos:app"`）。</Tip>
+
+## 查看 AgentUI
+
+- 打开 http://localhost:3000 查看 Agent UI
+- 在左侧边栏输入 `localhost:7777` 端点，开始与您的智能体和团队聊天！
+
+<video
+  autoPlay
+  muted
+  controls
+  className="w-full aspect-video"
+  src="/videos/agent-ui-demo.mp4"
+></video>
+
+## 了解更多
+
+<CardGroup cols={2}>
+  <Card title="AgentOS 介绍" icon="server" href="/agent-os/introduction">
+    了解 AgentOS
+  </Card>
+  <Card title="构建智能体" icon="robot" href="/basics/agents/building-agents">
+    构建您自己的智能体
+  </Card>
+</CardGroup>

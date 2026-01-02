@@ -1,0 +1,336 @@
+---
+title: AgentOS 配置
+sidebarTitle: 配置
+description: 使用自定义配置自定义您的 AgentOS 实例
+keywords: [agentos 配置, agentOS config, yaml 配置, 快速提示, 显示名称, 配置文件, 数据库配置]
+---
+
+AgentOS 配置允许您为不同环境和部署方案自定义您的实例。
+
+您可以全局控制和每个域（用于评估）可用的 AI 模型，为 UI 页面设置自定义显示名称，定义聊天界面的"快速提示"，并配置每个数据库的设置。这在管理多个数据库、跨不同环境（开发、测试、生产）部署或构建多租户系统时特别有用，其中每个客户端需要不同的配置。
+
+<Note>
+配置"快速提示"对于改善 AgentOS 用户的聊天体验特别有用。
+
+它会更改用户在聊天页面上创建新会话时可用的选项。
+</Note>
+
+## 设置您的配置
+
+您可以通过两种方式提供 AgentOS 配置：使用配置 YAML 文件，或使用 `AgentOSConfig` 类。
+
+<Tip>
+查看 `AgentOSConfig` 类的完整参考[这里](/reference/agent-os/configuration)。
+</Tip>
+
+## 配置 YAML 文件
+
+1. 使用您的配置创建 YAML 文件。例如：
+
+```yaml
+# 为聊天界面配置快速提示（每个智能体）
+chat:
+  quick_prompts:
+    marketing-agent:
+      - "您可以做什么？"
+      - "我们最新的帖子表现如何？"
+      - "告诉我关于我们活跃的营销活动"
+
+# 使用自定义显示名称配置内存页面
+memory:
+  display_name: "用户内存存储"
+  dbs:
+    - db_id: db-0001
+      tables: ["custom_memory_table"]  # 可选：指定自定义表名
+      domain_config:
+        display_name: 主应用用户内存
+    - db_id: db-0002
+      domain_config:
+        display_name: 支持流程用户内存
+
+# 配置模型可用性
+models:
+  providers:
+    openai:
+      models:
+        - id: gpt-4o
+          display_name: GPT-4 Omni
+        - id: gpt-4o-mini
+          display_name: GPT-4 Omni Mini
+    anthropic:
+      models:
+        - id: claude-sonnet-4-5
+          display_name: Claude 3.5 Sonnet
+        - id: claude-haiku-3-5
+          display_name: Claude 3.5 Haiku
+
+# 配置显示名称
+display_names:
+  agent_os: "我的 AgentOS"
+  agent: "智能体"
+  team: "团队"
+  workflow: "工作流"
+  knowledge: "知识库"
+  session: "会话"
+  metrics: "指标"
+  monitor: "监控"
+```
+
+2. 在创建 AgentOS 实例时加载配置：
+
+```python
+from agno.os import AgentOS
+from agno.agent import Agent
+
+# 从 YAML 文件创建 AgentOS
+agent_os = AgentOS(config_file="agentos_config.yaml")
+```
+
+## AgentOSConfig 类
+
+或者，您可以使用 Python 类进行配置：
+
+```python
+from agno.os import AgentOS, AgentOSConfig
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 创建配置实例
+config = AgentOSConfig(
+    chat={
+        "quick_prompts": {
+            "marketing-agent": [
+                "您可以做什么？",
+                "我们的活动进展如何？",
+                "分析最新的营销数据"
+            ]
+        }
+    },
+    memory={
+        "display_name": "用户内存存储",
+        "dbs": [
+            {
+                "db_id": "db-0001",
+                "domain_config": {"display_name": "主应用用户内存"}
+            }
+        ]
+    },
+    models={
+        "providers": {
+            "openai": {
+                "models": [
+                    {"id": "gpt-4o", "display_name": "GPT-4 Omni"},
+                    {"id": "gpt-4o-mini", "display_name": "GPT-4 Omni Mini"}
+                ]
+            }
+        }
+    }
+)
+
+# 使用配置创建 AgentOS
+agent_os = AgentOS(config=config)
+agent = Agent(name="营销智能体")
+agent_os.add_agents([agent])
+```
+
+## 配置选项
+
+### 聊天界面
+
+自定义聊天体验：
+
+```yaml
+chat:
+  quick_prompts:
+    support-agent:
+      - "帮助我解决技术问题"
+      - "检查系统状态"
+      - "分析最近的错误日志"
+    sales-agent:
+      - "查看销售数据"
+      - "生成销售报告"
+      - "分析客户反馈"
+    research-agent:
+      - "搜索最新研究"
+      - "总结关键发现"
+      "  "创建研究报告"
+```
+
+### 内存配置
+
+配置多个数据库和域：
+
+```yaml
+memory:
+  display_name: "分布式内存系统"
+  dbs:
+    - db_id: user-memory-db
+      tables: ["user_sessions", "user_preferences"]
+      domain_config:
+        display_name: 用户会话数据
+        description: "存储用户聊天历史和偏好"
+    - db_id: analytics-db
+      tables: ["analytics_events", "user_metrics"]
+      domain_config:
+        display_name: 分析数据
+        description: "存储用户行为分析"
+    - db_id: shared-memory
+      domain_config:
+        display_name: 共享内存
+        description: "多用户共享数据"
+```
+
+### 模型配置
+
+控制可用的 AI 模型：
+
+```yaml
+models:
+  providers:
+    openai:
+      models:
+        - id: gpt-4o
+          display_name: GPT-4 Omni
+          max_tokens: 128000
+          enabled: true
+        - id: gpt-4o-mini
+          display_name: GPT-4 Omni Mini
+          max_tokens: 128000
+          enabled: true
+    anthropic:
+      models:
+        - id: claude-sonnet-4-5
+          display_name: Claude 3.5 Sonnet
+          max_tokens: 200000
+          enabled: true
+        - id: claude-haiku-3-5
+          display_name: Claude 3.5 Haiku
+          max_tokens: 200000
+          enabled: true
+    google:
+      models:
+        - id: gemini-pro
+          display_name: Gemini Pro
+          max_tokens: 32768
+          enabled: false
+```
+
+### 显示名称
+
+自定义 UI 显示名称：
+
+```yaml
+display_names:
+  agent_os: "我的智能体操作系统"
+  agent: "AI 智能体"
+  team: "协作团队"
+  workflow: "自动化工作流"
+  knowledge: "知识库"
+  session: "对话会话"
+  metrics: "性能指标"
+  monitor: "系统监控"
+  tools: "工具集"
+  integrations: "集成中心"
+```
+
+## 环境特定配置
+
+### 开发环境
+
+```yaml
+# dev.yaml
+models:
+  providers:
+    openai:
+      models:
+        - id: gpt-4o-mini
+          display_name: GPT-4 Mini (开发)
+          enabled: true
+        - id: gpt-4o
+          display_name: GPT-4 Omni (开发)
+          enabled: false  # 在开发中节省成本
+```
+
+### 生产环境
+
+```yaml
+# prod.yaml
+models:
+  providers:
+    openai:
+      models:
+        - id: gpt-4o
+          display_name: GPT-4 Omni (生产)
+          enabled: true
+        - id: gpt-4o-mini
+          display_name: GPT-4 Omni Mini (备用)
+          enabled: true
+    anthropic:
+      models:
+        - id: claude-sonnet-4-5
+          display_name: Claude 3.5 Sonnet (生产)
+          enabled: true
+```
+
+## 最佳实践
+
+### 1. 环境分离
+
+为不同环境创建不同的配置文件：
+
+```python
+import os
+from agno.os import AgentOS
+
+# 根据环境加载配置
+config_file = "agentos_prod.yaml" if os.getenv("ENV") == "prod" else "agentos_dev.yaml"
+agent_os = AgentOS(config_file=config_file)
+```
+
+### 2. 敏感信息保护
+
+不要在配置文件中包含敏感信息：
+
+```yaml
+# ❌ 错误：包含 API 密钥
+models:
+  providers:
+    openai:
+      api_key: "sk-..."  # 不要这样做
+
+# ✅ 正确：使用环境变量
+models:
+  providers:
+    openai:
+      api_key_env: "OPENAI_API_KEY"
+```
+
+### 3. 配置验证
+
+验证配置文件的有效性：
+
+```python
+from agno.os import AgentOS, AgentOSConfig
+import yaml
+
+def validate_config(config_file: str):
+    try:
+        with open(config_file, "r") as f:
+            config_data = yaml.safe_load(f)
+        AgentOSConfig(**config_data)
+        print(f"✅ 配置文件 {config_file} 验证成功")
+        return True
+    except Exception as e:
+        print(f"❌ 配置文件 {config_file} 验证失败: {e}")
+        return False
+
+# 使用示例
+validate_config("agentos_config.yaml")
+```
+
+## 下一步
+
+- 了解如何[连接您的 OS](/agent-os/connecting-your-os)
+- 查看[控制平面](/agent-os/control-plane)
+- 探索[AgentOS 功能](/agent-os/features)
+- 查看[AgentOS 参考](/reference/agent-os/configuration)

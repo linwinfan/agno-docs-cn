@@ -1,0 +1,28 @@
+---
+title: Async SQLite
+description: 学习使用 SQLite 异步ly 作为智能体的数据库
+sidebarTitle: 概览
+---
+
+Agno 支持 using [Sqlite](https://www.sqlite.org) 异步ly, with the `AsyncSqliteDb` class.
+
+## 使用方法
+
+```python async_sqlite_for_agent.py
+from agno.agent import Agent
+from agno.db.sqlite import AsyncSqliteDb
+
+# Setup the SQLite database
+db = AsyncSqliteDb(db_file="tmp/data.db")
+
+# Setup a basic agent with the SQLite database
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-async-sqlite-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/sqlite/async_sqlite)

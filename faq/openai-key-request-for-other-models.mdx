@@ -1,0 +1,61 @@
+---
+title: 使用其他模型时要求 OpenAI 密钥
+sidebarTitle: 使用其他模型时要求 OpenAI 密钥
+---
+
+如果您看到要求 OpenAI API 密钥的请求，但您没有明确配置 OpenAI，这是因为 Agno 在多个地方默认使用 OpenAI 模型，包括：
+
+- 在 `Agent` 中未指定时的默认模型
+- VectorDBs 的默认嵌入器是 OpenAIEmbedder，除非另有指定
+
+## 快速修复：配置不同的模型
+
+最好明确指定代理的模型，否则它将默认为 `OpenAIChat`。
+
+例如，要使用 Google 的 Gemini 而不是 OpenAI：
+
+```python
+from agno.agent import Agent, RunOutput
+from agno.models.google import Gemini
+
+agent = Agent(
+    model=Gemini(id="gemini-1.5-flash"),
+    markdown=True,
+)
+
+# 在终端中打印响应
+agent.print_response("分享一个两句话的恐怖故事。")
+```
+
+有关配置不同模型提供商的更多详细信息，请查看我们的[模型文档](/basics/models)
+
+## 快速修复：配置不同的嵌入器
+
+同样的情况也适用于嵌入。如果您想使用不同的嵌入器而不是 `OpenAIEmbedder`，请明确配置它。
+
+例如，要使用 Google 的 Gemini 作为嵌入器，请使用 `GeminiEmbedder`：
+
+```python
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.pgvector import PgVector
+from agno.knowledge.embedder.google import GeminiEmbedder
+
+# 在数据库中嵌入句子
+embeddings = GeminiEmbedder().get_embedding("The quick brown fox jumps over the lazy dog.")
+
+# 打印嵌入及其维度
+print(f"Embeddings: {embeddings[:5]}")
+print(f"Dimensions: {len(embeddings)}")
+
+# 在知识库中使用嵌入器
+knowledge = Knowledge(
+    vector_db=PgVector(
+        db_url="postgresql+psycopg://ai:ai@localhost:5532/ai",
+        table_name="gemini_embeddings",
+        embedder=GeminiEmbedder(),
+    ),
+    max_results=2,
+)
+```
+
+有关配置不同模型提供商的更多详细信息，请查看我们的[嵌入文档](/basics/knowledge/embedder/)

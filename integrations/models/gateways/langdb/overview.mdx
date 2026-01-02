@@ -1,0 +1,61 @@
+---
+title: LangDB
+sidebarTitle: 概览
+---
+
+[LangDB](https://langdb.ai/) is an AI Gateway for seamless access to 350+ LLMs. Secure, govern, and optimize AI Traffic across LLMs using OpenAI-Compatible APIs.
+
+For detailed 集成 instructions, see the [LangDB Agno 文档ation](https://docs.langdb.ai/getting-started/working-with-智能体-frameworks/working-with-agno).
+
+## Authentication
+
+Set your `LANGDB_API_KEY` environment variable. Get your key from [here](https://app.langdb.ai/settings/api_keys).
+
+<CodeGroup>
+
+```bash Mac
+export LANGDB_API_KEY=***
+export LANGDB_PROJECT_ID=***
+
+```
+
+```bash Windows
+setx LANGDB_API_KEY ***
+setx LANGDB_PROJECT_ID ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `LangDB` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.langdb import LangDB
+
+agent = Agent(
+    model=LangDB(id="gpt-5-mini"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"gpt-4o-mini"`                | The id of the 模型 to use through LangDB                            |
+| `name`       | `str`              | `"LangDB"`                     | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"LangDB"`                     | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for LangDB (defaults to LANGDB_API_KEY env var)          |
+| `base_url`   | `str`              | `"https://api.langdb.ai/v1"`  | The base URL for the LangDB API                                       |
+
+`LangDB` also 支持 the params of [OpenAI](/reference/models/openai).

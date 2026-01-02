@@ -1,0 +1,42 @@
+---
+title: Singlestore
+description: 学习使用 Singlestore 作为您的代理数据库
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [Singlestore](https://www.singlestore.com/) 作为数据库，通过 `SingleStoreDb` 类实现。
+
+您可以按照他们的[文档](https://docs.singlestore.com/db/v9.0/introduction/)开始使用 Singlestore。
+
+## 用法
+
+```python singlestore_for_agent.py
+from os import getenv
+
+from agno.agent import Agent
+from agno.db.singlestore import SingleStoreDb
+
+# 配置 SingleStore 数据库连接
+USERNAME = getenv("SINGLESTORE_USERNAME")
+PASSWORD = getenv("SINGLESTORE_PASSWORD")
+HOST = getenv("SINGLESTORE_HOST")
+PORT = getenv("SINGLESTORE_PORT")
+DATABASE = getenv("SINGLESTORE_DATABASE")
+db_url = (
+    f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?charset=utf8mb4"
+)
+
+# 设置您的数据库
+db = SingleStoreDb(db_url=db_url)
+
+# 使用 SingleStore 数据库创建代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-singlestore-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/singlestore/singlestore_for_agent.py)

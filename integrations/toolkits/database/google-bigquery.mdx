@@ -1,0 +1,55 @@
+---
+title: Google BigQuery
+description: GoogleBigQueryTools enables 智能体s to interact with Google BigQuery for large-scale 数据 analysis and SQL queries.
+sidebarTitle: Google BigQuery
+keywords: [google bigquery, database]
+---
+
+## Example
+
+The 以下 智能体 can query and analyze BigQuery 数据sets:
+
+```python
+from agno.agent import Agent
+from agno.tools.google_bigquery import GoogleBigQueryTools
+
+agent = Agent(
+    instructions=[
+        "You are a data analyst assistant that helps with BigQuery operations",
+        "Execute SQL queries to analyze large datasets",
+        "Provide insights and summaries of query results",
+        "Help with data exploration and table analysis",
+    ],
+    tools=[GoogleBigQueryTools(dataset="your_dataset_name")],
+)
+
+agent.print_response("List all tables in the dataset and describe the sales table", stream=True)
+```
+
+## Toolkit 参数
+
+| Parameter           | Type                | Default | Description                                                    |
+| ------------------- | ------------------- | ------- | -------------------------------------------------------------- |
+| `数据set`           | `str`               | `None`  | BigQuery 数据set name (required).                            |
+| `project`           | `Optional[str]`     | `None`  | Google Cloud project ID. Uses GOOGLE_CLOUD_PROJECT.         |
+| `location`          | `Optional[str]`     | `None`  | BigQuery location. Uses GOOGLE_CLOUD_LOCATION.              |
+| `credentials`       | `Optional[Any]`     | `None`  | Google Cloud credentials object.                             |
+| `enable_list_tables`| `bool`              | `True`  | Enable table listing functionality.                         |
+| `enable_describe_table` | `bool`          | `True`  | Enable table description functionality.                     |
+| `enable_run_sql_query` | `bool`           | `True`  | Enable SQL query execution functionality.                   |
+
+## Toolkit Functions
+
+| Function         | Description                                                      |
+| ---------------- | ---------------------------------------------------------------- |
+| `list_tables`    | List all tables in the specified BigQuery 数据set.              |
+| `describe_table` | Get detailed schema information about a specific table.         |
+| `run_sql_query`  | Execute SQL queries on BigQuery 数据sets.                       |
+
+
+
+## 开发者资源
+
+- 查看 [Tools Source](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/tools/google_bigquery.py)
+- [BigQuery Documentation](https://云.google.com/bigquery/docs)
+- [BigQuery SQL Reference](https://云.google.com/bigquery/docs/reference/standard-sql/)

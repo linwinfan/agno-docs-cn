@@ -1,0 +1,32 @@
+---
+title: 异步 SQLite
+description: 学习异步使用 SQLite 作为您的代理数据库
+sidebarTitle: 概述
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.2.2" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.2.2">v2.2.2</Tooltip>
+</Badge>
+
+Agno 支持异步使用 [Sqlite](https://www.sqlite.org)，通过 `AsyncSqliteDb` 类实现。
+
+## 用法
+
+```python async_sqlite_for_agent.py
+from agno.agent import Agent
+from agno.db.sqlite import AsyncSqliteDb
+
+# 设置 SQLite 数据库
+db = AsyncSqliteDb(db_file="tmp/data.db")
+
+# 使用 SQLite 数据库设置基本代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-async-sqlite-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/sqlite/async_sqlite)

@@ -1,0 +1,457 @@
+---
+title: "AgentOS 认证"
+sidebarTitle: "认证"
+description: "使用 RBAC 和 JWT 令牌与 AgentOS 进行认证"
+keywords: [agentos 认证, bearer 令牌, api 安全, jwt, rbac, 授权, 作用域]
+---
+
+AgentOS 使用基于角色的访问控制（RBAC）和 JWT 令牌来保护您的 API 端点并提供细粒度的权限控制。
+
+## RBAC 认证（推荐）
+
+启用 RBAC 时，在请求中包含带作用域的 JWT 令牌：
+
+```bash
+curl --location 'http://localhost:7777/agents/my-agent/runs' \
+    --header 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...' \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode 'message=您的查询内容'
+```
+
+### JWT 令牌结构
+
+您的 JWT 令牌应包含作用域和受众声明：
+
+```json
+{
+  "sub": "user-123",
+  "aud": "my-agent-os",
+  "scopes": ["agents:read", "agents:my-agent:run", "sessions:write"],
+  "exp": 1735689600
+}
+```
+
+### 必需声明
+
+| 声明 | 描述 |
+|-------|-------------|
+| `aud` | 必须匹配您的 AgentOS `id` |
+| `scopes` | 权限作用域数组 |
+
+### 常见作用域
+
+| 作用域 | 描述 |
+|-------|-------------|
+| `agents:read` | 列出和查看智能体 |
+| `agents:run` | 运行任何智能体 |
+| `agents:<id>:run` | 运行特定智能体 |
+| `sessions:read` | 查看会话数据 |
+| `sessions:write` | 创建/更新会话 |
+| `agent_os:admin` | 完全管理员访问权限 |
+
+## 配置 RBAC
+
+### 启用 RBAC
+
+在 AgentOS 配置中启用 RBAC：
+
+```python
+from agno.os import AgentOS, AgentOSConfig
+
+config = AgentOSConfig(
+    authentication={
+        "rbac": {
+            "enabled": True,
+            "secret_key": "your-secret-key-here",
+            "algorithm": "RS256"
+        }
+    }
+)
+
+agent_os = AgentOS(config=config)
+```
+
+### 角色定义
+
+定义用户角色和权限：
+
+```python
+from agno.auth import Role, Permission
+
+# 创建权限
+read_agents = Permission("agents:read")
+run_agents = Permission("agents:run")
+manage_sessions = Permission("sessions:write")
+admin_access = Permission("agent_os:admin")
+
+# 创建角色
+viewer_role = Role(
+    name="viewer",
+    permissions=[read_agents]
+)
+
+operator_role = Role(
+    name="operator", 
+    permissions=[read_agents, run_agents, manage_sessions]
+)
+
+admin_role = Role(
+    name="admin",
+    permissions=[read_agents, run_agents, manage_sessions, admin_access]
+)
+```
+
+### 用户分配
+
+将角色分配给用户：
+
+```python
+from agno.auth import User, UserRole
+
+# 创建用户
+user = User(
+    id="user-123",
+    email="user@example.com",
+    name="张三"
+)
+
+# 分配角色
+user_role = UserRole(
+    user_id=user.id,
+    role_id=operator_role.id
+)
+```
+
+## JWT 令牌管理
+
+### 生成令牌
+
+使用您的身份验证系统生成 JWT 令牌：
+
+```python
+import jwt
+from datetime import datetime, timedelta
+
+def generate_jwt_token(user_id: str, scopes: list, secret_key: str):
+    payload = {
+        "sub": user_id,
+        "aud": "my-agent-os",
+        "scopes": scopes,
+        "exp": datetime.utcnow() + timedelta(hours=1),
+        "iat": datetime.utcnow()
+    }
+    
+    token = jwt.encode(payload, secret_key, algorithm="RS256")
+    return token
+
+# 示例使用
+token = generate_jwt_token(
+    user_id="user-123",
+    scopes=["agents:read", "sessions:write"],
+    secret_key="your-secret-key"
+)
+```
+
+### 验证令牌
+
+AgentOS 自动验证传入的 JWT 令牌：
+
+```python
+from agno.auth import verify_jwt_token
+
+def authenticate_request(request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise AuthenticationError("缺少授权头")
+    
+    token = auth_header.split(" ")[1]
+    
+    try:
+        payload = verify_jwt_token(token)
+        return payload
+    except jwt.InvalidTokenError:
+        raise AuthenticationError("无效令牌")
+```
+
+## API 密钥认证
+
+对于简单的用例，您也可以使用 API 密钥认证：
+
+### 配置 API 密钥
+
+```python
+config = AgentOSConfig(
+    authentication={
+        "api_key": {
+            "enabled": True,
+            "keys": {
+                "prod-key": {
+                    "name": "生产密钥",
+                    "scopes": ["agents:run", "sessions:write"]
+                },
+                "dev-key": {
+                    "name": "开发密钥", 
+                    "scopes": ["agents:read"]
+                }
+            }
+        }
+    }
+)
+```
+
+### 使用 API 密钥
+
+```bash
+curl --location 'http://localhost:7777/agents' \
+    --header 'X-API-Key: prod-key' \
+    --header 'Content-Type: application/json'
+```
+
+## 作用域权限系统
+
+### 作用域格式
+
+作用域遵循 `resource:action:target` 格式：
+
+- `resource`: 资源类型（agents、sessions、workflows 等）
+- `action`: 操作类型（read、write、run、delete 等）
+- `target`: 特定目标（可选，如智能体 ID）
+
+### 作用域示例
+
+| 作用域 | 描述 | 示例用法 |
+|-------|-------------|---------|
+| `agents:read` | 读取所有智能体 | GET /agents |
+| `agents:write` | 创建/更新智能体 | POST /agents, PUT /agents/{id} |
+| `agents:my-agent:run` | 运行特定智能体 | POST /agents/my-agent/runs |
+| `sessions:*` | 所有会话操作 | 任何会话端点 |
+| `agent_os:admin` | 管理员权限 | 所有操作 |
+
+### 自定义作用域
+
+定义自定义作用域：
+
+```python
+from agno.auth import Scope
+
+# 创建自定义作用域
+custom_scope = Scope(
+    name="agents:custom-action",
+    description="自定义智能体操作",
+    resource="agents",
+    action="custom-action"
+)
+```
+
+## 中间件集成
+
+### FastAPI 中间件
+
+在您的 FastAPI 应用中集成认证：
+
+```python
+from fastapi import FastAPI, Depends, HTTPException
+from agno.auth import get_current_user, require_scope
+
+app = FastAPI()
+
+@app.get("/agents")
+async def list_agents(current_user = Depends(get_current_user)):
+    """列出智能体 - 需要 agents:read 权限"""
+    return await agent_os.list_agents()
+
+@app.post("/agents/{agent_id}/runs")
+async def run_agent(
+    agent_id: str,
+    request: RunRequest,
+    current_user = Depends(require_scope("agents:run"))
+):
+    """运行智能体 - 需要特定权限"""
+    return await agent_os.run_agent(agent_id, request)
+```
+
+### Express.js 中间件
+
+在 Node.js/Express 中集成：
+
+```javascript
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const app = express();
+
+// 认证中间件
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ error: '缺少访问令牌' });
+    }
+    
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: '无效令牌' });
+        req.user = user;
+        next();
+    });
+}
+
+// 权限检查中间件
+function requireScope(scope) {
+    return (req, res, next) => {
+        if (!req.user.scopes.includes(scope)) {
+            return res.status(403).json({ error: '权限不足' });
+        }
+        next();
+    };
+}
+
+// 使用中间件
+app.get('/agents', authenticateToken, requireScope('agents:read'), (req, res) => {
+    // 处理请求
+});
+```
+
+## 最佳实践
+
+### 1. 最小权限原则
+
+只授予用户所需的最低权限：
+
+```python
+# ❌ 错误：授予过多权限
+user_scopes = ["agent_os:admin"]
+
+# ✅ 正确：授予必要权限
+user_scopes = ["agents:read", "sessions:write"]
+```
+
+### 2. 令牌过期管理
+
+设置合理的令牌过期时间：
+
+```python
+# 短期访问令牌（1 小时）
+access_token = generate_token(
+    user_id=user.id,
+    scopes=user.scopes,
+    expires_in=3600
+)
+
+# 长期刷新令牌（30 天）
+refresh_token = generate_token(
+    user_id=user.id,
+    scopes=["token:refresh"],
+    expires_in=30 * 24 * 3600
+)
+```
+
+### 3. 令牌刷新
+
+实现令牌刷新机制：
+
+```python
+@app.post("/auth/refresh")
+async def refresh_token(refresh_request: RefreshRequest):
+    # 验证刷新令牌
+    payload = verify_jwt_token(refresh_request.refresh_token)
+    
+    # 生成新的访问令牌
+    new_token = generate_jwt_token(
+        user_id=payload["sub"],
+        scopes=payload["scopes"],
+        expires_in=3600
+    )
+    
+    return {"access_token": new_token}
+```
+
+### 4. 安全密钥管理
+
+安全地管理 JWT 密钥：
+
+```python
+import os
+from cryptography.hazmat.primitives import serialization
+
+# 从环境变量加载密钥
+private_key = os.getenv("JWT_PRIVATE_KEY")
+public_key = os.getenv("JWT_PUBLIC_KEY")
+
+# 或者从文件加载
+def load_keys():
+    with open("private_key.pem", "rb") as f:
+        private_key = serialization.load_pem_private_key(
+            f.read(),
+            password=None
+        )
+    
+    with open("public_key.pem", "rb") as f:
+        public_key = serialization.load_pem_public_key(f.read())
+    
+    return private_key, public_key
+```
+
+## 故障排除
+
+### 常见错误
+
+#### 1. 令牌过期
+
+```bash
+# 错误响应
+HTTP/1.1 401 Unauthorized
+{"error": "令牌已过期"}
+```
+
+解决方案：刷新令牌或重新登录。
+
+#### 2. 权限不足
+
+```bash
+# 错误响应
+HTTP/1.1 403 Forbidden
+{"error": "权限不足"}
+```
+
+解决方案：检查用户作用域或联系管理员。
+
+#### 3. 无效签名
+
+```bash
+# 错误响应
+HTTP/1.1 401 Unauthorized
+{"error": "无效令牌签名"}
+```
+
+解决方案：验证密钥配置。
+
+### 调试工具
+
+使用调试工具验证令牌：
+
+```python
+import jwt
+
+def debug_token(token: str, secret_key: str):
+    try:
+        payload = jwt.decode(token, secret_key, algorithms=["RS256"])
+        print("令牌有效:")
+        print(f"  用户 ID: {payload['sub']}")
+        print(f"  受众: {payload['aud']}")
+        print(f"  作用域: {payload['scopes']}")
+        print(f"  过期时间: {payload['exp']}")
+    except jwt.ExpiredSignatureError:
+        print("令牌已过期")
+    except jwt.InvalidTokenError as e:
+        print(f"令牌无效: {e}")
+
+# 使用示例
+debug_token("your-jwt-token", "your-secret-key")
+```
+
+## 下一步
+
+- 了解[AgentOS 配置](/agent-os/config)
+- 查看[API 使用指南](/agent-os/api/usage)
+- 探索[安全功能](/agent-os/security)
+- 查看[API 参考](/reference-api/overview)

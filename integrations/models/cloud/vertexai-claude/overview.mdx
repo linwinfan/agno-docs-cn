@@ -1,0 +1,74 @@
+---
+title: Vertex AI Claude
+description: Learn how to use Vertex AI Claude 模型s with Agno.
+sidebarTitle: Claude
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.1.3" cta="查看 release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.1.3">v2.1.3</Tooltip>
+</Badge>
+Use Claude 模型s through Vertex AI. This provides a 原生 Claude 集成 optimized for Vertex AI infrastructure.
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `claude-sonnet-4@20250514` 模型 is good for most use-cases.
+- `claude-opus-4@20250805` 模型 is their best 模型.
+
+## Authentication
+
+Set your `GOOGLE_CLOUD_PROJECT` and `CLOUD_ML_REGION` environment variables.
+
+<CodeGroup>
+
+```bash Mac
+export GOOGLE_CLOUD_PROJECT=***
+export CLOUD_ML_REGION=***
+```
+
+```bash Windows
+setx GOOGLE_CLOUD_PROJECT ***
+setx CLOUD_ML_REGION ***
+```
+
+</CodeGroup>
+
+And then authenticate your CLI session:
+
+```bash
+gcloud auth application-default login
+```
+
+## Example
+
+Use `Claude` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.vertexai.claude import Claude
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4@20250514"),
+)
+
+# Print the response on the terminal
+agent.print_response("Share a 2 sentence dramatic story.")
+```
+
+</CodeGroup>
+
+<Note>查看 更多功能 examples [here](/integrations/models/cloud/vertexai-claude/usage/basic-stream). </Note>
+
+## Parameters
+
+| Parameter    | Type  | Default                      | Description                                        |
+| ------------ | ----- | ---------------------------- | -------------------------------------------------- |
+| `id`         | `str` | `"claude-sonnet-4@20250514"` | The specific Vertex AI Claude 模型 ID to use      |
+| `name`       | `str` | `"Claude"`                   | The name identifier for the Vertex AI Claude 模型 |
+| `提供商`   | `str` | `"VertexAI"`                 | The 提供商 of the 模型                          |
+| `region`     | `str` | `"None`                      | The region to use for the 模型                    |
+| `project_id` | `str` | `None`                       | The project ID to use for the 模型                |
+| `base_url`   | `str` | `None`                       | The base URL to use for the 模型                  |
+
+`Claude` (Vertex AI) extends the [Anthropic Claude](/integrations/models/native/anthropic/overview) 模型 with Vertex AI 集成 and has access to most of the same parameters.

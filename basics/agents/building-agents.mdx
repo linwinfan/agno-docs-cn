@@ -1,0 +1,78 @@
+---
+title: 构建智能体
+sidebarTitle: 构建智能体
+description: 学习如何使用 Agno 构建智能体
+keywords: [智能体, ai 智能体, 介绍]
+mode: wide
+---
+
+要构建有效的智能体，从简单开始——只需要一个模型、工具和指令。一旦这个可行，根据需要逐步添加更多功能。
+
+关键是从明确定义的任务开始，如报告生成、数据提取、分类、摘要、知识搜索和文档处理。这些早期的成功帮助您识别什么有效、验证用户需求，并为高级系统奠定基础。
+
+例如，这是最简单的报告生成智能体（使用 Hackernews 工具包）：
+
+```python hackernews_agent.py lines
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+agent.print_response("趋势初创公司和产品。", stream=True)
+```
+
+## 运行您的智能体
+
+在开发智能体时，使用 `Agent.print_response()` 方法运行它。这将在您的终端中以友好的格式打印智能体的响应。
+
+这仅用于开发目的，不建议在生产环境中使用。在生产环境中，使用 `Agent.run()` 或 `Agent.arun()` 方法。例如：
+
+```python
+from typing import Iterator
+from agno.agent import Agent, RunOutput, RunOutputEvent, RunEvent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+from agno.utils.pprint import pprint_run_response
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+# 运行智能体并打印响应
+agent.print_response("趋势初创公司和产品。")
+
+################ 流式响应 #################
+stream: Iterator[RunOutputEvent] = agent.run("趋势产品", stream=True)
+for chunk in stream:
+    if chunk.event == RunEvent.run_content:
+        print(chunk.content)
+
+################ 流式响应和美化打印 #################
+stream: Iterator[RunOutputEvent] = agent.run("趋势产品", stream=True)
+pprint_run_response(stream, markdown=True)
+```
+
+## 下一步
+
+熟悉基础知识后，根据需要继续通过添加功能来构建您的智能体。
+
+需要考虑的常见问题：
+
+- **如何运行我的智能体？** -> 查看[运行智能体](/basics/agents/running-agents)文档。
+- **如何调试我的智能体？** -> 查看[调试智能体](/basics/agents/debugging-agents)文档。
+- **如何管理会话？** -> 查看[智能体会话](/basics/sessions/overview)文档。
+- **如何管理输入和捕获输出？** -> 查看[输入和输出](/basics/input-output/overview)文档。
+- **如何添加工具？** -> 查看[工具](/basics/tools/overview)文档。
+- **如何给智能体提供上下文？** -> 查看[上下文工程](/basics/context/overview)文档。
+- **如何添加知识？** -> 查看[知识](/basics/knowledge/overview)文档。
+- **如何处理图像、音频、视频和文件？** -> 查看[多模态](/basics/multimodal/overview)文档。
+- **如何添加防护栏？** -> 查看[防护栏](/basics/guardrails/overview)文档。
+- **如何在开发期间缓存模型响应？** -> 查看[响应缓存](/basics/models/cache-response)文档。

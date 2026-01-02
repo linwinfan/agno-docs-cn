@@ -1,0 +1,172 @@
+---
+title: 路由团队直接响应
+sidebarTitle: 成员直接响应
+description: 这个示例演示了由AI智能体组成的路由团队，协同工作以回答不同语言的问题。
+---
+
+该团队由六个专业智能体组成：
+1. **英语智能体** - 只能用英语回答
+2. **日语智能体** - 只能用日语回答
+3. **中文智能体** - 只能用中文回答
+4. **西班牙语智能体** - 只能用西班牙语回答
+5. **法语智能体** - 只能用法语回答
+6. **德语智能体** - 只能用德语回答
+
+团队负责人将用户的问题路由到相应的语言智能体。通过设置 `respond_directly=True`，选中的智能体会直接响应，而无需团队负责人处理响应。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch respond_directly.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python respond_directly.py
+    import asyncio
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+
+    english_agent = Agent(
+        name="英语智能体",
+        role="您只用英语回答",
+        model=OpenAIChat(id="o3-mini"),
+    )
+    japanese_agent = Agent(
+        name="日语智能体",
+        role="您只用日语回答",
+        model=OpenAIChat(id="o3-mini"),
+    )
+    chinese_agent = Agent(
+        name="中文智能体",
+        role="您只用中文回答",
+        model=OpenAIChat(id="o3-mini"),
+    )
+    spanish_agent = Agent(
+        name="西班牙语智能体",
+        role="您只能用西班牙语回答",
+        model=OpenAIChat(id="o3-mini"),
+    )
+    french_agent = Agent(
+        name="法语智能体",
+        role="您只能用法语回答",
+        model=OpenAIChat(id="o3-mini"),
+    )
+    german_agent = Agent(
+        name="德语智能体",
+        role="您只能用德语回答",
+        model=OpenAIChat(id="o3-mini"),
+    )
+
+    multi_language_team = Team(
+        name="多语言团队",
+        model=OpenAIChat("o3-mini"),
+        respond_directly=True,
+        members=[
+            english_agent,
+            spanish_agent,
+            japanese_agent,
+            french_agent,
+            german_agent,
+            chinese_agent,
+        ],
+        markdown=True,
+        instructions=[
+            "您是一个语言路由器，负责将问题路由到相应的语言智能体。",
+            "如果用户使用团队成员中没有对应智能体的语言提问，请用英语回答：",
+            "'我只能用以下语言回答：英语、西班牙语、日语、法语和德语。请用其中一种语言提问。'",
+            "在将问题路由给智能体之前，请始终检查用户输入的语言。",
+            "对于意大利语等不支持的语言，请用英语回复上述消息。",
+        ],
+        show_members_responses=True,
+    )
+
+
+    async def main():
+        """Main async function demonstrating team routing mode."""
+        # Ask "How are you?" in all supported languages
+        await multi_language_team.aprint_response(
+            "How are you?",
+            stream=True,  # English
+        )
+
+        await multi_language_team.aprint_response(
+            "你好吗？",
+            stream=True,  # Chinese
+        )
+
+        await multi_language_team.aprint_response(
+            "お元気ですか?",
+            stream=True,  # Japanese
+        )
+
+        await multi_language_team.aprint_response("Comment allez-vous?", stream=True)
+
+        await multi_language_team.aprint_response(
+            "Wie geht es Ihnen?",
+            stream=True,  # German
+        )
+
+        await multi_language_team.aprint_response(
+            "Come stai?",
+            stream=True,  # Italian
+        )
+
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="设置您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python respond_directly.py
+    ```
+
+    ```bash Windows
+    python respond_directly.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/basic_flows" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+
+
+
+

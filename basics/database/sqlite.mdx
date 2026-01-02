@@ -1,0 +1,28 @@
+---
+title: SQLite
+description: 学习使用 Sqlite 作为您的代理数据库
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [Sqlite](https://www.sqlite.org) 作为数据库，通过 `SqliteDb` 类实现。
+
+## 用法
+
+```python sqlite_for_agent.py
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+
+# 设置 SQLite 数据库
+db = SqliteDb(db_file="tmp/data.db")
+
+# 使用 SQLite 数据库设置基本代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-sqlite-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/sqlite/sqlite_for_agent.py)

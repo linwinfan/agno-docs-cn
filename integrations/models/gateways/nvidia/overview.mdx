@@ -1,0 +1,62 @@
+---
+title: Nvidia
+sidebarTitle: 概览
+description: Learn how to use Nvidia 模型s in Agno.
+---
+
+NVIDIA offers a suite of high-performance language 模型s optimized for advanced NLP tasks.
+These 模型s are part of the NeMo framework, which provides tools for training, fine-tuning
+and deploying state-of-the-art 模型s efficiently. NVIDIA’s language 模型s are designed to
+handle large-scale workloads with GPU acceleration for faster 推理 and training.
+We recommend experimenting with NVIDIA’s 模型s to find the best fit for your application.
+
+Explore NVIDIA’s 模型s [here](https://build.nvidia.com/模型s).
+
+## Authentication
+
+Set your `NVIDIA_API_KEY` environment variable. Get your key [from Nvidia here](https://build.nvidia.com/explore/discover).
+
+<CodeGroup>
+
+```bash Mac
+export NVIDIA_API_KEY=***
+```
+
+```bash Windows
+setx NVIDIA_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Nvidia` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.nvidia import Nvidia
+
+agent = Agent(model=Nvidia(), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/nvidia/usage/basic-stream). </Note>
+
+## Parameters
+
+| Parameter    | Type               | Default                                       | Description                                                           |
+| ------------ | ------------------ | --------------------------------------------- | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"nvidia/llama-3.1-nemotron-70b-instruct"`  | The id of the NVIDIA 模型 to use                                    |
+| `name`       | `str`              | `"NVIDIA"`                                   | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"NVIDIA"`                                   | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                                        | The API key for NVIDIA (defaults to NVIDIA_API_KEY env var)          |
+| `base_url`   | `str`              | `"https://integrate.api.nvidia.com/v1"`     | The base URL for the NVIDIA API                                       |
+
+`NVIDIA` extends the OpenAI-兼容 interface and 支持 most parameters from the [OpenAI 模型](/integrations/models/native/openai/completion/overview).

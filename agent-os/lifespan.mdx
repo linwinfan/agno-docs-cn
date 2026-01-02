@@ -1,0 +1,554 @@
+---
+title: "自定义生命周期"
+description: "自定义您的 AgentOS 应用程序的生命周期以处理启动和关闭逻辑"
+keywords: [agentos, agentos 钩子, 生命周期, 生命周期函数, 生命周期上下文管理器, fastapi 生命周期]
+---
+
+您通常希望在 AgentOS 应用程序启动之前或关闭之前运行代码。
+
+这可以通过 `lifespan` 参数提供自定义**生命周期函数**来实现。
+
+生命周期函数如下所示：
+
+```python
+@asynccontextmanager
+async def lifespan(app):
+    # 这将在您的应用程序启动之前运行
+    log_info("启动我的 FastAPI 应用程序")
+
+    yield
+
+    # 这将在您的应用程序关闭之前运行
+    log_info("停止我的 FastAPI 应用程序")
+```
+
+## FastAPI 生命周期
+
+您提供的自定义生命周期函数将被用作 AgentOS 使用的 FastAPI 应用程序的**生命周期上下文管理器**。请记住使用 `@asynccontextmanager` 装饰它，如示例中所示。
+
+<Tip>
+查看 [FastAPI 文档](https://fastapi.tiangolo.com/advanced/events/#lifespan-events) 了解有关生命周期上下文管理器的更多信息。
+</Tip>
+
+如果您使用自定义 FastAPI 应用程序，无需担心覆盖其生命周期。
+
+您提供的生命周期将包装应用程序的现有生命周期，让您可以组合所有功能。
+
+## 常见用例
+
+生命周期控制对于处理典型的启动和关闭任务很有用，例如：
+
+- **资源初始化**: 数据库、第三方服务、缓存...或您的应用程序需要的任何其他东西。
+- **清理**: 在关闭之前关闭连接、存储数据或释放资源。
+- **健康检查**: 在提供请求之前验证依赖项是否可用
+- **后台任务**: 启动/停止后台进程
+
+## 示例
+
+<Steps>
+  <Step title="代码">
+
+让我们创建一个带有自定义生命周期的完整 AgentOS 示例：
+
+```python
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+from agno.os import AgentOS
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 配置日志
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# 自定义生命周期函数
+@asynccontextmanager
+async def custom_lifespan(app):
+    # 启动逻辑
+    logger.info("🚀 正在启动 AgentOS 应用程序...")
+    
+    # 初始化数据库连接
+    logger.info("📊 正在连接数据库...")
+    await initialize_database()
+    
+    # 启动后台任务
+    logger.info("⚙️ 正在启动后台任务...")
+    background_task = asyncio.create_task(background_monitor())
+    
+    # 验证外部服务
+    logger.info("🔍 正在验证外部服务...")
+    await verify_external_services()
+    
+    logger.info("✅ AgentOS 应用程序启动完成!")
+    
+    yield
+    
+    # 关闭逻辑
+    logger.info("🛑 正在关闭 AgentOS 应用程序...")
+    
+    # 停止后台任务
+    logger.info("⏹️ 正在停止后台任务...")
+    background_task.cancel()
+    try:
+        await background_task
+    except asyncio.CancelledError:
+        pass
+    
+    # 清理数据库连接
+    logger.info("📊 正在关闭数据库连接...")
+    await cleanup_database()
+    
+    # 保存应用程序状态
+    logger.info("💾 正在保存应用程序状态...")
+    await save_application_state()
+    
+    logger.info("✅ AgentOS 应用程序关闭完成!")
+
+# 辅助函数
+async def initialize_database():
+    """初始化数据库连接"""
+    await asyncio.sleep(1)  # 模拟数据库连接
+    logger.info("   ✅ 数据库连接已建立")
+
+async def cleanup_database():
+    """清理数据库连接"""
+    await asyncio.sleep(0.5)  # 模拟清理
+    logger.info("   ✅ 数据库连接已关闭")
+
+async def verify_external_services():
+    """验证外部服务可用性"""
+    services = ["OpenAI API", "Redis", "向量数据库"]
+    for service in services:
+        await asyncio.sleep(0.3)  # 模拟验证
+        logger.info(f"   ✅ {service} 验证通过")
+
+async def background_monitor():
+    """后台监控任务"""
+    while True:
+        try:
+            await asyncio.sleep(30)  # 每 30 秒运行一次
+            logger.info("🔔 后台监控检查完成")
+        except asyncio.CancelledError:
+            logger.info("🔔 后台监控任务已停止")
+            break
+
+async def save_application_state():
+    """保存应用程序状态"""
+    await asyncio.sleep(0.5)  # 模拟保存
+    logger.info("   ✅ 应用程序状态已保存")
+
+# 创建智能体
+agent = Agent(
+    name="生命周期助手",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="您是一个有用的助手，了解 AgentOS 生命周期管理。"
+)
+
+# 创建带有自定义生命周期的 AgentOS
+agent_os = AgentOS(
+    name="生命周期演示",
+    description="演示自定义生命周期功能的 AgentOS",
+    agents=[agent],
+    lifespan=custom_lifespan  # 设置自定义生命周期
+)
+
+if __name__ == "__main__":
+    # 启动应用程序
+    app = agent_os.get_app()
+    agent_os.serve(app="lifespan_demo:app", reload=True)
+```
+
+  </Step>
+  <Step title="运行应用程序">
+
+保存代码为 `lifespan_demo.py` 并运行：
+
+```bash
+python lifespan_demo.py
+```
+
+您将看到详细的启动和关闭日志：
+
+```
+INFO:__main__:🚀 正在启动 AgentOS 应用程序...
+INFO:__main__:📊 正在连接数据库...
+INFO:__main__:   ✅ 数据库连接已建立
+INFO:__main__:⚙️ 正在启动后台任务...
+INFO:__main__:🔍 正在验证外部服务...
+INFO:__main__:   ✅ OpenAI API 验证通过
+INFO:__main__:   ✅ Redis 验证通过
+INFO:__main__:   ✅ 向量数据库验证通过
+INFO:__main__:✅ AgentOS 应用程序启动完成!
+INFO:     Started server process [12345]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000
+```
+
+当您按 `Ctrl+C` 停止应用程序时，您将看到关闭日志：
+
+```
+INFO:     Shutting down
+INFO:__main__:🛑 正在关闭 AgentOS 应用程序...
+INFO:__main__:⏹️ 正在停止后台任务...
+INFO:__main__:🔔 后台监控任务已停止
+INFO:__main__:📊 正在关闭数据库连接...
+INFO:__main__:   ✅ 数据库连接已关闭
+INFO:__main__:💾 正在保存应用程序状态...
+INFO:__main__:   ✅ 应用程序状态已保存
+INFO:__main__:✅ AgentOS 应用程序关闭完成!
+```
+
+  </Step>
+</Steps>
+
+## 高级用法
+
+### 条件性启动
+
+根据环境条件执行不同的启动逻辑：
+
+```python
+@asynccontextmanager
+async def conditional_lifespan(app):
+    environment = os.getenv("ENVIRONMENT", "development")
+    
+    if environment == "production":
+        logger.info("🏭 生产环境启动")
+        await setup_production_resources()
+    elif environment == "staging":
+        logger.info("🧪 测试环境启动")
+        await setup_staging_resources()
+    else:
+        logger.info("💻 开发环境启动")
+        await setup_development_resources()
+    
+    yield
+    
+    if environment == "production":
+        await cleanup_production_resources()
+    elif environment == "staging":
+        await cleanup_staging_resources()
+    else:
+        await cleanup_development_resources()
+```
+
+### 错误处理
+
+在生命周期中处理启动和关闭错误：
+
+```python
+@asynccontextmanager
+async def robust_lifespan(app):
+    startup_errors = []
+    
+    # 启动阶段
+    try:
+        await initialize_critical_service()
+        logger.info("✅ 关键服务初始化成功")
+    except Exception as e:
+        logger.error(f"❌ 关键服务初始化失败: {e}")
+        startup_errors.append("critical_service")
+    
+    try:
+        await initialize_optional_service()
+        logger.info("✅ 可选服务初始化成功")
+    except Exception as e:
+        logger.warning(f"⚠️ 可选服务初始化失败: {e}")
+        # 可选服务失败不应阻止启动
+    
+    if "critical_service" in startup_errors:
+        logger.error("🚨 关键服务启动失败，应用程序无法启动")
+        raise RuntimeError("关键服务初始化失败")
+    
+    yield
+    
+    # 关闭阶段
+    try:
+        await cleanup_critical_service()
+        logger.info("✅ 关键服务清理成功")
+    except Exception as e:
+        logger.error(f"❌ 关键服务清理失败: {e}")
+    
+    try:
+        await cleanup_optional_service()
+        logger.info("✅ 可选服务清理成功")
+    except Exception as e:
+        logger.warning(f"⚠️ 可选服务清理失败: {e}")
+```
+
+### 资源池管理
+
+管理连接池和其他资源：
+
+```python
+@asynccontextmanager
+async def resource_pool_lifespan(app):
+    # 初始化资源池
+    db_pool = await create_database_pool(max_size=20)
+    redis_pool = await create_redis_pool(max_size=10)
+    http_client = create_http_client()
+    
+    # 将资源添加到应用程序状态
+    app.state.db_pool = db_pool
+    app.state.redis_pool = redis_pool
+    app.state.http_client = http_client
+    
+    logger.info("🏊 资源池初始化完成")
+    
+    yield
+    
+    # 清理资源池
+    await db_pool.close()
+    await redis_pool.close()
+    await http_client.aclose()
+    
+    logger.info("🏊 资源池清理完成")
+
+async def create_database_pool(max_size: int):
+    """创建数据库连接池"""
+    # 实现数据库连接池创建逻辑
+    pass
+
+async def create_redis_pool(max_size: int):
+    """创建 Redis 连接池"""
+    # 实现 Redis 连接池创建逻辑
+    pass
+
+def create_http_client():
+    """创建 HTTP 客户端"""
+    # 实现 HTTP 客户端创建逻辑
+    pass
+```
+
+### 健康检查集成
+
+集成健康检查到生命周期：
+
+```python
+@asynccontextmanager
+async def health_check_lifespan(app):
+    health_status = {
+        "database": False,
+        "redis": False,
+        "external_api": False
+    }
+    
+    # 启动健康检查
+    async def run_health_checks():
+        while True:
+            try:
+                # 检查数据库
+                health_status["database"] = await check_database_health()
+                
+                # 检查 Redis
+                health_status["redis"] = await check_redis_health()
+                
+                # 检查外部 API
+                health_status["external_api"] = await check_external_api_health()
+                
+                # 更新应用程序状态
+                app.state.health_status = health_status
+                
+                await asyncio.sleep(60)  # 每分钟检查一次
+            except asyncio.CancelledError:
+                break
+    
+    health_check_task = asyncio.create_task(run_health_checks())
+    
+    # 添加健康检查端点
+    @app.get("/health")
+    async def health_endpoint():
+        return {"status": "healthy", "checks": health_status}
+    
+    yield
+    
+    health_check_task.cancel()
+    try:
+        await health_check_task
+    except asyncio.CancelledError:
+        pass
+
+async def check_database_health():
+    """检查数据库健康状态"""
+    try:
+        # 实现数据库健康检查
+        return True
+    except:
+        return False
+
+async def check_redis_health():
+    """检查 Redis 健康状态"""
+    try:
+        # 实现 Redis 健康检查
+        return True
+    except:
+        return False
+
+async def check_external_api_health():
+    """检查外部 API 健康状态"""
+    try:
+        # 实现外部 API 健康检查
+        return True
+    except:
+        return False
+```
+
+## 最佳实践
+
+### 1. 幂等性
+
+确保启动和关闭操作是幂等的：
+
+```python
+@asynccontextmanager
+async def idempotent_lifespan(app):
+    # 使用状态标志避免重复初始化
+    if not hasattr(app.state, "initialized"):
+        await initialize_resources()
+        app.state.initialized = True
+    
+    yield
+    
+    if hasattr(app.state, "initialized"):
+        await cleanup_resources()
+        delattr(app.state, "initialized")
+```
+
+### 2. 超时控制
+
+为启动和关闭操作设置超时：
+
+```python
+@asynccontextmanager
+async def timeout_lifespan(app):
+    try:
+        # 设置启动超时
+        await asyncio.wait_for(initialize_resources(), timeout=30)
+        logger.info("✅ 资源初始化成功")
+    except asyncio.TimeoutError:
+        logger.error("❌ 资源初始化超时")
+        raise
+    
+    yield
+    
+    try:
+        # 设置关闭超时
+        await asyncio.wait_for(cleanup_resources(), timeout=10)
+        logger.info("✅ 资源清理成功")
+    except asyncio.TimeoutError:
+        logger.error("❌ 资源清理超时")
+```
+
+### 3. 优雅关闭
+
+实现优雅关闭机制：
+
+```python
+@asynccontextmanager
+async def graceful_lifespan(app):
+    shutdown_event = asyncio.Event()
+    
+    # 设置信号处理器
+    def signal_handler(signum, frame):
+        logger.info(f"收到信号 {signum}，开始优雅关闭...")
+        shutdown_event.set()
+    
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    yield
+    
+    # 等待关闭信号或超时
+    try:
+        await asyncio.wait_for(shutdown_event.wait(), timeout=30)
+    except asyncio.TimeoutError:
+        logger.warning("⏰ 优雅关闭超时，强制退出")
+    
+    await cleanup_resources()
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 1. 生命周期函数未执行
+
+确保正确使用 `@asynccontextmanager` 装饰器：
+
+```python
+# ❌ 错误：缺少装饰器
+async def lifespan(app):
+    # 代码
+    yield
+    # 更多代码
+
+# ✅ 正确：使用装饰器
+@asynccontextmanager
+async def lifespan(app):
+    # 代码
+    yield
+    # 更多代码
+```
+
+#### 2. 启动失败时资源泄漏
+
+在启动失败时正确清理资源：
+
+```python
+@asynccontextmanager
+async def safe_lifespan(app):
+    resources = []
+    
+    try:
+        resource1 = await create_resource1()
+        resources.append(resource1)
+        
+        resource2 = await create_resource2()
+        resources.append(resource2)
+        
+        yield
+    except Exception as e:
+        logger.error(f"启动失败: {e}")
+    finally:
+        # 清理所有已创建的资源
+        for resource in reversed(resources):
+            try:
+                await cleanup_resource(resource)
+            except Exception as e:
+                logger.error(f"资源清理失败: {e}")
+```
+
+#### 3. 关闭顺序问题
+
+按正确顺序清理资源：
+
+```python
+@asynccontextmanager
+async def ordered_lifespan(app):
+    # 按依赖顺序初始化
+    db_connection = await create_db_connection()
+    cache_client = await create_cache_client(db_connection)
+    api_service = await create_api_service(cache_client)
+    
+    yield
+    
+    # 按相反顺序清理
+    await cleanup_api_service(api_service)
+    await cleanup_cache_client(cache_client)
+    await cleanup_db_connection(db_connection)
+```
+
+## 下一步
+
+- 了解[AgentOS 配置](/agent-os/config)选项
+- 查看[创建您的第一个 OS](/agent-os/creating-your-first-os)了解基本设置
+- 探索[控制平面功能](/agent-os/control-plane)
+- 查看[部署指南](/deploy/overview)了解生产部署
+
+## 相关资源
+
+- [FastAPI 生命周期文档](https://fastapi.tiangolo.com/advanced/events/#lifespan-events)
+- [Python 上下文管理器](https://docs.python.org/3/library/contextlib.html)
+- [asyncio 事件循环](https://docs.python.org/3/library/asyncio-eventloop.html)

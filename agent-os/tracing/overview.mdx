@@ -1,0 +1,562 @@
+---
+title: 追踪
+description: 在 AgentOS 中为您的智能体、团队和工作流配置追踪
+sidebarTitle: 概述
+keywords: [追踪, agentos, 可观察性, 调试]
+---
+
+在生产环境中运行智能体时，理解系统内部发生的事情变得至关重要。智能体做出自主决策、调用外部 API，以及以仅从日志无法看到的方式进行协调。追踪为您提供了调试故障、识别性能瓶颈和理解智能体行为所需的可观察性。
+
+AgentOS 提供内置的追踪支持，与 AgentOS UI 无缝集成。只需启用一个简单的标志，即可立即获得对每个智能体运行、模型调用和工具执行的可见性——所有这些都可以在您的 AgentOS 仪表板中直接查看。
+
+<Note>
+有关 Agno 追踪概念（追踪、跨度以及捕获的内容）的全面介绍，请参阅[追踪概述](/basics/tracing/overview)。
+</Note>
+
+本指南介绍如何根据您的数据库设置在 AgentOS 中配置追踪。
+
+运行智能体/团队后，您可以在 [AgentOS UI](https://os.agno.com/traces) 中**查看追踪**。
+
+## 先决条件
+
+安装所需的 OpenTelemetry 包：
+
+```bash
+pip install -U opentelemetry-api opentelemetry-sdk openinference-instrumentation-agno
+```
+
+## 理解数据库配置
+
+如何配置追踪取决于您的数据库设置：
+
+| 场景 | 配置 | 追踪存储位置 |
+|------|------|-------------|
+| 单个共享数据库 | `tracing=True` | 共享数据库 |
+| 多个数据库 | `tracing=True` + `tracing_db=...` | 专用的 `tracing_db` |
+| 未指定 `tracing_db` | `tracing=True` | 找到的第一个数据库（不推荐） |
+
+<Note>
+建议使用单独的专用数据库来存储追踪数据。这确保所有追踪都存储在一个中心位置，使查询和分析更容易。
+</Note>
+
+## 单数据库设置
+
+如果您的所有智能体和团队共享**同一个数据库实例**，启用追踪很简单：
+
+```python
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.os import AgentOS
+
+# 创建数据库连接
+db = SqliteDb(db_file="tmp.db")
+
+# 创建智能体
+agent = Agent(
+    name="示例智能体",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="你是一个有用的助手。",
+    db=db
+)
+
+# 创建带追踪的 AgentOS
+agent_os = AgentOS(
+    id="my-agent-os",
+    agents=[agent],
+    tracing=True  # 启用追踪
+)
+
+if __name__ == "__main__":
+    agent_os.serve(app="agent_os:app", reload=True)
+```
+
+## 多数据库设置
+
+如果您使用多个数据库，建议为追踪数据指定专用数据库：
+
+```python
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+from agno.os import AgentOS
+
+# 主数据库
+main_db = PostgresDb(
+    db_url="postgresql+psycopg://user:pass@localhost:5432/main_db"
+)
+
+# 追踪专用数据库
+tracing_db = PostgresDb(
+    db_url="postgresql+psycopg://user:pass@localhost:5432/tracing_db"
+)
+
+# 创建智能体
+agent = Agent(
+    name="示例智能体",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="你是一个有用的助手。",
+    db=main_db
+)
+
+# 创建带专用追踪数据库的 AgentOS
+agent_os = AgentOS(
+    id="my-agent-os",
+    agents=[agent],
+    tracing=True,
+    tracing_db=tracing_db  # 指定追踪数据库
+)
+
+if __name__ == "__main__":
+    agent_os.serve(app="agent_os:app", reload=True)
+```
+
+## 追踪架构
+
+### 核心组件
+
+```mermaid
+graph TB
+    subgraph "智能体执行"
+        A[智能体运行] --> B[模型调用]
+        B --> C[工具执行]
+        C --> D[数据处理]
+    end
+    
+    subgraph "追踪系统"
+        E[追踪生成器] --> F[跨度创建]
+        F --> G[事件记录]
+        G --> H[数据存储]
+    end
+    
+    subgraph "观察性工具"
+        I[追踪查看器] --> J[性能分析]
+        J --> K[错误诊断]
+        K --> L[行为分析]
+    end
+    
+    A --> E
+    H --> I
+```
+
+### 追踪数据流
+
+```mermaid
+sequenceDiagram
+    participant A as 智能体
+    participant T as 追踪系统
+    participant D as 数据库
+    participant U as UI 界面
+    
+    A->>T: 开始追踪
+    T->>T: 创建根跨度
+    A->>A: 执行任务
+    A->>T: 记录事件
+    T->>D: 存储追踪数据
+    A->>T: 结束追踪
+    U->>D: 查询追踪数据
+    D-->>U: 返回追踪信息
+```
+
+## 高级配置
+
+### 1. 追踪采样
+
+```python
+from agno.os import AgentOS
+from agno.os.config import TracingConfig
+
+# 追踪配置
+tracing_config = TracingConfig(
+    enabled=True,
+    sample_rate=0.1,  # 10% 采样率
+    max_spans_per_trace=1000,  # 每个追踪最大跨度数
+    trace_timeout=30,  # 追踪超时时间（秒）
+    include_payloads=True,  # 包含负载数据
+    include_headers=False,  # 不包含头部信息
+    exclude_spans=["health_check", "metrics"]  # 排除的跨度类型
+)
+
+agent_os = AgentOS(
+    id="my-agent-os",
+    agents=[agent],
+    tracing=tracing_config
+)
+```
+
+### 2. 自定义追踪器
+
+```python
+from agno.os.tracing import CustomTracer
+from opentelemetry import trace
+
+class CustomAgentTracer(CustomTracer):
+    def __init__(self):
+        super().__init__()
+        self.tracer = trace.get_tracer(__name__)
+    
+    def start_span(self, name: str, **kwargs):
+        """开始自定义跨度"""
+        span = self.tracer.start_span(name, **kwargs)
+        
+        # 添加自定义属性
+        span.set_attribute("custom.agent_type", "ai_assistant")
+        span.set_attribute("custom.environment", "production")
+        
+        return span
+    
+    def end_span(self, span, result=None, error=None):
+        """结束自定义跨度"""
+        if result:
+            span.set_attribute("custom.result", str(result)[:100])
+        
+        if error:
+            span.set_attribute("custom.error", str(error))
+            span.record_exception(error)
+        
+        span.end()
+
+# 使用自定义追踪器
+custom_tracer = CustomAgentTracer()
+
+agent_os = AgentOS(
+    id="my-agent-os",
+    agents=[agent],
+    tracing=True,
+    custom_tracer=custom_tracer
+)
+```
+
+### 3. 环境变量配置
+
+```bash
+# 追踪环境变量
+export OS_TRACING_ENABLED="true"
+export OS_TRACING_SAMPLE_RATE="0.1"
+export OS_TRACING_MAX_SPANS="1000"
+export OS_TRACING_TIMEOUT="30"
+export OS_TRACING_INCLUDE_PAYLOADS="true"
+export OS_TRACING_DB_URL="postgresql://user:pass@localhost:5432/tracing"
+```
+
+## 追踪数据结构
+
+### 1. 追踪信息
+
+```python
+# 追踪数据结构示例
+trace_data = {
+    "trace_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b",
+    "span_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b8b",
+    "parent_span_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b8b",
+    "name": "agent.run",
+    "kind": "SPAN_KIND_CLIENT",
+    "status_code": "STATUS_CODE_OK",
+    "start_time": "2024-01-01T12:00:00Z",
+    "end_time": "2024-01-01T12:00:05Z",
+    "duration_ms": 5000,
+    "attributes": {
+        "agent.name": "示例智能体",
+        "agent.model": "gpt-4",
+        "agent.instructions": "你是一个有用的助手",
+        "user.id": "user-123",
+        "session.id": "session-456"
+    },
+    "events": [
+        {
+            "name": "model.call.start",
+            "timestamp": "2024-01-01T12:00:01Z",
+            "attributes": {
+                "model.name": "gpt-4",
+                "model.provider": "openai"
+            }
+        }
+    ],
+    "links": [
+        {
+            "trace_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b8b",
+            "span_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b8b",
+            "attributes": {
+                "link.type": "related_trace"
+            }
+        }
+    ]
+}
+```
+
+### 2. 跨度类型
+
+| 跨度类型 | 描述 | 属性 |
+|----------|------|------|
+| `agent.run` | 智能体执行 | `agent.name`, `agent.model`, `agent.instructions` |
+| `model.call` | 模型调用 | `model.name`, `model.provider`, `model.temperature` |
+| `tool.execute` | 工具执行 | `tool.name`, `tool.type`, `tool.parameters` |
+| `data.process` | 数据处理 | `data.type`, `data.size`, `data.format` |
+| `network.request` | 网络请求 | `http.method`, `http.url`, `http.status_code` |
+
+## 性能优化
+
+### 1. 采样策略
+
+```python
+from agno.os.tracing import SamplingStrategy
+
+class IntelligentSampler(SamplingStrategy):
+    def __init__(self):
+        self.error_threshold = 0.1  # 错误率阈值
+        self.performance_threshold = 1000  # 性能阈值（毫秒）
+    
+    def should_sample(self, trace_context: dict) -> bool:
+        """智能采样决策"""
+        # 基于错误率的采样
+        error_rate = trace_context.get("error_rate", 0)
+        if error_rate > self.error_threshold:
+            return True
+        
+        # 基于性能的采样
+        avg_duration = trace_context.get("avg_duration", 0)
+        if avg_duration > self.performance_threshold:
+            return True
+        
+        # 基于用户重要性的采样
+        user_tier = trace_context.get("user_tier", "basic")
+        if user_tier in ["premium", "enterprise"]:
+            return True
+        
+        # 默认采样率
+        return hash(trace_context.get("trace_id", "")) % 10 < 1  # 10%
+
+# 使用智能采样器
+sampler = IntelligentSampler()
+
+tracing_config = TracingConfig(
+    enabled=True,
+    custom_sampler=sampler
+)
+```
+
+### 2. 批量处理
+
+```python
+from agno.os.tracing import BatchProcessor
+
+class TraceBatchProcessor(BatchProcessor):
+    def __init__(self, batch_size: int = 100, flush_interval: int = 10):
+        super().__init__()
+        self.batch_size = batch_size
+        self.flush_interval = flush_interval
+        self.trace_buffer = []
+        self.last_flush = time.time()
+    
+    def add_trace(self, trace_data: dict):
+        """添加追踪数据到批处理缓冲区"""
+        self.trace_buffer.append(trace_data)
+        
+        # 检查是否需要刷新
+        if (len(self.trace_buffer) >= self.batch_size or 
+            time.time() - self.last_flush >= self.flush_interval):
+            self.flush_traces()
+    
+    def flush_traces(self):
+        """刷新追踪数据到数据库"""
+        if not self.trace_buffer:
+            return
+        
+        try:
+            # 批量插入数据库
+            self.db.insert_traces_batch(self.trace_buffer)
+            self.trace_buffer.clear()
+            self.last_flush = time.time()
+        except Exception as e:
+            print(f"批量插入追踪数据失败: {e}")
+
+# 使用批处理器
+batch_processor = TraceBatchProcessor(batch_size=50, flush_interval=5)
+
+agent_os = AgentOS(
+    id="my-agent-os",
+    agents=[agent],
+    tracing=True,
+    trace_processor=batch_processor
+)
+```
+
+## 监控和分析
+
+### 1. 追踪指标
+
+```python
+from agno.os.tracing import TraceAnalyzer
+
+class TraceMetricsAnalyzer(TraceAnalyzer):
+    def __init__(self):
+        self.metrics_cache = {}
+        self.analysis_window = 3600  # 1 小时分析窗口
+    
+    def analyze_performance(self, traces: list) -> dict:
+        """分析追踪性能指标"""
+        if not traces:
+            return {}
+        
+        # 计算基本指标
+        total_traces = len(traces)
+        successful_traces = sum(1 for t in traces if t.get("status") == "success")
+        error_rate = (total_traces - successful_traces) / total_traces
+        
+        # 计算性能指标
+        durations = [t.get("duration_ms", 0) for t in traces]
+        avg_duration = sum(durations) / len(durations)
+        p95_duration = sorted(durations)[int(len(durations) * 0.95)]
+        
+        # 按智能体分组分析
+        agent_performance = {}
+        for trace in traces:
+            agent_name = trace.get("attributes", {}).get("agent.name", "unknown")
+            if agent_name not in agent_performance:
+                agent_performance[agent_name] = {
+                    "count": 0,
+                    "total_duration": 0,
+                    "errors": 0
+                }
+            
+            agent_performance[agent_name]["count"] += 1
+            agent_performance[agent_name]["total_duration"] += trace.get("duration_ms", 0)
+            
+            if trace.get("status") != "success":
+                agent_performance[agent_name]["errors"] += 1
+        
+        # 计算每个智能体的平均性能
+        for agent_name, stats in agent_performance.items():
+            stats["avg_duration"] = stats["total_duration"] / stats["count"]
+            stats["error_rate"] = stats["errors"] / stats["count"]
+        
+        return {
+            "total_traces": total_traces,
+            "success_rate": 1 - error_rate,
+            "avg_duration_ms": avg_duration,
+            "p95_duration_ms": p95_duration,
+            "agent_performance": agent_performance
+        }
+
+# 使用追踪分析器
+analyzer = TraceMetricsAnalyzer()
+```
+
+### 2. 异常检测
+
+```python
+from agno.os.tracing import AnomalyDetector
+
+class TraceAnomalyDetector(AnomalyDetector):
+    def __init__(self):
+        self.baseline_metrics = {}
+        self.anomaly_thresholds = {
+            "error_rate_increase": 2.0,  # 错误率增加倍数
+            "duration_increase": 3.0,   # 持续时间增加倍数
+            "span_count_deviation": 2.0  # 跨度数量偏差倍数
+        }
+    
+    def detect_anomalies(self, current_traces: list) -> list:
+        """检测追踪异常"""
+        anomalies = []
+        
+        # 计算当前指标
+        current_metrics = self.calculate_metrics(current_traces)
+        
+        # 与基线比较
+        for metric_name, current_value in current_metrics.items():
+            if metric_name in self.baseline_metrics:
+                baseline_value = self.baseline_metrics[metric_name]
+                
+                # 检查异常
+                if self.is_anomaly(metric_name, current_value, baseline_value):
+                    anomalies.append({
+                        "metric": metric_name,
+                        "current_value": current_value,
+                        "baseline_value": baseline_value,
+                        "severity": self.calculate_severity(metric_name, current_value, baseline_value),
+                        "timestamp": time.time()
+                    })
+        
+        return anomalies
+    
+    def is_anomaly(self, metric_name: str, current_value: float, baseline_value: float) -> bool:
+        """判断是否为异常"""
+        if baseline_value == 0:
+            return current_value > 0
+        
+        ratio = current_value / baseline_value
+        
+        if metric_name == "error_rate":
+            return ratio > self.anomaly_thresholds["error_rate_increase"]
+        elif metric_name == "avg_duration":
+            return ratio > self.anomaly_thresholds["duration_increase"]
+        elif metric_name == "span_count":
+            return abs(ratio - 1.0) > self.anomaly_thresholds["span_count_deviation"]
+        
+        return False
+
+# 使用异常检测器
+anomaly_detector = TraceAnomalyDetector()
+```
+
+## 最佳实践
+
+### 1. 追踪设计原则
+
+- **最小开销**: 确保追踪不会显著影响性能
+- **有意义的数据**: 只记录有用的追踪信息
+- **一致性**: 在整个系统中使用一致的追踪策略
+- **隐私保护**: 避免在追踪中记录敏感信息
+
+### 2. 数据管理
+
+- **数据保留**: 制定合理的数据保留策略
+- **数据压缩**: 使用压缩减少存储空间
+- **数据分区**: 按时间或用户分区存储数据
+- **数据备份**: 定期备份重要的追踪数据
+
+### 3. 监控策略
+
+- **实时监控**: 实施实时追踪监控
+- **告警机制**: 设置智能告警规则
+- **趋势分析**: 分析长期趋势和模式
+- **容量规划**: 基于追踪数据进行容量规划
+
+## 故障排除
+
+### 常见问题
+
+#### 追踪数据丢失
+
+**问题**: 追踪数据没有正确存储
+**解决方案**:
+1. 检查数据库连接配置
+2. 验证追踪数据库权限
+3. 检查存储空间限制
+4. 确认追踪服务状态
+
+#### 性能影响
+
+**问题**: 追踪影响系统性能
+**解决方案**:
+1. 调整采样率
+2. 优化追踪数据量
+3. 使用异步处理
+4. 实施批处理机制
+
+#### 数据查询缓慢
+
+**问题**: 追踪数据查询速度慢
+**解决方案**:
+1. 添加适当的索引
+2. 实施数据分区
+3. 使用缓存机制
+4. 优化查询语句
+
+## 下一步
+
+- 查看[追踪使用指南](/agent-os/tracing/usage)
+- 了解[可观察性概念](/basics/tracing/overview)
+- 探索[AgentOS 配置](/agent-os/config)
+- 查看[AgentOS API](/agent-os/api)

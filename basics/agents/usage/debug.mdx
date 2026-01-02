@@ -1,0 +1,75 @@
+---
+title: 智能体调试模式
+sidebarTitle: 智能体调试模式
+description: 学习如何启用调试模式
+mode: wide
+---
+
+此示例演示如何启用调试模式，以获得更详细的输出和关于智能体执行的详细信息。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch debug.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python debug.py
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+
+    # 您可以为智能体设置调试模式，使所有运行都产生更详细的输出
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        debug_mode=True,
+    )
+
+    agent.print_response(input="给我讲个笑话。")
+
+
+    # 您也可以为单次运行设置调试模式
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+    )
+    agent.print_response(input="给我讲个笑话。", debug_mode=True)
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python debug.py
+    ```
+
+    ```bash Windows
+    python debug.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

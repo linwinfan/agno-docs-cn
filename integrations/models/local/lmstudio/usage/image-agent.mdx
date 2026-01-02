@@ -1,0 +1,54 @@
+---
+title: Image Agent
+---
+
+## Code
+
+```python cookbook/11_models/lmstudio/image_agent.py
+import httpx
+
+from agno.agent import Agent
+from agno.media import Image
+from agno.models.lmstudio import LMStudio
+
+agent = Agent(
+    model=LMStudio(id="llama3.2-vision"),
+    markdown=True,
+)
+
+response = httpx.get(
+    "https://upload.wikimedia.org/wikipedia/commons/0/0c/GoldenGateBridge-001.jpg"
+)
+
+agent.print_response(
+    "Tell me about this image",
+    images=[Image(content=response.content)],
+    stream=True,
+)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+<Step title="安装 LM Studio">
+  安装 LM Studio from [here](https://lmstudio.ai/download) and download the
+  模型 you want to use.
+</Step>
+
+<Step title="安装 libraries">```bash pip install -U agno ```</Step>
+
+  <Step title="Run Agent">
+    <CodeGroup>
+    ```bash Mac
+    python cookbook/11_models/lmstudio/image_agent.py
+    ```
+
+    ```bash Windows
+    python cookbook/11_models/lmstudio/image_agent.py
+    ```
+    </CodeGroup>
+
+  </Step>
+</Steps>

@@ -1,0 +1,52 @@
+---
+title: 工具结果缓存
+description: 学习如何在 Agno 中缓存工具结果。
+---
+
+工具结果缓存旨在通过将函数调用的结果存储在磁盘上来避免不必要的重复计算。
+这在开发和测试期间非常有用，可以加快开发过程、避免速率限制并降低成本。
+
+<Check>
+所有 Agno 工具包都支持此功能
+</Check>
+
+## 在工具包上
+
+将 `cache_results=True` 传递给工具包构造函数以启用该工具包的缓存。
+
+```python cache_tool_calls.py
+import asyncio
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.yfinance import YFinanceTools
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools(cache_results=True), YFinanceTools(cache_results=True)],
+)
+
+asyncio.run(
+    agent.aprint_response(
+        "What is the current stock price of AAPL and latest news on 'Apple'?",
+        markdown=True,
+    )
+)
+```
+
+## 在 @tool 上
+
+将 `cache_results=True` 传递给 `@tool` 装饰器以启用该工具的缓存。
+
+```python cache_tool_calls.py
+from agno.tools import tool
+
+@tool(cache_results=True)
+def get_stock_price(ticker: str) -> str:
+    """Get the current stock price of a given ticker"""
+
+    # ... Long running operation
+
+    return f"The current stock price of {ticker} is 100"
+```

@@ -1,0 +1,155 @@
+---
+title: 数据库迁移
+sidebarTitle: 数据库迁移
+description: 学习如何迁移您的 Agno 数据库表。
+---
+
+您可以预期您的 Agno 数据库表模式在版本之间保持稳定。
+
+但是，在未来的版本中，我们可能会偶尔更新或添加新的列或表。
+
+要应用迁移，Agno 提供了两个选项：
+
+- **使用 AgentOS 迁移端点**：这是使用 AgentOS 时最简单的选项。您只需要发出一个 POST 请求。
+- **使用 `MigrationManager` 手动迁移**：如果您更喜欢受控的迁移体验，您可以使用 MigrationManager 类来升级或降级您的模式。
+
+## 使用 AgentOS 迁移端点
+
+如果您正在使用 [AgentOS](/agent-os/introduction)，您可以通过迁移端点处理您的迁移需求。
+
+您可以在 [AgentOS 数据库迁移](/agent-os/usage/database-migrations) 页面中了解更多相关信息。
+
+## 使用 MigrationManager 手动迁移
+
+所有迁移最终都由 `MigrationManager` 类处理。
+
+您可以直接使用它来完全控制您的迁移过程，或者使用我们提供的一个支持脚本。
+
+直接使用它看起来像这样：
+
+```python
+import asyncio
+
+from agno.db.migrations import MigrationManager
+from agno.db.postgres import AsyncPostgresDb
+
+# 您想要迁移的数据库
+db = AsyncPostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai")
+
+async run_migrations():
+    await MigrationManager(db).up()
+
+if __name__ == "__main__":
+    asyncio.run(run_migrations())
+```
+
+您可以在 [`libs/agno/migrations`](https://github.com/agno-agi/agno/tree/main/libs/agno/migrations) 目录中找到支持脚本来处理您的迁移需求。
+
+## 关于 MigrationManager
+
+`MigrationManager`：
+
+1. 创建一个 `agno_schema_versions` 表来跟踪每个表的模式版本
+2. 检查每个表的当前模式版本
+3. 按顺序从当前版本到目标版本应用迁移
+4. 成功迁移后更新模式版本记录
+5. 支持同步和异步数据库操作
+
+支持以下数据库：
+
+- PostgreSQL
+- SQLite
+- MySQL
+- SingleStore
+
+您也可以使用异步数据库类（`AsyncPostgresDb` 和 `AsyncSqliteDb`）也受支持。
+
+<Tip>
+- 我们建议避免在数据库中手动创建列。这可能导致迁移管理器失败。
+- 确保 `agno_schema_versions` 表中的模式版本是正确的。
+</Tip>
+
+请参阅 [MigrationManager](/reference/storage/migrations) 页面了解更多信息。
+
+
+### 升级特定表
+
+您也可以升级特定表：
+
+```python
+import asyncio
+
+from agno.db.migrations import MigrationManager
+from agno.db.postgres import AsyncPostgresDb
+
+# 您想要迁移的数据库
+db = AsyncPostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai")
+
+async run_migrate_table():
+    # 这将把 memories 表迁移到最新版本
+    await MigrationManager(db).up(table_type="memory")
+
+    # 或者如果您想要升级到特定版本
+    await MigrationManager(db).up(table_type="memory", target_version="2.0.0")
+
+    # 或者如果您想要强制迁移
+    await MigrationManager(db).up(table_type="memory", force=True)
+
+if __name__ == "__main__":
+    asyncio.run(run_migrate_table())
+```
+
+支持的表类型有：`session`、`memory`、`metrics`、`eval`、`knowledge`、`culture`。
+
+
+### 恢复迁移
+
+您也可以使用 `MigrationManager` 类来恢复迁移：
+
+```python
+import asyncio
+
+from agno.db.migrations import MigrationManager
+from agno.db.postgres import AsyncPostgresDb
+
+# 您想要迁移的数据库
+db = AsyncPostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai")
+
+async run_revert_migrations():
+    await MigrationManager(db).down(target_version="2.0.0")
+
+if __name__ == "__main__":
+    asyncio.run(run_revert_migrations())
+```
+
+
+## 故障排除
+
+<Tabs>
+  <Tab title="模式不匹配错误">
+    如果您继续看到错误并且无法读取或写入数据库，这可能是由于模式版本与表的实际模式之间的不匹配造成的。
+
+    请将 `force` 参数设置为 `True` 来强制特定表的迁移。
+    ```python
+    await MigrationManager(db).up(
+        target_version="2.3.0",
+        table_type="memory",
+        force=True,
+    )
+    ```
+  </Tab>
+  <Tab title="无效列错误">
+    确保在生产环境中使用更新的 `agno` 代码之前已经运行了迁移。
+  </Tab>
+  <Tab title="SQL INSERT 错误">
+    如果您在使用数据库时遇到 SQL INSERT 错误，请确保您已经运行了最新的迁移并且您已经重启了 AgentOS 实例。
+  </Tab>
+</Tabs>
+
+## 从 Agno v1 迁移到 v2
+
+如果您在 v1 期间开始使用 Agno 并希望迁移到 v2，我们有一个迁移脚本可以帮助您更新您的数据库表。
+
+您可以在 [`libs/agno/migrations/v1_to_v2/migrate_to_v2.py`](https://github.com/agno-agi/agno/blob/main/libs/agno/migrations/v1_to_v2/migrate_to_v2.py) 文件中找到该脚本。
+
+您可以在[迁移到 Agno v2 指南](/how-to/v2-migration)中找到有关从 v1 迁移到 v2 的更多信息。

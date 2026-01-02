@@ -1,0 +1,103 @@
+---
+title: 智能体工具
+sidebarTitle: 概述
+description: 学习如何在 Agno 中使用工具来构建 AI 智能体。
+---
+
+**智能体使用工具来执行操作并与外部系统交互**。
+
+工具是智能体可以运行以完成任务的函数。例如：搜索网络、运行 SQL、发送电子邮件或调用 API。您可以使用任何 Python 函数作为工具，或使用预构建的 Agno **工具包**。
+
+基本语法如下：
+
+```python
+from agno.agent import Agent
+
+agent = Agent(
+    # 添加函数或工具包
+    tools=[...],
+)
+```
+
+## 使用工具包
+
+Agno 提供了许多预构建的 **工具包**，您可以将其添加到智能体中。例如，让我们使用 DuckDuckGo 工具包来搜索网络。
+
+<Tip>
+  您可以在 [工具包](/integrations/toolkits) 指南中找到更多工具包。
+</Tip>
+
+<Steps>
+  <Step title="创建网络搜索智能体">
+    创建文件 `web_search.py`
+
+    ```python web_search.py
+    from agno.agent import Agent
+    from agno.tools.duckduckgo import DuckDuckGoTools
+
+    agent = Agent(tools=[DuckDuckGoTools()], markdown=True)
+    agent.print_response("Whats happening in France?", stream=True)
+    ```
+
+  </Step>
+  <Step title="运行智能体">
+    安装库
+
+    ```shell
+    pip install openai ddgs agno
+    ```
+
+    运行智能体
+
+    ```shell
+    python web_search.py
+    ```
+
+  </Step>
+</Steps>
+
+## 编写自己的工具
+
+为了获得更多控制权，您可以编写自己的 Python 函数并将其作为工具添加到智能体中。例如，以下是如何将 `get_top_hackernews_stories` 工具添加到智能体。
+
+```python hn_agent.py
+import json
+import httpx
+
+from agno.agent import Agent
+
+def get_top_hackernews_stories(num_stories: int = 10) -> str:
+    """Use this function to get top stories from Hacker News.
+
+    Args:
+        num_stories (int): Number of stories to return. Defaults to 10.
+    """
+
+    # Fetch top story IDs
+    response = httpx.get('https://hacker-news.firebaseio.com/v0/topstories.json')
+    story_ids = response.json()
+
+    # Fetch story details
+    stories = []
+    for story_id in story_ids[:num_stories]:
+        story_response = httpx.get(f'https://hacker-news.firebaseio.com/v0/item/{story_id}.json')
+        story = story_response.json()
+        if "text" in story:
+            story.pop("text", None)
+        stories.append(story)
+    return json.dumps(stories)
+
+agent = Agent(tools=[get_top_hackernews_stories], markdown=True)
+agent.print_response("Summarize the top 5 stories on hackernews?", stream=True)
+```
+
+了解更多：
+
+- [可用工具包](/integrations/toolkits)
+- [创建自己的工具](/basics/tools/creating-tools/overview)
+
+## 开发者资源
+
+- 查看 [智能体架构](/reference/agents/agent)
+- 查看 [知识架构](/reference/knowledge/knowledge)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/08_knowledge/)

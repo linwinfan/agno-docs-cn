@@ -1,0 +1,756 @@
+---
+title: 使用您自己的 FastAPI 应用
+sidebarTitle: 概述
+description: 了解如何在您的 AgentOS 中使用您自己的 FastAPI 应用
+keywords: [fastapi, 自定义路由, agentos 集成, 中间件, asgi 服务器, uvicorn, 自定义应用, fastapi 应用]
+---
+
+AgentOS 基于 FastAPI 构建，这意味着您可以轻松集成现有的 FastAPI 应用程序或添加自定义路由和路由器来扩展智能体的功能。
+
+## 快速开始
+
+使用您自己的 FastAPI 应用最简单的方法是将其传递给 AgentOS 构造函数：
+
+```python
+from fastapi import FastAPI
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.os import AgentOS
+
+# 创建您的自定义 FastAPI 应用
+app = FastAPI(title="我的自定义应用")
+
+# 添加您的自定义路由
+@app.get("/status")
+async def status_check():
+    return {"status": "健康"}
+
+# 将您的应用传递给 AgentOS
+agent_os = AgentOS(
+    agents=[Agent(id="basic-agent", model=OpenAIChat(id="gpt-5-mini"))],
+    base_app=app  # 您的自定义 FastAPI 应用
+)
+
+# 获取包含 AgentOS 和您的路由的组合应用
+app = agent_os.get_app()
+```
+
+<Tip>
+您的自定义 FastAPI 应用可以有自己的中间件和依赖项。
+
+如果您有自己的 CORS 中间件，它将被更新以包含 AgentOS 允许的源，以使 AgentOS 实例与控制平面兼容。
+否则，适当的 CORS 中间件将被添加到应用中。
+</Tip>
+
+### 添加中间件
+
+您可以将任何 FastAPI 中间件添加到您的自定义 FastAPI 应用，AgentOS 将会尊重它。
+
+Agno 还为常见用例提供了一些内置中间件，包括身份验证。
+
+## 高级集成
+
+### 自定义路由器
+
+将多个路由器组织到您的应用中：
+
+```python
+from fastapi import APIRouter
+
+# 创建自定义路由器
+api_router = APIRouter(prefix="/api/v1")
+
+@api_router.get("/users")
+async def get_users():
+    return {"users": ["张三", "李四"]}
+
+@api_router.post("/webhook")
+async def handle_webhook(data: dict):
+    return {"status": "received", "data": data}
+
+# 管理路由器
+admin_router = APIRouter(prefix="/admin")
+
+@admin_router.get("/stats")
+async def get_stats():
+    return {"total_users": 100, "active_sessions": 25}
+
+# 创建主应用
+app = FastAPI(title="企业应用")
+
+# 包含路由器
+app.include_router(api_router)
+app.include_router(admin_router)
+
+# 集成 AgentOS
+agent_os = AgentOS(
+    agents=[Agent(id="assistant", model=OpenAIChat())],
+    base_app=app
+)
+
+combined_app = agent_os.get_app()
+```
+
+### 依赖注入
+
+使用 FastAPI 的依赖注入系统：
+
+```python
+from fastapi import Depends, HTTPException, status
+from pydantic import BaseModel
+
+class User(BaseModel):
+    id: int
+    name: str
+    email: str
+
+# 模拟数据库
+fake_users_db = {}
+
+async def get_current_user(user_id: int) -> User:
+    if user_id not in fake_users_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="用户未找到"
+        )
+    return fake_users_db[user_id]
+
+# 使用依赖项的路由
+@app.get("/users/{user_id}")
+async def read_user(user: User = Depends(get_current_user)):
+    return user
+
+@app.post("/users/{user_id}/chat")
+async def chat_with_user(
+    message: str,
+    user: User = Depends(get_current_user)
+):
+    # 为特定用户运行智能体
+    result = await agent_os.run_agent(
+        agent_id="assistant",
+        message=message,
+        user_id=user.email
+    )
+    return {"response": result.content}
+```
+
+### 中间件集成
+
+添加自定义中间件：
+
+```python
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
+import time
+import logging
+
+logger = logging.getLogger(__name__)
+
+class TimingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        start_time = time.time()
+        
+        response = await call_next(request)
+        
+        process_time = time.time() - start_time
+        response.headers["X-Process-Time"] = str(process_time)
+        
+        logger.info(f"{request.method} {request.url.path} - {process_time:.4f}s")
+        
+        return response
+
+class AuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # 检查授权头
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+            return Response(
+                content="缺少授权头",
+                status_code=401
+            )
+        
+        # 验证令牌（简化示例）
+        if not auth_header.startswith("Bearer "):
+            return Response(
+                content="无效的授权格式",
+                status_code=401
+            )
+        
+        # 继续处理请求
+        response = await call_next(request)
+        return response
+
+# 添加中间件到应用
+app.add_middleware(TimingMiddleware)
+app.add_middleware(AuthMiddleware)
+
+# 然后集成 AgentOS
+agent_os = AgentOS(
+    agents=[Agent(id="assistant", model=OpenAIChat())],
+    base_app=app
+)
+```
+
+## AgentOS 中间件
+
+### 认证中间件
+
+使用 AgentOS 内置的认证中间件：
+
+```python
+from agno.middleware.auth import AuthMiddleware
+from agno.middleware.rbac import RBACMiddleware
+
+# 添加认证中间件
+app.add_middleware(
+    AuthMiddleware,
+    auth_type="jwt",  # 或 "api_key"
+    secret_key="your-secret-key"
+)
+
+# 添加 RBAC 中间件
+app.add_middleware(
+    RBACMiddleware,
+    permissions={
+        "/agents": ["agents:read"],
+        "/agents/*/runs": ["agents:run"],
+        "/admin/*": ["admin:access"]
+    }
+)
+
+# 集成 AgentOS
+agent_os = AgentOS(
+    agents=[Agent(id="assistant", model=OpenAIChat())],
+    base_app=app
+)
+```
+
+### 日志中间件
+
+使用 AgentOS 的日志中间件：
+
+```python
+from agno.middleware.logging import LoggingMiddleware
+
+# 配置日志中间件
+app.add_middleware(
+    LoggingMiddleware,
+    log_level="INFO",
+    include_body=True,
+    max_body_size=1000
+)
+```
+
+### 限流中间件
+
+添加限流保护：
+
+```python
+from agno.middleware.rate_limit import RateLimitMiddleware
+
+# 添加限流中间件
+app.add_middleware(
+    RateLimitMiddleware,
+    requests_per_minute=60,
+    burst_size=10,
+    key_func=lambda request: request.client.host
+)
+```
+
+## 自定义生命周期
+
+### 应用启动和关闭
+
+定义自定义生命周期事件：
+
+```python
+from contextlib import asynccontextmanager
+import asyncio
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 启动逻辑
+    print("🚀 应用启动中...")
+    
+    # 初始化数据库
+    await init_database()
+    
+    # 启动后台任务
+    background_task = asyncio.create_task(background_monitor())
+    
+    yield
+    
+    # 关闭逻辑
+    print("🛑 应用关闭中...")
+    
+    # 停止后台任务
+    background_task.cancel()
+    try:
+        await background_task
+    except asyncio.CancelledError:
+        pass
+    
+    # 清理资源
+    await cleanup_resources()
+
+async def init_database():
+    """初始化数据库连接"""
+    print("📊 连接数据库...")
+    await asyncio.sleep(1)  # 模拟连接
+    print("✅ 数据库连接成功")
+
+async def cleanup_resources():
+    """清理资源"""
+    print("🧹 清理资源...")
+    await asyncio.sleep(0.5)
+    print("✅ 资源清理完成")
+
+async def background_monitor():
+    """后台监控任务"""
+    while True:
+        try:
+            await asyncio.sleep(30)
+            print("🔔 后台监控检查")
+        except asyncio.CancelledError:
+            break
+
+# 使用生命周期的应用
+app = FastAPI(
+    title="带生命周期的应用",
+    lifespan=lifespan
+)
+```
+
+## 配置管理
+
+### 环境配置
+
+使用环境变量配置应用：
+
+```python
+from pydantic import BaseSettings
+from typing import Optional
+
+class Settings(BaseSettings):
+    app_name: str = "AgentOS 应用"
+    debug: bool = False
+    database_url: str
+    openai_api_key: str
+    cors_origins: list = ["http://localhost:3000"]
+    log_level: str = "INFO"
+    
+    class Config:
+        env_file = ".env"
+
+# 加载设置
+settings = Settings()
+
+# 创建应用
+app = FastAPI(
+    title=settings.app_name,
+    debug=settings.debug
+)
+
+# 使用设置
+@app.get("/settings")
+async def get_settings():
+    return {
+        "app_name": settings.app_name,
+        "debug": settings.debug,
+        "log_level": settings.log_level
+    }
+```
+
+### 动态配置
+
+实现动态配置更新：
+
+```python
+from fastapi import BackgroundTasks
+import asyncio
+
+class ConfigManager:
+    def __init__(self):
+        self.config = {}
+        self.listeners = []
+    
+    def update_config(self, key: str, value: str):
+        """更新配置"""
+        self.config[key] = value
+        
+        # 通知监听器
+        for listener in self.listeners:
+            asyncio.create_task(listener(key, value))
+    
+    def add_listener(self, callback):
+        """添加配置变更监听器"""
+        self.listeners.append(callback)
+
+# 全局配置管理器
+config_manager = ConfigManager()
+
+@app.post("/config/{key}")
+async def update_config(key: str, value: str):
+    """更新配置"""
+    config_manager.update_config(key, value)
+    return {"status": "updated", "key": key, "value": value}
+
+async def config_change_handler(key: str, value: str):
+    """配置变更处理器"""
+    print(f"配置已更新: {key} = {value}")
+    
+    if key == "log_level":
+        # 更新日志级别
+        logging.getLogger().setLevel(value)
+
+# 添加监听器
+config_manager.add_listener(config_change_handler)
+```
+
+## 测试
+
+### 单元测试
+
+为自定义应用编写测试：
+
+```python
+import pytest
+from fastapi.testclient import TestClient
+from agno.agent import Agent
+from agno.os import AgentOS
+
+# 创建测试应用
+@pytest.fixture
+def test_app():
+    app = FastAPI()
+    
+    @app.get("/test")
+    async def test_endpoint():
+        return {"message": "测试"}
+    
+    agent_os = AgentOS(
+        agents=[Agent(id="test-agent", instructions="测试智能体")],
+        base_app=app
+    )
+    
+    return agent_os.get_app()
+
+@pytest.fixture
+def client(test_app):
+    return TestClient(test_app)
+
+def test_custom_endpoint(client):
+    """测试自定义端点"""
+    response = client.get("/test")
+    assert response.status_code == 200
+    assert response.json() == {"message": "测试"}
+
+def test_agentos_endpoint(client):
+    """测试 AgentOS 端点"""
+    response = client.get("/agents")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) > 0
+```
+
+### 集成测试
+
+测试完整的集成：
+
+```python
+@pytest.mark.asyncio
+async def test_full_integration():
+    """测试完整集成"""
+    app = FastAPI()
+    
+    @app.post("/webhook")
+    async def webhook(data: dict):
+        # 处理 webhook 并调用智能体
+        result = await run_agent_with_data(data)
+        return {"processed": True, "result": result}
+    
+    agent_os = AgentOS(
+        agents=[Agent(id="webhook-agent", instructions="处理 webhook 数据")],
+        base_app=app
+    )
+    
+    # 测试完整流程
+    with TestClient(agent_os.get_app()) as client:
+        response = client.post(
+            "/webhook",
+            json={"message": "测试 webhook"}
+        )
+        
+        assert response.status_code == 200
+        assert response.json()["processed"] is True
+```
+
+## 部署
+
+### Docker 部署
+
+使用 Docker 部署自定义应用：
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 复制依赖文件
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# 复制应用代码
+COPY . .
+
+# 暴露端口
+EXPOSE 8000
+
+# 启动命令
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+```yaml
+# docker-compose.yml
+version: "3.8"
+
+services:
+  agentos-app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/app
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
+```
+
+### Kubernetes 部署
+
+使用 Kubernetes 部署：
+
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentos-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: agentos-app
+  template:
+    metadata:
+      labels:
+        app: agentos-app
+    spec:
+      containers:
+      - name: agentos-app
+        image: your-registry/agentos-app:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: openai-api-key
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentos-app-service
+spec:
+  selector:
+    app: agentos-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+```
+
+## 最佳实践
+
+### 1. 模块化结构
+
+组织代码为模块化结构：
+
+```
+app/
+├── __init__.py
+├── main.py              # 主应用入口
+├── routers/
+│   ├── __init__.py
+│   ├── users.py         # 用户路由
+│   ├── admin.py         # 管理路由
+│   └── webhooks.py      # Webhook 路由
+├── middleware/
+│   ├── __init__.py
+│   ├── auth.py          # 认证中间件
+│   └── logging.py       # 日志中间件
+├── models/
+│   ├── __init__.py
+│   ├── user.py          # 用户模型
+│   └── response.py      # 响应模型
+├── services/
+│   ├── __init__.py
+│   ├── user_service.py  # 用户服务
+│   └── agent_service.py # 智能体服务
+└── config/
+    ├── __init__.py
+    └── settings.py      # 配置设置
+```
+
+### 2. 错误处理
+
+实现统一的错误处理：
+
+```python
+from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+import logging
+
+logger = logging.getLogger(__name__)
+
+class AppException(Exception):
+    def __init__(self, message: str, status_code: int = 500):
+        self.message = message
+        self.status_code = status_code
+
+@app.exception_handler(AppException)
+async def app_exception_handler(request: Request, exc: AppException):
+    logger.error(f"应用异常: {exc.message}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": exc.message}
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    logger.warning(f"验证错误: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={"error": "验证失败", "details": exc.errors()}
+    )
+```
+
+### 3. 性能优化
+
+优化应用性能：
+
+```python
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+import asyncio
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 启动性能优化
+    app.state.connection_pool = create_connection_pool()
+    app.state.cache = create_cache()
+    
+    yield
+    
+    # 清理资源
+    await app.state.connection_pool.close()
+    await app.state.cache.close()
+
+# 使用缓存
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def get_expensive_data(key: str):
+    """缓存昂贵的数据获取操作"""
+    # 模拟昂贵操作
+    time.sleep(0.1)
+    return f"data_{key}"
+
+@app.get("/cached/{key}")
+async def get_cached_data(key: str):
+    return {"data": get_expensive_data(key)}
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 1. 路由冲突
+
+```python
+# 检查路由冲突
+def print_routes(app: FastAPI):
+    """打印所有路由"""
+    for route in app.routes:
+        print(f"{route.methods} {route.path}")
+
+# 在集成后检查
+agent_os = AgentOS(base_app=app)
+combined_app = agent_os.get_app()
+print_routes(combined_app)
+```
+
+#### 2. 中间件顺序
+
+```python
+# 确保中间件顺序正确
+# 认证应该在日志之前
+app.add_middleware(AuthMiddleware)
+app.add_middleware(LoggingMiddleware)
+app.add_middleware(TimingMiddleware)
+```
+
+#### 3. CORS 问题
+
+```python
+# 调试 CORS 问题
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 开发时使用
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+## 下一步
+
+- 了解[AgentOS 配置](/agent-os/config)
+- 查看[路由覆盖](/agent-os/custom-fastapi/override-routes)
+- 探索[中间件](/agent-os/middleware)功能
+- 查看[API 参考](/reference-api/overview)

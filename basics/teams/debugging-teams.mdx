@@ -1,0 +1,82 @@
+---
+title: 调试团队
+sidebarTitle: 调试团队
+description: 学习如何调试 Agno 团队。
+keywords: [团队, 调试团队]
+---
+
+Agno 提供了调试模式，将您的团队开发体验提升到新水平。它帮助您理解执行流程和中间步骤。例如：
+
+1. 检查发送给模型的消息及其生成的响应。
+2. 跟踪中间步骤并监控指标，如令牌使用量、执行时间等。
+3. 检查工具调用、错误及其结果。
+4. 监控团队成员交互和委派模式。
+
+## 调试模式
+
+要在团队上启用调试模式，请使用以下方法之一：
+
+1. 在您的团队上设置 `debug_mode` 参数，为所有运行以及成员运行启用它。
+2. 在 `run` 方法上设置 `debug_mode` 参数，为单次运行启用它。
+3. 将 `AGNO_DEBUG` 环境变量设置为 `True`，为所有团队启用调试模式。
+
+```python
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+news_agent = Agent(name="新闻智能体", role="获取最新新闻")
+weather_agent = Agent(name="天气智能体", role="获取未来7天的天气")
+
+team = Team(
+    name="新闻和天气团队",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o"),
+    debug_mode=True,
+    # debug_level=2, # 取消注释以获取更详细的日志
+)
+
+# 运行团队并将响应打印到终端
+team.print_response("东京的天气怎么样？", show_member_responses=True)
+```
+
+<Tip>
+
+您可以设置 `debug_level=2` 来获取更详细的日志。
+
+</Tip>
+
+## 交互式CLI
+
+Agno 还提供了一个预构建的交互式CLI，可以将您的团队作为命令行应用程序运行。您可以使用它来测试与团队的来回对话。
+
+```python
+from agno.team import Team
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+
+news_agent = Agent(name="新闻智能体", role="获取最新新闻")
+weather_agent = Agent(name="天气智能体", role="获取未来7天的天气")
+
+team = Team(
+    name="新闻和天气团队",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o"),
+    db=SqliteDb(db_file="tmp/data.db"),
+    add_history_to_context=True,
+    num_history_runs=3,
+)
+
+# 将团队作为交互式CLI应用程序运行
+team.cli_app(stream=True)
+```
+
+<Note>
+使用 `await team.acli_app()` 在交互式CLI应用程序中异步运行团队。
+</Note>
+
+## 开发者资源
+
+- View the [Team reference](/reference/teams/team)
+- View [Team Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/README.md)

@@ -1,0 +1,57 @@
+---
+title: 包含和排除工具
+sidebarTitle: 包含和排除工具
+description: 学习如何从工具包中包含和排除工具。
+mode: wide
+---
+
+您可以使用 `include_tools` 和 `exclude_tools` 参数指定要从 `Toolkit` 中包含或排除哪些工具。这对于限制智能体可用的工具数量非常有用。
+
+例如，以下是如何在 `GmailTools` 工具包中仅包含 `get_latest_emails` 工具：
+
+```python
+agent = Agent(
+    tools=[GmailTools(include_tools=["get_latest_emails"])],
+)
+```
+
+类似地，以下是如何从 `GmailTools` 工具包中排除 `create_draft_email` 工具：
+
+```python
+agent = Agent(
+    tools=[GmailTools(exclude_tools=["create_draft_email"])],
+)
+```
+
+## 示例
+
+以下是如何使用 `include_tools` 和 `exclude_tools` 参数来限制智能体可用工具数量的示例：
+
+```python include_exclude_tools.py
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.calculator import CalculatorTools
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.yfinance import YFinanceTools
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[
+        CalculatorTools(
+            exclude_tools=["exponentiate", "factorial", "is_prime", "square_root"],
+        ),
+        DuckDuckGoTools(include_tools=["duckduckgo_search"]),
+    ],
+    markdown=True,
+)
+
+agent.print_response(
+    "Search the web for a difficult sum that can be done with normal arithmetic and solve it.",
+)
+```
+
+
+
+
+

@@ -1,0 +1,47 @@
+---
+title: JSON 文件作为数据库，基于 Google Cloud Storage (GCS)
+sidebarTitle: 概述
+description: 学习使用 Google Cloud Storage (GCS) 作为您的代理数据库
+---
+
+Agno 支持使用 [Google Cloud Storage (GCS)](https://cloud.google.com/storage) 作为数据库，通过 `GcsJsonDb` 类实现。
+会话数据将作为 JSON blob 存储在 GCS 存储桶中。
+
+您可以按照他们的[入门指南](https://cloud.google.com/docs/get-started)开始使用 GCS。
+
+## 用法
+
+```python gcs_for_agent.py
+import uuid
+import google.auth
+from agno.agent import Agent
+from agno.db.gcs_json import GcsJsonDb
+
+# 从您的 gcloud CLI 会话获取默认凭证和项目 ID。
+credentials, project_id = google.auth.default()
+
+# 使用基础名称和 UUID4 后缀生成唯一的存储桶名称。
+base_bucket_name = "example-gcs-bucket"
+unique_bucket_name = f"{base_bucket_name}-{uuid.uuid4().hex[:12]}"
+print(f"Using bucket: {unique_bucket_name}")
+
+# 使用显式凭证、唯一存储桶名称和项目初始化 GcsJsonDb。
+db = GcsJsonDb(
+    bucket_name=unique_bucket_name,
+    prefix="agent/",
+    project=project_id,
+    credentials=credentials,
+)
+
+# 使用数据库设置您的代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-gcs-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/gcs/gcs_json_for_agent.py)
+- 在[这里](/integrations/database/gcs/usage/gcs-for-agent)查看完整示例

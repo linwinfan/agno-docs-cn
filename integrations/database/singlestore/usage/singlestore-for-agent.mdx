@@ -1,0 +1,49 @@
+---
+title: Singlestore for Agent
+sidebarTitle: Agent
+---
+
+Agno 支持 using Singlestore 作为智能体的存储后端 using the `SingleStoreDb` class.
+
+## 使用方法
+
+Obtain the credentials for Singlestore from [here](https://portal.singlestore.com/)
+
+```python singlestore_for_agent.py
+from os import getenv
+
+from agno.agent import Agent
+from agno.db.singlestore.singlestore import SingleStoreDb
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+# Configure SingleStore DB connection
+USERNAME = getenv("SINGLESTORE_USERNAME")
+PASSWORD = getenv("SINGLESTORE_PASSWORD")
+HOST = getenv("SINGLESTORE_HOST")
+PORT = getenv("SINGLESTORE_PORT")
+DATABASE = getenv("SINGLESTORE_DATABASE")
+
+db_url = (
+    f"mysql+pymysql://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}?charset=utf8mb4"
+)
+
+db = SingleStoreDb(db_url=db_url)
+
+# Create an agent with SingleStore db
+agent = Agent(
+    db=db,
+    tools=[DuckDuckGoTools()],
+    add_history_to_context=True,
+)
+agent.print_response("How many people live in Canada?")
+agent.print_response("What is their national anthem called?")
+
+```
+
+## 参数
+
+<Snippet file="db-singlestore-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/singlestore/singlestore_for_智能体.py)

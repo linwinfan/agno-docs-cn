@@ -1,0 +1,83 @@
+---
+title: 什么是知识过滤器？
+sidebarTitle: 概述
+description: 使用知识过滤器来限制和优化搜索
+keywords: [knowledge filters]
+---
+
+知识过滤器允许您使用元数据（如用户ID、文档类型、年份等）来限制和优化知识库内的搜索。当您拥有大量文档并希望检索与特定用户或上下文相关的信息时，此功能特别有用。
+
+## 为什么使用知识过滤器？
+
+- **个性化**：为特定用户或组检索信息。
+- **安全性**：限制对敏感文档的访问。
+- **效率**：通过缩小搜索结果范围来减少噪音。
+
+## 知识过滤器如何工作？
+
+当您将文档加载到知识库时，可以附加元数据（如用户ID、文档类型、年份等）。稍后，在查询时，您可以指定过滤器以仅搜索匹配特定条件的文档。
+
+**Example Metadata:**
+```python
+{
+    "user_id": "jordan_mitchell",
+    "document_type": "cv",
+    "year": 2025,
+}
+```
+
+## Ways to Apply Filters
+
+You can apply knowledge filters in two main ways:
+1. **Manual Filters:** Explicitly pass filters when querying.
+2. **Agentic Filters:** Let the Agent automatically extract filters from your query.
+
+> **Tip:** You can combine multiple filters for more precise results!
+
+## Filters in Traditional RAG vs. Agentic RAG
+
+When configuring your Agent it is important to choose the right approach for your use case. There are two broad approaches to RAG with Agno agents: traditional RAG and agentic RAG. With a traditional RAG approach you set `add_knowledge_to_context=True` to ensure that references are included in the system message sent to the LLM. For Agentic RAG, you set `search_knowledge=True` to leverage the agent's ability search the knowledge base directly.
+
+Example:
+```python
+agent = Agent(
+    name="KnowledgeFilterAgent",
+    search_knowledge=False,  # Do not use agentic search
+    add_knowledge_to_context=True,     # Add knowledge base references to the system prompt
+    knowledge_filters={"user_id": "jordan_mitchell"}, # Pass filters like this
+)
+```
+
+<Check>
+Remember to use only one of these configurations at a time, setting the other to false. By default, `search_knowledge=True` is preferred as it offers a more dynamic and interactive experience.
+Checkout an example [here](/basics/knowledge/filters/usage/filtering) of how to set up knowledge filters in a Traditional RAG system
+</Check>
+
+## Best Practices
+
+- Make your prompts descriptive (e.g., include user names, document types, years).
+- Use agentic filtering for interactive applications or chatbots.
+
+## Manual vs. Agentic Filtering
+
+| Manual Filtering | Agentic Filtering |
+|------------------|------------------|
+| Explicit filters in code | Filters inferred from query text |
+| Full control | More natural, less code |
+| Good for automation | Good for user-facing apps |
+
+<Note>
+🚦 **Currently, knowledge filtering is supported on the following vector databases:**
+
+- **Qdrant**
+- **LanceDB**
+- **PgVector**
+- **MongoDB**
+- **Pinecone**
+- **Weaviate**
+- **ChromaDB**
+- **Milvus**
+</Note>
+
+## Developer Resources
+See the detailed cookbooks [here](https://github.com/agno-agi/agno/blob/main/cookbook/08_knowledge/filters/README.md)

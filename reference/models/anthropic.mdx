@@ -1,0 +1,32 @@
+---
+title: Claude
+sidebarTitle: Claude
+---
+
+Claude 模型提供对 Anthropic 的 Claude 模型的访问。
+
+## 参数
+
+| 参数                       | 类型                        | 默认值                         | 描述                                                     |
+| ------------------------------ | --------------------------- | ------------------------------ | ------------------------------------------------------- |
+| `id`                           | `str`                       | `"claude-3-5-sonnet-20241022"` | 要使用的 Anthropic Claude 模型的 ID                     |
+| `name`                         | `str`                       | `"Claude"`                     | 模型的名称                                              |
+| `provider`                     | `str`                       | `"Anthropic"`                  | 模型的提供商                                            |
+| `max_tokens`                   | `Optional[int]`             | `4096`                         | 在聊天完成中要生成的最大 token 数量                     |
+| `thinking`                     | `Optional[Dict[str, Any]]`  | `None`                         | 思考（推理）过程的配置                                  |
+| `temperature`                  | `Optional[float]`           | `None`                         | 控制模型输出的随机性                                    |
+| `stop_sequences`               | `Optional[List[str]]`       | `None`                         | 模型应该停止生成文本的字符串列表                        |
+| `top_p`                        | `Optional[float]`           | `None`                         | 通过核采样控制多样性                                    |
+| `top_k`                        | `Optional[int]`             | `None`                         | 通过 top-k 采样控制多样性                                |
+| `cache_system_prompt`          | `Optional[bool]`            | `False`                        | 是否缓存系统提示以提高性能                              |
+| `extended_cache_time`          | `Optional[bool]`            | `False`                        | 是否使用扩展缓存时间（1 小时而不是默认时间）             |
+| `request_params`               | `Optional[Dict[str, Any]]`  | `None`                         | 要包含在请求中的额外参数                                |
+| `mcp_servers`                  | `Optional[List[MCPServerConfiguration]]` | `None`        | MCP（模型上下文协议）服务器配置列表                     |
+| `api_key`                      | `Optional[str]`             | `None`                         | 用于向 Anthropic 认证的 API 密钥                        |
+| `default_headers`              | `Optional[Dict[str, Any]]`  | `None`                         | 要包含在所有请求中的默认标头                            |
+| `client_params`                | `Optional[Dict[str, Any]]`  | `None`                         | 客户端配置的额外参数                                    |
+| `client`                       | `Optional[AnthropicClient]` | `None`                         | Anthropic 客户端的预配置实例                            |
+| `async_client`                 | `Optional[AsyncAnthropicClient]` | `None`                    | 异步 Anthropic 客户端的预配置实例                        |
+| `retries`                      | `int`                       | `0`                            | 在抛出 ModelProviderError 之前尝试的重试次数             |
+| `delay_between_retries`        | `int`                       | `1`                            | 重试之间的延迟（秒）                                    |
+| `exponential_backoff`          | `bool`                      | `False`                        | 如果为 True，每次重试之间的延迟会翻倍                   |

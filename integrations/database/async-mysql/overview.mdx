@@ -1,0 +1,46 @@
+---
+title: Async MySQL
+sidebarTitle: 概览
+description: 学习使用 MySQL 异步ly 作为智能体的数据库
+---
+
+Agno 支持 using [MySQL](https://www.mysql.com/) 异步ly, with the `AsyncMySQLDb` class.
+
+## 使用方法
+
+```python async_mysql_for_agent.py
+from agno.agent import Agent
+from agno.db.postgres import AsyncPostgresDb
+
+# Replace with your own connection string, and notice the `async_` prefix
+db_url = "postgresql+psycopg_async://ai:ai@localhost:5532/ai"
+
+# Setup your Database
+db = AsyncPostgresDb(db_url=db_url)
+
+# Setup your Agent with the Database
+agent = Agent(db=db)
+```
+
+### Run MySQL
+
+安装 [docker desktop](https://docs.docker.com/desktop/install/mac-install/) 并运行 **MySQL** 在端口 **3306** 使用：
+
+```bash
+docker run -d \
+  --name mysql \
+  -e MYSQL_ROOT_PASSWORD=ai \
+  -e MYSQL_DATABASE=ai \
+  -e MYSQL_USER=ai \
+  -e MYSQL_PASSWORD=ai \
+  -p 3306:3306 \
+  -d mysql:8
+```
+
+## 参数
+
+<Snippet file="db-async-postgres-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/postgres/async_postgres)

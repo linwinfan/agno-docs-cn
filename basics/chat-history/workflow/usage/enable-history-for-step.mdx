@@ -1,0 +1,112 @@
+---
+title: 为特定步骤启用历史
+description: 本示例演示了一个为特定步骤启用历史的工作流。
+---
+
+本示例展示了如何使用 `add_workflow_history` 标志将工作流历史添加到工作流中的特定步骤。
+在本例中，我们有一个包含三个步骤的工作流。
+- 第一个步骤是研究专家，负责收集主题信息。
+- 第二个步骤是内容创建者，负责编写引人入胜的内容。
+- 第三个步骤是内容发布者，负责准备内容以供发布。
+
+```python 03_enable_history_for_step.py
+"""
+本示例展示了步骤级别的 add_workflow_history 控制。
+只有内容创建者步骤获得工作流历史，以避免重复之前的内容。
+
+工作流：研究 → 内容创建（带历史）→ 发布
+"""
+
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.workflow.step import Step
+from agno.workflow.workflow import Workflow
+
+research_agent = Agent(
+    name="Research Specialist",
+    model=OpenAIChat(id="gpt-4o"),
+    instructions=[
+        "您是一位研究专家，负责收集主题信息。",
+        "进行彻底的研究并提供关键事实、趋势和见解。",
+        "专注于来自可靠来源的当前、准确的信息。",
+        "以清晰、结构化的格式组织您的发现。",
+        "为您的研究提供引用和上下文。",
+    ],
+)
+
+content_creator = Agent(
+    name="Content Creator",
+    model=OpenAIChat(id="gpt-4o"),
+    instructions=[
+        "您是一位专业的内容创建者，负责编写引人入胜的内容。",
+        "使用提供的研究资料并创建独特且突出的内容。",
+        "重要：查看工作流历史以了解：",
+        "- 之前涵盖过哪些内容主题",
+        "- 之前使用过的写作风格和格式",
+        "- 用户偏好和内容模式",
+        "- 避免重复类似的内容或方法",
+        "在保持内容新颖和原创的同时，基于之前的主题进行构建。",
+        "参考对话历史以保持语调和风格的一致性。",
+        "创建引人注目的标题、吸引人的引言和有价值的内容。",
+    ],
+)
+
+publisher_agent = Agent(
+    name="Content Publisher",
+    model=OpenAIChat(id="gpt-4o"),
+    instructions=[
+        "您是一位内容发布专家。",
+        "审查创建的内容并准备发布。",
+        "添加适当的标签、格式和发布建议。",
+        "建议最佳发布时间和分发渠道。",
+        "确保内容符合平台要求和最佳实践。",
+    ],
+)
+
+workflow = Workflow(
+    name="智能内容创建管道",
+    description="研究 → 内容创建（带历史感知）→ 发布",
+    db=SqliteDb(db_file="tmp/content_workflow.db"),
+    steps=[
+        Step(
+            name="研究阶段",
+            agent=research_agent,
+            add_workflow_history=True,  # 专门为这个步骤添加历史
+        ),
+        # 内容创建步骤 - 使用工作流历史来避免重复并提供更好的结果
+        Step(
+            name="内容创建",
+            agent=content_creator,
+            add_workflow_history=True,  # 专门为这个步骤添加历史
+        ),
+        Step(
+            name="内容发布",
+            agent=publisher_agent,
+        ),
+    ],
+)
+
+
+if __name__ == "__main__":
+    print("🎨 内容创建演示 - 步骤级别历史控制")
+    print("只有内容创建者步骤能看到之前的工作流历史！")
+    print("")
+    print("尝试这些内容请求：")
+    print("• '创建一篇关于2024年AI趋势的LinkedIn帖子'")
+    print("• '写一条关于生产力技巧的Twitter线程'")
+    print("• '创建一篇关于远程工作好处的博客引言'")
+    print("")
+    print(
+        "注意内容创建者如何引用之前的内容来避免重复！"
+    )
+    print("输入'exit'退出")
+    print("-" * 70)
+
+    workflow.cli_app(
+        session_id="content_demo",
+        user="Content Requester",
+        emoji="📝",
+        stream=True,
+    )
+```

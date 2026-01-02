@@ -1,0 +1,39 @@
+---
+title: Redis
+description: 学习使用 Redis 作为智能体的数据库
+sidebarTitle: 概览
+---
+
+Agno 支持 using [Redis](https://redis.io/) as a 数据库 with the `RedisDb` class.
+
+## 使用方法
+
+### Run Redis
+
+安装 [docker desktop](https://docs.docker.com/desktop/install/mac-install/) 并运行 **Redis** 在端口 **6379** 使用：
+
+```bash
+docker run -d \
+  --name my-redis \
+  -p 6379:6379 \
+  redis
+```
+
+```python redis_for_agent.py
+from agno.agent import Agent
+from agno.db.redis import RedisDb
+
+# Initialize Redis db (use the right db_url for your setup)
+db = RedisDb(db_url="redis://localhost:6379")
+
+# Create agent with Redis db
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-redis-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/redis/redis_for_智能体.py)

@@ -1,0 +1,29 @@
+---
+title: 模型
+---
+
+Model 类是 Agno 中所有模型的基类。它提供了通用功能和参数，这些功能和参数被特定的模型实现（如 OpenAIChat、Claude 等）继承。
+
+## 参数
+
+| 参数                  | 类型                               | 默认值                         | 描述                                                                                                             |
+| -------------------- | ---------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `id`                 | `str`                              | 必需                           | 要使用的模型的 ID/名称                                                                                          |
+| `name`               | `Optional[str]`                    | `None`                         | 模型的显示名称                                                                                                  |
+| `provider`           | `Optional[str]`                    | `None`                         | 模型的提供商                                                                                                    |
+| `frequency_penalty`  | `Optional[float]`                  | `None`                         | 根据新 token 在文本中的出现频率对其进行惩罚                                                                      |
+| `presence_penalty`   | `Optional[float]`                  | `None`                         | 根据新 token 是否在文本中出现过对其进行惩罚                                                                      |
+| `response_format`    | `Optional[str]`                    | `None`                         | 响应的格式                                                                                                      |
+| `seed`               | `Optional[int]`                    | `None`                         | 用于确定性采样的随机种子                                                                                        |
+| `stop`               | `Optional[Union[str, List[str]]]`  | `None`                         | 最多 4 个序列，API 在遇到这些序列时将停止生成更多 token                                                          |
+| `stream`             | `bool`                             | `True`                         | 是否流式传输响应                                                                                                |
+| `temperature`        | `Optional[float]`                  | `None`                         | 控制模型输出的随机性                                                                                            |
+| `top_p`              | `Optional[float]`                  | `None`                         | 通过核采样控制多样性                                                                                            |
+| `max_tokens`         | `Optional[int]`                    | `None`                         | 要生成的最大 token 数量                                                                                          |
+| `request_params`     | `Optional[Dict[str, Any]]`         | `None`                         | 要包含在请求中的额外参数                                                                                        |
+| `cache_response`     | `bool`                             | `False`                        | 启用模型响应缓存以避免冗余 API 调用                                                                             |
+| `cache_ttl`          | `Optional[int]`                    | `None`                         | 缓存模型响应的生存时间（秒）。如果为 None，缓存永不过期                                                          |
+| `cache_dir`          | `Optional[str]`                    | `None`                         | 存储缓存模型响应的目录路径。如果为 None，使用默认缓存位置                                                        |
+| `retries`            | `int`                              | `0`                            | 在抛出 ModelProviderError 之前尝试的重试次数                                                                     |
+| `delay_between_retries` | `int`                           | `1`                            | 重试之间的延迟（秒）                                                                                            |
+| `exponential_backoff` | `bool`                            | `False`                        | 如果为 True，每次重试之间的延迟会翻倍                                                                           |

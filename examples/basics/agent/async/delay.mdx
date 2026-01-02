@@ -1,0 +1,111 @@
+---
+title: 带延迟执行的异步代理
+---
+
+此示例演示如何运行多个带延迟执行的异步代理，从不同的 AI 提供商收集结果以编写综合报告。
+
+## 代码
+
+```python delay.py
+import asyncio
+
+from agno.agent import Agent, RunOutput
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+from rich.pretty import pprint
+
+providers = ["openai", "anthropic", "ollama", "cohere", "google"]
+instructions = [
+    "Your task is to write a well researched report on AI providers.",
+    "The report should be unbiased and factual.",
+]
+
+
+async def get_agent(delay, provider):
+    agent = Agent(
+        model=OpenAIChat(id="gpt-4"),
+        instructions=instructions,
+        tools=[DuckDuckGoTools()],
+    )
+    await asyncio.sleep(delay)
+    response: RunOutput = await agent.arun(
+        f"Write a report on the following AI provider: {provider}"
+    )
+    return response
+
+
+async def get_reports():
+    tasks = []
+    for delay, provider in enumerate(providers):
+        delay = delay * 2
+        tasks.append(get_agent(delay, provider))
+
+    results = await asyncio.gather(*tasks)
+    return results
+
+
+async def main():
+    results = await get_reports()
+    for result in results:
+        print("************")
+        pprint(result.content)
+        print("************")
+        print("\n")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai ddgs rich
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+        export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+        $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+    </Step>
+
+    <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上述代码。
+    ```bash
+    touch delay.py
+    ```
+    </Step>
+
+    <Step title="运行代理">
+    <CodeGroup>
+    ```bash Mac
+    python delay.py
+    ```
+    
+    ```bash Windows
+    python delay.py
+    ```
+    </CodeGroup>
+    </Step>
+
+    <Step title="查找所有示例代码">
+    探索 Agno 存储库中所有可用的示例代码。点击下面的链接在 GitHub 上查看代码：
+
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/async" target="_blank">
+      GitHub 上的 Agno 示例代码
+    </Link>
+    </Step>
+</Steps>

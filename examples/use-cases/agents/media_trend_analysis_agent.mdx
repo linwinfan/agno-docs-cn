@@ -1,0 +1,185 @@
+---
+title: 媒体趋势分析智能体
+---
+媒体趋势分析智能体示例展示了一个复杂的 AI 驱动工具，旨在分析媒体趋势、跟踪数字对话，并在各种在线平台上提供可操作的洞察。该智能体结合了网络搜索功能和内容抓取功能，以提供全面的趋势分析报告。
+
+### 功能说明
+
+该智能体专门用于：
+- **趋势识别**：检测媒体报道中的新兴模式和转变
+- **来源分析**：识别关键影响者和权威来源
+- **数据提取**：从新闻网站、社交平台和数字媒体收集信息
+- **洞察生成**：基于趋势分析提供可操作的建议
+- **未来预测**：基于当前模式预测潜在发展
+
+### 主要功能
+
+- **多源分析**：结合 Exa 搜索工具和 Firecrawl 抓取功能
+- **智能过滤**：使用基于关键词的搜索和日期过滤来获得相关结果
+- **智能抓取**：仅在搜索结果不足时抓取内容
+- **结构化报告**：生成带有执行摘要的综合 markdown 报告
+- **实时数据**：使用可配置的时间窗口分析当前趋势
+
+## 代码
+
+```python cookbook/02_examples/agents/media_trend_analysis_agent.py
+"""Please install dependencies using:
+pip install openai exa-py agno firecrawl
+"""
+
+from datetime import datetime, timedelta
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.exa import ExaTools
+from agno.tools.firecrawl import FirecrawlTools
+
+
+def calculate_start_date(days: int) -> str:
+    """Calculate start date based on number of days."""
+    start_date = datetime.now() - timedelta(days=days)
+    return start_date.strftime("%Y-%m-%d")
+
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[
+        ExaTools(start_published_date=calculate_start_date(30), type="keyword"),
+        FirecrawlTools(scrape=True),
+    ],
+    description=dedent("""\
+        You are an expert media trend analyst specializing in:
+        1. Identifying emerging trends across news and digital platforms
+        2. Recognizing pattern changes in media coverage
+        3. Providing actionable insights based on data
+        4. Forecasting potential future developments
+    """),
+    instructions=[
+        "Analyze the provided topic according to the user's specifications:",
+        "1. Use keywords to perform targeted searches",
+        "2. Identify key influencers and authoritative sources",
+        "3. Extract main themes and recurring patterns",
+        "4. Provide actionable recommendations",
+        "5. if got sources less then 2, only then scrape them using firecrawl tool, dont crawl it  and use them to generate the report",
+        "6. growth rate should be in percentage , and if not possible dont give growth rate",
+    ],
+    expected_output=dedent("""\
+    # Media Trend Analysis Report
+
+    ## Executive Summary
+    {High-level overview of findings and key metrics}
+
+    ## Trend Analysis
+    ### Volume Metrics
+    - Peak discussion periods: {dates}
+    - Growth rate: {percentage or dont show this}
+
+    ## Source Analysis
+    ### Top Sources
+    1. {Source 1}
+
+    2. {Source 2}
+
+
+    ## Actionable Insights
+    1. {Insight 1}
+       - Evidence: {data points}
+       - Recommended action: {action}
+
+    ## Future Predictions
+    1. {Prediction 1}
+       - Supporting evidence: {evidence}
+
+    ## References
+    {Detailed source list with links}
+    """),
+    markdown=True,
+    add_datetime_to_context=True,
+)
+
+# Example usage:
+analysis_prompt = """\
+Analyze media trends for:
+Keywords: ai agents
+Sources: verge.com ,linkedin.com, x.com
+"""
+
+agent.print_response(analysis_prompt, stream=True)
+
+# Alternative prompt example
+crypto_prompt = """\
+Analyze media trends for:
+Keywords: cryptocurrency, bitcoin, ethereum
+Sources: coindesk.com, cointelegraph.com
+"""
+
+# agent.print_response(crypto_prompt, stream=True)
+
+```
+## Usage
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="Set your API key">
+    ```bash
+    export OPENAI_API_KEY=xxx
+    export EXA_API_KEY=xxx
+    export FIRECRAWL_API_KEY=xxx
+    ```
+  </Step>
+
+  <Step title="Install libraries">
+    ```bash
+    pip install -U agno openai exa-py agno firecrawl
+    ```
+  </Step>
+
+  <Step title="Run Agent">
+    <CodeGroup>
+    ```bash Mac
+    python cookbook/02_examples/agents/media_trend_analysis_agent.py
+    ```
+
+    ```bash Windows
+    python cookbook/02_examples/agents/media_trend_analysis_agent.py
+    ```
+    </CodeGroup>
+  </Step>
+</Steps>
+
+## Customization Options
+
+You can customize the agent's behavior by:
+- **Adjusting Time Windows**: Modify the `calculate_start_date()` function to analyze different time periods
+- **Adding Sources**: Include additional websites or platforms in your analysis prompts
+- **Modifying Keywords**: Change search terms to focus on specific topics or industries
+- **Customizing Output**: Modify the `expected_output` template to match your reporting needs
+
+## Example Prompts
+
+Here are some additional prompt examples you can try:
+
+```python
+# Technology trends
+tech_prompt = """\
+Analyze media trends for:
+Keywords: artificial intelligence, machine learning, automation
+Sources: techcrunch.com, arstechnica.com, wired.com
+"""
+
+# Business trends
+business_prompt = """\
+Analyze media trends for:
+Keywords: remote work, digital transformation, sustainability
+Sources: forbes.com, bloomberg.com, hbr.org
+"""
+
+# Entertainment trends
+entertainment_prompt = """\
+Analyze media trends for:
+Keywords: streaming, gaming, social media
+Sources: variety.com, polygon.com, theverge.com
+"""
+```

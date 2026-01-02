@@ -1,0 +1,46 @@
+---
+title: PostgreSQL
+description: 学习使用 PostgreSQL 作为智能体的数据库
+sidebarTitle: 概览
+---
+
+Agno 支持使用 `PostgresDb` 类将 [PostgreSQL](https://www.postgresql.org/) 作为数据库。
+
+## 使用方法
+
+```python postgres_for_agent.py
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+
+db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai" # 替换为您自己的连接字符串
+
+# 设置您的数据库
+db = PostgresDb(db_url=db_url)
+
+# 为您的智能体设置数据库
+agent = Agent(db=db)
+```
+
+### 运行 Postgres（带 PgVector）
+
+安装 [docker desktop](https://docs.docker.com/desktop/install/mac-install/) 并使用以下命令在端口 **5532** 上运行 **PgVector**：
+
+```bash
+docker run -d \
+  -e POSTGRES_DB=ai \
+  -e POSTGRES_USER=ai \
+  -e POSTGRES_PASSWORD=ai \
+  -e PGDATA=/var/lib/postgresql/data/pgdata \
+  -v pgvolume:/var/lib/postgresql/data \
+  -p 5532:5432 \
+  --name pgvector \
+  agnohq/pgvector:16
+```
+
+## 参数
+
+<Snippet file="db-postgres-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/postgres/postgres_for_agent.py)

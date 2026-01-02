@@ -1,0 +1,28 @@
+---
+title: SQLite
+description: 学习使用 Sqlite 作为智能体的数据库
+sidebarTitle: 概览
+---
+
+Agno 支持 using [Sqlite](https://www.sqlite.org) as a 数据库 with the `SqliteDb` class.
+
+## 使用方法
+
+```python sqlite_for_agent.py
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+
+# Setup the SQLite database
+db = SqliteDb(db_file="tmp/data.db")
+
+# Setup a basic agent with the SQLite database
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-sqlite-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/sqlite/sqlite_for_智能体.py)

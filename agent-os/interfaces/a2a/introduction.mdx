@@ -1,0 +1,914 @@
+---
+title: A2A
+description: 通过 A2A 协议暴露 Agno 智能体
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.1.2" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.1.2">v2.1.2</Tooltip>
+</Badge>
+
+Google 的[智能体到智能体协议（A2A）](https://a2a-protocol.org/latest/topics/what-is-a2a/)为智能体之间的通信提供了标准方式。
+
+Agno 与 A2A 集成，使 Agno 智能体和团队能够以 A2A 兼容格式暴露。
+
+`A2A` 接口与 [AgentOS](/agent-os/introduction) 运行时协同工作以提供此功能。
+
+## 设置
+
+创建 `AgentOS` 实例时设置 `a2a_interface=True`：
+
+```python a2a_agentos.py
+from agno.agent import Agent
+from agno.os import AgentOS
+from agno.os.interfaces.a2a import A2A
+
+# 创建智能体
+agent = Agent(
+    name="我的 Agno 智能体",
+    id="my_agent",
+    instructions="你是一个有用的中文智能助手，可以协助用户完成各种任务。"
+)
+
+# 创建带有 A2A 接口的 AgentOS 实例
+agent_os = AgentOS(
+    agents=[agent],
+    a2a_interface=True,
+)
+app = agent_os.get_app()
+
+# 启动服务
+if __name__ == "__main__":
+    agent_os.serve(app="a2a:app", reload=True)
+```
+
+默认情况下，AgentOS 中的所有智能体、团队和工作流都通过 A2A 暴露。
+
+可以通过显式初始化接口来暴露特定的智能体、团队和工作流：
+
+```python a2a-interface-initialization.py
+from agno.agent import Agent
+from agno.os import AgentOS
+from agno.os.interfaces.a2a import A2A
+
+# 创建智能体
+agent = Agent(
+    name="我的 Agno 智能体",
+    id="my_agent",
+    instructions="你是一个专业的中文智能助手。"
+)
+
+# 初始化 A2A 接口，指定要暴露的智能体
+a2a = A2A(agents=[agent])
+
+# 创建 AgentOS 实例
+agent_os = AgentOS(
+    agents=[agent],
+    interfaces=[a2a],
+)
+app = agent_os.get_app()
+
+# 启动服务
+if __name__ == "__main__":
+    agent_os.serve(app="a2a:app", reload=True)
+```
+
+## A2A 协议概述
+
+### 什么是 A2A？
+
+A2A（Agent-to-Agent）协议是一个开放标准，定义了：
+
+- **通信格式**: 智能体之间的标准消息格式
+- **发现机制**: 智能体如何发现其他智能体
+- **认证授权**: 安全的智能体间通信
+- **能力协商**: 智能体能力的声明和匹配
+
+### 核心特性
+
+#### 1. 智能体发现
+
+```python
+# 智能体发现示例
+from agno.os.interfaces.a2a import AgentDiscovery
+
+class A2AAgentDiscovery(AgentDiscovery):
+    async def discover_agents(self, criteria=None):
+        """发现可用的智能体"""
+        agents = await self.get_registered_agents()
+        
+        if criteria:
+            agents = self.filter_agents(agents, criteria)
+        
+        return agents
+    
+    async def register_agent(self, agent_info):
+        """注册智能体"""
+        await self.agent_registry.register(agent_info)
+    
+    async def get_agent_capabilities(self, agent_id):
+        """获取智能体能力"""
+        agent = await self.get_agent(agent_id)
+        return agent.capabilities
+```
+
+#### 2. 消息路由
+
+```python
+# A2A 消息路由
+from agno.os.interfaces.a2a import MessageRouter
+
+class A2AMessageRouter(MessageRouter):
+    async def route_message(self, message):
+        """路由消息到目标智能体"""
+        target_agent_id = message.get("target_agent_id")
+        
+        # 查找目标智能体
+        target_agent = await self.find_agent(target_agent_id)
+        
+        if not target_agent:
+            raise AgentNotFoundError(f"智能体 {target_agent_id} 未找到")
+        
+        # 转发消息
+        response = await target_agent.process_message(message)
+        
+        return response
+    
+    async def broadcast_message(self, message, agent_types=None):
+        """广播消息到多个智能体"""
+        agents = await self.get_agents_by_type(agent_types)
+        
+        responses = []
+        for agent in agents:
+            try:
+                response = await agent.process_message(message)
+                responses.append({
+                    "agent_id": agent.id,
+                    "response": response
+                })
+            except Exception as e:
+                responses.append({
+                    "agent_id": agent.id,
+                    "error": str(e)
+                })
+        
+        return responses
+```
+
+## 高级配置
+
+### 1. 自定义 A2A 配置
+
+```python
+from agno.os.interfaces.a2a import A2A, A2AConfig
+
+# 自定义 A2A 配置
+a2a_config = A2AConfig(
+    endpoint="/a2a",
+    discovery_enabled=True,
+    authentication_required=True,
+    authorization_enabled=True,
+    message_encryption=True,
+    max_message_size=10485760,  # 10MB
+    timeout=30,
+    retry_attempts=3,
+    rate_limiting={
+        "requests_per_minute": 1000,
+        "burst_size": 100
+    },
+    capabilities={
+        "text_processing": True,
+        "image_analysis": True,
+        "audio_processing": False,
+        "video_processing": False
+    }
+)
+
+# 创建自定义 A2A 接口
+a2a_interface = A2A(
+    agents=[agent],
+    config=a2a_config
+)
+```
+
+### 2. 多智能体协作
+
+```python
+from agno.agent import Agent
+from agno.team import Team
+from agno.os.interfaces.a2a import A2A
+
+# 创建专门的智能体
+research_agent = Agent(
+    name="研究智能体",
+    id="research_agent",
+    instructions="负责信息收集和研究分析"
+)
+
+analysis_agent = Agent(
+    name="分析智能体", 
+    id="analysis_agent",
+    instructions="负责数据分析和报告生成"
+)
+
+writing_agent = Agent(
+    name="写作智能体",
+    id="writing_agent", 
+    instructions="负责内容创作和文本编写"
+)
+
+# 创建协作团队
+collaboration_team = Team(
+    name="协作团队",
+    id="team_001",
+    agents=[research_agent, analysis_agent, writing_agent],
+    instructions="团队协作为用户综合完成研究报告"
+)
+
+# 创建 A2A 接口，暴露所有智能体和团队
+a2a_interface = A2A(
+    agents=[research_agent, analysis_agent, writing_agent],
+    teams=[collaboration_team]
+)
+
+# 创建 AgentOS 实例
+agent_os = AgentOS(
+    agents=[research_agent, analysis_agent, writing_agent],
+    teams=[collaboration_team],
+    interfaces=[a2a_interface]
+)
+```
+
+### 3. 智能体能力声明
+
+```python
+from agno.os.interfaces.a2a import AgentCapability
+
+class CustomAgentCapability(AgentCapability):
+    def __init__(self, agent_id, capabilities):
+        super().__init__(agent_id)
+        self.capabilities = capabilities
+    
+    def get_capabilities(self):
+        """获取智能体能力"""
+        return {
+            "agent_id": self.agent_id,
+            "version": "1.0.0",
+            "capabilities": self.capabilities,
+            "supported_formats": ["text", "json", "xml"],
+            "languages": ["zh-CN", "en-US"],
+            "performance_metrics": {
+                "avg_response_time": "2s",
+                "throughput": "100 req/min",
+                "accuracy": "95%"
+            }
+        }
+    
+    async def can_handle_request(self, request):
+        """检查是否能处理请求"""
+        required_capabilities = request.get("required_capabilities", [])
+        
+        for capability in required_capabilities:
+            if capability not in self.capabilities:
+                return False
+        
+        return True
+
+# 为智能体声明能力
+research_capabilities = {
+    "web_search": True,
+    "data_extraction": True,
+    "document_analysis": True,
+    "source_verification": True
+}
+
+research_agent_capability = CustomAgentCapability(
+    agent_id="research_agent",
+    capabilities=research_capabilities
+)
+```
+
+## 安全和认证
+
+### 1. 智能体认证
+
+```python
+from agno.os.interfaces.a2a import AuthenticationProvider
+import jwt
+from datetime import datetime, timedelta
+
+class A2AAuthenticationProvider(AuthenticationProvider):
+    def __init__(self, secret_key):
+        self.secret_key = secret_key
+    
+    async def authenticate_agent(self, credentials):
+        """认证智能体"""
+        token = credentials.get("token")
+        
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
+            return await self.validate_agent_credentials(payload)
+        except jwt.InvalidTokenError:
+            raise AuthenticationError("无效的认证令牌")
+    
+    async def generate_agent_token(self, agent_id, permissions, expiry_hours=24):
+        """生成智能体令牌"""
+        payload = {
+            "agent_id": agent_id,
+            "permissions": permissions,
+            "exp": datetime.utcnow() + timedelta(hours=expiry_hours),
+            "iat": datetime.utcnow()
+        }
+        
+        return jwt.encode(payload, self.secret_key, algorithm="HS256")
+    
+    async def validate_agent_credentials(self, payload):
+        """验证智能体凭据"""
+        agent_id = payload.get("agent_id")
+        permissions = payload.get("permissions")
+        
+        # 检查智能体是否已注册
+        agent = await self.get_registered_agent(agent_id)
+        if not agent:
+            raise AuthenticationError(f"智能体 {agent_id} 未注册")
+        
+        # 检查权限
+        if not self.validate_permissions(agent, permissions):
+            raise AuthenticationError("权限不足")
+        
+        return {
+            "agent_id": agent_id,
+            "permissions": permissions,
+            "validated_at": datetime.utcnow()
+        }
+
+# 应用认证提供者
+auth_provider = A2AAuthenticationProvider("your-secret-key")
+a2a_interface = A2A(
+    agents=[agent],
+    auth_provider=auth_provider
+)
+```
+
+### 2. 消息加密
+
+```python
+from agno.os.interfaces.a2a import MessageEncryption
+from cryptography.fernet import Fernet
+import base64
+
+class A2AMessageEncryption(MessageEncryption):
+    def __init__(self, encryption_key):
+        self.cipher_suite = Fernet(encryption_key)
+    
+    async def encrypt_message(self, message):
+        """加密消息"""
+        message_json = json.dumps(message, ensure_ascii=False)
+        message_bytes = message_json.encode("utf-8")
+        
+        encrypted_bytes = self.cipher_suite.encrypt(message_bytes)
+        encrypted_base64 = base64.b64encode(encrypted_bytes).decode("utf-8")
+        
+        return {
+            "encrypted_data": encrypted_base64,
+            "encryption_algorithm": "Fernet",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    
+    async def decrypt_message(self, encrypted_message):
+        """解密消息"""
+        encrypted_base64 = encrypted_message.get("encrypted_data")
+        encrypted_bytes = base64.b64decode(encrypted_base64.encode("utf-8"))
+        
+        decrypted_bytes = self.cipher_suite.decrypt(encrypted_bytes)
+        message_json = decrypted_bytes.decode("utf-8")
+        
+        return json.loads(message_json)
+    
+    async def generate_shared_key(self, agent_id):
+        """为智能体生成共享密钥"""
+        return Fernet.generate_key().decode("utf-8")
+
+# 应用消息加密
+encryption_key = Fernet.generate_key()
+message_encryption = A2AMessageEncryption(encryption_key)
+a2a_interface = A2A(
+    agents=[agent],
+    message_encryption=message_encryption
+)
+```
+
+## 消息处理
+
+### 1. 消息格式标准
+
+```python
+# A2A 标准消息格式
+class A2AMessage:
+    def __init__(self):
+        self.message_id = None
+        self.sender_agent_id = None
+        self.target_agent_id = None
+        self.message_type = None
+        self.content = None
+        self.metadata = None
+        self.timestamp = None
+        self.signature = None
+    
+    def to_dict(self):
+        """转换为字典格式"""
+        return {
+            "message_id": self.message_id,
+            "sender_agent_id": self.sender_agent_id,
+            "target_agent_id": self.target_agent_id,
+            "message_type": self.message_type,
+            "content": self.content,
+            "metadata": self.metadata,
+            "timestamp": self.timestamp,
+            "signature": self.signature
+        }
+    
+    @classmethod
+    def from_dict(cls, data):
+        """从字典创建消息"""
+        message = cls()
+        message.message_id = data.get("message_id")
+        message.sender_agent_id = data.get("sender_agent_id")
+        message.target_agent_id = data.get("target_agent_id")
+        message.message_type = data.get("message_type")
+        message.content = data.get("content")
+        message.metadata = data.get("metadata")
+        message.timestamp = data.get("timestamp")
+        message.signature = data.get("signature")
+        return message
+
+# 创建标准消息
+message = A2AMessage()
+message.message_id = "msg_123456"
+message.sender_agent_id = "agent_a"
+message.target_agent_id = "agent_b"
+message.message_type = "request"
+message.content = {
+    "action": "analyze_data",
+    "parameters": {
+        "data": "sample_data",
+        "analysis_type": "statistical"
+    }
+}
+message.metadata = {
+    "priority": "high",
+    "timeout": 30,
+    "retry_count": 0
+}
+message.timestamp = datetime.utcnow().isoformat()
+```
+
+### 2. 消息处理器
+
+```python
+from agno.os.interfaces.a2a import MessageHandler
+
+class A2AMessageHandler(MessageHandler):
+    async def handle_message(self, message):
+        """处理接收到的消息"""
+        try:
+            # 验证消息格式
+            self.validate_message_format(message)
+            
+            # 验证消息签名
+            await self.verify_message_signature(message)
+            
+            # 根据消息类型处理
+            if message.message_type == "request":
+                return await self.handle_request(message)
+            elif message.message_type == "response":
+                return await self.handle_response(message)
+            elif message.message_type == "broadcast":
+                return await self.handle_broadcast(message)
+            else:
+                raise UnsupportedMessageTypeError(f"不支持的消息类型: {message.message_type}")
+        
+        except Exception as e:
+            return self.create_error_response(message, str(e))
+    
+    async def handle_request(self, message):
+        """处理请求消息"""
+        content = message.get("content", {})
+        action = content.get("action")
+        parameters = content.get("parameters", {})
+        
+        # 获取目标智能体
+        target_agent = await self.get_agent(message.target_agent_id)
+        
+        # 执行请求
+        try:
+            result = await target_agent.execute_action(action, parameters)
+            
+            return self.create_response(
+                message=message,
+                content={
+                    "status": "success",
+                    "result": result,
+                    "execution_time": time.time()
+                }
+            )
+        
+        except Exception as e:
+            return self.create_error_response(message, str(e))
+    
+    async def handle_broadcast(self, message):
+        """处理广播消息"""
+        content = message.get("content", {})
+        broadcast_type = content.get("broadcast_type")
+        
+        if broadcast_type == "capability_announcement":
+            await self.handle_capability_announcement(message)
+        elif broadcast_type == "status_update":
+            await self.handle_status_update(message)
+        elif broadcast_type == "discovery_request":
+            return await self.handle_discovery_request(message)
+        else:
+            raise UnsupportedBroadcastTypeError(f"不支持的广播类型: {broadcast_type}")
+
+# 应用消息处理器
+message_handler = A2AMessageHandler()
+a2a_interface = A2A(
+    agents=[agent],
+    message_handler=message_handler
+)
+```
+
+## 智能体发现和注册
+
+### 1. 智能体注册中心
+
+```python
+from agno.os.interfaces.a2a import AgentRegistry
+
+class A2AAgentRegistry(AgentRegistry):
+    def __init__(self):
+        self.registered_agents = {}
+        self.agent_capabilities = {}
+        self.agent_status = {}
+    
+    async def register_agent(self, agent_info):
+        """注册智能体"""
+        agent_id = agent_info["agent_id"]
+        
+        # 验证智能体信息
+        self.validate_agent_info(agent_info)
+        
+        # 注册智能体
+        self.registered_agents[agent_id] = {
+            "agent_info": agent_info,
+            "registered_at": datetime.utcnow(),
+            "last_heartbeat": datetime.utcnow(),
+            "status": "active"
+        }
+        
+        # 存储能力信息
+        self.agent_capabilities[agent_id] = agent_info.get("capabilities", {})
+        
+        return {
+            "agent_id": agent_id,
+            "registration_status": "success",
+            "registered_at": datetime.utcnow().isoformat()
+        }
+    
+    async def unregister_agent(self, agent_id):
+        """注销智能体"""
+        if agent_id in self.registered_agents:
+            del self.registered_agents[agent_id]
+            del self.agent_capabilities[agent_id]
+            del self.agent_status[agent_id]
+            
+            return {
+                "agent_id": agent_id,
+                "unregistration_status": "success",
+                "unregistered_at": datetime.utcnow().isoformat()
+            }
+        else:
+            raise AgentNotFoundError(f"智能体 {agent_id} 未找到")
+    
+    async def discover_agents(self, criteria=None):
+        """发现智能体"""
+        agents = []
+        
+        for agent_id, agent_data in self.registered_agents.items():
+            if agent_data["status"] != "active":
+                continue
+            
+            if criteria:
+                if not self.matches_criteria(agent_id, criteria):
+                    continue
+            
+            agents.append({
+                "agent_id": agent_id,
+                "agent_info": agent_data["agent_info"],
+                "capabilities": self.agent_capabilities[agent_id],
+                "status": agent_data["status"],
+                "last_heartbeat": agent_data["last_heartbeat"]
+            })
+        
+        return agents
+    
+    async def update_agent_status(self, agent_id, status):
+        """更新智能体状态"""
+        if agent_id in self.registered_agents:
+            self.agent_status[agent_id] = status
+            self.registered_agents[agent_id]["last_heartbeat"] = datetime.utcnow()
+        else:
+            raise AgentNotFoundError(f"智能体 {agent_id} 未找到")
+
+# 应用智能体注册中心
+agent_registry = A2AAgentRegistry()
+a2a_interface = A2A(
+    agents=[agent],
+    agent_registry=agent_registry
+)
+```
+
+### 2. 智能体发现服务
+
+```python
+from agno.os.interfaces.a2a import DiscoveryService
+
+class A2ADiscoveryService(DiscoveryService):
+    async def find_agents_by_capability(self, required_capability):
+        """根据能力查找智能体"""
+        matching_agents = []
+        
+        for agent_id, capabilities in self.agent_capabilities.items():
+            if required_capability in capabilities:
+                agent_info = self.registered_agents.get(agent_id)
+                if agent_info and agent_info["status"] == "active":
+                    matching_agents.append({
+                        "agent_id": agent_id,
+                        "capabilities": capabilities,
+                        "agent_info": agent_info["agent_info"]
+                    })
+        
+        return matching_agents
+    
+    async def find_agents_by_type(self, agent_type):
+        """根据类型查找智能体"""
+        matching_agents = []
+        
+        for agent_id, agent_data in self.registered_agents.items():
+            if agent_data["status"] != "active":
+                continue
+            
+            agent_info = agent_data["agent_info"]
+            if agent_info.get("agent_type") == agent_type:
+                matching_agents.append({
+                    "agent_id": agent_id,
+                    "agent_info": agent_info,
+                    "capabilities": self.agent_capabilities[agent_id]
+                })
+        
+        return matching_agents
+    
+    async def get_agent_network_topology(self):
+        """获取智能体网络拓扑"""
+        topology = {
+            "nodes": [],
+            "edges": []
+        }
+        
+        # 添加节点
+        for agent_id, agent_data in self.registered_agents.items():
+            if agent_data["status"] == "active":
+                topology["nodes"].append({
+                    "id": agent_id,
+                    "label": agent_data["agent_info"]["name"],
+                    "type": agent_data["agent_info"].get("agent_type", "unknown"),
+                    "capabilities": list(self.agent_capabilities[agent_id].keys())
+                })
+        
+        # 添加边（基于已知的协作关系）
+        for agent_id in topology["nodes"]:
+            connected_agents = await self.get_connected_agents(agent_id)
+            for connected_agent in connected_agents:
+                topology["edges"].append({
+                    "from": agent_id,
+                    "to": connected_agent,
+                    "type": "collaboration"
+                })
+        
+        return topology
+
+# 应用发现服务
+discovery_service = A2ADiscoveryService()
+a2a_interface = A2A(
+    agents=[agent],
+    discovery_service=discovery_service
+)
+```
+
+## 监控和分析
+
+### 1. A2A 性能监控
+
+```python
+from agno.os.interfaces.a2a import A2AMetrics
+import time
+from collections import defaultdict
+
+class A2APerformanceMetrics(A2AMetrics):
+    def __init__(self):
+        self.metrics = {
+            "message_count": 0,
+            "response_times": [],
+            "error_count": 0,
+            "agent_activity": defaultdict(int),
+            "capability_usage": defaultdict(int),
+            "network_traffic": 0
+        }
+    
+    async def record_message(self, message, response_time, success=True):
+        """记录消息指标"""
+        self.metrics["message_count"] += 1
+        self.metrics["response_times"].append(response_time)
+        
+        if not success:
+            self.metrics["error_count"] += 1
+        
+        # 记录智能体活动
+        sender = message.get("sender_agent_id")
+        target = message.get("target_agent_id")
+        
+        if sender:
+            self.metrics["agent_activity"][sender] += 1
+        if target:
+            self.metrics["agent_activity"][target] += 1
+        
+        # 记录网络流量
+        message_size = len(json.dumps(message))
+        self.metrics["network_traffic"] += message_size
+    
+    async def record_capability_usage(self, agent_id, capability):
+        """记录能力使用"""
+        self.metrics["capability_usage"][f"{agent_id}:{capability}"] += 1
+    
+    def generate_performance_report(self):
+        """生成性能报告"""
+        avg_response_time = (
+            sum(self.metrics["response_times"]) / len(self.metrics["response_times"])
+            if self.metrics["response_times"] else 0
+        )
+        
+        error_rate = (
+            self.metrics["error_count"] / self.metrics["message_count"]
+            if self.metrics["message_count"] > 0 else 0
+        )
+        
+        return {
+            "period": "last_24_hours",
+            "summary": {
+                "total_messages": self.metrics["message_count"],
+                "avg_response_time": f"{avg_response_time:.3f}s",
+                "error_rate": f"{error_rate:.2%}",
+                "network_traffic_mb": self.metrics["network_traffic"] / 1024 / 1024
+            },
+            "top_active_agents": self.get_top_agents(),
+            "most_used_capabilities": self.get_top_capabilities(),
+            "performance_trends": self.get_performance_trends()
+        }
+    
+    def get_top_agents(self):
+        """获取最活跃的智能体"""
+        sorted_agents = sorted(
+            self.metrics["agent_activity"].items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+        
+        return [
+            {"agent_id": agent_id, "message_count": count}
+            for agent_id, count in sorted_agents[:10]
+        ]
+    
+    def get_top_capabilities(self):
+        """获取最常用的能力"""
+        sorted_capabilities = sorted(
+            self.metrics["capability_usage"].items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+        
+        return [
+            {"capability": capability, "usage_count": count}
+            for capability, count in sorted_capabilities[:10]
+        ]
+
+# 应用性能监控
+metrics = A2APerformanceMetrics()
+a2a_interface = A2A(
+    agents=[agent],
+    metrics=metrics
+)
+```
+
+## 部署和扩展
+
+### 1. 生产环境配置
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  a2a-agent:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - A2A_SECRET_KEY=${A2A_SECRET_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://user:password@postgres:5432/a2a_agent
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+  
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=a2a_agent
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
+```
+
+## 最佳实践
+
+### 1. 性能优化
+
+- **异步处理**: 使用异步操作处理智能体间通信
+- **连接池**: 复用网络连接
+- **消息缓存**: 缓存常用消息和响应
+- **负载均衡**: 在多个智能体实例间分配负载
+
+### 2. 安全实践
+
+- **端到端加密**: 所有智能体间消息加密
+- **身份验证**: 严格的智能体身份验证
+- **权限控制**: 细粒度的权限管理
+- **审计日志**: 记录所有智能体间交互
+
+### 3. 可扩展性设计
+
+- **微服务架构**: 每个智能体作为独立服务
+- **动态发现**: 支持智能体的动态注册和发现
+- **水平扩展**: 支持智能体实例的水平扩展
+- **容错处理**: 优雅处理智能体故障
+
+## 故障排除
+
+### 常见问题
+
+#### 智能体发现失败
+
+**问题**: 无法发现其他智能体
+**解决方案**:
+1. 检查网络连接
+2. 验证注册中心配置
+3. 确认智能体状态
+4. 检查防火墙设置
+
+#### 消息路由失败
+
+**问题**: 消息无法路由到目标智能体
+**解决方案**:
+1. 验证目标智能体ID
+2. 检查智能体是否在线
+3. 确认路由表配置
+4. 检查权限设置
+
+## 下一步
+
+- 查看[AG-UI 接口](/agent-os/interfaces/ag-ui/introduction)
+- 了解[Slack 接口](/agent-os/interfaces/slack/introduction)
+- 探索[WhatsApp 接口](/agent-os/interfaces/whatsapp/introduction)
+- 查看[AgentOS 配置](/agent-os/config)

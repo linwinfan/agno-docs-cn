@@ -1,0 +1,57 @@
+---
+title: LM Studio
+sidebarTitle: 概览
+description: Learn how to use LM Studio with Agno.
+---
+
+Run Large Language Models 本地ly with LM Studio
+
+[LM Studio](https://lmstudio.ai) is a fantastic tool for running 模型s 本地ly.
+
+LM Studio 支持 multiple open-source 模型s. See the library [here](https://lmstudio.ai/模型s).
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `llama3.3` 模型s are good for most basic use-cases.
+- `qwen` 模型s perform specifically well with tool use.
+- `deepseek-r1` 模型s have strong reasoning 功能.
+- `phi4` 模型s are powerful, while being really small in size.
+
+## Set up a 模型
+
+安装 [LM Studio](https://lmstudio.ai), download the 模型 you want to use, 并运行 it.
+
+## Example
+
+After you have the 模型 本地ly, use the `LM Studio` 模型 class to access it
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.lmstudio import LMStudio
+
+agent = Agent(
+    model=LMStudio(id="qwen2.5-7b-instruct-1m"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/local/lmstudio/usage/basic-stream). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"lmstudio-community/Meta-Llama-3-8B-Instruct-GGUF"` | The id of the LMStudio 模型 to use       |
+| `name`       | `str`              | `"LMStudio"`                   | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"LMStudio"`                   | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for LMStudio (usually not needed for 本地)              |
+| `base_url`   | `str`              | `"http://本地host:1234/v1"`  | The base URL for the 本地 LMStudio server                            |
+
+`LM Studio` also 支持 the params of [OpenAI](/reference/models/openai).

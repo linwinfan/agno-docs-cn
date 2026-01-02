@@ -1,0 +1,84 @@
+---
+title: Memori
+description: Memori is an open-source 记忆 layer for AI. It automatically captures conversations, extracts meaningful facts, and makes them searchable across entities, processes, and sessions.
+---
+
+## Prerequisites
+
+The 以下 example requires the `memori` library.
+
+```shell
+pip install -U memori sqlalchemy python-dotenv
+```
+
+## Example
+
+The 以下 智能体 uses Memori to maintain persistent 记忆 across conversations with SQLite:
+
+```python
+import os
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from memori import Memori
+
+load_dotenv()
+
+db_path = os.getenv("DATABASE_PATH", "memori_agno.db")
+engine = create_engine(f"sqlite:///{db_path}")
+Session = sessionmaker(bind=engine)
+
+model = OpenAIChat(id="gpt-4o-mini")
+
+mem = Memori(conn=Session).agno.register(openai_chat=model)
+mem.attribution(entity_id="customer-456", process_id="support-agent")
+mem.config.storage.build()
+
+agent = Agent(
+    model=model,
+    instructions=[
+        "You are a helpful customer support agent.",
+        "Remember customer preferences and history from previous conversations.",
+    ],
+    markdown=True,
+)
+
+if __name__ == "__main__":
+    print("Customer: Hi, I'd like to order a large pepperoni pizza with extra cheese")
+    response1 = agent.run(
+        "Hi, I'd like to order a large pepperoni pizza with extra cheese"
+    )
+    print(f"Agent: {response1.content}\n")
+
+    print("Customer: Actually, can you remind me what I just ordered?")
+    response2 = agent.run("Actually, can you remind me what I just ordered?")
+    print(f"Agent: {response2.content}\n")
+
+    print("Customer: Perfect! And what size was that again?")
+    response3 = agent.run("Perfect! And what size was that again?")
+    print(f"Agent: {response3.content}")
+```
+
+## Key Features
+
+- **LLM Agnostic**: OpenAI, Anthropic, Bedrock, Gemini, Grok (xAI) - all modes (streamed, unstreamed, sync, async)
+- **Smart Attribution**: Track memories by entity (e.g., customer) and process (e.g., support 智能体)
+- **Advanced Augmentation**: AI-powered 记忆 augmentation with no latency impact
+- **Database Flexibility**: Supports PostgreSQL, MySQL/MariaDB, SQLite, MongoDB, CockroachDB, Neon, Supabase, Oracle, and 更多功能
+
+## Setup
+
+1. **Create Database Engine**: Use SQLAlchemy to create a 数据库 connection
+2. **Initialize Memori**: Create a Memori instance with the 数据库 session
+3. **Register with Model**: Register Memori with your Agno 智能体 using `.agno.register()`
+4. **Set Attribution**: Define entity and process IDs for 记忆 tracking
+5. **Build Storage**: Initialize the 数据库 schema with `.config.存储.build()`
+
+## 开发者资源
+
+- [Memori SDK Documentation](https://memorilabs.ai/docs/)
+- [Memori GitHub Repository](https://github.com/MemoriLabs/Memori)

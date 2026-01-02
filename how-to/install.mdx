@@ -1,0 +1,64 @@
+---
+title: 安装和设置
+sidebarTitle: Agno 安装和设置
+---
+
+## 安装 `agno` SDK
+
+我们强烈推荐：
+
+- 在 Python 虚拟环境中使用 `pip` 安装 `agno`。
+
+<Steps>
+  <Step title="创建虚拟环境">
+    <CodeGroup>
+
+    ```bash Mac
+    python3 -m venv ~/.venvs/agno
+    source ~/.venvs/agno/bin/activate
+    ```
+
+    ```bash Windows
+    python3 -m venv agnoenv
+    agnoenv/scripts/activate
+    ```
+
+    </CodeGroup>
+
+  </Step>
+  <Step title="安装 agno">
+    使用 pip 安装 `agno`
+
+    <CodeGroup>
+
+    ```bash Mac
+    pip install -U agno
+    ```
+
+    ```bash Windows
+    pip install -U agno
+    ```
+
+    </CodeGroup>
+
+  </Step>
+</Steps>
+
+<br />
+
+<Note>
+
+如果遇到错误，尝试使用 `python -m pip install --upgrade pip` 更新 pip
+
+</Note>
+
+---
+
+## 升级 agno
+
+要升级 `agno`，请在你的虚拟环境中运行此命令
+
+```bash
+pip install -U agno --no-cache-dir
+```
+

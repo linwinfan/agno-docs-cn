@@ -1,0 +1,375 @@
+---
+title: 调试智能体
+sidebarTitle: 调试智能体
+description: 学习如何调试和排除智能体故障。
+---
+
+Agno 提供了强大的调试功能，帮助您理解和优化智能体的行为。
+
+## 调试模式
+
+调试模式提供以下功能：
+
+- 📊 **实时监控**：查看智能体的实时执行过程
+- 🔍 **详细日志**：获取详细的执行日志和错误信息
+- 🎯 **步骤跟踪**：跟踪智能体的每个执行步骤
+- 📈 **性能分析**：分析智能体的性能指标
+- 🛠️ **交互式调试**：在执行过程中暂停和检查状态
+
+### 启用调试模式
+
+1. **设置环境变量**：
+
+```bash
+export AGNO_DEBUG=true
+```
+
+2. **在代码中启用**：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    debug=True  # 启用调试模式
+)
+
+response = agent.run("趋势初创公司和产品。")
+```
+
+3. **使用调试装饰器**：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+from agno.utils.debug import debug_agent
+
+@debug_agent
+def debug_run():
+    agent = Agent(
+        model=Claude(id="claude-sonnet-4-5"),
+        tools=[HackerNewsTools()],
+        instructions="就该主题写一份报告。只输出报告。",
+        markdown=True,
+    )
+    
+    response = agent.run("趋势初创公司和产品。")
+    return response
+
+result = debug_run()
+```
+
+## 交互式 CLI
+
+Agno 提供了交互式命令行界面，让您能够实时调试智能体：
+
+```bash
+agno debug --agent-id your_agent_id
+```
+
+### CLI 功能
+
+- **实时日志查看**：查看智能体的实时日志输出
+- **断点设置**：在特定点暂停执行
+- **变量检查**：检查执行过程中的变量值
+- **状态监控**：监控智能体的内部状态
+- **错误追踪**：追踪和分析错误
+
+### 使用示例
+
+```bash
+# 启动调试会话
+agno debug --agent-id web_agent
+
+# 设置断点
+agno debug --breakpoint tool_call --agent-id web_agent
+
+# 查看实时日志
+agno debug --logs --follow --agent-id web_agent
+
+# 检查特定运行
+agno debug --run-id run_123 --agent-id web_agent
+```
+
+<Tip>
+调试模式会产生大量日志输出，建议仅在开发环境中使用。
+</Tip>
+
+## 常见调试场景
+
+### 1. 工具调用失败
+
+当智能体的工具调用失败时，检查以下内容：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    debug=True,
+    # 启用详细错误信息
+    show_tool_errors=True,
+)
+
+response = agent.run("趋势初创公司和产品。")
+```
+
+### 2. 性能问题
+
+分析智能体的性能瓶颈：
+
+```python
+import time
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+# 性能监控装饰器
+def monitor_performance(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"执行时间: {end_time - start_time:.2f} 秒")
+        return result
+    return wrapper
+
+@monitor_performance
+def run_agent():
+    agent = Agent(
+        model=Claude(id="claude-sonnet-4-5"),
+        tools=[HackerNewsTools()],
+        instructions="就该主题写一份报告。只输出报告。",
+        markdown=True,
+        debug=True,
+    )
+    
+    response = agent.run("趋势初创公司和产品。")
+    return response
+
+result = run_agent()
+```
+
+### 3. 记忆问题
+
+调试智能体的记忆功能：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+from agno.memory.agent.sqlite import SqliteAgentMemory
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    debug=True,
+    # 启用记忆调试
+    memory=SqliteAgentMemory(table_name="agent_memory"),
+    show_memory_usage=True,
+)
+
+response = agent.run("趋势初创公司和产品。")
+
+# 检查记忆使用情况
+print(f"记忆使用情况: {agent.memory.get_usage_stats()}")
+```
+
+### 4. 上下文问题
+
+调试上下文构建过程：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    debug=True,
+    # 启用上下文调试
+    show_context=True,
+    context_debug_level="verbose",
+)
+
+response = agent.run("趋势初创公司和产品。")
+
+# 查看上下文构建过程
+print(f"上下文详情: {agent.get_context_debug()}")
+```
+
+## 高级调试技巧
+
+### 1. 自定义调试处理器
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+from agno.utils.debug import DebugHandler
+
+class CustomDebugHandler(DebugHandler):
+    def handle_tool_call(self, tool_call):
+        print(f"🔧 工具调用: {tool_call.name}")
+        print(f"📝 参数: {tool_call.arguments}")
+    
+    def handle_tool_response(self, tool_response):
+        print(f"📋 工具响应: {tool_response.name}")
+        print(f"📊 结果: {tool_response.result}")
+    
+    def handle_model_response(self, response):
+        print(f"💬 模型响应: {response.content[:100]}...")
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    debug=True,
+    debug_handler=CustomDebugHandler(),
+)
+
+response = agent.run("趋势初创公司和产品。")
+```
+
+### 2. 条件调试
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+def should_debug(input_text):
+    # 仅对特定输入启用调试
+    debug_keywords = ["debug", "error", "test"]
+    return any(keyword in input_text.lower() for keyword in debug_keywords)
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    debug=should_debug("趋势初创公司和产品。"),
+)
+
+response = agent.run("趋势初创公司和产品。")
+```
+
+### 3. 调试数据导出
+
+```python
+import json
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    debug=True,
+)
+
+response = agent.run("趋势初创公司和产品。")
+
+# 导出调试数据
+debug_data = {
+    "run_id": response.run_id,
+    "tools_called": response.tools,
+    "metrics": response.metrics,
+    "context": agent.get_context_debug(),
+}
+
+with open("debug_output.json", "w", encoding="utf-8") as f:
+    json.dump(debug_data, f, indent=2, ensure_ascii=False)
+```
+
+## 故障排除指南
+
+### 常见问题及解决方案
+
+#### 1. 智能体无响应
+
+**症状**：智能体不产生任何输出
+**可能原因**：
+- 模型 API 密钥无效
+- 网络连接问题
+- 指令不清晰
+
+**解决方案**：
+```python
+# 检查 API 连接
+from agno.models.anthropic import Claude
+
+try:
+    model = Claude(id="claude-sonnet-4-5")
+    response = model.generate("测试连接")
+    print("API 连接正常")
+except Exception as e:
+    print(f"API 连接失败: {e}")
+```
+
+#### 2. 工具调用失败
+
+**症状**：工具调用返回错误
+**可能原因**：
+- 工具参数不正确
+- 工具服务不可用
+- 权限问题
+
+**解决方案**：
+```python
+# 测试工具
+from agno.tools.hackernews import HackerNewsTools
+
+try:
+    tools = HackerNewsTools()
+    result = tools.top_stories(limit=1)
+    print("工具工作正常")
+except Exception as e:
+    print(f"工具测试失败: {e}")
+```
+
+#### 3. 记忆功能异常
+
+**症状**：智能体不记住之前的交互
+**可能原因**：
+- 数据库连接问题
+- 记忆配置错误
+- 存储路径问题
+
+**解决方案**：
+```python
+# 测试记忆连接
+from agno.memory.agent.sqlite import SqliteAgentMemory
+
+try:
+    memory = SqliteAgentMemory(table_name="test_memory")
+    memory.add("测试记忆", "test_user")
+    print("记忆功能正常")
+except Exception as e:
+    print(f"记忆功能失败: {e}")
+```
+
+## 开发者资源
+
+- 查看[智能体架构](/reference/agents/agent)
+- 查看[调试工具](/reference/utils/debug)
+- 查看[实践指南](https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/README.md)

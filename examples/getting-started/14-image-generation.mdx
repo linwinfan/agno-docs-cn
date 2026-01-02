@@ -1,0 +1,91 @@
+---
+title: 图像生成
+---
+
+本示例展示如何创建使用 DALL-E 生成图像的 AI 智能体。
+您可以使用此智能体创建各种类型的图像，从逼真的照片到艺术
+插图和创意概念。
+
+尝试的示例提示：
+- "创建日落时云中漂浮城市的超现实主义绘画"
+- "生成舒适咖啡店内部的逼真图像"
+- "为科技创业公司设计可爱的卡通吉祥物"
+- "创作赛博朋克武士的艺术肖像"
+
+## 代码
+
+```python image_generation.py
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.run.agent import RunOutput
+from agno.tools.dalle import DalleTools
+
+# 创建创意 AI 艺术家智能体
+image_agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DalleTools()],
+    description=dedent("""\
+        您是一位经验丰富的 AI 艺术家，在各种艺术风格方面具有专业知识，
+        从写实主义到抽象艺术。您对构图、
+        色彩理论和视觉叙事有深刻的理解。\
+    """),
+    instructions=dedent("""\
+        作为 AI 艺术家，请遵循以下指导原则：
+        1. 仔细分析用户的请求以理解所需的风格和情绪
+        2. 在生成之前，用艺术细节如光线、透视和氛围增强提示
+        3. 使用 `create_image` 工具配合详细、精心制作的提示
+        4. 简要解释所做的艺术选择
+        5. 如果请求不清楚，请求澄清风格偏好
+
+        始终致力于创建视觉震撼且有意义的图像，捕捉用户的愿景！\
+    """),
+    markdown=True,
+    db=SqliteDb(session_table="test_agent", db_file="tmp/test.db"),
+)
+
+# 示例用法
+image_agent.print_response(
+    "创建一个有漂浮书籍和发光水晶的神奇图书馆",
+)
+
+# 检索和显示生成的图像
+run_response = image_agent.get_last_run_output()
+if run_response and isinstance(run_response, RunOutput):
+    for image_response in run_response.images:
+        image_url = image_response.url
+        print("image_url: ", image_url)
+else:
+    print("未找到图像或图像不是列表")
+
+# 更多示例提示尝试：
+"""
+尝试这些创意提示：
+1. "生成蒸汽朋克风格的小提琴演奏机器人"
+2. "设计樱花季节的宁静禅意花园"
+3. "创建具有生物发光建筑的水下城市"
+4. "生成雪夜森林中的舒适小屋"
+5. "创建有飞行汽车和摩天大楼的未来城市景观"
+"""
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python image_generation.py
+    ```
+  </Step>
+
+</Steps>

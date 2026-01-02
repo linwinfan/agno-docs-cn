@@ -1,0 +1,149 @@
+---
+title: "常见问题"
+description: "Agno 使用过程中的常见问题解答"
+---
+
+# 常见问题
+
+## 一般问题
+
+### Q: Agno 是什么？
+A: Agno 是一个用于构建、运行和管理多智能体系统的统一框架。它提供了完整的工具链，从开发到生产部署。
+
+### Q: Agno 与其他智能体框架有什么区别？
+A: Agno 的主要优势包括：
+- 完整的生产运行时（AgentOS）
+- 内置的数据隐私和安全特性
+- 丰富的工具生态系统
+- 简单易用的 API
+
+### Q: Agno 是开源的吗？
+A: 是的，Agno 是开源项目，您可以在 [GitHub](https://github.com/agno-agi/agno) 上查看源代码。
+
+## 安装和设置
+
+### Q: 如何安装 Agno？
+A: 使用 pip 安装：
+```bash
+pip install agno
+```
+
+### Q: 系统要求是什么？
+A: Agno 需要：
+- Python 3.8 或更高版本
+- 网络连接（用于访问模型 API）
+- 可选：数据库（用于持久化存储）
+
+### Q: 支持哪些模型？
+A: Agno 支持多种模型：
+- OpenAI (GPT-3.5, GPT-4, GPT-4-turbo)
+- Anthropic (Claude)
+- Google (Gemini)
+- 本地模型（通过 Ollama）
+- 更多模型正在添加中
+
+## 使用问题
+
+### Q: 如何创建第一个智能体？
+A: 参考我们的[快速入门指南](/get-started/quickstart)。
+
+### Q: 如何添加自定义工具？
+A: 您可以创建继承自 `Tool` 类的自定义工具：
+```python
+from agno.tools.tool import Tool
+
+def my_function(param1: str) -> str:
+    return f"处理结果: {param1}"
+
+my_tool = Tool(
+    name="my_tool",
+    description="我的自定义工具",
+    func=my_function
+)
+
+agent = Agent(tools=[my_tool])
+```
+
+### Q: 如何启用智能体记忆？
+A: 使用 `add_history_to_context=True` 参数：
+```python
+agent = Agent(
+    add_history_to_context=True,
+    db=SqliteDb(db_file="memory.db")
+)
+```
+
+## AgentOS 问题
+
+### Q: AgentOS 和普通智能体有什么区别？
+A: AgentOS 是生产就绪的运行时环境，提供：
+- Web API 接口
+- 监控和管理界面
+- 自动扩缩容
+- 企业级安全
+
+### Q: 如何部署 AgentOS？
+A: AgentOS 支持多种部署方式：
+- 本地开发服务器
+- Docker 容器
+- 云平台（AWS、GCP、Azure）
+- Kubernetes
+
+### Q: AgentOS 是否需要特殊的硬件？
+A: 不需要，AgentOS 可以在任何支持 Python 的环境中运行。
+
+## 性能和优化
+
+### Q: 如何提高智能体响应速度？
+A: 尝试以下方法：
+- 使用更快的模型
+- 优化工具调用
+- 启用缓存
+- 减少上下文长度
+
+### Q: 如何处理大量并发请求？
+A: 使用 AgentOS 的自动扩缩容功能，或部署到负载均衡环境。
+
+## 安全和隐私
+
+### Q: 我的数据是否安全？
+A: 是的，AgentOS 完全在您的基础设施中运行，数据不会离开您的环境。
+
+### Q: 如何保护智能体不被滥用？
+A: 实施以下安全措施：
+- API 密钥认证
+- 速率限制
+- 输入验证
+- 审计日志
+
+## 故障排除
+
+### Q: 智能体不响应怎么办？
+A: 检查以下几点：
+- 网络连接
+- API 密钥有效性
+- 模型可用性
+- 错误日志
+
+### Q: 如何调试智能体？
+A: 启用调试模式：
+```python
+agent = Agent(debug_mode=True)
+```
+
+### Q: 内存使用过高怎么办？
+A: 尝试：
+- 清理不必要的聊天历史
+- 使用更高效的数据库
+- 优化知识库大小
+
+## 更多帮助
+
+如果您的问题没有在这里得到解答，请：
+
+1. 查看[完整文档](/)
+2. 加入我们的 [Discord 社区](https://agno.link/discord)
+3. 在 [GitHub](https://github.com/agno-agi/agno) 上提交 issue
+4. 联系技术支持：support@agno.com
+
+我们致力于帮助您成功使用 Agno！

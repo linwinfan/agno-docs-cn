@@ -1,0 +1,111 @@
+---
+title: 异常与重试
+sidebarTitle: 异常与重试
+description: 学习如何使用异常和重试来控制工具的行为。
+keywords: [exceptions, retries, tool calls, tool call loop, agent run, agent run status, agent run completion]
+---
+
+如果在工具调用后您需要向模型提供反馈以更改其行为或退出工具调用循环，您可以引发以下异常之一：
+
+- `RetryAgentRun`：当您想向模型提供有关如何更改其行为的指令并让模型重试工具调用时，请使用此异常。异常消息将作为工具调用错误传递给模型，允许模型在 LLM 循环的下一次迭代中重试或调整其方法。
+
+<Note>这不会重试完整的智能体运行——它仅在当前运行内向模型提供反馈。</Note>
+
+- `StopAgentRun`：当您想退出模型执行循环并结束智能体运行时，请使用此异常。当从工具函数引发时，智能体退出工具调用循环，运行状态设置为 `COMPLETED`。到那时为止的所有会话状态、消息、工具调用和工具结果都存储在数据库中。
+
+<Note>这不会取消智能体运行。它在退出工具调用循环后完成运行。</Note>
+
+## 使用 RetryAgentRun
+
+此示例显示如何使用 `RetryAgentRun` 异常向模型提供反馈，允许其调整行为：
+
+```python retry_in_tool_call.py
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.exceptions import RetryAgentRun
+from agno.models.openai import OpenAIChat
+from agno.utils.log import logger
+from agno.run import RunContext
+
+
+def add_item(run_context: RunContext, item: str) -> str:
+    """Add an item to the shopping list."""
+    if not run_context.session_state:
+        run_context.session_state = {}
+    
+    if "shopping_list" not in run_context.session_state:
+        run_context.session_state["shopping_list"] = []
+    
+    run_context.session_state["shopping_list"].append(item)
+    len_shopping_list = len(run_context.session_state["shopping_list"])
+    
+    if len_shopping_list < 3:
+        raise RetryAgentRun(
+            f"Shopping list is: {run_context.session_state['shopping_list']}. Minimum 3 items in the shopping list. "
+            + f"Add {3 - len_shopping_list} more items.",
+        )
+    
+    logger.info(f"The shopping list is now: {run_context.session_state.get('shopping_list')}")
+    return f"The shopping list is now: {run_context.session_state.get('shopping_list')}"
+
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    session_id="retry_example_session",
+    db=SqliteDb(
+        session_table="retry_example_session",
+        db_file="tmp/retry_example.db",
+    ),
+    # Initialize the session state with empty shopping list
+    session_state={"shopping_list": []},
+    tools=[add_item],
+    markdown=True,
+)
+agent.print_response("Add milk", stream=True)
+print(f"Final session state: {agent.get_session_state(session_id='retry_example_session')}")
+```
+
+在此示例中，当 `add_item` 被调用且项目少于 3 个时，它会引发带有指令的 `RetryAgentRun`。模型将其作为工具调用错误接收，并可以使用其他项目再次调用 `add_item` 以满足要求。
+
+## 使用 StopAgentRun
+
+此示例显示如何使用 `StopAgentRun` 异常退出工具调用循环：
+
+```python stop_in_tool_call.py
+from agno.agent import Agent
+from agno.exceptions import StopAgentRun
+from agno.models.openai import OpenAIChat
+from agno.run import RunContext
+
+
+def check_condition(run_context: RunContext, value: int) -> str:
+    """Check a condition and stop tool calls if met."""
+    if value > 100:
+        raise StopAgentRun(
+            f"Value {value} exceeds threshold. Stopping tool call execution."
+        )
+    return f"Value {value} is acceptable."
+
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[check_condition],
+    markdown=True,
+)
+
+# When the model calls check_condition with value > 100,
+# the tool call loop will exit and the run will complete
+agent.print_response("Use the check_condition tool to check if 150 is acceptable", stream=True)
+```
+
+在此示例中，当 `check_condition` 被调用且值大于 100 时，它会引发 `StopAgentRun`。工具调用循环立即退出，运行以状态 `COMPLETED` 完成。到那时为止的所有会话状态、消息和工具调用都存储在数据库中。
+
+<Tip>
+如果要查看调试日志，请确保设置 `AGNO_DEBUG=True`。
+</Tip>
+
+## 开发者资源
+
+- 查看 [RetryAgentRun 架构](/reference/tools/retry-agent-run)
+- 查看 [StopAgentRun 架构](/reference/tools/stop-agent-run)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/14_tools/exceptions)

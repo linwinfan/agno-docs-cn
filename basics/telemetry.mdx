@@ -1,0 +1,270 @@
+---
+title: Agno 遥测
+sidebarTitle: 遥测
+description: 控制 Agno 收集的使用数据
+keywords: 遥测, 隐私, 数据收集, 使用跟踪, 禁用遥测, 匿名数据
+---
+
+Agno 收集关于智能体、团队、工作流和 AgentOS 配置的匿名使用数据，以帮助改进平台并提供更好的支持。
+
+<Note>
+**隐私优先**: 从不收集敏感数据（提示、响应、用户数据或 API 密钥）。所有遥测数据都是匿名的和聚合的。
+</Note>
+
+## 收集哪些数据？
+
+Agno 为以下内容收集基本使用指标：
+- **智能体运行** - 模型提供商、数据库类型、功能使用情况
+- **团队运行** - 多智能体协调模式
+- **工作流运行** - 编排和执行模式
+- **AgentOS 启动** - 平台使用情况和配置
+
+### 遥测载荷示例
+
+这是一个智能体运行遥测载荷的样子：
+```json
+{
+    "session_id": "123",
+    "run_id": "123",
+    "sdk_version": "1.0.0",
+    "type": "agent",
+    "data": {
+        "agent_id": "123",
+        "db_type": "PostgresDb",
+        "model_provider": "openai",
+        "model_name": "OpenAIResponses",
+        "model_id": "gpt-5-mini",
+        "parser_model": {
+            "model_provider": "openai",
+            "model_name": "OpenAIResponses",
+            "model_id": "gpt-5-mini",
+        },
+        "output_model": {
+            "model_provider": "openai",
+            "model_name": "OpenAIResponses",
+            "model_id": "gpt-5-mini",
+        },
+        "has_tools": true,
+        "has_memory": false,
+        "has_reasoning": true,
+        "has_knowledge": true,
+        "has_input_schema": false,
+        "has_output_schema": false,
+        "has_team": true,
+    },
+}
+```
+
+## 如何禁用遥测
+
+您可以通过两种方式禁用遥测：
+
+### 环境变量
+
+将 `AGNO_TELEMETRY` 环境变量设置为 `false`：
+
+```bash
+export AGNO_TELEMETRY=false
+```
+
+### 每实例配置
+
+为特定的智能体、团队、工作流或 AgentOS 实例禁用遥测：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 为特定智能体禁用遥测
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    telemetry=False
+)
+```
+
+这适用于：
+- **智能体**: `Agent(telemetry=False)`
+- **团队**: `Team(telemetry=False)`
+- **工作流**: `Workflow(telemetry=False)`
+- **AgentOS**: `AgentOS(telemetry=False)`
+
+## 隐私和安全
+
+### 数据保护原则
+
+1. **匿名化**: 所有数据都是匿名的，无法追溯到个人
+2. **聚合**: 数据在聚合后进行分析，保护个体隐私
+3. **最小化**: 只收集必要的功能改进数据
+4. **透明**: 完全公开收集的数据类型和用途
+
+### 数据使用
+
+收集的数据用于：
+- **产品改进**: 了解功能使用情况，优化用户体验
+- **错误诊断**: 快速识别和修复常见问题
+- **性能优化**: 分析使用模式，提升系统性能
+- **安全监控**: 检测异常使用模式，保护系统安全
+
+### 数据不包含
+
+以下数据**不会**被收集：
+- 用户输入的提示内容
+- 模型生成的响应内容
+- API 密钥或认证信息
+- 个人身份信息
+- 私有数据或敏感信息
+
+## 配置选项
+
+### 全局配置
+
+在项目中全局禁用遥测：
+
+```python
+# 在项目初始化时设置
+import os
+os.environ["AGNO_TELEMETRY"] = "false"
+
+from agno.agent import Agent
+# 所有后续的智能体实例都不会发送遥测数据
+```
+
+### 条件配置
+
+根据环境条件配置遥测：
+
+```python
+import os
+from agno.agent import Agent
+
+# 只在生产环境启用遥测
+telemetry_enabled = os.getenv("ENVIRONMENT") == "production"
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    telemetry=telemetry_enabled
+)
+```
+
+### 配置文件
+
+通过配置文件管理遥测设置：
+
+```python
+# config.py
+TELEMETRY_CONFIG = {
+    "enabled": False,
+    "environment": "development",
+    "debug_mode": True
+}
+
+# main.py
+from config import TELEMETRY_CONFIG
+from agno.agent import Agent
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    telemetry=TELEMETRY_CONFIG["enabled"]
+)
+```
+
+## 企业环境配置
+
+### 企业级隐私控制
+
+对于有严格隐私要求的企业环境：
+
+```python
+# 企业配置示例
+class EnterpriseConfig:
+    def __init__(self):
+        self.telemetry_enabled = False
+        self.data_retention_days = 0
+        self.audit_logging = True
+    
+    def create_agent(self):
+        return Agent(
+            model=OpenAIChat(id="gpt-4o"),
+            telemetry=self.telemetry_enabled,
+            audit_mode=self.audit_logging
+        )
+
+enterprise = EnterpriseConfig()
+agent = enterprise.create_agent()
+```
+
+### 合规性考虑
+
+确保遥测配置符合各种合规要求：
+
+- **GDPR**: 完全匿名化，不收集个人数据
+- **SOC 2**: 数据安全和隐私保护
+- **HIPAA**: 不收集任何受保护的健康信息
+- **CCPA**: 消费者隐私权保护
+
+## 监控和审计
+
+### 遥测状态检查
+
+```python
+from agno.utils.telemetry import get_telemetry_status
+
+# 检查当前遥测状态
+status = get_telemetry_status()
+print(f"遥测启用状态: {status.enabled}")
+print(f"数据收集类型: {status.collection_types}")
+```
+
+### 审计日志
+
+```python
+# 启用详细的审计日志
+import logging
+
+audit_logger = logging.getLogger("agno.audit")
+audit_handler = logging.FileHandler("audit.log")
+audit_logger.addHandler(audit_handler)
+audit_logger.setLevel(logging.INFO)
+
+# 记录遥测配置变更
+audit_logger.info("遥测配置已更新: enabled=False")
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 遥测仍然工作
+
+**问题**: 设置了 `telemetry=False` 但遥测仍在工作
+**解决方案**:
+1. 检查环境变量是否正确设置
+2. 确认代码中的配置优先级
+3. 重启应用程序确保配置生效
+4. 检查是否有其他配置覆盖了设置
+
+#### 性能影响
+
+**问题**: 遥测影响应用程序性能
+**解决方案**:
+1. 在生产环境中禁用遥测
+2. 使用异步遥测发送
+3. 优化遥测数据收集频率
+4. 监控遥测对性能的实际影响
+
+#### 数据合规
+
+**问题**: 需要确保符合特定的数据保护法规
+**解决方案**:
+1. 完全禁用遥测以确保合规
+2. 审查遥测数据收集的具体内容
+3. 实施额外的数据保护措施
+4. 咨询法律顾问确认合规要求
+
+## 开发者资源
+
+- 查看[智能体架构](/reference/agents/agent)
+- 查看[团队架构](/reference/teams/team)
+- 查看[工作流架构](/reference/workflows/workflow)
+- 了解[隐私政策](https://agno.ai/privacy)
+- 查看[安全文档](/security/overview)

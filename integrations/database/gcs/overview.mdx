@@ -1,0 +1,47 @@
+---
+title: JSON files as 数据库, on Google Cloud Storage (GCS)
+sidebarTitle: 概览
+description: 学习使用 Google Cloud Storage (GCS) 作为智能体的数据库
+---
+
+Agno 支持 using [Google Cloud Storage (GCS)](https://云.google.com/存储) as a 数据库 with the `GcsJsonDb` class.
+Session 数据 will be stored as JSON blobs in a GCS bucket.
+
+You can get started with GCS 以下 their [Get Started guide](https://云.google.com/docs/get-started).
+
+## 使用方法
+
+```python gcs_for_agent.py
+import uuid
+import google.auth
+from agno.agent import Agent
+from agno.db.gcs_json import GcsJsonDb
+
+# Obtain the default credentials and project id from your gcloud CLI session.
+credentials, project_id = google.auth.default()
+
+# Generate a unique bucket name using a base name and a UUID4 suffix.
+base_bucket_name = "example-gcs-bucket"
+unique_bucket_name = f"{base_bucket_name}-{uuid.uuid4().hex[:12]}"
+print(f"Using bucket: {unique_bucket_name}")
+
+# Initialize GCSJsonDb with explicit credentials, unique bucket name, and project.
+db = GcsJsonDb(
+    bucket_name=unique_bucket_name,
+    prefix="agent/",
+    project=project_id,
+    credentials=credentials,
+)
+
+# Setup your Agent with the Database
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-gcs-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/gcs/gcs_json_for_智能体.py)
+- see full example [here](/integrations/database/gcs/usage/gcs-for-智能体)

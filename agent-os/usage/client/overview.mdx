@@ -1,0 +1,67 @@
+---
+title: 客户端使用
+description: AgentOS 客户端使用指南
+sidebarTitle: 客户端
+keywords: [客户端, agentos, api, 集成]
+---
+
+AgentOS 提供了多种客户端方式来访问和智能体交互。
+
+## AgentOSClient
+
+```python
+from agno.os.client import AgentOSClient
+
+# 创建客户端连接
+client = AgentOSClient(
+    base_url="http://localhost:7777",
+    headers={"Authorization": "Bearer your-token"}
+)
+
+# 获取智能体
+agent = client.agent("agent-id")
+
+# 运行智能体
+response = agent.run("你好！")
+print(response.content)
+```
+
+## 远程智能体
+
+```python
+from agno.agent import RemoteAgent
+
+# 连接到远程智能体
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",
+    agent_id="remote-agent"
+)
+
+# 执行远程智能体
+response = agent.run("执行任务")
+print(response.content)
+```
+
+## 认证配置
+
+### JWT 认证
+
+```python
+client = AgentOSClient(
+    base_url="http://localhost:7777",
+    headers={
+        "Authorization": "Bearer your-jwt-token"
+    }
+)
+```
+
+### API 密钥认证
+
+```python
+client = AgentOSClient(
+    base_url="http://localhost:7777",
+    headers={
+        "X-API-Key": "your-api-key"
+    }
+)
+```

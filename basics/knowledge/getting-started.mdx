@@ -1,0 +1,241 @@
+---
+title: 入门指南
+sidebarTitle: 入门指南
+description: 通过这个实践教程，在三个简单步骤中构建您的第一个知识驱动的代理。
+keywords: [knowledge,rag,agentic rag]
+---
+
+准备构建您的第一个智能代理了吗？本指南将带您创建一个知识驱动的代理，它可以在几分钟内回答关于您文档的问题。
+
+## 您将构建什么
+
+在本教程结束时，您将拥有一个能够：
+- 阅读和理解您的文档或网站内容
+- 基于该信息回答特定问题
+- 为其响应提供来源
+- 智能搜索，无需您指定要查找的内容
+
+## 先决条件
+
+<Steps>
+  <Step title="安装 Agno">
+    ```bash
+    pip install agno
+    ```
+  </Step>
+  <Step title="设置您的API密钥">
+    ```bash
+    export OPENAI_API_KEY="your-api-key-here"
+    ```
+    <Note>本教程使用OpenAI，但Agno支持[许多其他模型](/basics/models/overview)。</Note>
+  </Step>
+</Steps>
+
+## 步骤1：设置您的知识库
+
+首先，让我们创建一个带有向量数据库的知识库来存储您的信息：
+
+```python knowledge_agent.py
+from agno.agent import Agent
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.pgvector import PgVector
+from agno.models.openai import OpenAIChat
+
+# 使用Postgres和PgVector创建知识库
+knowledge = Knowledge(
+    contents_db=PostgresDb(
+        db_url="postgresql+psycopg://ai:ai@localhost:5432/db",
+        knowledge_table="knowledge_contents",
+    ),
+    vector_db=PgVector(
+        table_name="knowledge_documents",
+        db_url="postgresql+psycopg://ai:ai@localhost:5432/db"
+    ),
+)
+
+# 创建带有知识的代理
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    knowledge=knowledge,
+    # 启用自动知识搜索
+    search_knowledge=True,
+    instructions=[
+        "在回答问题之前始终搜索您的知识库",
+        "在可能的情况下在响应中包含来源引用"
+    ]
+)
+```
+
+<Accordion title="没有PostgreSQL？改用LanceDB">
+为了快速开始而无需设置PostgreSQL，使用在本地存储数据的LanceDB：
+
+```python
+from agno.vectordb.pgvector import PgVector
+
+# 本地向量存储 - 无需数据库设置
+knowledge = Knowledge(
+    vector_db=PgVector(db_url="postgresql+psycopg://ai:ai@localhost:5432/ai"),
+)
+```
+</Accordion>
+
+## 步骤2：添加您的内容
+
+现在让我们为您的代理添加一些知识。您可以从各种来源添加内容：
+
+<Tabs>
+  <Tab title="从本地文件">
+    ```python
+    # 添加特定文件
+    knowledge.add_content(
+        path="path/to/your/document.pdf"
+    )
+
+    # 添加整个目录
+    knowledge.add_content(
+        path="path/to/documents/"
+    )
+    ```
+  </Tab>
+  <Tab title="从URL">
+    ```python
+    # 从网站添加内容
+    knowledge.add_content(
+        url="https://docs.agno.com/introduction"
+    )
+
+    # 从网络添加PDF
+    knowledge.add_content(
+        url="https://example.com/document.pdf"
+    )
+    ```
+  </Tab>
+  <Tab title="从文本">
+    ```python
+    # 直接添加文本内容
+    knowledge.add_content(
+        text_content="""
+        公司政策：远程工作指南
+
+        1. 远程工作适用于所有全职员工
+        2. 员工必须与团队保持定期沟通
+        3. 家庭办公设备每年提供高达1000美元
+        """
+    )
+    ```
+  </Tab>
+</Tabs>
+
+## 步骤3：与您的代理聊天
+
+就是这样！您的代理现在已准备好基于您的内容回答问题：
+
+```python
+# 测试您的知识驱动代理
+if __name__ == "__main__":
+    # 您的代理将自动搜索其知识来回答
+    agent.print_response(
+        "公司关于远程工作的政策是什么？",
+        stream=True
+    )
+```
+
+### 完整示例
+
+这是完整的工作示例：
+
+```python knowledge_agent.py
+from agno.agent import Agent
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.pgvector import PgVector
+from agno.models.openai import OpenAIChat
+
+# 设置知识库
+knowledge = Knowledge(
+    contents_db=PostgresDb(
+        db_url="postgresql+psycopg://ai:ai@localhost:5432/db",
+        knowledge_table="knowledge_contents",
+    ),
+    vector_db=PgVector(db_url="postgresql+psycopg://ai:ai@localhost:5432/ai"),
+)
+
+# 添加您的内容
+knowledge.add_content(
+    text_content="""
+    Agno 知识系统
+
+    知识允许AI代理在运行时访问和搜索
+    特定领域的信息。这实现了
+    动态少样本学习和智能RAG能力。
+
+    主要功能：
+    - 自动内容分块
+    - 向量相似性搜索
+    - 多数据源支持
+    - 智能检索
+    """
+)
+
+# 创建您的代理
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    knowledge=knowledge,
+    search_knowledge=True,
+    instructions=["回答前始终搜索知识"]
+)
+
+# 与您的代理聊天
+if __name__ == "__main__":
+    agent.print_response("什么是Agno知识？", stream=True)
+```
+
+运行它：
+```bash
+python knowledge_agent.py
+```
+
+## 刚才发生了什么？
+
+当您运行代码时，幕后发生了以下情况：
+
+1. **内容处理**：您的文本被分块成更小的片段并转换为向量嵌入
+2. **智能搜索**：代理分析您的问题并搜索相关信息
+3. **上下文响应**：代理将检索到的知识与您的问题结合起来提供准确答案
+4. **来源归属**：响应基于您的特定内容，而不是通用训练数据
+
+## 下一步：探索高级功能
+
+<CardGroup cols={3}>
+  <Card title="内容类型" icon="file-lines" href="/basics/knowledge/content-types">
+    了解添加内容的不同方式：文件、URL、数据库等。
+  </Card>
+  <Card title="分块策略" icon="scissors" href="/basics/knowledge/chunking/overview">
+    优化您的内容分解方式以获得更好的搜索结果。
+  </Card>
+  <Card title="向量数据库" icon="database" href="/basics/vectordb/overview">
+    为您的需求和规模选择合适的存储解决方案。
+  </Card>
+  <Card title="搜索类型" icon="magnifying-glass" href="/basics/knowledge/search-and-retrieval/overview">
+    探索不同的搜索策略：向量、关键词和混合搜索。
+  </Card>
+</CardGroup>
+
+## 故障排除
+
+<AccordionGroup>
+  <Accordion title="代理在响应中没有使用知识">
+    确保在创建代理时设置了`search_knowledge=True`，并考虑添加明确指令来搜索知识库。
+  </Accordion>
+
+  <Accordion title="向量数据库连接错误">
+    对于本地开发，尝试使用LanceDB而不是PostgreSQL。对于生产环境，确保您的数据库连接字符串正确。
+  </Accordion>
+
+  <Accordion title="搜索中找不到内容">
+    您的内容可能需要更好的分块。尝试不同的分块策略或更小的分块大小以获得更精确的检索。
+  </Accordion>
+</AccordionGroup>
+
+<Card title="准备好学习核心概念了吗？" icon="graduation-cap" href="/basics/knowledge/knowledge-bases">
+  深入了解知识库以及它们如何为智能代理提供动力
+</Card>

@@ -1,0 +1,115 @@
+---
+title: 自定义事件
+description: 学习如何从您自己的工具中产生自定义事件。
+---
+
+### 完整示例
+
+```python custom_events.py
+import asyncio
+from dataclasses import dataclass
+from typing import Optional
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.run.agent import CustomEvent
+from agno.tools import tool
+
+
+# Our custom event, extending the CustomEvent class
+@dataclass
+class CustomerProfileEvent(CustomEvent):
+    """CustomEvent for customer profile."""
+
+    customer_name: Optional[str] = None
+    customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
+
+
+# Our custom tool
+@tool()
+async def get_customer_profile():
+    """
+    Get customer profiles.
+    """
+
+    yield CustomerProfileEvent(
+        customer_name="John Doe",
+        customer_email="john.doe@example.com",
+        customer_phone="1234567890",
+    )
+
+
+# Setup an Agent with our custom tool.
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    tools=[get_customer_profile],
+    instructions="Your task is to retrieve customer profiles for the user.",
+)
+
+
+async def run_agent():
+    # Running the Agent: it should call our custom tool and yield the custom event
+    async for event in agent.arun(
+        "Hello, can you get me the customer profile for customer with ID 123?",
+        stream=True,
+    ):
+        if isinstance(event, CustomEvent):
+            print(f"✅ Custom event emitted: {event}")
+
+
+asyncio.run(run_agent())
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+  </Step>
+
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上述代码。
+    ```bash
+    touch custom_events.py
+    ```
+  </Step>
+
+  <Step title="运行代理">
+    <CodeGroup>
+    ```bash Mac
+    python custom_events.py
+    ```
+    
+    ```bash Windows
+    python custom_events.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有示例代码">
+    探索 Agno 存储库中所有可用的示例代码。点击下面的链接在 GitHub 上查看代码：
+
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/events" target="_blank">
+      GitHub 上的 Agno 示例代码
+    </Link>
+  </Step>
+</Steps>

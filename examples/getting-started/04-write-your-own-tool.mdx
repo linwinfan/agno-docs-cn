@@ -1,0 +1,97 @@
+---
+title: 编写自定义工具
+---
+
+本示例展示如何使用 Agno 创建和使用您自己的自定义工具。
+您可以将 Hacker News 功能替换为您想要的任何 API 或服务！
+
+一些自定义工具的想法：
+- 天气数据获取器
+- 股价分析器
+- 个人日历集成
+- 自定义数据库查询
+- 本地文件操作
+
+## 代码
+
+```python custom_tools.py
+import json
+from textwrap import dedent
+
+import httpx
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+
+def get_top_hackernews_stories(num_stories: int = 10) -> str:
+    """使用此函数获取 Hacker News 的热门故事。
+
+    Args:
+        num_stories (int): 要返回的故事数量。默认为 10。
+
+    Returns:
+        str: 热门故事的 JSON 字符串。
+    """
+
+    # Fetch top story IDs
+    response = httpx.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+    story_ids = response.json()
+
+    # Fetch story details
+    stories = []
+    for story_id in story_ids[:num_stories]:
+        story_response = httpx.get(
+            f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json"
+        )
+        story = story_response.json()
+        if "text" in story:
+            story.pop("text", None)
+        stories.append(story)
+    return json.dumps(stories)
+
+
+# 创建一个具有硅谷个性的科技新闻记者智能体
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=dedent("""\
+        你是一个精通技术的 Hacker News 记者，对一切技术充满热情！🤖
+        把自己想象成硅谷内部人士和科技记者的结合体。
+
+        你的风格指南：
+        - 使用表情符号开始一个引人注目的科技标题
+        以热情和技术前瞻的态度展示 Hacker News 故事
+        - 保持回复简洁但信息丰富
+        - 适当使用科技行业引用和创业术语
+        - 以引人注目的科技主题署名结束，如'回到终端！'或'推送到生产环境！'
+
+        记住要彻底分析 HN 故事，同时保持高昂的技术热情！\
+    """),
+    tools=[get_top_hackernews_stories],
+    markdown=True,
+)
+
+# 示例问题尝试：
+# - "当前 HN 上有哪些热门科技讨论？"
+# - "总结 Hacker News 上前 5 个故事"
+# - "今天最受点赞的故事是什么？"
+agent.print_response("总结 hackernews 上前 5 个故事？", stream=True)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai httpx agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python custom_tools.py
+    ```
+  </Step>
+
+</Steps>

@@ -1,0 +1,187 @@
+---
+title: 工具钩子
+sidebarTitle: 工具钩子
+description: 学习如何使用工具钩子来修改工具的行为。
+---
+
+您可以使用工具钩子在工具调用之前或之后执行验证、日志记录或任何其他逻辑。
+
+工具钩子是一个接受函数名、函数调用和参数的函数。可选地，您也可以访问 `Agent` 或 `Team` 对象。在工具钩子内部，您必须调用函数调用并返回结果。
+
+<Note>
+定义工具钩子时使用确切的参数名称很重要。`agent`、`team`、`run_context`、`function_name`、`function_call` 和 `arguments` 是可用参数。
+</Note>
+
+例如：
+
+```python
+def logger_hook(
+    function_name: str, function_call: Callable, arguments: Dict[str, Any]
+):
+    """Log the duration of the function call"""
+    start_time = time.time()
+
+    # Call the function
+    result = function_call(**arguments)
+
+    end_time = time.time()
+    duration = end_time - start_time
+
+    logger.info(f"Function {function_name} took {duration:.2f} seconds to execute")
+
+    # Return the result
+    return result
+```
+
+或
+
+```python
+def confirmation_hook(
+    function_name: str, function_call: Callable, arguments: Dict[str, Any]
+):
+    """Confirm the function call"""
+    if function_name != "get_top_hackernews_stories":
+        raise ValueError("This tool is not allowed to be called")
+    return function_call(**arguments)
+```
+
+您可以在智能体和团队上分配工具钩子。工具钩子将应用于智能体或团队进行的所有工具调用。
+
+例如：
+
+```python
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+    tool_hooks=[logger_hook],
+)
+```
+
+您也可以在工具钩子中访问 `RunContext` 对象。在运行上下文中，您将找到会话状态、依赖项和元数据。
+
+```python
+from agno.run import RunContext
+
+def grab_customer_profile_hook(
+    run_context: RunContext, function_name: str, function_call: Callable, arguments: Dict[str, Any]
+):
+    if not run_context.session_state:
+        run_context.session_state = {}
+
+    cust_id = arguments.get("customer")
+    if cust_id not in run_context.session_state["customer_profiles"]:
+        raise ValueError(f"Customer profile for {cust_id} not found")
+    customer_profile = run_context.session_state["customer_profiles"][cust_id]
+
+    # Replace the customer with the customer_profile for the function call
+    arguments["customer"] = json.dumps(customer_profile)
+    # Call the function with the updated arguments
+    result = function_call(**arguments)
+
+    return result
+```
+
+### 多个工具钩子
+
+您也可以一次分配多个工具钩子。它们将按照分配的顺序应用。
+
+```python
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+    tool_hooks=[logger_hook, confirmation_hook],  # The logger_hook will run on the outer layer, and the confirmation_hook will run on the inner layer
+)
+```
+
+您也可以将工具钩子分配给特定的自定义工具。
+
+```python
+@tool(tool_hooks=[logger_hook, confirmation_hook])
+def get_top_hackernews_stories(num_stories: int) -> Iterator[str]:
+    """Fetch top stories from Hacker News.
+
+    Args:
+        num_stories (int): Number of stories to retrieve
+    """
+    # Fetch top story IDs
+    response = httpx.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+    story_ids = response.json()
+
+    # Yield story details
+    final_stories = []
+    for story_id in story_ids[:num_stories]:
+        story_response = httpx.get(
+            f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json"
+        )
+        story = story_response.json()
+        if "text" in story:
+            story.pop("text", None)
+        final_stories.append(story)
+
+    return json.dumps(final_stories)
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[get_top_hackernews_stories],
+)
+```
+
+## 前置和后置钩子
+
+前置和后置钩子让您可以修改工具调用之前和之后发生的事情。它是工具钩子的替代方案。
+
+在 `@tool` 装饰器中设置 `pre_hook` 以在工具调用之前运行函数。
+
+在 `@tool` 装饰器中设置 `post_hook` 以在工具调用之后运行函数。
+
+这是一个使用 `pre_hook`、`post_hook` 以及智能体上下文的演示示例。
+
+```python pre_and_post_hooks.py
+import json
+from typing import Iterator
+
+import httpx
+from agno.agent import Agent
+from agno.tools import FunctionCall, tool
+
+
+def pre_hook(fc: FunctionCall):
+    print(f"Pre-hook: {fc.function.name}")
+    print(f"Arguments: {fc.arguments}")
+    print(f"Result: {fc.result}")
+
+
+def post_hook(fc: FunctionCall):
+    print(f"Post-hook: {fc.function.name}")
+    print(f"Arguments: {fc.arguments}")
+    print(f"Result: {fc.result}")
+
+
+@tool(pre_hook=pre_hook, post_hook=post_hook)
+def get_top_hackernews_stories(agent: Agent) -> Iterator[str]:
+    num_stories = agent.context.get("num_stories", 5) if agent.context else 5
+
+    # Fetch top story IDs
+    response = httpx.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+    story_ids = response.json()
+
+    # Yield story details
+    for story_id in story_ids[:num_stories]:
+        story_response = httpx.get(
+            f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json"
+        )
+        story = story_response.json()
+        if "text" in story:
+            story.pop("text", None)
+        yield json.dumps(story)
+
+
+agent = Agent(
+    dependencies={
+        "num_stories": 2,
+    },
+    tools=[get_top_hackernews_stories],
+    markdown=True,
+)
+agent.print_response("What are the top hackernews stories?", stream=True)
+```

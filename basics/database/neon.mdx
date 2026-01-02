@@ -1,0 +1,36 @@
+---
+title: Neon
+description: 学习使用 Neon 作为您的代理数据库提供商
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [Neon](https://neon.com/)，通过 `PostgresDb` 类实现。
+
+您可以按照他们的[入门指南](https://neon.com/docs/get-started/signing-up)开始使用 Neon。
+
+您也可以在其部分中阅读更多关于 [`PostgresDb` 类](/basics/database/postgres)的信息。
+
+## 用法
+
+```python neon_for_agent.py
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+from os import getenv
+
+# 获取您的 Neon 数据库 URL
+NEON_DB_URL = getenv("NEON_DB_URL")
+
+# 设置 Neon 数据库
+db = PostgresDb(db_url=NEON_DB_URL)
+
+# 使用数据库设置您的代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-postgres-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/postgres/postgres_for_agent.py)

@@ -1,0 +1,34 @@
+---
+title: JSON 文件作为数据库
+sidebarTitle: 概述
+description: 学习使用 JSON 文件作为您的代理数据库
+---
+
+Agno 支持使用本地 JSON 文件作为"数据库"，通过 `JsonDb` 类实现。
+这是一种无需设置数据库即可存储代理会话数据的简单方法。
+
+<Warning>
+不建议在生产应用程序中使用 JSON 文件作为数据库。
+将其用于演示、测试以及您不想设置数据库的任何其他用例。
+</Warning>
+
+## 用法
+
+```python json_for_agent.py
+from agno.agent import Agent
+from agno.db.json import JsonDb
+
+# 设置 JSON 数据库
+db = JsonDb(db_path="tmp/json_db")
+
+# 使用数据库设置您的代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-json-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/json/json_for_agent.py)

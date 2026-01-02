@@ -1,0 +1,78 @@
+---
+title: 结构化输出
+sidebarTitle: 结构化输出
+---
+
+## 结构化输出 vs. JSON 模式
+
+在使用语言模型时，生成匹配特定结构的响应对于构建可靠的应用程序至关重要。Agno 代理支持两种实现此目标的方法：**结构化输出**和**JSON 模式**。
+
+---
+
+### 结构化输出（如果支持则默认）
+
+"结构化输出"是从模型中提取格式良好、符合架构的响应的**首选**和最**可靠**的方法。如果模型类支持它，Agno 代理默认使用结构化输出。
+
+使用结构化输出时，我们向模型提供一个架构（使用 Pydantic 或 JSON Schema），模型的响应保证**严格遵循**该架构。这消除了许多常见问题，如缺失字段、无效的枚举值或不一致的格式。当您需要高置信度、结构良好的响应时，结构化输出是理想选择——如实体提取、UI 渲染的内容生成等。
+
+在这种情况下，响应模型作为关键字参数传递给模型。
+
+## 示例
+
+```python
+from pydantic import BaseModel
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+class User(BaseModel):
+    name: str
+    age: int
+    email: str
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    description="You are a helpful assistant that can extract information from a user's profile.",
+    output_schema=User,
+)
+```
+
+在上面的示例中，模型将通过 OpenAI 的 `gpt-5-mini` 模型使用结构化输出生成匹配 `User` 架构的响应。然后代理将原样返回 `User` 对象。
+
+---
+
+### JSON 模式
+
+某些模型类**不支持结构化输出**，或者即使模型支持两个选项，您也可能想要回退到 JSON 模式。在这种情况下，您可以通过设置 `use_json_mode=True` 来启用**JSON 模式**。
+
+JSON 模式通过将预期 JSON 结构的详细描述注入到系统提示中来工作。然后模型被指示返回遵循此结构的有效 JSON 对象。与结构化输出不同，响应在 API 级别**不会自动验证**是否符合架构。
+
+## 示例
+
+```python
+from pydantic import BaseModel
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+class User(BaseModel):
+    name: str
+    age: int
+    email: str
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    description="You are a helpful assistant that can extract information from a user's profile.",
+    output_schema=User,
+    use_json_mode=True,
+)
+
+```
+
+### 何时使用
+
+如果模型支持，请使用**结构化输出**——它可靠、干净且自动验证。
+
+使用**JSON 模式**：
+
+- 当模型不支持结构化输出时。Agno 代理会默认为您执行此操作。
+- 当您需要更广泛的兼容性，但可以手动验证时。
+- 当模型不支持带结构化输出的工具时。

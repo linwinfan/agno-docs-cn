@@ -1,0 +1,166 @@
+---
+title: 智能体团队
+---
+
+本示例展示如何创建一个强大的 AI 智能体团队，协同工作以提供全面的财务分析和新闻报道。团队包括：
+1. 网络智能体：搜索和分析最新新闻
+2. 财务智能体：分析财务数据和市场趋势
+3. 主编：协调并整合两个智能体的见解
+
+尝试的示例提示：
+- "苹果（AAPL）的最新新闻和财务表现如何？"
+- "分析 AI 发展对英伟达（NVDA）股票的影响"
+- "电动汽车制造商表现如何？重点关注特斯拉（TSLA）和 Rivian（RIVN）"
+- "AMD 和英特尔等半导体公司的市场前景如何？"
+- "总结微软（MSFT）的最新发展和股票表现"
+
+## 代码
+
+```python agent_team.py
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.exa import ExaTools
+
+web_agent = Agent(
+    name="网络智能体",
+    role="搜索网络信息",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+    instructions=dedent("""\
+        您是一位经验丰富的网络研究员和新闻分析师！🔍
+
+        搜索信息时请遵循以下步骤：
+        1. 从最新和相关来源开始
+        2. 交叉参考多个来源的信息
+        3. 优先考虑有信誉的新闻媒体和官方来源
+        4. 始终用链接引用您的来源
+        5. 专注于影响市场的新闻和重大发展
+
+        您的风格指南：
+        - 以清晰的新闻风格呈现信息
+        - 使用项目符号列出关键要点
+        - 在可用时包含相关引用
+        - 为每条新闻指定日期和时间
+        - 突出市场情绪和行业趋势
+        - 以整体叙事的简要分析结束
+        - 特别关注监管新闻、收益报告和战略公告\
+    """),
+    markdown=True,
+)
+
+finance_agent = Agent(
+    name="财务智能体",
+    role="获取财务数据",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[
+        ExaTools(
+            include_domains=["trendlyne.com"],
+            text=False,
+            show_results=True,
+            highlights=False,
+        )
+    ],
+    instructions=dedent("""\
+        您是一位熟练的财务分析师，在市场数据方面具有专业知识！📊
+
+        分析财务数据时请遵循以下步骤：
+        1. 从最新股价、交易量和日波动范围开始
+        2. 呈现详细的分析师建议和共识目标价格
+        3. 包含关键指标：市盈率、市值、52周范围
+        4. 分析交易模式和成交量趋势
+        5. 与相关行业指数比较表现
+
+        您的风格指南：
+        - 使用表格进行结构化数据呈现
+        - 为每个数据部分包含清晰的标题
+        - 为技术术语添加简要解释
+        - 用表情符号突出显著变化（📈 📉）
+        - 使用项目符号快速提供见解
+        - 将当前值与历史平均值比较
+        - 以数据驱动的财务前景结束\
+    """),
+    markdown=True,
+)
+
+agent_team = Team(
+    members=[web_agent, finance_agent],
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=dedent("""\
+        您是著名金融新闻台的主编！📰
+
+        您的角色：
+        1. 协调网络研究员和财务分析师
+        2. 将他们的发现整合成引人入胜的叙事
+        3. 确保所有信息都有适当的来源和验证
+        4. 呈现新闻和数据的平衡观点
+        5. 突出关键风险和机会
+
+        您的风格指南：
+        - 以引人注目的标题开始
+        - 以强有力的执行摘要开始
+        - 首先呈现财务数据，然后是新闻背景
+        - 在不同类型信息之间使用清晰的分段
+        - 在可用时包含相关图表或表格
+        - 添加带有当前情绪的"市场情绪"部分
+        - 在末尾包含"关键要点"部分
+        - 适当时以"风险因素"结束
+        - 以"市场观察团队"和当前日期署名\
+    """),
+    add_datetime_to_context=True,
+    markdown=True,
+    show_members_responses=False,
+)
+
+# 与多样化查询的示例用法
+agent_team.print_response(
+    input="总结分析师建议并分享 NVDA 的最新新闻",
+    stream=True,
+)
+agent_team.print_response(
+    input="AI 半导体公司的市场前景和财务表现如何？",
+    stream=True,
+)
+agent_team.print_response(
+    input="分析 TSLA 的最新发展和财务表现",
+    stream=True,
+)
+
+# 更多示例提示尝试：
+"""
+探索高级查询：
+1. "比较主要云服务提供商（AMZN、MSFT、GOOGL）的财务表现和最新新闻"
+2. "最近的美联储决定对银行股票有什么影响？重点关注 JPM 和 BAC"
+3. "通过 ATVI、EA 和 TTWO 的表现分析游戏行业前景"
+4. "社交媒体公司表现如何？比较 META 和 SNAP"
+5. "AI 芯片制造商及其市场地位的最新情况如何？"
+"""
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai ddgs exa agno
+    ```
+  </Step>
+
+  <Step title="设置 API 密钥">
+    ```bash
+    export EXA_API_KEY=xxx
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python agent_team.py
+    ```
+  </Step>
+
+</Steps>

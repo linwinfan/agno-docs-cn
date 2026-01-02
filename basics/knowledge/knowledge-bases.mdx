@@ -1,0 +1,154 @@
+---
+title: 知识库
+description: 深入了解知识库设计、架构以及它们如何为AI代理检索进行优化。
+keywords: [knowledge,rag,agentic rag]
+---
+
+Agno中的知识库在架构上专为AI代理检索而设计，具有专门组件来弥合原始数据存储和智能信息访问之间的差距。
+
+## 知识库组件
+
+知识库由几个相互连接的层组成，它们协同工作以优化代理检索的信息：
+
+### 存储层
+**向量数据库**：将处理过的内容存储为针对相似性搜索优化的嵌入
+- PgVector用于生产可扩展性
+- LanceDB用于开发和测试
+- Pinecone用于托管云部署
+
+### 处理层
+**内容管道**：将原始信息转换为可搜索格式
+- 阅读器解析不同文件类型
+- 分块策略将内容分解为最佳片段
+- 嵌入器将文本转换为向量表示
+
+### 访问层
+**搜索接口**：启用智能信息检索
+- 语义相似性搜索
+- 结合向量和关键词匹配的混合搜索
+- 元数据过滤以获得精确结果
+
+## How Agents Use Knowledge Bases
+
+When you give an agent access to a knowledge base, several powerful capabilities emerge:
+
+### Automatic Information Retrieval
+The agent doesn't need to be told when to search - it automatically determines when additional information would help answer a question or complete a task.
+Although - explicitly instructing the agent to search a knowledge base is a perfectly fine and very common use case.
+
+```python
+# Agent automatically searches when needed
+user: "What's our current return policy?"
+# Agent searches knowledge base for return policy information
+# Agent responds with current, accurate policy details
+```
+
+### Contextual Understanding
+The agent understands the context of questions and searches for the most relevant information, not just keyword matches.
+
+```python
+# Understands intent and context
+user: "Can I send back this item I bought last month?"
+# Searches for: return policies, time limits, return procedures
+# Not just: "send back", "item", "bought", "month"
+```
+
+### Source Attribution
+Agents can provide references to where they found information, building trust and enabling verification.
+
+```python
+# Response includes source information
+"Based on section 3.2 of our Return Policy document,
+items can be returned within 30 days of purchase..."
+```
+
+## Knowledge Base Architecture
+
+Here's how the different pieces work together:
+
+<Steps>
+  <Step title="Content Ingestion">
+    Raw content is processed through **readers** that understand different file formats (PDF, websites, databases, etc.) and extract meaningful text.
+  </Step>
+  <Step title="Intelligent Chunking">
+    Large documents are broken down into smaller, meaningful pieces using **chunking strategies** that preserve context while enabling precise retrieval.
+  </Step>
+  <Step title="Embedding Generation">
+    Each chunk is converted into a vector embedding that captures its semantic meaning using **embedders** powered by language models.
+  </Step>
+  <Step title="Vector Storage">
+    Embeddings are stored in **vector databases** optimized for similarity search, often with support for hybrid search combining semantic and keyword matching.
+  </Step>
+  <Step title="Intelligent Retrieval">
+    When agents need information, they generate search queries, find similar embeddings, and retrieve the most relevant content chunks.
+  </Step>
+</Steps>
+
+## Benefits of Knowledge-Powered Agents
+
+### Accuracy and Reliability
+- Responses are grounded in your specific information, not generic training data
+- Reduced hallucinations because agents reference actual sources
+- Up-to-date information that reflects your current state
+
+### Scalability and Maintenance
+- Add new information without retraining or modifying code
+- Handle unlimited amounts of information without performance degradation
+- Easy updates by simply adding new content to the knowledge base
+
+### Context Awareness
+- Agents understand your specific domain, terminology, and processes
+- Responses are tailored to your organization's context and needs
+- Consistent information across all agent interactions
+
+## Getting Started with Knowledge Bases
+
+Ready to build your own knowledge base? The process is straightforward:
+
+<CodeGroup>
+```python Basic Setup
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.pgvector import PgVector
+from agno.db.postgres import PostgresDb
+
+# Create a knowledge base
+knowledge = Knowledge(
+    contents_db=PostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai"),
+    vector_db=PgVector(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai")
+)
+
+# Add your content
+knowledge.add_content(path="documents/")
+```
+
+```python With Custom Configuration
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.pgvector import PgVector
+from agno.embedder.openai import OpenAIEmbedder
+
+# Customized knowledge base
+knowledge = Knowledge(
+    vector_db=PgVector(
+        table_name="company_knowledge",
+        embedder=OpenAIEmbedder(model="text-embedding-3-large")
+    )
+)
+```
+</CodeGroup>
+
+## Learn More
+
+<CardGroup cols={3}>
+  <Card title="Content Types" icon="file-lines" href="/basics/knowledge/content-types">
+    Explore different ways to add information to your knowledge base
+  </Card>
+  <Card title="Search & Retrieval" icon="magnifying-glass" href="/basics/knowledge/search-and-retrieval/overview">
+    Learn how agents search and find relevant information
+  </Card>
+  <Card title="Vector Databases" icon="database" href="/basics/vectordb/overview">
+    Choose the right storage solution for your knowledge base
+  </Card>
+  <Card title="Performance Tips" icon="gauge" href="/basics/knowledge/performance-tips">
+    Optimize your knowledge base for speed and accuracy
+  </Card>
+</CardGroup>

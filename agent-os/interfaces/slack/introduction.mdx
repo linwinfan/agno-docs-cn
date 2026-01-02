@@ -1,0 +1,971 @@
+---
+title: Slack
+description: 将智能体作为 Slack 应用程序托管
+---
+
+使用 Slack 接口在 Slack 上提供智能体、团队或工作流服务。它在 FastAPI 应用上挂载 Slack 事件路由，并将响应发送回 Slack 线程。
+
+## 设置步骤
+
+请按照 [cookbook](https://github.com/agno-agi/agno/blob/main/cookbook/06_agent_os/interfaces/slack/README.md) 中的 Slack 设置指南进行操作。
+
+必需配置：
+
+- `SLACK_TOKEN`（Bot User OAuth Token）
+- `SLACK_SIGNING_SECRET`（App Signing Secret）
+- 一个 ngrok 隧道（用于本地开发）和指向 `/slack/events` 的事件订阅
+
+## 示例用法
+
+创建一个智能体，使用 `Slack` 接口暴露它，并通过 `AgentOS` 提供服务：
+
+```python basic.py
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.os import AgentOS
+from agno.os.interfaces.slack import Slack
+
+# 创建基础智能体
+basic_agent = Agent(
+    name="基础智能体",
+    model=OpenAIChat(id="gpt-5-mini"), # 确保设置了 OPENAI_API_KEY
+    add_history_to_context=True,
+    num_history_runs=3,
+    add_datetime_to_context=True,
+    instructions="""
+    你是一个有用的 Slack 智能助手。
+    请用简洁、友好的中文回答用户问题。
+    可以帮助用户处理日常任务、回答问题和提供建议。
+    """
+)
+
+# 创建带有 Slack 接口的 AgentOS 实例
+agent_os = AgentOS(
+    agents=[basic_agent],
+    interfaces=[Slack(agent=basic_agent)],
+)
+app = agent_os.get_app()
+
+# 启动服务
+if __name__ == "__main__":
+    agent_os.serve(app="basic:app", port=8000, reload=True)
+```
+
+完整示例可在 `cookbook/06_agent_os/interfaces/slack/basic.py` 中找到。
+
+## 核心组件
+
+- `Slack`（接口）：通过 FastAPI 将 Agno `Agent`、`Team` 或 `Workflow` 包装以进行 Slack 集成。
+
+## Slack 接口架构
+
+### 事件处理流程
+
+```mermaid
+graph TB
+    A[Slack 事件] --> B[事件验证]
+    B --> C[事件解析]
+    C --> D[智能体处理]
+    D --> E[响应格式化]
+    E --> F[Slack API 调用]
+    F --> G[用户收到响应]
+    
+    subgraph "AgentOS Slack 接口"
+        B1[签名验证] --> B2[事件类型识别]
+        B2 --> B3[消息提取]
+        B3 --> B4[上下文构建]
+    end
+    
+    subgraph "智能体处理"
+        D1[消息预处理] --> D2[智能体推理]
+        D2 --> D3[工具调用]
+        D3 --> D4[响应生成]
+    end
+```
+
+## 高级配置
+
+### 1. 自定义 Slack 配置
+
+```python
+from agno.os.interfaces.slack import Slack, SlackConfig
+
+# 自定义 Slack 配置
+slack_config = SlackConfig(
+    endpoint="/slack/events",
+    bot_token_env="SLACK_BOT_TOKEN",
+    signing_secret_env="SLACK_SIGNING_SECRET",
+    interactive_components=True,
+    slash_commands=["help", "status", "reset", "analyze"],
+    buttons=True,
+    modals=True,
+    app_home=True,
+    message_actions=True,
+    reaction_added=True,
+    team_join=True,
+    pin_added=True
+)
+
+# 创建自定义 Slack 接口
+slack_interface = Slack(
+    agent=basic_agent,
+    config=slack_config
+)
+```
+
+### 2. 多智能体 Slack 集成
+
+```python
+from agno.agent import Agent
+from agno.team import Team
+from agno.os.interfaces.slack import Slack
+
+# 创建专门的智能体
+tech_support_agent = Agent(
+    name="技术支持",
+    instructions="你是技术支持专家，专门解决技术问题"
+)
+
+hr_agent = Agent(
+    name="人力资源",
+    instructions="你是人力资源专家，处理 HR 相关问题"
+)
+
+finance_agent = Agent(
+    name="财务助手",
+    instructions="你是财务专家，提供财务建议和分析"
+)
+
+# 创建智能体团队
+support_team = Team(
+    agents=[tech_support_agent, hr_agent, finance_agent],
+    instructions="团队协作解决用户问题，根据问题类型分配给合适的专家"
+)
+
+# 为每个智能体创建专门的 Slack 接口
+slack_interfaces = [
+    Slack(agent=tech_support_agent, channel="#tech-support"),
+    Slack(agent=hr_agent, channel="#hr-help"),
+    Slack(agent=finance_agent, channel="#finance"),
+    Slack(agent=support_team, channel="#general-support")
+]
+
+agent_os = AgentOS(
+    agents=[tech_support_agent, hr_agent, finance_agent, support_team],
+    interfaces=slack_interfaces
+)
+```
+
+### 3. 自定义事件处理器
+
+```python
+from agno.os.interfaces.slack import SlackEventHandler
+
+class CustomSlackEventHandler(SlackEventHandler):
+    async def handle_message(self, event_data):
+        """处理消息事件"""
+        # 自定义消息处理逻辑
+        message = event_data.get("text", "")
+        user_id = event_data.get("user")
+        channel_id = event_data.get("channel")
+        
+        # 检查是否是特定命令
+        if message.startswith("!"):
+            await self.handle_slash_command(event_data)
+        else:
+            await super().handle_message(event_data)
+    
+    async def handle_slash_command(self, event_data):
+        """处理斜杠命令"""
+        command = event_data.get("text", "").split()[0].lower()
+        
+        if command == "!help":
+            await self.send_help_message(event_data)
+        elif command == "!status":
+            await self.send_status_update(event_data)
+        elif command == "!analyze":
+            await self.analyze_conversation(event_data)
+    
+    async def send_help_message(self, event_data):
+        """发送帮助消息"""
+        help_text = """
+        🤖 *智能助手命令列表：*
+        
+        `!help` - 显示此帮助信息
+        `!status` - 查看系统状态
+        `!analyze` - 分析当前对话
+        `!reset` - 重置对话上下文
+        
+        直接发送消息即可与智能助手对话！
+        """
+        
+        await self.slack_client.chat_postMessage(
+            channel=event_data.get("channel"),
+            text=help_text,
+            thread_ts=event_data.get("thread_ts")
+        )
+    
+    async def send_status_update(self, event_data):
+        """发送状态更新"""
+        import psutil
+        import datetime
+        
+        # 获取系统信息
+        cpu_percent = psutil.cpu_percent()
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
+        
+        status_text = f"""
+        📊 *系统状态报告*
+        
+        🔧 **CPU 使用率**: {cpu_percent}%
+        💾 **内存使用**: {memory.percent}% ({memory.used//1024//1024}MB/{memory.total//1024//1024}MB)
+        💿 **磁盘使用**: {disk.percent}% ({disk.used//1024//1024//1024}GB/{disk.total//1024//1024//1024}GB)
+        ⏰ **更新时间**: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+        """
+        
+        await self.slack_client.chat_postMessage(
+            channel=event_data.get("channel"),
+            text=status_text,
+            thread_ts=event_data.get("thread_ts")
+        )
+
+# 应用自定义事件处理器
+slack_interface = Slack(
+    agent=basic_agent,
+    event_handler=CustomSlackEventHandler()
+)
+```
+
+## 交互式组件
+
+### 1. 按钮 and 交互式消息
+
+```python
+from agno.os.interfaces.slack import InteractiveComponents
+
+class InteractiveSlackHandler(InteractiveComponents):
+    async def send_with_buttons(self, channel, text, buttons):
+        """发送带按钮的消息"""
+        blocks = [
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": text}
+            },
+            {
+                "type": "actions",
+                "elements": buttons
+            }
+        ]
+        
+        await self.slack_client.chat_postMessage(
+            channel=channel,
+            blocks=blocks
+        )
+    
+    async def send_quick_reply_options(self, channel, text, options):
+        """发送快速回复选项"""
+        blocks = [
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": text}
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "buttons",
+                        "text": {"type": "plain_text", "text": option},
+                        "action_id": f"quick_reply_{option.lower().replace(' ', '_')}"
+                    }
+                    for option in options
+                ]
+            }
+        ]
+        
+        await self.slack_client.chat_postMessage(
+            channel=channel,
+            blocks=blocks
+        )
+
+# 使用交互式组件
+async def send_welcome_message(channel, user_name):
+    """发送欢迎消息"""
+    handler = InteractiveSlackHandler()
+    
+    welcome_text = f"👋 欢迎 {user_name}！我是你的智能助手。我可以帮你："
+    
+    buttons = [
+        {
+            "type": "button",
+            "text": {"type": "plain_text", "text": "🔍 搜索信息"},
+            "action_id": "search_info"
+        },
+        {
+            "type": "button", 
+            "text": {"type": "plain_text", "text": "📊 生成报告"},
+            "action_id": "generate_report"
+        },
+        {
+            "type": "button",
+            "text": {"type": "plain_text", "text": "💬 开始对话"},
+            "action_id": "start_chat"
+        }
+    ]
+    
+    await handler.send_with_buttons(channel, welcome_text, buttons)
+```
+
+### 2. 模态框（Modals）
+
+```python
+from agno.os.interfaces.slack import ModalHandler
+
+class SlackModalHandler(ModalHandler):
+    async def open_feedback_modal(self, trigger_id):
+        """打开反馈模态框"""
+        modal_view = {
+            "type": "modal",
+            "title": {"type": "plain_text", "text": "💬 用户反馈"},
+            "submit": {"type": "plain_text", "text": "提交"},
+            "close": {"type": "plain_text", "text": "取消"},
+            "blocks": [
+                {
+                    "type": "input",
+                    "block_id": "feedback_type",
+                    "element": {
+                        "type": "static_select",
+                        "action_id": "type",
+                        "placeholder": {"type": "plain_text", "text": "选择反馈类型"},
+                        "options": [
+                            {"text": {"type": "plain_text", "text": "功能建议"}, "value": "feature"},
+                            {"text": {"type": "plain_text", "text": "错误报告"}, "value": "bug"},
+                            {"text": {"type": "plain_text", "text": "一般反馈"}, "value": "general"}
+                        ]
+                    },
+                    "label": {"type": "plain_text", "text": "反馈类型"}
+                },
+                {
+                    "type": "input",
+                    "block_id": "feedback_content",
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "content",
+                        "multiline": True,
+                        "placeholder": {"type": "plain_text", "text": "请详细描述您的反馈..."}
+                    },
+                    "label": {"type": "plain_text", "text": "反馈内容"}
+                },
+                {
+                    "type": "input",
+                    "block_id": "contact_info",
+                    "element": {
+                        "type": "plain_text_input",
+                        "action_id": "contact",
+                        "placeholder": {"type": "plain_text", "text": "邮箱或用户名（可选）"}
+                    },
+                    "label": {"type": "plain_text", "text": "联系方式"},
+                    "optional": True
+                }
+            ]
+        }
+        
+        await self.slack_client.views_open(
+            trigger_id=trigger_id,
+            view=modal_view
+        )
+    
+    async def handle_modal_submission(self, payload):
+        """处理模态框提交"""
+        feedback_type = payload["view"]["state"]["values"]["feedback_type"]["type"]["selected_option"]["value"]
+        feedback_content = payload["view"]["state"]["values"]["feedback_content"]["content"]["value"]
+        contact_info = payload["view"]["state"]["values"]["contact_info"]["contact"]["value"]
+        
+        # 处理反馈数据
+        await self.process_feedback(feedback_type, feedback_content, contact_info)
+        
+        # 发送确认消息
+        await self.slack_client.chat_postMessage(
+            channel=payload["user"]["id"],
+            text="✅ 感谢您的反馈！我们已收到并会认真处理。"
+        )
+```
+
+## 斜杠命令
+
+### 1. 自定义斜杠命令
+
+```python
+from agno.os.interfaces.slack import SlashCommandHandler
+
+class CustomSlashCommands(SlashCommandHandler):
+    def __init__(self, slack_client, agent):
+        super().__init__(slack_client, agent)
+        self.commands = {
+            "/help": self.help_command,
+            "/status": self.status_command,
+            "/analyze": self.analyze_command,
+            "/summarize": self.summarize_command,
+            "/schedule": self.schedule_command,
+            "/poll": self.poll_command
+        }
+    
+    async def help_command(self, command_data):
+        """帮助命令"""
+        help_text = """
+        🤖 *可用命令列表：*
+        
+        `/help` - 显示此帮助信息
+        `/status` - 查看系统状态
+        `/analyze` - 分析当前对话
+        `/summarize` - 总结对话内容
+        `/schedule [时间] [任务]` - 安排任务
+        `/poll [问题] [选项1] [选项2]` - 创建投票
+        
+        💡 提示：直接 @智能助手 也可以开始对话！
+        """
+        
+        await self.slack_client.chat_postEphemeral(
+            channel=command_data["channel_id"],
+            user=command_data["user_id"],
+            text=help_text
+        )
+    
+    async def analyze_command(self, command_data):
+        """分析命令"""
+        # 获取最近的对话历史
+        history = await self.get_conversation_history(command_data["channel_id"])
+        
+        # 生成分析报告
+        analysis = await self.agent.analyze_conversation(history)
+        
+        analysis_text = f"""
+        📊 *对话分析报告*
+        
+        **主题**: {analysis['main_topic']}
+        **参与人数**: {analysis['participant_count']}
+        **消息数量**: {analysis['message_count']}
+        **情感倾向**: {analysis['sentiment']}
+        
+        **关键要点**:
+        {chr(10).join(f"• {point}" for point in analysis['key_points'])}
+        """
+        
+        await self.slack_client.chat_postMessage(
+            channel=command_data["channel_id"],
+            text=analysis_text
+        )
+    
+    async def poll_command(self, command_data):
+        """投票命令"""
+        text = command_data["text"]
+        parts = text.split()
+        
+        if len(parts) < 3:
+            await self.slack_client.chat_postEphemeral(
+                channel=command_data["channel_id"],
+                user=command_data["user_id"],
+                text="❌ 格式错误！使用: `/poll [问题] [选项1] [选项2] ...`"
+            )
+            return
+        
+        question = parts[1]
+        options = parts[2:]
+        
+        # 创建投票消息
+        poll_blocks = [
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": f"📊 *投票：{question}*"}
+            }
+        ]
+        
+        # 添加选项按钮
+        for i, option in enumerate(options[:5]):  # 最多5个选项
+            poll_blocks.append({
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {"type": "plain_text", "text": option},
+                        "action_id": f"poll_vote_{i}",
+                        "value": option
+                    }
+                ]
+            })
+        
+        message = await self.slack_client.chat_postMessage(
+            channel=command_data["channel_id"],
+            blocks=poll_blocks
+        )
+        
+        # 保存投票信息
+        await self.save_poll(message["ts"], question, options)
+
+# 应用斜杠命令处理器
+slash_handler = CustomSlashCommands(slack_client, basic_agent)
+slack_interface = Slack(
+    agent=basic_agent,
+    slash_command_handler=slash_handler
+)
+```
+
+## 应用主页集成
+
+### 1. 自定义应用主页
+
+```python
+from agno.os.interfaces.slack import AppHomeHandler
+
+class CustomAppHome(AppHomeHandler):
+    async def render_app_home(self, user_id):
+        """渲染应用主页"""
+        user_info = await self.get_user_info(user_id)
+        recent_conversations = await self.get_recent_conversations(user_id)
+        
+        home_view = {
+            "type": "home",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {"type": "plain_text", "text": "🤖 智能助手控制台"}
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"欢迎回来，{user_info['real_name']}！\n\n今天是个美好的一天，让我来帮助你处理任务。"
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {"type": "mrkdwn", "text": "📋 *快速操作*"}
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {"type": "plain_text", "text": "💬 开始新对话"},
+                            "action_id": "start_new_conversation"
+                        },
+                        {
+                            "type": "button",
+                            "text": {"type": "plain_text", "text": "📊 查看统计"},
+                            "action_id": "view_statistics"
+                        }
+                    ]
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {"type": "mrkdwn", "text": "📝 *最近对话*"}
+                }
+            ]
+        }
+        
+        # 添加最近对话
+        for conv in recent_conversations[:5]:
+            home_view["blocks"].append({
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"• {conv['channel']} - {conv['last_message'][:50]}..."
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": "查看"},
+                    "action_id": "open_conversation",
+                    "value": conv['channel']
+                }
+            })
+        
+        await self.slack_client.views_publish(
+            user_id=user_id,
+            view=home_view
+        )
+
+# 应用自定义主页
+app_home_handler = CustomAppHomeHandler()
+slack_interface = Slack(
+    agent=basic_agent,
+    app_home_handler=app_home_handler
+)
+```
+
+## 文件和媒体处理
+
+### 1. 文件上传处理
+
+```python
+from agno.os.interfaces.slack import FileHandler
+
+class SlackFileHandler(FileHandler):
+    async def handle_file_share(self, event_data):
+        """处理文件分享事件"""
+        file_id = event_data.get("file_id")
+        user_id = event_data.get("user_id")
+        channel_id = event_data.get("channel_id")
+        
+        # 获取文件信息
+        file_info = await self.slack_client.files_info(file=file_id)
+        file_url = file_info["file"]["url_private"]
+        file_name = file_info["file"]["name"]
+        file_type = file_info["file"]["mimetype"]
+        
+        # 下载文件内容
+        if file_type.startswith("text/"):
+            content = await self.download_text_file(file_url)
+            analysis = await self.analyze_text_content(content)
+        elif file_type.startswith("image/"):
+            image_data = await self.download_image_file(file_url)
+            analysis = await self.analyze_image_content(image_data)
+        else:
+            analysis = "抱歉，我暂时无法处理这种类型的文件。"
+        
+        # 发送分析结果
+        response = f"""
+        📎 *文件分析结果*
+        
+        **文件名**: {file_name}
+        **文件类型**: {file_type}
+        **分析结果**: {analysis}
+        """
+        
+        await self.slack_client.chat_postMessage(
+            channel=channel_id,
+            text=response,
+            thread_ts=event_data.get("thread_ts")
+        )
+    
+    async def analyze_text_content(self, content):
+        """分析文本内容"""
+        # 使用智能体分析文本
+        analysis_prompt = f"""
+        请分析以下文本内容，提供：
+        1. 主要内容摘要
+        2. 关键要点
+        3. 可能的行动建议
+        
+        文本内容：
+        {content[:2000]}  # 限制长度
+        """
+        
+        response = await self.agent.run(analysis_prompt)
+        return response.content
+    
+    async def analyze_image_content(self, image_data):
+        """分析图像内容"""
+        # 使用多模态智能体分析图像
+        analysis_prompt = """
+        请描述这张图片的内容，包括：
+        1. 图片中的主要对象
+        2. 场景描述
+        3. 可能的用途或意义
+        """
+        
+        response = await self.agent.run(analysis_prompt, images=[image_data])
+        return response.content
+
+# 应用文件处理器
+file_handler = SlackFileHandler()
+slack_interface = Slack(
+    agent=basic_agent,
+    file_handler=file_handler
+)
+```
+
+## 监控和分析
+
+### 1. 使用统计
+
+```python
+from agno.os.interfaces.slack import SlackAnalytics
+
+class SlackUsageAnalytics(SlackAnalytics):
+    def __init__(self):
+        self.usage_stats = {
+            "daily_messages": {},
+            "user_activity": {},
+            "command_usage": {},
+            "response_times": [],
+            "error_count": 0
+        }
+    
+    async def track_message(self, user_id, channel_id, response_time):
+        """跟踪消息统计"""
+        today = datetime.now().strftime("%Y-%m-%d")
+        
+        # 每日消息统计
+        if today not in self.usage_stats["daily_messages"]:
+            self.usage_stats["daily_messages"][today] = 0
+        self.usage_stats["daily_messages"][today] += 1
+        
+        # 用户活动统计
+        if user_id not in self.usage_stats["user_activity"]:
+            self.usage_stats["user_activity"][user_id] = 0
+        self.usage_stats["user_activity"][user_id] += 1
+        
+        # 响应时间统计
+        self.usage_stats["response_times"].append(response_time)
+    
+    async def track_command_usage(self, command, user_id):
+        """跟踪命令使用"""
+        if command not in self.usage_stats["command_usage"]:
+            self.usage_stats["command_usage"][command] = 0
+        self.usage_stats["command_usage"][command] += 1
+    
+    def generate_usage_report(self):
+        """生成使用报告"""
+        avg_response_time = sum(self.usage_stats["response_times"]) / len(self.usage_stats["response_times"]) if self.usage_stats["response_times"] else 0
+        
+        report = {
+            "period": "last_30_days",
+            "total_messages": sum(self.usage_stats["daily_messages"].values()),
+            "active_users": len(self.usage_stats["user_activity"]),
+            "avg_response_time": avg_response_time,
+            "error_count": self.usage_stats["error_count"],
+            "top_commands": sorted(
+                self.usage_stats["command_usage"].items(),
+                key=lambda x: x[1],
+                reverse=True
+            )[:10]
+        }
+        
+        return report
+
+# 应用分析
+analytics = SlackUsageAnalytics()
+slack_interface = Slack(
+    agent=basic_agent,
+    analytics=analytics
+)
+```
+
+## 部署和扩展
+
+### 1. 生产环境配置
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  slack-agent:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      - SLACK_SIGNING_SECRET=${SLACK_SIGNING_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://user:password@postgres:5432/slack_agent
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+  
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=slack_agent
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:
+```
+
+### 2. Kubernetes 部署
+
+```yaml
+# k8s-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slack-agent
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: slack-agent
+  template:
+    metadata:
+      labels:
+        app: slack-agent
+    spec:
+      containers:
+      - name: slack-agent
+        image: slack-agent:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: SLACK_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: slack-secrets
+              key: bot-token
+        - name: SLACK_SIGNING_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: slack-secrets
+              key: signing-secret
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-secrets
+              key: openai-key
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: slack-agent-service
+spec:
+  selector:
+    app: slack-agent
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+```
+
+## 最佳实践
+
+### 1. 性能优化
+
+- **异步处理**: 使用异步操作处理 Slack 事件
+- **连接池**: 复用 Slack API 客户端连接
+- **缓存策略**: 缓存用户信息和频道信息
+- **批量操作**: 批量处理 API 请求
+
+### 2. 用户体验
+
+- **快速响应**: 确认收到消息后立即响应
+- **智能路由**: 根据内容类型路由到合适的处理器
+- **个性化**: 记住用户偏好和对话历史
+- **多语言支持**: 支持中英文混合对话
+
+### 3. 安全考虑
+
+- **输入验证**: 验证所有用户输入
+- **权限控制**: 实施适当的权限检查
+- **数据保护**: 保护敏感用户数据
+- **审计日志**: 记录所有重要操作
+
+### 4. 监控和维护
+
+- **健康检查**: 实施全面的健康检查
+- **错误处理**: 优雅处理所有错误情况
+- **性能监控**: 监控响应时间和资源使用
+- **告警机制**: 设置智能告警规则
+
+## 故障排除
+
+### 常见问题
+
+#### 事件验证失败
+
+**问题**: Slack 事件签名验证失败
+**解决方案**:
+1. 检查 `SLACK_SIGNING_SECRET` 配置
+2. 验证时间戳是否在有效范围内
+3. 确认签名计算逻辑正确
+
+#### 权限不足
+
+**问题**: 智能体无法访问某些频道或功能
+**解决方案**:
+1. 检查 Bot Token 权限范围
+2. 确认智能体已添加到相关频道
+3. 验证用户权限设置
+
+#### 响应超时
+
+**问题**: Slack 请求超时
+**解决方案**:
+1. 在 3 秒内发送确认响应
+2. 使用后台任务处理长时间操作
+3. 实施适当的超时处理
+
+### 调试工具
+
+```python
+# Slack 调试工具
+import asyncio
+from agno.os.interfaces.slack import SlackDebugger
+
+async def debug_slack_interface():
+    """调试 Slack 接口"""
+    debugger = SlackDebugger()
+    
+    # 测试 Slack 连接
+    connection_test = await debugger.test_slack_connection()
+    print(f"Slack 连接测试: {connection_test}")
+    
+    # 验证配置
+    config_validation = await debugger.validate_slack_config()
+    print(f"配置验证: {config_validation}")
+    
+    # 检查权限
+    permissions_check = await debugger.check_bot_permissions()
+    print(f"权限检查: {permissions_check}")
+    
+    # 测试事件处理
+    event_test = await debugger.test_event_handling()
+    print(f"事件处理测试: {event_test}")
+
+asyncio.run(debug_slack_interface())
+```
+
+## 下一步
+
+- 查看[WhatsApp 接口](/agent-os/interfaces/whatsapp/introduction)
+- 了解[A2A 接口](/agent-os/interfaces/a2a/introduction)
+- 探索[AG-UI 接口](/agent-os/interfaces/ag-ui/introduction)
+- 查看[AgentOS 配置](/agent-os/config)

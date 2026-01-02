@@ -1,0 +1,171 @@
+---
+title: 结构化输出
+---
+
+本示例展示如何使用 AI 智能体的结构化输出来生成格式良好的电影剧本概念。它展示了两种方法：
+1. JSON 模式：传统的 JSON 响应解析
+2. 结构化输出：增强的结构化数据处理
+
+尝试的示例提示：
+- "东京" - 获取设定在未来日本的高科技惊悚片
+- "古罗马" - 体验史诗历史剧
+- "曼哈顿" - 探索现代浪漫喜剧
+- "亚马逊雨林" - 在异国情调地点冒险
+- "火星殖民地" - 太空定居点中的科幻故事
+
+## 代码
+
+```python structured_output.py
+from textwrap import dedent
+from typing import List
+
+from agno.agent import Agent, RunOutput  # noqa
+from agno.models.openai import OpenAIChat
+from pydantic import BaseModel, Field
+
+
+class MovieScript(BaseModel):
+    setting: str = Field(
+        ...,
+        description="电影主要地点和时间段的丰富细节、氛围描述。包括感官细节和情绪。",
+    )
+    ending: str = Field(
+        ...,
+        description="电影强有力的结局，将所有情节线索联系在一起。应该带来情感冲击和满足感。",
+    )
+    genre: str = Field(
+        ...,
+        description="电影的主要和次要类型（例如，'科幻惊悚片'、'浪漫喜剧'）。应与场景和基调保持一致。",
+    )
+    name: str = Field(
+        ...,
+        description="一个引人注目、令人难忘的标题，抓住故事的精髓并吸引目标受众。",
+    )
+    characters: List[str] = Field(
+        ...,
+        description="4-6 个主要角色，具有独特的名字和简短的角色描述（例如，'Sarah Chen - 拥有黑暗秘密的杰出量子物理学家'）。",
+    )
+    storyline: str = Field(
+        ...,
+        description="引人入胜的三句话情节摘要：设定、冲突和赌注。用悬念和情感吸引读者。",
+    )
+
+
+# 使用 JSON 模式的智能体
+json_mode_agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    description=dedent("""\
+        你是一位著名的好莱坞编剧，以创造令人难忘的大片而闻名！🎬
+        拥有克里斯托弗·诺兰、艾伦·索金和昆汀·塔伦蒂诺的综合叙事才华，
+        你打造独特的故事，吸引全球观众。
+
+        你的专长是将地点转化为推动叙事的活生生的角色。\
+    """),
+    instructions=dedent("""\
+        制作电影概念时，请遵循以下原则：
+
+        1. 场景应该是角色：
+           - 用感官细节让地点栩栩如生
+           - 包含影响故事的大气元素
+           - 考虑时间段对叙事的影响
+
+        2. 角色发展：
+           - 给每个角色独特的声音和明确的动机
+           - 创造引人入胜的关系和冲突
+           - 确保多样化的代表性和真实的背景
+
+        3. 故事结构：
+           - 以吸引注意力的钩子开始
+           - 通过升级冲突建立紧张感
+           - 传递令人惊讶但不可避免的结局
+
+        4. 类型掌握：
+           - 在添加新鲜转折的同时拥抱类型惯例
+           - 有意混合类型以获得独特的组合
+           - 保持一致的基调
+
+        将每个地点转化为难忘的电影体验！\
+    """),
+    output_schema=MovieScript,
+    use_json_mode=True,
+)
+
+# 使用结构化输出的智能体
+structured_output_agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    description=dedent("""\
+        你是一位著名的好莱坞编剧，以创造令人难忘的大片而闻名！🎬
+        拥有克里斯托弗·诺兰、艾伦·索金和昆汀·塔伦蒂诺的综合叙事才华，
+        你打造独特的故事，吸引全球观众。
+
+        你的专长是将地点转化为推动叙事的活生生的角色。\
+    """),
+    instructions=dedent("""\
+        制作电影概念时，请遵循以下原则：
+
+        1. 场景应该是角色：
+           - 用感官细节让地点栩栩如生
+           - 包含影响故事的大气元素
+           - 考虑时间段对叙事的影响
+
+        2. 角色发展：
+           - 给每个角色独特的声音和明确的动机
+           - 创造引人入胜的关系和冲突
+           - 确保多样化的代表性和真实的背景
+
+        3. 故事结构：
+           - 以吸引注意力的钩子开始
+           - 通过升级冲突建立紧张感
+           - 传递令人惊讶但不可避免的结局
+
+        4. 类型掌握：
+           - 在添加新鲜转折的同时拥抱类型惯例
+           - 有意混合类型以获得独特的组合
+           - 保持一致的基调
+
+        将每个地点转化为难忘的电影体验！\
+    """),
+    output_schema=MovieScript,
+)
+
+# 不同地点的示例用法
+json_mode_agent.print_response("东京", stream=True)
+structured_output_agent.print_response("古罗马", stream=True)
+
+# 更多示例尝试：
+"""
+探索创意地点提示：
+1. "水下研究站" - 用于幽闭科幻惊悚片
+2. "维多利亚时代的伦敦" - 用于哥特式神秘
+3. "迪拜 2050" - 用于未来主义劫案电影
+4. "南极研究基地" - 用于生存恐怖故事
+5. "加勒比海岛" - 用于热带冒险浪漫
+"""
+
+# 在变量中获取响应：
+# from rich.pretty import pprint
+
+# json_mode_response: RunOutput = json_mode_agent.run("纽约")
+# pprint(json_mode_response.content)
+# structured_output_response: RunOutput = structured_output_agent.run("纽约")
+# pprint(structured_output_response.content)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python structured_output.py
+    ```
+  </Step>
+
+</Steps>

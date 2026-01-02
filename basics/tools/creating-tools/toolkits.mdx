@@ -1,0 +1,92 @@
+---
+title: 自定义工具包
+sidebarTitle: 自定义工具包
+description: 学习如何编写自己的工具包。
+---
+
+许多高级用例需要编写自定义工具包。工具包是可以添加到智能体的函数集合。工具包中的函数旨在协同工作、共享内部状态并提供更好的开发体验。
+
+一般流程如下：
+
+1. 创建继承 `agno.tools.Toolkit` 类的类。
+2. 将您的函数添加到类中。
+3. 在 `Toolkit` 构造函数的 `tools` 参数中包含所有函数。
+
+例如：
+
+```python shell_toolkit.py
+from typing import List
+
+from agno.agent import Agent
+from agno.tools import Toolkit
+from agno.utils.log import logger
+
+class ShellTools(Toolkit):
+    def __init__(self, working_directory: str = "/", **kwargs):
+        self.working_directory = working_directory
+
+        tools = [
+            self.run_shell_command,
+        ]
+
+        super().__init__(name="shell_tools", tools=tools, **kwargs)
+    
+    def list_files(self, directory: str):
+        """
+        List the files in the given directory.
+
+        Args:
+            directory (str): The directory to list the files from.
+        Returns:
+            str: The list of files in the directory.
+        """
+        import os
+
+        # List files relative to the toolkit's working_directory
+        path = os.path.join(self.working_directory, directory)
+        try:
+            files = os.listdir(path)
+            return "\n".join(files)
+        except Exception as e:
+            logger.warning(f"Failed to list files in {path}: {e}")
+            return f"Error: {e}"
+        return os.listdir(directory)
+
+    def run_shell_command(self, args: List[str], tail: int = 100) -> str:
+        """
+        Runs a shell command and returns the output or error.
+
+        Args:
+            args (List[str]): The command to run as a list of strings.
+            tail (int): The number of lines to return from the output.
+        Returns:
+            str: The output of the command.
+        """
+        import subprocess
+
+        logger.info(f"Running shell command: {args}")
+        try:
+            logger.info(f"Running shell command: {args}")
+            result = subprocess.run(args, capture_output=True, text=True, cwd=self.working_directory)
+            logger.debug(f"Result: {result}")
+            logger.debug(f"Return code: {result.returncode}")
+            if result.returncode != 0:
+                return f"Error: {result.stderr}"
+            # return only the last n lines of the output
+            return "\n".join(result.stdout.split("\n")[-tail:])
+        except Exception as e:
+            logger.warning(f"Failed to run shell command: {e}")
+            return f"Error: {e}"
+
+agent = Agent(tools=[ShellTools()], markdown=True)
+agent.print_response("List all the files in my home directory.")
+
+```
+
+<Tip>
+重要提示：
+- 为每个函数填写详细的函数及其参数描述的文档字符串。
+- 请记住，此函数是提供给 LLM 的，不会在代码的其他地方使用，因此文档字符串应该对 LLM 有意义，函数名称需要具有描述性。
+</Tip>
+
+有关更多详细信息，请参阅 [工具包参考](/reference/tools/toolkit)。

@@ -1,0 +1,119 @@
+---
+title: 设置环境变量
+sidebarTitle: 环境变量设置
+---
+
+要为应用程序配置环境，您可能需要设置环境变量。本指南提供了在 macOS (Shell) 和 Windows (PowerShell 和 Windows 命令提示符) 中设置环境变量的说明。
+
+## macOS
+
+### 在 Shell 中设置环境变量
+
+#### 临时环境变量
+
+这些环境变量仅在当前 shell 会话中可用。
+
+```shell
+export VARIABLE_NAME="value"
+```
+
+要显示环境变量：
+
+```shell
+echo $VARIABLE_NAME
+```
+
+#### 永久环境变量
+
+要使环境变量在会话之间持续存在，请将它们添加到您的 shell 配置文件中（例如 `.bashrc`、`.bash_profile`、`.zshrc`）。
+
+对于 Zsh：
+
+```shell
+echo 'export VARIABLE_NAME="value"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+要显示环境变量：
+
+```shell
+echo $VARIABLE_NAME
+```
+
+## Windows
+
+### 在 PowerShell 中设置环境变量
+
+#### 临时环境变量
+
+这些环境变量仅在当前 PowerShell 会话中可用。
+
+```powershell
+$env:VARIABLE_NAME = "value"
+```
+
+要显示环境变量：
+
+```powershell
+echo $env:VARIABLE_NAME
+```
+
+#### 永久环境变量
+
+要使环境变量在会话之间持续存在，请将它们添加到您的 PowerShell 配置文件脚本中（例如 `Microsoft.PowerShell_profile.ps1`）。
+
+```powershell
+notepad $PROFILE
+```
+
+将以下行添加到配置文件脚本中：
+
+```powershell
+$env:VARIABLE_NAME = "value"
+```
+
+保存并关闭文件，然后重新加载配置文件：
+
+```powershell
+. $PROFILE
+```
+
+要显示环境变量：
+
+```powershell
+echo $env:VARIABLE_NAME
+```
+
+### 在 Windows 命令提示符中设置环境变量
+
+#### 临时环境变量
+
+这些环境变量仅在当前命令提示符会话中可用。
+
+```cmd
+set VARIABLE_NAME=value
+```
+
+要显示环境变量：
+
+```cmd
+echo %VARIABLE_NAME%
+```
+
+#### 永久环境变量
+
+要使环境变量在会话之间持续存在，您可以使用 `setx` 命令：
+
+```cmd
+setx VARIABLE_NAME "value"
+```
+
+注意：使用 `setx` 设置环境变量后，您需要重新启动命令提示符或任何需要读取新环境变量的应用程序。
+
+要在新的命令提示符会话中显示环境变量：
+
+```cmd
+echo %VARIABLE_NAME%
+```
+
+通过遵循这些步骤，您可以在 macOS Shell、Windows 命令提示符和 PowerShell 中有效地设置和显示环境变量。这将确保您的环境为应用程序正确配置。

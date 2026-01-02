@@ -1,0 +1,51 @@
+---
+title: OpenAI
+sidebarTitle: OpenAI
+---
+
+OpenAIChat 模型提供对 OpenAI 模型（如 GPT-4o）的访问。
+
+## 参数
+
+| 参数                    | 类型                           | 默认值                 | 描述                                                                                                      |
+| ---------------------------- | ------------------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `id`                         | `str`                          | `"gpt-4o"`             | 要使用的 OpenAI 模型的 ID                                                                                 |
+| `name`                       | `str`                          | `"OpenAIChat"`         | 模型的名称                                                                                                |
+| `provider`                   | `str`                          | `"OpenAI"`             | 模型的提供商                                                                                              |
+| `store`                      | `Optional[bool]`               | `None`                 | 是否存储对话用于训练目的                                                                                  |
+| `reasoning_effort`           | `Optional[str]`                | `None`                 | o1 模型的推理努力级别（"low"、"medium"、"high"）                                                          |
+| `verbosity`                  | `Optional[Literal["low", "medium", "high"]]` | `None`     | 控制推理模型的详细程度级别                                                                                |
+| `metadata`                   | `Optional[Dict[str, Any]]`     | `None`                 | 与完成关联的开发者定义的元数据                                                                            |
+| `frequency_penalty`          | `Optional[float]`              | `None`                 | 根据新 token 在文本中的出现频率对其进行惩罚（-2.0 到 2.0）                                               |
+| `logit_bias`                 | `Optional[Any]`                | `None`                 | 修改指定 token 在完成中出现的可能性                                                                        |
+| `logprobs`                   | `Optional[bool]`               | `None`                 | 是否返回输出 token 的对数概率                                                                             |
+| `top_logprobs`               | `Optional[int]`                | `None`                 | 返回对数概率的最可能 token 数量（0 到 20）                                                                |
+| `max_tokens`                 | `Optional[int]`                | `None`                 | 要生成的最大 token 数量（已弃用，使用 max_completion_tokens）                                             |
+| `max_completion_tokens`      | `Optional[int]`                | `None`                 | 要生成的最大完成 token 数量                                                                               |
+| `modalities`                 | `Optional[List[str]]`          | `None`                 | 要使用的模态列表（"text" 和/或 "audio"）                                                                 |
+| `audio`                      | `Optional[Dict[str, Any]]`     | `None`                 | 音频配置（例如 `{"voice": "alloy", "format": "wav"}`）                                                   |
+| `presence_penalty`           | `Optional[float]`              | `None`                 | 根据新 token 是否在文本中出现过对其进行惩罚（-2.0 到 2.0）                                               |
+| `seed`                       | `Optional[int]`                | `None`                 | 用于确定性采样的随机种子                                                                                  |
+| `stop`                       | `Optional[Union[str, List[str]]]` | `None`              | 最多 4 个序列，API 在遇到这些序列时将停止生成更多 token                                                  |
+| `temperature`                | `Optional[float]`              | `None`                 | 控制模型输出的随机性（0.0 到 2.0）                                                                       |
+| `user`                       | `Optional[str]`                | `None`                 | 表示您的最终用户的唯一标识符                                                                              |
+| `top_p`                      | `Optional[float]`              | `None`                 | 通过核采样控制多样性（0.0 到 1.0）                                                                       |
+| `service_tier`               | `Optional[str]`                | `None`                 | 要使用的服务层级（"auto"、"default"、"flex"、"priority"）                                                  |
+| `strict_output`              | `bool`                         | `True`                 | 控制结构化输出的模式遵循                                                                                  |
+| `extra_headers`              | `Optional[Any]`                | `None`                 | 要包含在请求中的额外标头                                                                                  |
+| `extra_query`                | `Optional[Any]`                | `None`                 | 要包含在请求中的额外查询参数                                                                              |
+| `extra_body`                 | `Optional[Any]`                | `None`                 | 要包含在请求中的额外正文参数                                                                              |
+| `request_params`             | `Optional[Dict[str, Any]]`     | `None`                 | 要包含在请求中的额外参数                                                                                  |
+| `role_map`                   | `Optional[Dict[str, str]]`     | `None`                 | 消息角色到 OpenAI 角色的映射                                                                              |
+| `api_key`                    | `Optional[str]`                | `None`                 | 用于向 OpenAI 认证的 API 密钥（默认为 OPENAI_API_KEY 环境变量）                                          |
+| `organization`               | `Optional[str]`                | `None`                 | 用于请求的组织 ID                                                                                         |
+| `base_url`                   | `Optional[Union[str, httpx.URL]]` | `None`              | OpenAI API 的基础 URL                                                                                     |
+| `timeout`                    | `Optional[float]`              | `None`                 | 请求超时时间（秒）                                                                                        |
+| `max_retries`                | `Optional[int]`                | `None`                 | 失败请求的最大重试次数                                                                                    |
+| `default_headers`            | `Optional[Any]`                | `None`                 | 要包含在所有请求中的默认标头                                                                              |
+| `default_query`              | `Optional[Any]`                | `None`                 | 要包含在所有请求中的默认查询参数                                                                          |
+| `http_client`                | `Optional[Union[httpx.Client, httpx.AsyncClient]]` | `None` | 用于发出请求的 HTTP 客户端实例                                                                           |
+| `client_params`              | `Optional[Dict[str, Any]]`     | `None`                 | 客户端配置的额外参数                                                                                      |
+| `retries`                    | `int`                          | `0`                    | 在抛出 ModelProviderError 之前尝试的重试次数                                                               |
+| `delay_between_retries`      | `int`                          | `1`                    | 重试之间的延迟（秒）                                                                                      |
+| `exponential_backoff`        | `bool`                         | `False`                | 如果为 True，每次重试之间的延迟会翻倍                                                                     |

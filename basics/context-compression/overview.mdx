@@ -1,0 +1,267 @@
+﻿---
+title: 上下文压缩
+sidebarTitle: 概述
+description: 学习如何压缩工具调用结果以节省上下文空间，同时保留关键信息。
+keywords: [context compression, tool call compression, context management, token optimization]
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.2.3" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.2.3">v2.2.3</Tooltip>
+</Badge>
+
+
+上下文压缩允许您在代理运行时管理其上下文，帮助代理保持在上下文窗口内，避免速率限制或响应质量下降。
+
+可以把它想象成一个研究助手，它会阅读冗长的报告并为您提供关键要点，而不是完整的文档。
+
+
+## 问题：冗长的工具结果
+
+如果您使用响应大小较大的工具，在没有压缩的情况下，工具结果会快速消耗您的上下文窗口：
+
+| 组件        | 累积Token数量    | 说明                          |
+|------------------|---------------------------|--------------------------------|
+| 系统提示    | 1,200 tokens              |                                |
+| 用户消息     | 1,300 tokens              |                                |
+| LLM响应     | 1,500 tokens              |                                |
+| 工具调用 1      | 2,500 tokens              |                                |
+| 工具调用 2      | 5,700 tokens              | 2,500 + 3,200 新增              |
+| 工具调用 3      | 8,500 tokens              | 5,700 + 2,800 新增              |
+| 工具调用 4      | 12,000 tokens             | 8,500 + 3,500 新增              |
+
+这很快变得昂贵，并在复杂工作流程中达到上下文限制。
+
+## 解决方案：自动压缩
+
+上下文压缩在达到阈值后总结工具结果：
+
+`
+工具调用 1: 2,500 tokens
+工具调用 2: 5,700 tokens
+工具调用 3: 8,500 tokens
+[压缩触发]
+工具调用 4: 1,300 tokens (800 压缩 + 500 新增)
+`
+
+**优势：**
+- 大幅减少token成本
+- 保持在上下文窗口限制内
+- 保留关键事实和数据
+- 自动压缩
+
+## 工作原理
+
+上下文压缩遵循一个简单的模式：
+
+<Steps>
+    <Step title="启用压缩">
+        在您的代理或团队上设置 compress_tool_results=True，或提供一个 CompressionManager。系统会监控传入的工具调用结果。
+    </Step>
+    <Step title="达到阈值">
+        达到阈值后，触发压缩。每个未压缩的工具调用结果都会被单独总结。
+    </Step>
+    <Step title="智能总结">
+        压缩模型保留关键事实（数字、日期、实体、URL），同时删除样板文本、冗余内容和填充文本。
+    </Step>
+    <Step title="LLM循环继续">
+        压缩后的工具结果在接下来的LLM执行中使用，减少token使用并延长上下文窗口的生命周期。
+    </Step>
+</Steps>
+
+<Note>
+当在 Agent 或 Team 上使用 run 时，压缩是异步处理的，未压缩的工具调用结果会被并发总结。
+</Note>
+
+## 启用压缩
+
+设置 compress_tool_results=True 以自动压缩工具结果。这默认带有3个工具调用的阈值。
+
+例如：
+<CodeGroup>
+`python Agent
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    tools=[DuckDuckGoTools()],
+    compress_tool_results=True,
+)
+
+agent.print_response("Research each of the following topics: AI, Crypto, Web3, and Blockchain")
+`
+
+`python Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+web_agent = Agent(
+    name="Web Researcher",
+    tools=[DuckDuckGoTools()],
+)
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o"),
+    members=[web_agent],
+    compress_tool_results=True,
+)
+
+team.print_response("Research each of the following topics: AI, Crypto, Web3, and Blockchain")
+`
+</CodeGroup>
+
+<Info>
+您也可以在单个团队成员上启用 compress_tool_results=True 来独立压缩他们的工具结果。
+</Info>
+
+## 自定义压缩
+
+提供一个 [CompressionManager](/reference/compression/compression-manager) 来自定义压缩行为：
+
+<CodeGroup>
+`python Agent
+from agno.agent import Agent
+from agno.compression.manager import CompressionManager
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+compression_manager = CompressionManager(
+    model=OpenAIChat(id="gpt-4o-mini"),  # 使用更快的模型进行压缩
+    compress_tool_results_limit=2,  # 在2个工具调用后压缩（默认：3）
+    compress_tool_call_instructions="Your custom compression prompt here...",
+)
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    tools=[DuckDuckGoTools()],
+    compression_manager=compression_manager,
+)
+
+agent.print_response("Find recent funding rounds for AI startups")
+`
+
+`python Team
+from agno.agent import Agent
+from agno.compression.manager import CompressionManager
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+compression_manager = CompressionManager(
+    model=OpenAIChat(id="gpt-4o-mini"),  # 使用更快的模型进行压缩
+    compress_tool_results_limit=2,  # 在2个工具调用后压缩（默认：3）
+    compress_tool_call_instructions="Your custom compression prompt here...",
+)
+
+web_agent = Agent(
+    name="Web Researcher",
+    tools=[DuckDuckGoTools()],
+)
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o"),
+    members=[web_agent],
+    compression_manager=compression_manager,
+)
+
+team.print_response("Find recent funding rounds for AI startups")
+`
+</CodeGroup>
+
+<Tip>
+使用像 gpt-4o-mini 这样更快、更便宜的模型进行压缩，以减少延迟和成本，同时使用更有能力的模型作为您代理的主要模型。
+</Tip>
+
+## 压缩触发器
+
+CompressionManager 支持两种类型的阈值来触发压缩：
+
+| 模式 | 参数 | 使用场景 |
+|------|-----------|----------|
+| **基于计数** | compress_tool_results_limit | 可预测的工具调用模式。在N个未压缩的工具结果后触发。 |
+| **基于Token** | compress_token_limit | 可变的结果大小或严格的上下文限制。当上下文超过token阈值时触发。 |
+
+<Note>
+如果两个阈值都没有设置，compress_tool_results_limit 默认为 3。
+</Note>
+
+### 基于工具的压缩
+
+当您有可预测的工具调用模式并希望在固定数量的工具调用结果后触发压缩时，设置 compress_tool_results_limit。
+
+### 基于Token的压缩
+
+当您需要对上下文大小进行精确控制时使用 compress_token_limit，特别是当工具结果大小差异很大时：
+
+<CodeGroup>
+`python Agent
+from agno.agent import Agent
+from agno.compression.manager import CompressionManager
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+compression_manager = CompressionManager(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    compress_tool_results=True,
+    compress_token_limit=5000,  # 或 compress_tool_results_limit
+)
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    tools=[DuckDuckGoTools()],
+    compression_manager=compression_manager,
+)
+
+agent.print_response("Research AI companies: OpenAI, Anthropic, Google DeepMind, Meta AI")
+`
+
+`python Team
+from agno.agent import Agent
+from agno.compression.manager import CompressionManager
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+compression_manager = CompressionManager(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    compress_tool_results=True,
+    compress_token_limit=5000,  # 或 compress_tool_results_limit
+)
+
+web_agent = Agent(
+    name="Web Researcher",
+    tools=[DuckDuckGoTools()],
+)
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o"),
+    members=[web_agent],
+    compression_manager=compression_manager,
+)
+
+team.print_response("Research AI companies: OpenAI, Anthropic, Google DeepMind, Meta AI")
+`
+</CodeGroup>
+
+<Info>
+Token计数包括消息、工具定义和输出模式。详情请参见 [Token计数](/basics/context-compression/token-counting)。
+</Info>
+
+## 何时使用上下文压缩
+
+**非常适合：**
+- 使用返回冗长结果的工具的代理（网络搜索、API）
+- 包含许多工具调用的多步骤工作流程
+- 上下文累积的长时间运行的会话
+- 成本很重要的生产系统
+
+
+## 开发者资源
+
+- [CompressionManager 参考](/reference/compression/compression-manager) - 完整的CompressionManager文档
+- [Agent 参考](/reference/agents/agent) - Agent参数文档
+- [Team 参考](/reference/teams/team) - Team参数文档
+- [Cookbook 示例](https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/context_compression)

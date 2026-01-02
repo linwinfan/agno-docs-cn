@@ -1,0 +1,58 @@
+---
+title: SiliconFlow
+sidebarTitle: 概览
+description: Learn how to use Siliconflow 模型s in Agno.
+---
+
+Siliconflow is a 平台 for providing endpoints for Large Language 模型s.
+
+Explore Siliconflow’s 模型s [here](https://siliconflow.ai/模型s).
+
+## Authentication
+
+Set your `SILICONFLOW_API_KEY` environment variable. Get your key [from Siliconflow here](https://siliconflow.ai).
+
+<CodeGroup>
+
+```bash Mac
+export SILICONFLOW_API_KEY=***
+```
+
+```bash Windows
+setx SILICONFLOW_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Siliconflow` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.siliconflow import Siliconflow
+
+agent = Agent(model=Siliconflow(), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/siliconflow/usage/basic-stream). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"meta-llama/Meta-Llama-3.1-8B-Instruct"` | The id of the SiliconFlow 模型 to use                  |
+| `name`       | `str`              | `"SiliconFlow"`                | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"SiliconFlow"`                | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for SiliconFlow (defaults to SILICONFLOW_API_KEY env var)|
+| `base_url`   | `str`              | `"https://api.siliconflow.cn/v1"` | The base URL for the SiliconFlow API                             |
+
+`Siliconflow` also 支持 the params of [OpenAI](/reference/models/openai).

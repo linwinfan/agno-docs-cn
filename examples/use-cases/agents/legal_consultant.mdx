@@ -1,0 +1,91 @@
+---
+title: 法律顾问
+---
+
+此示例展示如何创建一个专门的 AI 智能体，基于法律文档知识库提供法律信息和指导。法律顾问智能体旨在通过利用法律内容的向量数据库帮助用户理解法律概念、后果和程序。
+
+**主要功能：**
+- **法律知识库**：与包含法律文档和资源的 PostgreSQL 向量数据库集成
+- **文档处理**：自动摄取和索引来自权威来源的法律 PDF（例如司法部手册）
+- **上下文响应**：提供相关法律信息并附带适当的引用和来源
+- **专业免责声明**：始终明确说明响应仅供参考，而非专业法律建议
+- **律师推荐**：建议针对特定法律情况咨询持证律师
+
+**使用场景：**
+- 法律研究和教育
+- 了解刑事处罚和后果
+- 学习法律程序和要求
+- 在咨询专业人士之前获得初步法律信息
+
+## 代码
+
+```python cookbook/02_examples/agents/legal_consultant.py
+import asyncio
+
+from agno.agent import Agent
+from agno.knowledge.knowledge import Knowledge
+from agno.models.openai import OpenAIChat
+from agno.vectordb.pgvector import PgVector
+
+db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
+
+knowledge = Knowledge(
+    vector_db=PgVector(table_name="legal_docs", db_url=db_url),
+)
+
+asyncio.run(
+    knowledge.add_content_async(
+        url="https://www.justice.gov/d9/criminal-ccips/legacy/2015/01/14/ccmanual_0.pdf",
+    )
+)
+
+legal_agent = Agent(
+    name="LegalAdvisor",
+    knowledge=knowledge,
+    search_knowledge=True,
+    model=OpenAIChat(id="gpt-5-mini"),
+    markdown=True,
+    instructions=[
+        "Provide legal information and advice based on the knowledge base.",
+        "Include relevant legal citations and sources when answering questions.",
+        "Always clarify that you're providing general legal information, not professional legal advice.",
+        "Recommend consulting with a licensed attorney for specific legal situations.",
+    ],
+)
+
+legal_agent.print_response(
+    "What are the legal consequences and criminal penalties for spoofing Email Address?",
+    stream=True,
+)
+
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="Set your API key">
+    ```bash
+    export OPENAI_API_KEY=xxx
+    ```
+  </Step>
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno sqlalchemy openai psycopg
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python cookbook/02_examples/agents/legal_consultant.py
+    ```
+
+    ```bash Windows
+    python cookbook/02_examples/agents/legal_consultant.py
+    ```
+    </CodeGroup>
+  </Step>
+</Steps>

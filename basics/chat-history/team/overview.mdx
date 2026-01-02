@@ -1,0 +1,207 @@
+---
+title: 团队中的聊天历史
+sidebarTitle: 概述
+description: 了解团队会话历史和对话历史管理。
+keywords: [聊天历史, 历史记录, 团队历史, 多轮对话]
+---
+
+启用存储功能的团队会自动访问会话的运行历史（也称为"对话历史"或"聊天历史"）。
+
+我们可以通过以下方式为团队提供聊天历史访问权限：
+
+**团队级别历史**：
+- 您可以设置 `add_history_to_context=True` 和 `num_history_runs=5`，以自动将最近5次运行的输入和响应添加到发送给团队领导者的每个请求中。
+- 您可以通过设置 `num_history_messages` 来更精细地控制要包含在发送给模型的列表中的消息数量。
+- 您可以设置 `read_chat_history=True`，为您的团队提供 `get_chat_history()` 工具，使其能够读取整个聊天历史中的任何消息。
+- 您可以设置 `read_tool_call_history=True`，为您的团队提供 `get_tool_call_history()` 工具，使其能够按逆时间顺序读取工具调用。
+- 您可以启用 `search_session_history` 以允许搜索之前的会话。
+- 您可以设置 `add_team_history_to_members=True` 和 `num_team_history_runs=5`，以自动将最近5次运行（即团队级别的输入和响应）的输入和响应添加到发送给团队成员的每个消息中。
+
+**成员级别历史**：
+- 您还可以为单个团队成员启用 `add_history_to_context`。这只会将该成员的输入和输出添加到发送给该成员的所有请求中，使其能够访问自己的历史记录。
+
+<Tip>
+处理团队历史可能比较棘手。请尝试上述设置，以找到最适合您用例的配置。
+请参阅[历史参考](#历史参考)以了解如何使用不同的历史功能。
+</Tip>
+
+
+## 历史参考
+
+<Tabs>
+  <Tab title="简单历史">
+    从**上下文中的团队历史**开始，实现基本的对话连续性：
+    ```python
+    team = Team(
+        members=[...],
+        db=SqliteDb(db_file="tmp/team.db"),
+        add_history_to_context=True,
+        num_history_runs=5,
+    )
+    ```
+  </Tab>
+
+  <Tab title="成员协调">
+    使用**团队历史到成员**以共享上下文：
+    ```python
+    team = Team(
+        members=[german_agent, spanish_agent],
+        db=SqliteDb(db_file="tmp/team.db"),
+        add_team_history_to_members=True,
+        num_team_history_runs=3,
+    )
+    ```
+  </Tab>
+
+  <Tab title="共享交互信息">
+    在运行期间共享**成员交互**：
+    ```python
+    team = Team(
+        members=[profile_agent, billing_agent],
+        db=SqliteDb(db_file="tmp/team.db"),
+        share_member_interactions=True,
+    )
+    ```
+  </Tab>
+  <Tab title="长对话">
+    当智能体需要搜索历史时，添加**聊天历史工具**：
+    ```python
+    team = Team(
+        members=[...],
+        db=SqliteDb(db_file="tmp/team.db"),
+        read_chat_history=True,  # 智能体决定何时查找
+    )
+    ```
+  </Tab>
+
+  <Tab title="多会话记忆">
+    启用**多会话搜索**以实现跨会话连续性：
+    ```python
+    team = Team(
+        members=[...],
+        db=SqliteDb(db_file="tmp/team.db"),
+        search_session_history=True,
+        num_history_sessions=2,  # 保持较低值
+    )
+    ```
+  </Tab>
+
+</Tabs>
+
+<Note>
+**数据库要求**：所有历史功能都需要在团队上配置数据库。有关设置详情，请参阅[数据库](/basics/database/overview)。
+</Note>
+
+<Tip>
+**性能提示**：更多的历史记录 = 更大的上下文 = 更慢且更昂贵的请求。从 `num_history_runs=3` 开始，仅在需要时增加。
+</Tip>
+
+
+
+### 将历史添加到团队上下文
+
+要将对话历史添加到上下文中，您可以设置 `add_history_to_context=True`。
+这将把最近3次运行（这是默认值）的输入和响应添加到团队领导者的上下文中。
+您可以通过设置 `num_history_runs=n` 来更改运行次数，其中 `n` 是要包含的运行次数。
+
+有关完整实现，请参阅[带团队历史的直接响应](/basics/chat-history/team/usage/respond-directly-with-history)示例。
+
+## 将团队历史发送给成员
+
+要将团队历史发送给成员，您可以设置 `add_team_history_to_members=True`。
+这将在任务委派给成员时，将最近3次团队级别运行（这是默认值）的输入和响应发送给成员。
+您可以通过设置 `num_team_history_runs=n` 来更改运行次数，其中 `n` 是要包含的运行次数。
+
+启用后，团队历史将以以下格式附加到发送给团队成员的任务中：
+```
+<team_history_context>
+input: Hallo, wie heißt du? Meine Name ist John.
+response: Ich heiße ChatGPT.
+</team_history_context>
+```
+
+这使成员能够访问与其他团队成员之前交互的信息。
+
+有关完整实现，请参阅[成员的团队历史](/basics/chat-history/team/usage/team-history)示例。
+
+## 与其他成员共享成员交互
+
+所有与团队成员的交互都会自动记录，包括成员名称、分配给成员的任务以及成员的响应。
+
+<Note>
+此功能仅在单次运行期间可用 - 它共享当前执行中发生的交互。
+</Note>
+
+如果您希望成员能够访问当前运行期间发生的所有交互，可以设置 `share_member_interactions=True`。
+
+启用后，交互详细信息将以以下格式附加到发送给团队成员的任务中：
+```
+<member_interaction_context>
+- Member: Web Researcher
+- Task: Find information about the web
+- Response: I found information about the web
+
+- Member: HackerNews Researcher
+- Task: Find information about the web
+- Response: I found information about the web
+</member_interaction_context>
+```
+
+有关完整实现，请参阅[共享成员交互](/basics/chat-history/team/usage/share-member-interactions)示例。
+
+## 读取聊天历史
+
+要读取聊天历史，您可以设置 `read_chat_history=True`。
+这将为您的团队提供 `get_chat_history()` 工具，使其能够读取整个聊天历史中的任何消息。
+
+
+## 搜索会话历史
+
+在某些场景中，您可能希望从多个会话中获取消息，以提供上下文或保持对话连续性。
+
+要启用从最近N个会话中获取消息，您需要使用以下标志：
+
+- `search_session_history`：将其设置为 `True` 以允许搜索之前的会话。
+- `num_history_sessions`：指定要在搜索中包含的过去会话数量。
+
+<Tip>
+保持 `num_history_sessions` 较低（2或3），以避免填满模型的上下文长度，这可能导致性能问题。
+</Tip>
+
+
+## 开发者资源
+
+<CardGroup cols={2}>
+  <Card
+    title="带历史的直接响应"
+    icon="reply"
+    iconType="duotone"
+    href="/basics/chat-history/team/usage/respond-directly-with-history"
+  >
+    团队领导者在访问对话历史的情况下路由请求。
+  </Card>
+  <Card
+    title="成员的团队历史"
+    icon="share-nodes"
+    iconType="duotone"
+    href="/basics/chat-history/team/usage/team-history"
+  >
+    成员访问来自之前交互的共享团队历史。
+  </Card>
+  <Card
+    title="成员级别历史"
+    icon="user-check"
+    iconType="duotone"
+    href="/basics/chat-history/team/usage/history-of-members"
+  >
+    每个成员维护自己独立的对话历史。
+  </Card>
+  <Card
+    title="共享成员交互"
+    icon="comments"
+    iconType="duotone"
+    href="/basics/chat-history/team/usage/share-member-interactions"
+  >
+    在当前运行期间共享成员交互以避免重复工作。
+  </Card>
+</CardGroup>

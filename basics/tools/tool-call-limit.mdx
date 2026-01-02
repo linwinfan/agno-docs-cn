@@ -1,0 +1,35 @@
+---
+title: 工具调用限制
+description: 学习限制智能体可以进行的工具调用数量。
+---
+
+限制智能体可以进行的工具调用数量对于防止循环以及更好地控制成本和性能非常有用。
+
+在 Agno 中做到这一点非常简单。您只需要在初始化智能体或团队时传递 `tool_call_limit` 参数。
+
+例如：
+
+```python
+from agno.agent import Agent
+from agno.models.openai.chat import OpenAIChat
+from agno.tools.yfinance import YFinanceTools
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[YFinanceTools(company_news=True, cache_results=True)],
+    tool_call_limit=1, # 智能体将不会执行超过一个工具调用。
+)
+
+# 第一个工具调用将被执行。第二个将优雅地失败。
+agent.print_response(
+    "Find me the current price of TSLA, then after that find me the latest news about Tesla.",
+    stream=True,
+)
+
+```
+
+<Tip>
+需要考虑的重要事项：
+- 如果智能体尝试一次性运行超过限制数量的工具调用，限制仍然有效。只执行允许数量的工具调用。
+- 限制是在整个运行中强制执行的，而不是针对智能体触发的单个请求。
+</Tip>

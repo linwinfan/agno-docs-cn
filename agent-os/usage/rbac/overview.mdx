@@ -1,0 +1,58 @@
+---
+title: RBAC 使用
+description: AgentOS 基于角色的访问控制使用指南
+sidebarTitle: RBAC
+keywords: [rbac, 权限控制, 认证, 授权, agentos]
+---
+
+AgentOS RBAC 提供了细粒度的权限控制。
+
+## 基本配置
+
+```python
+from agno.os.config import AuthorizationConfig
+
+auth_config = AuthorizationConfig(
+    enabled=True,
+    jwt_secret_key="your-jwt-secret-key",
+    default_scopes=["read"]
+)
+
+agent_os = AgentOS(
+    agents=[agent],
+    authorization=auth_config
+)
+```
+
+## 权限范围
+
+| 范围 | 描述 |
+|------|------|
+| `read` | 读取权限 |
+| `write` | 写入权限 |
+| `execute` | 执行权限 |
+| `admin` | 管理权限 |
+
+## JWT 令牌生成
+
+```python
+import jwt
+
+def generate_token(user_id, scopes):
+    payload = {
+        "sub": user_id,
+        "scopes": scopes,
+        "exp": datetime.utcnow() + timedelta(hours=1)
+    }
+    return jwt.encode(payload, "secret", algorithm="HS256")
+```
+
+## 权限检查
+
+```python
+from agno.os.decorators import require_scopes
+
+@require_scopes(["read", "execute"])
+async def protected_endpoint():
+    return {"message": "访问成功"}
+```

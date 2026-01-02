@@ -1,0 +1,506 @@
+---
+title: "创建您的第一个 AgentOS"
+sidebarTitle: "创建您的第一个 OS"
+description: "快速设置指南，让您的第一个 AgentOS 实例在本地运行"
+---
+
+通过设置最小的本地实例开始使用 AgentOS。
+本指南将在几分钟内让您运行第一个智能体，并提供通过我们的示例添加高级功能的可选路径。
+
+<Check>
+AgentOS 是一个 FastAPI 应用程序，您可以在本地或在云中运行。如果您想使用现有的 FastAPI 应用程序构建 AgentOS，请查看[自定义 FastAPI 应用程序](/agent-os/custom-fastapi/overview)指南。
+</Check>
+
+## 前提条件
+
+- Python 3.9+
+- LLM 提供商 API 密钥（例如，`OPENAI_API_KEY`）
+
+## 安装
+
+创建并激活虚拟环境：
+
+<CodeGroup>
+  ```bash Mac
+  # 创建虚拟环境
+  python -m venv venv
+
+  # 激活虚拟环境
+  source venv/bin/activate
+  ```
+
+  ```bash Windows
+  # 创建虚拟环境
+  python -m venv venv
+
+  # 激活虚拟环境
+  venv\Scripts\activate
+  ```
+</CodeGroup>
+
+安装依赖项：
+
+```bash
+pip install -U agno "fastapi[standard]" uvicorn openai
+```
+
+## 最小设置
+
+创建 `my_os.py`：
+
+```python
+import os
+from agno.os import AgentOS
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 设置 OpenAI API 密钥
+os.environ["OPENAI_API_KEY"] = "your-api-key-here"
+
+# 创建简单的智能体
+agent = Agent(
+    name="助手",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="你是一个有用的助手。请用中文回答问题。"
+)
+
+# 创建 AgentOS 实例
+agent_os = AgentOS()
+agent_os.add_agents([agent])
+
+if __name__ == "__main__":
+    # 启动 AgentOS
+    agent_os.launch()
+```
+
+运行您的第一个 AgentOS：
+
+```bash
+python my_os.py
+```
+
+您的 AgentOS 现在正在运行在 `http://localhost:8000`！
+
+## 验证安装
+
+检查 AgentOS 是否正常运行：
+
+1. 打开浏览器访问 `http://localhost:8000`
+2. 您应该看到 AgentOS 仪表板
+3. 尝试与智能体进行对话
+
+## 添加更多功能
+
+### 添加知识库
+
+为您的智能体添加知识库：
+
+```python
+from agno.knowledge.pdf import PDFKnowledgeBase
+from agno.vectordb.lancedb import LanceDb
+
+# 创建知识库
+knowledge_base = PDFKnowledgeBase(
+    path="./documents",  # 包含 PDF 文件的目录
+    vector_db=LanceDb(
+        table_name="agentos_knowledge",
+        uri="./vectordb"
+    )
+)
+
+# 将知识库添加到智能体
+agent = Agent(
+    name="知识助手",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="使用提供的知识库回答用户问题。",
+    knowledge=knowledge_base,
+    tools=[knowledge_base.search]
+)
+```
+
+### 添加工具
+
+为智能体添加自定义工具：
+
+```python
+import requests
+from agno.tools.toolkit import Toolkit
+
+class WeatherToolkit(Toolkit):
+    def __init__(self):
+        super().__init__(name="weather_tools")
+        self.register(self.get_weather)
+    
+    def get_weather(self, location: str) -> str:
+        """获取指定位置的天气信息"""
+        # 这里使用真实的天气 API
+        api_key = os.getenv("WEATHER_API_KEY")
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={location}&appid={api_key}"
+        
+        try:
+            response = requests.get(url)
+            data = response.json()
+            return f"{location} 的天气：{data['weather'][0]['description']}，温度：{data['main']['temp']}°C"
+        except:
+            return f"无法获取 {location} 的天气信息"
+
+# 创建带工具的智能体
+weather_tools = WeatherToolkit()
+agent = Agent(
+    name="天气助手",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="帮助用户查询天气信息。",
+    tools=[weather_tools.get_weather]
+)
+```
+
+### 添加多智能体
+
+创建多个智能体团队：
+
+```python
+# 创建不同角色的智能体
+support_agent = Agent(
+    name="客服助手",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="处理客户服务和售后问题。"
+)
+
+sales_agent = Agent(
+    name="销售助手", 
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="协助销售流程和产品咨询。"
+)
+
+tech_agent = Agent(
+    name="技术支持",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="提供技术支持和故障排除。"
+)
+
+# 创建 AgentOS 并添加所有智能体
+agent_os = AgentOS()
+agent_os.add_agents([support_agent, sales_agent, tech_agent])
+```
+
+## 配置选项
+
+### 自定义配置
+
+使用配置文件自定义 AgentOS：
+
+```python
+from agno.os import AgentOS, AgentOSConfig
+
+# 创建配置
+config = AgentOSConfig(
+    host="0.0.0.0",  # 允许外部访问
+    port=8080,       # 自定义端口
+    debug=True,      # 启用调试模式
+    cors_origins=["http://localhost:3000"]  # 允许的源
+)
+
+# 使用配置创建 AgentOS
+agent_os = AgentOS(config=config)
+```
+
+### 环境变量配置
+
+使用环境变量配置：
+
+```bash
+# 设置环境变量
+export AGENTOS_HOST=0.0.0.0
+export AGENTOS_PORT=8080
+export AGENTOS_DEBUG=true
+export OPENAI_API_KEY=your-api-key
+export ANTHROPIC_API_KEY=your-anthropic-key
+```
+
+```python
+# 在代码中读取环境变量
+import os
+from agno.os import AgentOS
+
+agent_os = AgentOS(
+    host=os.getenv("AGENTOS_HOST", "localhost"),
+    port=int(os.getenv("AGENTOS_PORT", 8000)),
+    debug=os.getenv("AGENTOS_DEBUG", "false").lower() == "true"
+)
+```
+
+## 数据库集成
+
+### 添加内存存储
+
+配置持久化内存：
+
+```python
+from agno.memory.postgres import PgMemoryDb
+
+# 配置 PostgreSQL 内存数据库
+memory_db = PgMemoryDb(
+    table_name="agentos_memory",
+    db_url="postgresql://user:password@localhost/agentos"
+)
+
+agent = Agent(
+    name="记忆助手",
+    model=OpenAIChat(model="gpt-4o"),
+    memory=memory_db
+)
+```
+
+### 添加向量数据库
+
+配置向量存储：
+
+```python
+from agno.vectordb.pgvector import PgVector2
+
+# 配置 PgVector 向量数据库
+vector_db = PgVector2(
+    table_name="agentos_vectors",
+    db_url="postgresql://user:password@localhost/agentos",
+    embedder=OpenAIChat(model="text-embedding-3-small")
+)
+
+knowledge_base = PDFKnowledgeBase(
+    path="./documents",
+    vector_db=vector_db
+)
+```
+
+## 部署选项
+
+### Docker 部署
+
+创建 `Dockerfile`：
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 复制依赖文件
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# 复制应用代码
+COPY . .
+
+# 暴露端口
+EXPOSE 8000
+
+# 启动命令
+CMD ["python", "my_os.py"]
+```
+
+创建 `requirements.txt`：
+
+```
+agno
+fastapi[standard]
+uvicorn
+openai
+psycopg2-binary
+```
+
+构建和运行 Docker 容器：
+
+```bash
+# 构建镜像
+docker build -t agentos-app .
+
+# 运行容器
+docker run -p 8000:8000 -e OPENAI_API_KEY=your-key agentos-app
+```
+
+### 云部署
+
+#### 部署到 Railway
+
+```python
+# 在 my_os.py 中添加 Railway 配置
+import os
+
+agent_os = AgentOS(
+    host="0.0.0.0",
+    port=int(os.getenv("PORT", 8000))
+)
+```
+
+#### 部署到 AWS
+
+使用 AWS ECS 或 Lambda 部署 AgentOS：
+
+```yaml
+# docker-compose.yml for AWS ECS
+version: '3.8'
+services:
+  agentos:
+    image: your-registry/agentos:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AGENTOS_HOST=0.0.0.0
+```
+
+## 监控和日志
+
+### 添加日志
+
+配置日志记录：
+
+```python
+import logging
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('agentos.log'),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
+# 在智能体中添加日志
+agent = Agent(
+    name="日志助手",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="帮助用户并提供日志记录。",
+    tools=[lambda x: logger.info(f"用户查询: {x}")]
+)
+```
+
+### 添加指标
+
+收集性能指标：
+
+```python
+import time
+from functools import wraps
+
+def measure_time(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"{func.__name__} 执行时间: {end_time - start_time:.2f}秒")
+        return result
+    return wrapper
+
+# 应用到智能体方法
+agent.process_input = measure_time(agent.process_input)
+```
+
+## 安全最佳实践
+
+### API 密钥管理
+
+安全地管理 API 密钥：
+
+```python
+import os
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
+
+# 验证必需的密钥
+required_keys = ["OPENAI_API_KEY"]
+for key in required_keys:
+    if not os.getenv(key):
+        raise ValueError(f"缺少必需的环境变量: {key}")
+```
+
+### 输入验证
+
+验证用户输入：
+
+```python
+from pydantic import BaseModel, validator
+
+class UserInput(BaseModel):
+    message: str
+    
+    @validator('message')
+    def validate_message(cls, v):
+        if len(v) > 1000:
+            raise ValueError("消息太长，最多 1000 个字符")
+        return v
+
+# 在智能体中使用
+def process_user_input(user_input: UserInput):
+    return agent.process_input(user_input.message)
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 1. 端口冲突
+
+```bash
+# 检查端口使用情况
+netstat -tulpn | grep :8000
+
+# 使用不同端口
+python my_os.py --port 8080
+```
+
+#### 2. API 密钥错误
+
+```python
+# 测试 API 连接
+def test_openai_connection():
+    client = OpenAI()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": "测试"}],
+            max_tokens=10
+        )
+        print("✅ OpenAI API 连接成功")
+        return True
+    except Exception as e:
+        print(f"❌ OpenAI API 连接失败: {e}")
+        return False
+
+test_openai_connection()
+```
+
+#### 3. 内存不足
+
+```python
+# 优化内存使用
+agent = Agent(
+    name="优化助手",
+    model=OpenAIChat(model="gpt-4o-mini"),  # 使用较小的模型
+    instructions="简洁地回答问题。",
+    max_tokens=1000,  # 限制响应长度
+    memory=None  # 禁用内存以节省资源
+)
+```
+
+## 下一步
+
+- 查看[AgentOS 配置](/agent-os/config)了解更多配置选项
+- 了解如何[连接您的 OS](/agent-os/connecting-your-os)到控制平面
+- 探索[AgentOS 功能](/agent-os/features)
+- 查看[部署指南](/deploy/overview)了解生产部署
+- 浏览[示例](/examples)获取更多灵感
+
+## 获取帮助
+
+如果您遇到问题：
+
+1. 查看[常见问题](/faq)
+2. 搜索[GitHub Issues](https://github.com/agno-agi/agno/issues)
+3. 加入我们的[Discord 社区](https://discord.gg/agno)
+4. 发送邮件至 support@agno.com

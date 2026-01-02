@@ -1,0 +1,37 @@
+---
+title: Ollama
+sidebarTitle: Ollama
+---
+
+Ollama 模型提供对开源模型的访问，包括本地托管和通过 **Ollama Cloud** 的访问。
+
+**本地使用**：使用 Ollama 客户端在自己的硬件上运行模型。非常适合开发、隐私敏感的工作负载，以及当您想要完全控制基础设施时使用。
+
+**云端使用**：通过 API 密钥访问 [Ollama Cloud](https://ollama.com) 托管的云模型，实现可扩展的生产就绪部署。无需本地设置 - 只需设置您的 `OLLAMA_API_KEY` 即可立即开始使用强大的模型。
+
+## 主要特性
+
+- **双重部署选项**：选择本地托管以获得隐私和控制，或选择云端托管以获得可扩展性
+- **无缝切换**：在本地和云端部署之间轻松转换，代码更改最少
+- **自动配置**：使用 API 密钥时，主机自动默认为 Ollama Cloud
+- **广泛的模型支持**：访问包含 GPT-OSS、Llama、Qwen、DeepSeek 和 Phi 模型的广泛开源模型库
+
+## 参数
+
+| 参数           | 类型                       | 默认值                         | 描述                                                                                                             |
+| ------------------- | -------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `id`                | `str`                      | `"llama3.2"`                   | 要使用的 Ollama 模型的名称                                                                                     |
+| `name`              | `str`                      | `"Ollama"`                     | 模型的名称                                                                                                     |
+| `provider`          | `str`                      | `"Ollama"`                     | 模型的提供商                                                                                                   |
+| `host`              | `str`                      | `"http://localhost:11434"`     | Ollama 服务器的主机 URL                                                                                        |
+| `timeout`           | `Optional[int]`            | `None`                         | 请求超时时间（秒）                                                                                             |
+| `format`            | `Optional[str]`            | `None`                         | 返回响应的格式（例如，"json"）                                                                                |
+| `options`           | `Optional[Dict[str, Any]]` | `None`                         | 额外的模型选项（temperature、top_p 等）                                                                        |
+| `keep_alive`        | `Optional[Union[float, str]]` | `None`                      | 保持模型加载的时间（例如，"5m"、3600 秒）                                                                     |
+| `template`          | `Optional[str]`            | `None`                         | 要使用的提示模板                                                                                               |
+| `system`            | `Optional[str]`            | `None`                         | 要使用的系统消息                                                                                               |
+| `raw`               | `Optional[bool]`           | `None`                         | 是否返回未经格式化的原始响应                                                                                   |
+| `stream`            | `bool`                     | `True`                         | 是否流式传输响应                                                                                               |
+| `retries`           | `int`                      | `0`                            | 在抛出 ModelProviderError 之前尝试的重试次数                                                                    |
+| `delay_between_retries` | `int`                  | `1`                            | 重试之间的延迟（秒）                                                                                           |
+| `exponential_backoff` | `bool`                   | `False`                        | 如果为 True，每次重试之间的延迟会翻倍                                                                          |

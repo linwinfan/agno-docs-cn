@@ -1,0 +1,127 @@
+---
+title: 智能体中的聊天历史
+sidebarTitle: 概述
+description: 了解如何在智能体中管理聊天历史。
+keywords: [聊天历史, 历史记录, 智能体历史, 多轮对话]
+---
+
+启用存储功能的智能体会自动访问会话的运行历史（也称为"对话历史"或"聊天历史"）。
+
+<Note>
+对于所有形式的会话历史，您都需要为智能体分配一个数据库。有关更多详细信息，请参阅[存储](/basics/database/overview)。
+</Note>
+
+我们可以通过以下方式为智能体提供聊天历史访问权限：
+
+## 智能体级别历史
+
+- 您可以设置 `add_history_to_context=True` 和 `num_history_runs=5`，以自动将最近5次运行的输入和响应添加到发送给智能体的每个请求中。
+- 您可以通过设置 `num_history_messages` 来更精细地控制要包含在发送给模型的列表中的消息数量。
+- 您可以设置 `read_chat_history=True`，为您的智能体提供 `get_chat_history()` 工具，使其能够读取整个聊天历史中的任何消息。
+- 您可以设置 `read_tool_call_history=True`，为您的智能体提供 `get_tool_call_history()` 工具，使其能够按逆时间顺序读取工具调用。
+- 您可以启用 `search_session_history` 以允许搜索之前的会话。
+
+<Tip>
+处理智能体历史可能比较棘手。请尝试上述设置，以找到最适合您用例的配置。
+请参阅[历史参考](#历史参考)以了解如何使用不同的历史功能。
+</Tip>
+
+## 历史参考
+
+<Tabs>
+  <Tab title="简单历史">
+    从**上下文中的智能体历史**开始，实现基本的对话连续性：
+    ```python
+    agent = Agent(
+        db=SqliteDb(db_file="tmp/agent.db"),
+        add_history_to_context=True,
+        num_history_runs=5,
+    )
+    ```
+  </Tab>
+
+  <Tab title="长对话">
+    当智能体需要搜索历史时，添加**聊天历史工具**：
+    ```python
+    agent = Agent(
+        db=SqliteDb(db_file="tmp/agent.db"),
+        read_chat_history=True,  # 智能体决定何时查找
+    )
+    ```
+  </Tab>
+
+  <Tab title="多会话记忆">
+    启用**多会话搜索**以实现跨会话连续性：
+    ```python
+    agent = Agent(
+        db=SqliteDb(db_file="tmp/agent.db"),
+        search_session_history=True,
+        num_history_sessions=2,  # 保持较低值
+    )
+    ```
+  </Tab>
+
+</Tabs>
+
+<Note>
+**数据库要求**：所有历史功能都需要在智能体上配置数据库。有关设置详情，请参阅[存储](/basics/database/overview)。
+</Note>
+
+<Tip>
+**性能提示**：更多的历史记录 = 更大的上下文 = 更慢且更昂贵的请求。从 `num_history_runs=3` 开始，仅在需要时增加。
+</Tip>
+
+
+### 将历史添加到智能体上下文
+
+要将对话历史添加到上下文中，您可以设置 `add_history_to_context=True`。
+这将把最近3次运行（这是默认值）的输入和响应添加到智能体的上下文中。
+您可以通过设置 `num_history_runs=n` 来更改运行次数，其中 `n` 是要包含的运行次数。
+
+您可以在 `Agent` 上或直接在 `run()` 方法上设置 `add_history_to_context=True`。
+有关完整实现，请参阅[带历史的持久会话](/basics/chat-history/agent/usage/persistent-session-history)示例。
+
+在[上下文工程](/basics/context/overview)文档中了解更多信息。
+
+
+## 读取聊天历史
+
+要读取聊天历史，您可以设置 `read_chat_history=True`。
+这将为您的智能体提供 `get_chat_history()` 工具，使其能够读取整个聊天历史中的任何消息。
+
+有关完整实现，请参阅[聊天历史管理](/basics/chat-history/agent/usage/chat-history)页面。
+
+## 搜索会话历史
+
+在某些场景中，您可能希望从多个会话中获取消息，以提供上下文或保持对话连续性。
+
+要启用从最近N个会话中获取消息，您需要使用以下标志：
+
+- `search_session_history`：将其设置为 `True` 以允许搜索之前的会话。
+- `num_history_sessions`：指定要在搜索中包含的过去会话数量。在下面的示例中，它被设置为 `2` 以仅包含最近的2个会话。
+- `num_history_sessions`：指定要在搜索中包含的过去会话数量。
+
+<Tip>
+保持 `num_history_sessions` 较低（2或3），以避免填满模型的上下文长度，这可能导致性能问题。
+</Tip>
+
+## 开发者资源
+
+<CardGroup cols={2}>
+  <Card
+    title="聊天历史示例"
+    icon="message"
+    iconType="duotone"
+    href="/basics/chat-history/agent/usage/chat-history"
+  >
+    了解如何在智能体对话中管理和检索聊天历史。
+  </Card>
+  <Card
+    title="带历史的持久会话"
+    icon="database"
+    iconType="duotone"
+    href="/basics/chat-history/agent/usage/persistent-session-history"
+  >
+    使用 num_history_runs 控制包含多少对话历史。
+  </Card>
+</CardGroup>

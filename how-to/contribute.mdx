@@ -1,0 +1,44 @@
+---
+title: 为 Agno 贡献代码
+description: 了解如何通过 fork 和 pull request 工作流程为 Agno 贡献代码。
+---
+
+Agno 是一个开源项目，我们欢迎各种贡献。
+
+## 👩‍💻 如何贡献
+
+请遵循 [fork 和 pull request](https://docs.github.com/en/get-started/quickstart/contributing-to-projects) 工作流程：
+
+- Fork 仓库。
+- 为你的功能创建一个新分支。
+- 添加你的功能或改进。
+- 发送 pull request。
+- 我们感谢你的支持和建议！
+
+## 开发环境设置
+
+1. 克隆仓库。
+2. 创建虚拟环境：
+   - 对于 Unix 系统，使用 `./scripts/dev_setup.sh`。
+   - 此设置将：
+     - 在当前目录创建 `.venv` 虚拟环境。
+     - 安装所需的包。
+     - 以可编辑模式安装 `agno` 包。
+3. 激活虚拟环境：
+   - 在 Unix 上：`source .venv/bin/activate`
+
+> 从现在开始，你必须使用 `uv pip install` 来安装缺失的包
+
+## 格式化和验证
+
+在提交 pull request 之前，请运行适当的格式化和验证脚本，确保你的代码符合我们的质量标准：
+
+- 对于 Unix 系统：
+  - `./scripts/format.sh`
+  - `./scripts/validate.sh`
+
+这些脚本将使用 `ruff` 执行代码格式化，并使用 `mypy` 进行静态类型检查。
+
+在[这里](https://github.com/agno-agi/agno/tree/main/CONTRIBUTING.md)阅读更多关于指南的信息。
+
+如果你有任何问题或需要帮助，请在 [Discord](https://discord.gg/4MtYHHrgA8) 上给我们发消息或在 [Discourse](https://community.agno.com/) 上发帖。

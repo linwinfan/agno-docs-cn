@@ -1,0 +1,64 @@
+---
+title: Requesty
+sidebarTitle: 概览
+description: Learn how to use Requesty with Agno.
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.1.0" cta="查看 release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.1.0">v2.1.0</Tooltip>
+</Badge>
+
+
+Requesty AI is an LLM 网关 with AI governance, providing 统一 access to various language 模型s with built-in governance and monitoring 功能.
+
+Learn 更多功能 about Requesty's 特性 at [requesty.ai](https://www.requesty.ai).
+
+## Authentication
+
+Set your `REQUESTY_API_KEY` environment variable. Get your key from Requesty.
+
+<CodeGroup>
+
+```bash Mac
+export REQUESTY_API_KEY=***
+```
+
+```bash Windows
+setx REQUESTY_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Requesty` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.requesty import Requesty
+
+agent = Agent(model=Requesty(id="openai/gpt-4o"), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/requesty/usage/basic-stream). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"openai/gpt-4.1"`             | The id of the 模型 to use through Requesty                          |
+| `name`       | `str`              | `"Requesty"`                   | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Requesty"`                   | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for Requesty (defaults to REQUESTY_API_KEY env var)      |
+| `base_url`   | `str`              | `"https://router.requesty.ai/v1"` | The base URL for the Requesty API                                |
+| `max_tokens` | `int`              | `1024`                         | The maximum number of tokens to generate                              |
+
+`Requesty` also 支持 the params of [OpenAI](/reference/models/openai).

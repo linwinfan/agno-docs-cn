@@ -1,0 +1,123 @@
+---
+title: Weaviate Vector Database
+sidebarTitle: 概览
+description: Learn how to use Weaviate as a vector 数据库 for your Knowledge Base
+---
+
+Follow steps mentioned in [Weaviate setup guide](https://weaviate.io/developers/weaviate/quickstart) to setup Weaviate.
+
+## Setup
+
+安装 weaviate packages
+
+```shell
+pip install weaviate-client
+```
+
+Run weaviate
+
+```shell
+docker run -d \
+  -p 8080:8080 \
+  -p 50051:50051 \
+  --name weaviate \
+  cr.weaviate.io/semitechnologies/weaviate:1.28.4
+```
+
+or
+
+```shell
+./cookbook/scripts/run_weaviate.sh
+```
+
+## Example
+
+```python agent_with_knowledge.py
+from agno.agent import Agent
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.search import SearchType
+from agno.vectordb.weaviate import Distance, VectorIndex, Weaviate
+
+vector_db = Weaviate(
+    collection="recipes",
+    search_type=SearchType.hybrid,
+    vector_index=VectorIndex.HNSW,
+    distance=Distance.COSINE,
+    local=True,  # Set to False if using Weaviate Cloud and True if using local instance
+)
+# Create knowledge base
+knowledge_base = Knowledge(
+    vector_db=vector_db,
+)
+
+# Create and use the agent
+agent = Agent(
+    knowledge=knowledge_base,
+    search_knowledge=True,
+)
+
+if __name__ == "__main__":
+    knowledge_base.add_content(
+        url="https://agno-public.s3.amazonaws.com/recipes/ThaiRecipes.pdf"
+    )
+
+    agent.print_response("How to make Thai curry?", markdown=True)
+```
+
+<Card title="Async Support ⚡">
+  <div className="mt-2">
+    <p>
+      Weaviate also 支持 异步 operations, enabling concurrency and leading to better performance.
+    </p>
+
+    ```python async_weaviate_db.py
+    import asyncio
+
+    from agno.agent import Agent
+    from agno.knowledge.knowledge import Knowledge
+    from agno.vectordb.search import SearchType
+    from agno.vectordb.weaviate import Distance, VectorIndex, Weaviate
+
+    vector_db = Weaviate(
+        collection="recipes_async",
+        search_type=SearchType.hybrid,
+        vector_index=VectorIndex.HNSW,
+        distance=Distance.COSINE,
+        local=True,  # Set to False if using Weaviate Cloud and True if using local instance
+    )
+
+    # Create knowledge base
+    knowledge_base = Knowledge(
+        vector_db=vector_db,
+    )
+
+    agent = Agent(
+        knowledge=knowledge_base,
+        search_knowledge=True,
+    )
+
+    if __name__ == "__main__":
+        # Load knowledge base asynchronously
+        asyncio.run(knowledge_base.add_content_async(
+                url="https://agno-public.s3.amazonaws.com/recipes/ThaiRecipes.pdf"
+            )
+        )
+
+        # Create and use the agent asynchronously
+        asyncio.run(agent.aprint_response("How to make Tom Kha Gai", markdown=True))
+    ```
+
+    <Tip className="mt-4">
+      Weaviate's async 功能 leverage <code>WeaviateAsyncClient</code> to provide non-blocking vector operations. This is particularly valuable for applications requiring high concurrency and throughput.
+    </Tip>
+  </div>
+</Card>
+
+## Weaviate 参数
+
+<Snippet file="vectordb_weaviate_params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook (Sync)](https://github.com/agno-agi/agno/blob/main/cookbook/08_knowledge/vector_db/weaviate_db/weaviate_db.py)
+- 查看 [Cookbook (Async)](https://github.com/agno-agi/agno/blob/main/cookbook/08_knowledge/vector_db/weaviate_db/async_weaviate_db.py)

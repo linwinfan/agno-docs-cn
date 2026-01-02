@@ -1,0 +1,68 @@
+---
+title: 中间件使用
+description: AgentOS 中间件使用指南
+sidebarTitle: 中间件
+keywords: [中间件, agentos, 认证, 日志, 安全]
+---
+
+AgentOS 中间件提供了请求处理、认证、日志记录等功能。
+
+## JWT 中间件
+
+```python
+from agno.os.middleware import JWTMiddleware
+
+agent_os = AgentOS(
+    agents=[agent],
+    middleware=[
+        JWTMiddleware(
+            secret_key="your-secret-key",
+            algorithm="HS256"
+        )
+    ]
+)
+```
+
+## 速率限制中间件
+
+```python
+from agno.os.middleware import RateLimitMiddleware
+
+agent_os = AgentOS(
+    agents=[agent],
+    middleware=[
+        RateLimitMiddleware(
+            requests_per_minute=100,
+            key_func=lambda request: request.client.host
+        )
+    ]
+)
+```
+
+## 日志中间件
+
+```python
+from agno.os.middleware import LoggingMiddleware
+
+agent_os = AgentOS(
+    agents=[agent],
+    middleware=[
+        LoggingMiddleware(
+            log_level="INFO",
+            include_body=False
+        )
+    ]
+)
+```
+
+## 自定义中间件
+
+```python
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class CustomMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        # 自定义处理逻辑
+        response = await call_next(request)
+        return response
+```

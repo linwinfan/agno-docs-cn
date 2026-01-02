@@ -1,0 +1,50 @@
+---
+title: 知识系统介绍
+sidebarTitle: 概述
+description: 理解为什么知识对于构建智能、上下文感知的AI代理至关重要，这些代理能够提供准确、相关的响应。
+keywords: [knowledge, rag, agentic rag, agentic search, dynamic few-shot learning]
+---
+
+想象一下，当AI代理被问及公司的人力资源政策时，它不是给出通用建议，而是基于实际的员工手册返回精确答案。或者考虑一个客户支持代理，它了解具体的产品细节、定价和故障排除指南。这就是Agno中知识的力量。
+
+## 无知识代理的问题
+
+没有访问特定信息的能力，AI代理只能依赖其通用训练数据。这会导致：
+
+- **通用响应**，不符合您的特定上下文
+- **过时信息**，来自几个月或几年前的训练数据
+- **幻觉**，当代理猜测它实际上不知道的事实时
+- **有限用途**，对于特定领域任务或公司特定工作流程
+
+## 实际影响
+
+### 智能文本到SQL代理
+构建了解您确切数据库架构、列名和常见查询模式的代理。它们不是猜测表结构，而是检索每个查询所需的具体架构信息，确保准确的SQL生成。
+
+### 客户支持卓越
+创建一个可以访问您完整产品文档、FAQ数据库和故障排除指南的支持代理。客户可以即时获得准确答案，无需等待人工代理查找信息。
+
+### 内部知识助手
+部署一个了解您公司流程、政策和机构知识的代理。新员工可以获得入职帮助，现有团队成员可以快速找到复杂流程问题的答案。
+
+## 准备开始了吗？
+
+将代理从通用助手转变为领域专家：
+
+<CardGroup cols={3}>
+  <Card title="了解工作原理" icon="book-open" href="/basics/knowledge/how-it-works">
+    理解智能知识检索背后的简单RAG管道
+  </Card>
+  <Card title="构建您的第一个代理" icon="rocket" href="/basics/knowledge/getting-started">
+    按照我们的快速教程在几分钟内创建知识驱动的代理
+  </Card>
+  <Card title="代理与知识" icon="robot" href="/basics/knowledge/agents/overview">
+    学习如何在代理中使用知识。
+  </Card>
+  <Card title="团队与知识" icon="users" href="/basics/knowledge/teams/overview">
+    学习如何在团队中使用知识。
+  </Card>
+  <Card title="进一步的知识概念" icon="book-open" href="/basics/knowledge/terminology">
+    学习更多知识概念。
+  </Card>
+</CardGroup>

@@ -1,0 +1,391 @@
+---
+title: "连接您的 AgentOS"
+sidebarTitle: "连接您的 OS"
+description: "将本地 AgentOS 连接到 AgentOS 控制平面的分步指南"
+---
+
+## 概述
+
+连接您的 AgentOS 是使用 AgentOS 控制平面的关键第一步。此过程在您运行的 AgentOS 实例和控制平面之间建立连接，允许您通过浏览器管理、监控和与您的智能体交互。
+
+<Note>
+  **前提条件**：在连接到控制平面之前，您需要一个正在运行的 AgentOS 实例。如果还没有创建实例，请查看我们的[创建您的第一个 OS](/agent-os/creating-your-first-os)指南。
+</Note>
+
+查看[AgentOS 控制平面](/agent-os/control-plane)文档以了解有关控制平面的更多信息。
+
+## 分步连接过程
+
+### 1. 访问连接对话框
+
+在 Agno 平台中：
+
+1. 点击顶部导航栏中的团队/组织下拉菜单
+2. 点击 **"+"**（加号）"添加新 OS"按钮旁边的按钮
+3. "连接您的 AgentOS" 对话框将打开
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/agent-os-connect-os.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+### 2. 选择您的环境
+
+选择 **"本地"**用于开发或 **"实时"**用于生产：
+
+- **本地**: 连接到在您的本地机器上运行的 AgentOS
+- **实时**: 连接到在您基础设施上运行的生产 AgentOS
+
+<Note>实时 AgentOS 连接需要 PRO 订阅。</Note>
+
+### 3. 配置连接设置
+
+#### 连接类型
+
+- **WebSocket**: 用于实时通信（推荐）
+- **HTTP**: 用于轮询通信
+- **SSE**: 用于服务器发送事件
+
+#### 认证设置
+
+- **密钥认证**: 使用 API 密钥
+- **JWT 认证**: 使用 JSON Web Token
+- **OAuth**: 使用第三方认证
+
+#### 高级设置
+
+- **重连间隔**: 自动重连的频率
+- **超时设置**: 连接超时时间
+- **代理配置**: 代理服务器设置
+
+### 4. 提供连接信息
+
+#### 本地连接
+
+```yaml
+# 连接设置
+connection_type: "websocket"
+host: "localhost"
+port: 8000
+protocol: "ws"
+path: "/ws"
+```
+
+#### 生产连接
+
+```yaml
+# 生产连接设置
+connection_type: "websocket"
+host: "your-domain.com"
+port: 443
+protocol: "wss"
+path: "/ws"
+api_key: "your-api-key"
+```
+
+### 5. 测试连接
+
+系统将验证连接并显示状态：
+
+- ✅ **连接成功**: 连接已建立
+- ⚠️ **连接失败**: 检查配置和网络
+- 🔄 **重试中**: 正在尝试重新连接
+
+### 6. 保存连接
+
+保存连接配置以便将来使用：
+
+- **本地保存**: 保存到本地配置文件
+- **云端同步**: 同步到云端账户
+
+## 连接类型详解
+
+### WebSocket 连接
+
+WebSocket 连接提供实时、双向通信：
+
+```python
+import asyncio
+import websockets
+
+async def connect_agentos():
+    uri = "ws://localhost:8000/ws"
+    async with websockets.connect(uri) as websocket:
+        await websocket.send(json.dumps({
+            "type": "connect",
+            "session_id": "session-123"
+        }))
+        response = await websocket.recv()
+        print(f"连接响应: {response}")
+```
+
+### HTTP 轮询连接
+
+HTTP 连接使用定期轮询：
+
+```python
+import requests
+import time
+
+def poll_agentos():
+    url = "http://localhost:8000/api/status"
+    while True:
+        try:
+            response = requests.get(url)
+            print(f"状态: {response.status_code}")
+            time.sleep(5)  # 每 5 秒轮询一次
+        except requests.exceptions.RequestException as e:
+            print(f"连接错误: {e}")
+            time.sleep(10)  # 错误时等待更长时间
+```
+
+### SSE 连接
+
+SSE 连接接收服务器发送的事件：
+
+```python
+import requests
+import json
+
+def connect_sse():
+    url = "http://localhost:8000/api/events"
+    
+    response = requests.get(url, stream=True)
+    
+    for line in response.iter_lines():
+        if line.startswith("data: "):
+            event_data = line[6:]  # 移除 "data: " 前缀
+            try:
+                event = json.loads(event_data)
+                print(f"收到事件: {event}")
+            except json.JSONDecodeError:
+                print(f"原始事件数据: {event_data}")
+```
+
+## 安全考虑
+
+### 认证机制
+
+#### API 密钥认证
+
+```yaml
+# 在配置文件中
+authentication:
+  type: "api_key"
+  api_key_env: "AGENTOS_API_KEY"
+```
+
+#### JWT 认证
+
+```yaml
+# 在配置文件中
+authentication:
+  type: "jwt"
+  token_env: "AGENTOS_JWT_TOKEN"
+  issuer: "https://auth.agno.com"
+  audience: "agentos-control-plane"
+```
+
+### 网络安全
+
+#### HTTPS 配置
+
+```yaml
+# 生产环境配置
+connection:
+  protocol: "wss"  # 安全 WebSocket
+  host: "your-domain.com"
+  port: 8443
+  ssl:
+    enabled: true
+    cert_path: "/path/to/cert.pem"
+    key_path: "/path/to/key.pem"
+```
+
+#### 防火墙配置
+
+```yaml
+# 网络配置
+firewall:
+  allowed_origins:
+    - "https://control-plane.agno.com"
+  allowed_ports:
+    - 443
+    - 8443
+  blocked_ips:
+    - "192.168.1.100"
+```
+
+## 故障排除
+
+### 常见连接问题
+
+#### 连接超时
+
+```python
+# 增加超时设置
+connection_config = {
+    "timeout": 30,  # 30 秒超时
+    "retry_attempts": 3,  # 重试 3 次
+    "retry_delay": 5  # 重试间隔 5 秒
+}
+```
+
+#### 网络错误
+
+```python
+# 网络诊断
+import socket
+import subprocess
+
+def check_network(host, port):
+    try:
+        socket.create_connection((host, port))
+        print(f"✅ {host}:{port} 可达")
+        return True
+    except socket.error as e:
+        print(f"❌ {host}:{port} 不可达: {e}")
+        return False
+
+# 检查本地连接
+check_network("localhost", 8000)
+```
+
+#### 认证失败
+
+```python
+# 验证 API 密钥
+import os
+from agno.utils.auth import validate_api_key
+
+def validate_credentials():
+    api_key = os.getenv("AGENTOS_API_KEY")
+    if not api_key:
+        print("❌ 未找到 AGNO_API_KEY 环境变量")
+        return False
+    
+    if validate_api_key(api_key):
+        print("✅ API 密钥有效")
+        return True
+    else:
+        print("❌ API 密钥无效")
+        return False
+```
+
+### 调试连接
+
+启用调试模式获取详细日志：
+
+```python
+import logging
+
+# 配置调试日志
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    filename="agentos_debug.log"
+)
+
+# 在连接时启用调试
+agent_os = AgentOS(
+    debug_mode=True,
+    log_level="debug"
+)
+```
+
+## 最佳实践
+
+### 1. 环境隔离
+
+为不同环境使用不同的配置：
+
+```python
+# 开发环境
+dev_config = {
+    "host": "localhost",
+    "port": 8000,
+    "protocol": "ws"
+}
+
+# 生产环境
+prod_config = {
+    "host": "api.yourcompany.com",
+    "port": 443,
+    "protocol": "wss",
+    "ssl": {"enabled": True}
+}
+
+# 根据环境选择配置
+config = dev_config if os.getenv("ENV") == "dev" else prod_config
+```
+
+### 2. 连接池管理
+
+实现连接池以提高性能：
+
+```python
+import asyncio
+import websockets
+
+class ConnectionPool:
+    def __init__(self, max_connections=10):
+        self.max_connections = max_connections
+        self.connections = []
+        self.available = asyncio.Queue()
+    
+    async def get_connection(self):
+        if self.available.qsize() > 0:
+            return self.available.get_nowait()
+        
+        if len(self.connections) < self.max_connections:
+            return await self._create_connection()
+        
+        return await self.available.get_nowait()
+    
+    async def _create_connection(self):
+        uri = f"ws://localhost:8000/ws"
+        websocket = await websockets.connect(uri)
+        self.connections.append(websocket)
+        return websocket
+```
+
+### 3. 监控连接状态
+
+实现连接状态监控：
+
+```python
+import time
+from datetime import datetime
+
+class ConnectionMonitor:
+    def __init__(self):
+        self.status = "disconnected"
+        self.last_ping = None
+    
+    async def monitor_connection(self, websocket):
+        self.status = "connected"
+        self.last_ping = datetime.now()
+        
+        while True:
+            try:
+                await asyncio.sleep(30)  # 每 30 秒检查一次
+                await websocket.ping()
+                self.last_ping = datetime.now()
+            except websockets.exceptions.ConnectionClosed:
+                self.status = "disconnected"
+                break
+```
+
+## 下一步
+
+- 了解[控制平面功能](/agent-os/control-plane)
+- 查看[AgentOS 功能](/agent-os/features)
+- 探索[AgentOS 参考](/reference/agent-os/configuration)
+- 查看[AgentOS 部署](/deploy/overview)

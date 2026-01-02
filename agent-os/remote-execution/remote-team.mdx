@@ -1,0 +1,921 @@
+---
+title: "远程团队"
+sidebarTitle: "远程团队"
+description: "执行托管在远程 AgentOS 实例上的团队"
+---
+
+`RemoteTeam` 允许您执行运行在远程 AgentOS 实例上的团队。这使您能够利用复杂的多智能体团队，而无需在本地托管它们。
+
+## 先决条件
+
+您需要一个运行中的 AgentOS 实例，其中至少配置了一个团队。请参阅[创建您的第一个OS](/agent-os/creating-your-first-os)来设置一个。
+
+## 基本用法
+
+```python
+import asyncio
+from agno.team import RemoteTeam
+
+async def main():
+    # 连接到远程团队
+    team = RemoteTeam(
+        base_url="http://remote-server:7778",  # 本地测试使用 localhost
+        team_id="research-team",
+    )
+    
+    # 运行团队
+    response = await team.arun("研究人工智能的最新趋势")
+    print(response.content)
+
+asyncio.run(main())
+```
+
+## 流式响应
+
+实时流式传输团队响应：
+
+```python
+from agno.team import RemoteTeam
+from agno.run.team import RunContentEvent
+
+team = RemoteTeam(
+    base_url="http://remote-server:7778",  # 本地测试使用 localhost
+    team_id="research-team",
+)
+
+print("团队响应: ", end="", flush=True)
+async for event in team.arun(
+    "分析量子计算的当前状态",
+    stream=True,
+):
+    if isinstance(event, RunContentEvent) and event.content:
+        print(event.content, end="", flush=True)
+```
+
+## 高级配置
+
+### 1. 认证和安全
+
+```python
+from agno.team import RemoteTeam
+
+# 使用 JWT 令牌认证
+team = RemoteTeam(
+    base_url="https://secure-agentos.example.com",
+    team_id="research-team",
+    headers={
+        "Authorization": "Bearer your-jwt-token",
+        "X-Client-ID": "your-client-id"
+    },
+    verify_ssl=True  # 启用 SSL 验证
+)
+
+# 使用 API 密钥认证
+team = RemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="research-team",
+    headers={
+        "X-API-Key": "your-api-key"
+    }
+)
+```
+
+### 2. 超时和重试
+
+```python
+from agno.team import RemoteTeam
+
+team = RemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="research-team",
+    timeout=60,  # 请求超时时间（秒）
+    max_retries=3,  # 最大重试次数
+    retry_delay=2,  # 重试延迟（秒）
+    backoff_factor=2  # 指数退避因子
+)
+```
+
+### 3. 连接池
+
+```python
+from agno.team import RemoteTeam
+from agno.team.connection import TeamConnectionPool
+
+# 创建团队连接池
+pool = TeamConnectionPool(
+    base_url="http://remote-server:7778",
+    max_connections=5,
+    keep_alive_timeout=60
+)
+
+# 使用连接池的团队
+team = RemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="research-team",
+    connection_pool=pool
+)
+```
+
+## 团队管理
+
+### 1. 团队信息查询
+
+```python
+from agno.team import RemoteTeam
+
+team = RemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="research-team"
+)
+
+# 获取团队信息
+team_info = await team.get_info()
+print(f"团队名称: {team_info.name}")
+print(f"团队描述: {team_info.description}")
+print(f"智能体数量: {len(team_info.agents)}")
+
+# 获取团队成员
+agents = await team.get_agents()
+for agent in agents:
+    print(f"- {agent.name} ({agent.role})")
+
+# 获取团队配置
+config = await team.get_config()
+print(f"团队配置: {config}")
+```
+
+### 2. 动态团队管理
+
+```python
+from agno.team import RemoteTeam
+
+class DynamicRemoteTeam(RemoteTeam):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.team_cache = {}
+        self.cache_ttl = 300  # 缓存 5 分钟
+    
+    async def get_cached_info(self):
+        """获取缓存的团队信息"""
+        import time
+        current_time = time.time()
+        
+        if "team_info" not in self.team_cache or \
+           current_time - self.team_cache["team_info"]["timestamp"] > self.cache_ttl:
+            
+            team_info = await self.get_info()
+            self.team_cache["team_info"] = {
+                "data": team_info,
+                "timestamp": current_time
+            }
+        
+        return self.team_cache["team_info"]["data"]
+    
+    async def add_agent(self, agent_id: str, role: str = None):
+        """动态添加智能体到团队"""
+        payload = {"agent_id": agent_id}
+        if role:
+            payload["role"] = role
+        
+        response = await self._make_request(
+            "POST",
+            f"/teams/{self.team_id}/agents",
+            json=payload
+        )
+        
+        # 清除缓存
+        self.team_cache.clear()
+        return response
+    
+    async def remove_agent(self, agent_id: str):
+        """从团队中移除智能体"""
+        response = await self._make_request(
+            "DELETE",
+            f"/teams/{self.team_id}/agents/{agent_id}"
+        )
+        
+        # 清除缓存
+        self.team_cache.clear()
+        return response
+    
+    async def update_team_config(self, config: dict):
+        """更新团队配置"""
+        response = await self._make_request(
+            "PUT",
+            f"/teams/{self.team_id}/config",
+            json=config
+        )
+        
+        # 清除缓存
+        self.team_cache.clear()
+        return response
+
+# 使用动态团队管理
+dynamic_team = DynamicRemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="research-team"
+)
+
+# 获取团队信息
+info = await dynamic_team.get_cached_info()
+print(f"团队: {info.name}")
+
+# 动态添加智能体
+await dynamic_team.add_agent("new-researcher", "分析师")
+```
+
+## 执行模式
+
+### 1. 同步执行
+
+```python
+from agno.team import RemoteTeam
+
+team = RemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="research-team"
+)
+
+# 同步执行（阻塞）
+response = team.run("分析市场趋势并提供建议")
+print(response.content)
+```
+
+### 2. 异步执行
+
+```python
+import asyncio
+from agno.team import RemoteTeam
+
+async def main():
+    team = RemoteTeam(
+        base_url="http://remote-server:7778",
+        team_id="research-team"
+    )
+    
+    # 异步执行（非阻塞）
+    task = asyncio.create_task(
+        team.arun("进行综合研究分析")
+    )
+    
+    # 在等待时执行其他任务
+    print("团队正在处理请求...")
+    
+    # 获取结果
+    response = await task
+    print(response.content)
+
+asyncio.run(main())
+```
+
+### 3. 批量执行
+
+```python
+import asyncio
+from agno.team import RemoteTeam
+
+async def main():
+    team = RemoteTeam(
+        base_url="http://remote-server:7778",
+        team_id="research-team"
+    )
+    
+    # 批量执行多个任务
+    tasks = [
+        team.arun(f"研究任务 {i}: {topic}")
+        for i, topic in enumerate([
+            "人工智能在医疗领域的应用",
+            "区块链技术的最新发展", 
+            "量子计算的商业前景",
+            "生物技术的创新突破"
+        ])
+    ]
+    
+    # 并行执行所有任务
+    responses = await asyncio.gather(*tasks)
+    
+    # 处理结果
+    for i, response in enumerate(responses):
+        print(f"任务 {i} 的研究结果:")
+        print(response.content)
+        print("-" * 50)
+
+asyncio.run(main())
+```
+
+## 错误处理
+
+### 1. 基本错误处理
+
+```python
+from agno.team import RemoteTeam
+from agno.team.exceptions import (
+    RemoteTeamError,
+    TeamNotFoundError,
+    AgentNotFoundError,
+    ConnectionError
+)
+
+team = RemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="research-team"
+)
+
+try:
+    response = team.run("执行复杂研究任务")
+    print(response.content)
+    
+except TeamNotFoundError as e:
+    print(f"团队未找到: {e}")
+    # 检查团队 ID 是否正确
+    
+except AgentNotFoundError as e:
+    print(f"智能体未找到: {e}")
+    # 检查团队成员配置
+    
+except ConnectionError as e:
+    print(f"连接错误: {e}")
+    # 检查网络连接和服务端状态
+    
+except RemoteTeamError as e:
+    print(f"远程团队错误: {e}")
+    # 处理其他远程执行错误
+```
+
+### 2. 高级错误处理
+
+```python
+import asyncio
+from agno.team import RemoteTeam
+from agno.team.exceptions import RemoteTeamError
+
+class RobustRemoteTeam(RemoteTeam):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fallback_responses = {
+            "default": "抱歉，研究团队现在无法处理您的请求，请稍后再试。",
+            "network": "网络连接出现问题，研究团队暂时无法访问。",
+            "unavailable": "研究团队当前不可用，请稍后重试。"
+        }
+    
+    async def safe_run(self, message: str) -> str:
+        """安全执行，带有错误恢复"""
+        try:
+            response = await self.arun(message)
+            return response.content
+            
+        except ConnectionError:
+            # 网络错误 - 实施回退策略
+            return self.fallback_responses["network"]
+            
+        except TeamNotFoundError:
+            # 团队未找到 - 尝试重新加载团队信息
+            await self._refresh_team_info()
+            try:
+                response = await self.arun(message)
+                return response.content
+            except:
+                return self.fallback_responses["unavailable"]
+                
+        except Exception as e:
+            # 其他错误 - 记录并返回默认响应
+            print(f"未预期的团队错误: {e}")
+            return self.fallback_responses["default"]
+    
+    async def _refresh_team_info(self):
+        """刷新团队信息"""
+        try:
+            await self.get_info()
+        except:
+            pass
+
+# 使用健壮的远程团队
+async def main():
+    robust_team = RobustRemoteTeam(
+        "http://remote-server:7778",
+        "research-team"
+    )
+    
+    response = await robust_team.safe_run("分析人工智能发展趋势")
+    print(response)
+
+asyncio.run(main())
+```
+
+## 性能优化
+
+### 1. 缓存机制
+
+```python
+import hashlib
+import time
+from typing import Dict, Optional
+from agno.team import RemoteTeam
+
+class CachedRemoteTeam(RemoteTeam):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cache: Dict[str, Dict] = {}
+        self.cache_ttl = kwargs.get("cache_ttl", 600)  # 10 分钟缓存
+    
+    def _generate_cache_key(self, message: str, team_config: dict = None) -> str:
+        """生成缓存键"""
+        key_data = f"{message}:{team_config or ''}"
+        return hashlib.md5(key_data.encode()).hexdigest()
+    
+    def _is_cache_valid(self, cache_entry: Dict) -> bool:
+        """检查缓存是否有效"""
+        return time.time() - cache_entry["timestamp"] < self.cache_ttl
+    
+    async def cached_run(self, message: str, team_config: dict = None) -> str:
+        """带缓存的执行"""
+        cache_key = self._generate_cache_key(message, team_config)
+        
+        # 检查缓存
+        if cache_key in self.cache:
+            cache_entry = self.cache[cache_key]
+            if self._is_cache_valid(cache_entry):
+                print("从缓存返回结果")
+                return cache_entry["response"]
+        
+        # 执行请求
+        response = await self.arun(message)
+        
+        # 缓存结果
+        self.cache[cache_key] = {
+            "response": response.content,
+            "timestamp": time.time(),
+            "team_config": team_config
+        }
+        
+        return response.content
+    
+    def clear_cache(self):
+        """清空缓存"""
+        self.cache.clear()
+    
+    def get_cache_stats(self) -> dict:
+        """获取缓存统计"""
+        total_entries = len(self.cache)
+        valid_entries = sum(
+            1 for entry in self.cache.values()
+            if self._is_cache_valid(entry)
+        )
+        
+        return {
+            "total_entries": total_entries,
+            "valid_entries": valid_entries,
+            "hit_rate": (total_entries - valid_entries) / max(total_entries, 1)
+        }
+
+# 使用缓存团队
+async def main():
+    cached_team = CachedRemoteTeam(
+        "http://remote-server:7778",
+        "research-team",
+        cache_ttl=300  # 5 分钟缓存
+    )
+    
+    # 第一次请求会执行远程调用
+    response1 = await cached_team.cached_run("研究人工智能在医疗领域的应用")
+    print(response1)
+    
+    # 第二次请求会从缓存获取结果
+    response2 = await cached_team.cached_run("研究人工智能在医疗领域的应用")
+    print(response2)
+    
+    # 查看缓存统计
+    stats = cached_team.get_cache_stats()
+    print(f"缓存统计: {stats}")
+
+asyncio.run(main())
+```
+
+### 2. 连接复用
+
+```python
+from agno.team import RemoteTeam
+from agno.team.connection import PersistentTeamConnection
+
+class TeamConnectionManager:
+    def __init__(self, base_url: str, max_connections: int = 3):
+        self.base_url = base_url
+        self.max_connections = max_connections
+        self.connections = []
+        self.available_connections = []
+    
+    async def get_connection(self) -> PersistentTeamConnection:
+        """获取可用连接"""
+        if self.available_connections:
+            return self.available_connections.pop()
+        
+        if len(self.connections) < self.max_connections:
+            connection = PersistentTeamConnection(self.base_url)
+            await connection.connect()
+            self.connections.append(connection)
+            return connection
+        
+        # 等待可用连接
+        return await self._wait_for_connection()
+    
+    async def release_connection(self, connection: PersistentTeamConnection):
+        """释放连接"""
+        if connection.is_healthy():
+            self.available_connections.append(connection)
+        else:
+            # 移除不健康的连接
+            self.connections.remove(connection)
+            await connection.close()
+    
+    async def _wait_for_connection(self) -> PersistentTeamConnection:
+        """等待可用连接"""
+        import asyncio
+        while not self.available_connections:
+            await asyncio.sleep(0.1)
+        return self.available_connections.pop()
+
+# 使用连接池管理器
+async def main():
+    connection_manager = TeamConnectionManager("http://remote-server:7778")
+    
+    # 创建多个团队实例共享连接池
+    teams = [
+        RemoteTeam(
+            base_url="http://remote-server:7778",
+            team_id="research-team",
+            connection_manager=connection_manager
+        )
+        for _ in range(3)
+    ]
+    
+    # 并行执行任务
+    tasks = [
+        team.arun(f"处理研究任务 {i}")
+        for i, team in enumerate(teams)
+    ]
+    
+    responses = await asyncio.gather(*tasks)
+    
+    for i, response in enumerate(responses):
+        print(f"任务 {i} 结果: {response.content[:50]}...")
+
+asyncio.run(main())
+```
+
+## 监控和调试
+
+### 1. 团队执行监控
+
+```python
+import time
+import logging
+from agno.team import RemoteTeam
+
+class MonitoredRemoteTeam(RemoteTeam):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.metrics = {
+            "total_requests": 0,
+            "successful_requests": 0,
+            "failed_requests": 0,
+            "total_response_time": 0,
+            "agent_performance": {}
+        }
+        self.logger = logging.getLogger(__name__)
+    
+    async def arun(self, message: str, **kwargs):
+        start_time = time.time()
+        self.metrics["total_requests"] += 1
+        
+        try:
+            self.logger.info(f"开始执行远程团队: {self.team_id}")
+            self.logger.info(f"请求内容: {message[:100]}...")
+            
+            response = await super().arun(message, **kwargs)
+            
+            response_time = time.time() - start_time
+            self.metrics["successful_requests"] += 1
+            self.metrics["total_response_time"] += response_time
+            
+            # 记录智能体性能
+            if hasattr(response, 'agent_contributions'):
+                for agent_id, contribution in response.agent_contributions.items():
+                    if agent_id not in self.metrics["agent_performance"]:
+                        self.metrics["agent_performance"][agent_id] = {
+                            "contributions": 0,
+                            "total_time": 0
+                        }
+                    
+                    self.metrics["agent_performance"][agent_id]["contributions"] += 1
+                    self.metrics["agent_performance"][agent_id]["total_time"] += contribution.get("time", 0)
+            
+            self.logger.info(
+                f"团队执行成功，耗时 {response_time:.2f}s，"
+                f"响应长度 {len(response.content)}"
+            )
+            
+            return response
+            
+        except Exception as e:
+            self.metrics["failed_requests"] += 1
+            self.logger.error(f"团队执行失败: {e}")
+            raise
+    
+    def get_metrics(self) -> dict:
+        """获取性能指标"""
+        if self.metrics["total_requests"] > 0:
+            avg_response_time = (
+                self.metrics["total_response_time"] / 
+                self.metrics["successful_requests"]
+                if self.metrics["successful_requests"] > 0
+                else 0
+            )
+            success_rate = (
+                self.metrics["successful_requests"] / 
+                self.metrics["total_requests"]
+            )
+            
+            return {
+                **self.metrics,
+                "avg_response_time": avg_response_time,
+                "success_rate": success_rate
+            }
+        
+        return self.metrics
+    
+    def get_agent_performance(self) -> dict:
+        """获取智能体性能统计"""
+        agent_stats = {}
+        
+        for agent_id, performance in self.metrics["agent_performance"].items():
+            if performance["contributions"] > 0:
+                agent_stats[agent_id] = {
+                    "contributions": performance["contributions"],
+                    "avg_time": performance["total_time"] / performance["contributions"],
+                    "total_time": performance["total_time"]
+                }
+        
+        return agent_stats
+
+# 使用监控团队
+async def main():
+    monitored_team = MonitoredRemoteTeam(
+        base_url="http://remote-server:7778",
+        team_id="research-team"
+    )
+    
+    # 执行一些测试请求
+    for i in range(3):
+        try:
+            response = await monitored_team.arun(f"研究任务 {i+1}")
+            print(f"任务 {i+1} 成功")
+        except Exception as e:
+            print(f"任务 {i+1} 失败: {e}")
+    
+    # 查看指标
+    metrics = monitored_team.get_metrics()
+    print("\n团队性能指标:")
+    for key, value in metrics.items():
+        print(f"  {key}: {value}")
+    
+    # 查看智能体性能
+    agent_performance = monitored_team.get_agent_performance()
+    print("\n智能体性能:")
+    for agent_id, stats in agent_performance.items():
+        print(f"  {agent_id}: {stats}")
+
+asyncio.run(main())
+```
+
+### 2. 团队协作分析
+
+```python
+from agno.team import RemoteTeam
+import json
+
+class TeamCollaborationAnalyzer(RemoteTeam):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.collaboration_log = []
+        self.interaction_patterns = {}
+    
+    async def arun(self, message: str, **kwargs):
+        # 记录协作开始
+        collaboration_start = time.time()
+        
+        try:
+            response = await super().arun(message, **kwargs)
+            
+            # 分析协作模式
+            if hasattr(response, 'execution_trace'):
+                collaboration_data = self._analyze_collaboration(
+                    response.execution_trace
+                )
+                
+                self.collaboration_log.append({
+                    "timestamp": collaboration_start,
+                    "message": message,
+                    "collaboration_data": collaboration_data,
+                    "response_length": len(response.content)
+                })
+                
+                # 更新交互模式
+                self._update_interaction_patterns(collaboration_data)
+            
+            return response
+            
+        except Exception as e:
+            # 记录失败的协作
+            self.collaboration_log.append({
+                "timestamp": collaboration_start,
+                "message": message,
+                "error": str(e),
+                "failed": True
+            })
+            raise
+    
+    def _analyze_collaboration(self, execution_trace: dict) -> dict:
+        """分析团队协作模式"""
+        agent_interactions = []
+        
+        for step in execution_trace.get("steps", []):
+            if "agent_id" in step and "result" in step:
+                agent_interactions.append({
+                    "agent_id": step["agent_id"],
+                    "action": step.get("action", "unknown"),
+                    "duration": step.get("duration", 0),
+                    "success": step.get("success", True)
+                })
+        
+        # 计算协作指标
+        total_agents = len(set(interaction["agent_id"] for interaction in agent_interactions))
+        total_time = sum(interaction["duration"] for interaction in agent_interactions)
+        success_rate = sum(1 for interaction in agent_interactions if interaction["success"]) / len(agent_interactions)
+        
+        return {
+            "agent_interactions": agent_interactions,
+            "total_agents": total_agents,
+            "total_time": total_time,
+            "success_rate": success_rate,
+            "collaboration_efficiency": len(agent_interactions) / max(total_agents, 1)
+        }
+    
+    def _update_interaction_patterns(self, collaboration_data: dict):
+        """更新交互模式统计"""
+        for interaction in collaboration_data["agent_interactions"]:
+            agent_id = interaction["agent_id"]
+            action = interaction["action"]
+            
+            if agent_id not in self.interaction_patterns:
+                self.interaction_patterns[agent_id] = {
+                    "total_interactions": 0,
+                    "actions": {},
+                    "total_duration": 0,
+                    "success_count": 0
+                }
+            
+            patterns = self.interaction_patterns[agent_id]
+            patterns["total_interactions"] += 1
+            patterns["total_duration"] += interaction["duration"]
+            
+            if interaction["success"]:
+                patterns["success_count"] += 1
+            
+            if action not in patterns["actions"]:
+                patterns["actions"][action] = 0
+            patterns["actions"][action] += 1
+    
+    def get_collaboration_report(self) -> dict:
+        """获取协作报告"""
+        if not self.collaboration_log:
+            return {"message": "暂无协作数据"}
+        
+        total_sessions = len(self.collaboration_log)
+        successful_sessions = sum(1 for log in self.collaboration_log if not log.get("failed", False))
+        
+        # 计算平均协作效率
+        collaboration_efficiencies = [
+            log["collaboration_data"]["collaboration_efficiency"]
+            for log in self.collaboration_log
+            if "collaboration_data" in log
+        ]
+        avg_efficiency = sum(collaboration_efficiencies) / len(collaboration_efficiencies) if collaboration_efficiencies else 0
+        
+        return {
+            "total_sessions": total_sessions,
+            "successful_sessions": successful_sessions,
+            "success_rate": successful_sessions / total_sessions,
+            "avg_collaboration_efficiency": avg_efficiency,
+            "interaction_patterns": self.interaction_patterns
+        }
+    
+    def export_collaboration_data(self, filename: str):
+        """导出协作数据"""
+        collaboration_report = {
+            "team_id": self.team_id,
+            "collaboration_log": self.collaboration_log,
+            "interaction_patterns": self.interaction_patterns,
+            "report": self.get_collaboration_report()
+        }
+        
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(collaboration_report, f, indent=2, ensure_ascii=False)
+        
+        print(f"协作数据已导出到: {filename}")
+
+# 使用协作分析器
+async def main():
+    analyzer = TeamCollaborationAnalyzer(
+        base_url="http://remote-server:7778",
+        team_id="research-team"
+    )
+    
+    # 执行一些测试任务
+    tasks = [
+        "分析人工智能发展趋势",
+        "研究量子计算应用",
+        "探索生物技术创新"
+    ]
+    
+    for task in tasks:
+        try:
+            await analyzer.arun(task)
+            print(f"任务完成: {task}")
+        except Exception as e:
+            print(f"任务失败: {task} - {e}")
+    
+    # 生成协作报告
+    report = analyzer.get_collaboration_report()
+    print("\n团队协作报告:")
+    print(json.dumps(report, indent=2, ensure_ascii=False))
+    
+    # 导出详细数据
+    analyzer.export_collaboration_data("team_collaboration_data.json")
+
+asyncio.run(main())
+```
+
+## 最佳实践
+
+### 1. 团队设计
+
+- **明确分工**: 确保每个智能体都有明确的角色和职责
+- **高效协作**: 设计合理的协作流程和通信机制
+- **容错机制**: 处理智能体失败和异常情况
+- **性能监控**: 监控团队整体性能和个体贡献
+
+### 2. 连接管理
+
+- **连接复用**: 使用连接池减少连接开销
+- **健康检查**: 定期检查团队成员的可用性
+- **负载均衡**: 在多个团队实例间分配负载
+
+### 3. 错误处理
+
+- **分类处理**: 区分团队错误和智能体错误
+- **恢复策略**: 实施团队级别的错误恢复机制
+- **降级方案**: 在团队不可用时提供备用方案
+
+### 4. 性能优化
+
+- **缓存策略**: 缓存团队协作结果
+- **并行处理**: 最大化团队成员的并行工作
+- **资源管理**: 合理分配计算资源
+
+## 故障排除
+
+### 常见问题
+
+#### 团队协作失败
+
+**问题**: 团队成员之间无法正常协作
+**解决方案**:
+1. 检查团队成员配置和角色定义
+2. 验证团队协作协议和通信机制
+3. 检查网络连接和服务状态
+4. 分析协作日志找出具体问题
+
+#### 性能瓶颈
+
+**问题**: 团队执行速度缓慢
+**解决方案**:
+1. 分析团队成员的性能指标
+2. 优化协作流程和任务分配
+3. 考虑增加或替换低效成员
+4. 调整团队配置和参数
+
+#### 负载不均
+
+**问题**: 某些智能体负载过重而其他智能体空闲
+**解决方案**:
+1. 分析任务分配算法
+2. 调整智能体能力和角色配置
+3. 实施动态负载均衡
+4. 优化团队协作策略
+
+## 下一步
+
+- 查看[RemoteAgent](/agent-os/remote-execution/remote-agent)
+- 了解[RemoteWorkflow](/agent-os/remote-execution/remote-workflow)
+- 探索[AgentOSClient](/reference/agent-os/client)
+- 查看[AgentOS 网关](/agent-os/remote-execution/gateway)

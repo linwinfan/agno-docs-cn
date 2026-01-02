@@ -1,0 +1,178 @@
+---
+title: 工作流历史与持续执行
+sidebarTitle: 概述
+description: 构建能够跨多次执行保持上下文的对话式工作流，创建真正智能和自然的交互。
+keywords: [工作流历史, 持续执行, 对话式工作流, 多轮对话]
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="在 v2.1.4 中引入" cta="查看发布说明" href="https://github.com/agno-agi/agno/releases/tag/v2.1.4">v2.1.4</Tooltip>
+</Badge>
+
+工作流历史功能使您的 Agno 工作流能够记住并引用之前的对话，将孤立的执行转换为持续的、具有上下文感知的交互。
+
+通过工作流历史，您无需每次都从头开始，而是可以：
+
+- **基于之前的交互构建** - 引用过去交互的上下文
+- **避免重复提问** - 避免请求之前已提供的信息
+- **保持上下文连续性** - 创建对话式体验
+- **从模式中学习** - 分析历史数据以做出更好的决策
+
+<Tip>
+注意此功能与 `add_history_to_context` 不同。
+这不会添加特定智能体或团队的历史，而是将完整的工作流历史添加到所有或部分步骤中。
+</Tip>
+
+## 工作原理
+
+启用工作流历史后，之前的消息会自动作为结构化上下文注入到智能体/团队的输入中：
+
+```xml
+<workflow_history_context>
+[run-1]
+input: 创建关于医疗保健中 AI 的内容
+response: # 医疗保健中的 AI：改变患者护理...
+
+[run-2]
+input: 使其更加注重家庭
+response: # 家庭医疗保健中的 AI：父母指南...
+</workflow_history_context>
+
+您的当前输入放在这里...
+```
+
+此外，在使用带有自定义函数的步骤时，您可以通过以下方式访问此历史：
+1. 如上所示的格式化上下文字符串
+2. 结构化格式（用于更多控制）
+```bash
+[
+    (<工作流第1次运行的输入>)(<工作流第1次运行的输出>),
+    (<工作流第2次运行的输入>)(<工作流第2次运行的输出>),
+]
+```
+
+<Note>
+使用工作流历史需要数据库。不同执行的运行将在其中持久化。
+</Note>
+
+示例-
+```python
+def custom_function(step_input: StepInput) -> StepOutput:
+    # 选项1：用于分析的结构化数据
+    history_tuples = step_input.get_workflow_history(num_runs=3)
+    for user_input, workflow_output in history_tuples:
+        # 处理每个对话轮次
+
+    # 选项2：用于智能体的格式化上下文
+    context_string = step_input.get_workflow_history_context(num_runs=3)
+
+    return StepOutput(content="分析完成")
+```
+
+<Note>
+您可以使用这些辅助函数来访问历史：
+- `step_input.get_workflow_history(num_runs=3)`
+- `step_input.get_workflow_history_context(num_runs=3)`
+</Note>
+
+有关更多详细信息，请参阅[StepInput](/reference/workflows/step_input) 参考文档。
+
+## 控制级别
+
+您可以指定要将历史添加到哪些步骤：
+
+### 工作流级别历史
+将工作流历史添加到工作流中的**所有步骤**：
+
+```python
+workflow = Workflow(
+    steps=[research_step, analysis_step, writing_step],
+    add_workflow_history_to_steps=True  # 所有步骤都获得历史
+)
+```
+
+### 步骤级别历史
+仅将工作流历史添加到**特定步骤**：
+
+```python
+Step(
+    name="内容创建者",
+    agent=content_agent,
+    add_workflow_history=True  # 仅此步骤获得历史
+)
+```
+
+<Note>
+您也可以设置 `add_workflow_history=False` 来禁用特定步骤的历史。
+</Note>
+
+## 优先级逻辑
+
+**步骤级别设置始终优先于工作流级别设置**：
+
+```python
+workflow = Workflow(
+    steps=[
+        Step("研究", agent=research_agent),                              # 无 → 继承工作流设置
+        Step("分析", agent=analysis_agent, add_workflow_history=False),  # False → 覆盖工作流
+        Step("写作", agent=writing_agent, add_workflow_history=True),     # True → 覆盖工作流
+    ],
+    add_workflow_history_to_steps=True  # 所有步骤的默认设置
+)
+```
+
+### 历史长度控制
+
+**默认情况下，包含所有可用历史**（无限制）。建议使用固定的历史运行限制，以避免膨胀 LLM 上下文窗口。
+
+您可以在两个级别控制此设置：
+
+```python
+# 工作流级别：限制所有步骤的历史
+workflow = Workflow(
+    add_workflow_history_to_steps=True,
+    num_history_runs=5  # 仅最近5次运行
+)
+
+# 步骤级别：为特定步骤覆盖
+Step("分析", agent=analysis_agent,
+     add_workflow_history=True,
+     num_history_runs=3  # 仅此步骤的最近3次运行
+)
+```
+
+## 开发者资源
+<CardGroup cols={2}>
+  <Card
+    title="单步骤持续执行"
+    icon="rotate"
+    iconType="duotone"
+    href="/basics/chat-history/workflow/usage/single-step-continuous-execution-workflow"
+  >
+    具有持续执行和历史感知的单步骤工作流。
+  </Card>
+  <Card
+    title="工作流步骤的历史"
+    icon="list-check"
+    iconType="duotone"
+    href="/basics/chat-history/workflow/usage/workflow-with-history-enabled-for-steps"
+  >
+    将工作流历史添加到工作流中的所有步骤。
+  </Card>
+  <Card
+    title="为特定步骤启用历史"
+    icon="toggle-on"
+    iconType="duotone"
+    href="/basics/chat-history/workflow/usage/enable-history-for-step"
+  >
+    仅为特定步骤启用工作流历史。
+  </Card>
+  <Card
+    title="在函数中获取历史"
+    icon="code"
+    iconType="duotone"
+    href="/basics/chat-history/workflow/usage/get-history-in-function"
+  >
+    在自定义函数中访问工作流历史进行分析。
+  </Card>
+</CardGroup>

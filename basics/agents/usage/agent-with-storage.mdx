@@ -1,0 +1,193 @@
+---
+title: 带存储的智能体
+sidebarTitle: 带存储的智能体
+description: 学习如何创建带持久存储的智能体
+mode: wide
+---
+
+此示例展示如何创建一个 AI 烹饪助手，将精选食谱数据库的知识与网络搜索功能和持久存储相结合。该智能体使用正宗泰式食谱的 PDF 知识库，并可以在需要时通过网络搜索补充这些信息。
+
+可尝试的示例提示：
+- "如何制作正宗的泰式炒河粉？"
+- "红咖喱和绿咖喱有什么区别？"
+- "你能解释一下高良姜是什么以及可能的替代品吗？"
+- "告诉我冬阴功汤的历史"
+- "泰式厨房必备的食材有哪些？"
+- "如何制作泰式罗勒鸡（帕克拉鲍）？"
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch agent_with_storage.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python agent_with_storage.py
+    from textwrap import dedent
+    from typing import List, Optional
+
+    import typer
+    from agno.agent import Agent
+    from agno.db.base import SessionType
+    from agno.db.sqlite import SqliteDb
+    from agno.knowledge.embedder.openai import OpenAIEmbedder
+    from agno.knowledge.knowledge import Knowledge
+    from agno.models.openai import OpenAIChat
+    from agno.session import AgentSession
+    from agno.tools.duckduckgo import DuckDuckGoTools
+    from agno.vectordb.lancedb import LanceDb, SearchType
+    from rich import print
+
+    agent_knowledge = Knowledge(
+        vector_db=LanceDb(
+            uri="tmp/lancedb",
+            table_name="recipe_knowledge",
+            search_type=SearchType.hybrid,
+            embedder=OpenAIEmbedder(id="text-embedding-3-small"),
+        ),
+    )
+
+    # Add content to the knowledge
+    agent_knowledge.add_content(
+        url="https://agno-public.s3.amazonaws.com/recipes/ThaiRecipes.pdf"
+    )
+
+    # Setup the database
+    db = SqliteDb(db_file="tmp/agents.db")
+
+
+    def recipe_agent(user: str = "user"):
+        session_id: Optional[str] = None
+
+        # 询问用户是否要开始新会话或继续现有会话
+        new = typer.confirm("您想要开始新会话吗？")
+
+        if not new:
+            existing_sessions: List[AgentSession] = db.get_sessions(  # type: ignore
+                user_id=user, session_type=SessionType.AGENT
+            )
+            if len(existing_sessions) > 0:
+                session_id = existing_sessions[0].session_id
+
+        agent = Agent(
+            user_id=user,
+            session_id=session_id,
+            model=OpenAIChat(id="gpt-5-mini"),
+            instructions=dedent("""\
+                您是一位充满热情且知识渊博的泰式料理专家！🧑‍🍳
+                将自己视为一位温暖鼓励的烹饪导师、
+                泰国美食历史学家和文化大使的结合体。
+
+                回答问题时请遵循以下步骤：
+                1. 首先，在知识库中搜索正宗的泰式食谱和烹饪信息
+                2. 如果知识库中的信息不完整，或者用户的问题更适合通过网络搜索，请进行网络搜索来补充信息
+                3. 如果在知识库中找到了信息，则无需进行网络搜索
+                4. 为保证真实性，始终优先使用知识库信息而非网络搜索结果
+                5. 如有需要，可通过网络搜索补充以下信息：
+                   - 现代改良版本或食材替代品
+                   - 文化背景和历史渊源
+                   - 额外的烹饪技巧和故障排除方法
+
+                沟通风格：
+                1. 每个回复都以相关的烹饪表情符号开头
+                2. 清晰地组织您的回复结构：
+                   - 简短的介绍或背景说明
+                   - 主要内容（食谱、解释或历史）
+                   - 专业技巧或文化见解
+                   - 鼓励性的结论
+                3. 对于食谱，应包含：
+                   - 食材清单及可能的替代品
+                   - 清晰的编号烹饪步骤
+                   - 成功秘诀和常见陷阱提示
+                4. 使用友好、鼓励性的语言
+
+                特殊功能：
+                - 解释不熟悉的泰式食材并建议替代品
+                - 分享相关的文化背景和传统
+                - 提供适应不同饮食需求的食谱调整建议
+                - 包含搭配建议和配菜推荐
+
+                每个回复都以积极向上的结束语结尾，例如：
+                - '祝您烹饪愉快！ขอให้อร่อย (享受您的美食)！'
+                - '愿您的泰式烹饪之旅带来快乐！'
+                - '享受您自制的泰式盛宴！'
+
+                请记住：
+                - 始终通过知识库验证食谱的真实性
+                - 明确指出哪些信息来自网络来源
+                - 对所有技能水平的家庭厨师都要给予鼓励和支持\
+            """),
+            db=db,
+            knowledge=agent_knowledge,
+            tools=[DuckDuckGoTools()],
+            # To provide the agent with the chat history
+            # We can either:
+            # 1. Provide the agent with a tool to read the chat history
+            # 2. Automatically add the chat history to the messages sent to the model
+            #
+            # 1. Provide the agent with a tool to read the chat history
+            read_chat_history=True,
+            # 2. Automatically add the chat history to the messages sent to the model
+            # add_history_to_context=True,
+            # Number of historical responses to add to the messages.
+            # num_history_runs=3,
+            markdown=True,
+        )
+
+        print("您即将与智能体聊天！")
+        if session_id is None:
+            session_id = agent.session_id
+            if session_id is not None:
+                print(f"已开始会话：{session_id}\n")
+            else:
+                print("已开始会话\n")
+        else:
+            print(f"继续会话：{session_id}\n")
+
+        # Runs the agent as a command line application
+        agent.cli_app(markdown=True)
+
+
+    if __name__ == "__main__":
+        typer.run(recipe_agent)
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai lancedb tantivy pypdf ddgs sqlalchemy typer rich agno
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python agent_with_storage.py
+    ```
+
+    ```bash Windows
+    python agent_with_storage.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

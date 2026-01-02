@@ -1,0 +1,110 @@
+---
+title: 如何在不同模型之间切换
+sidebarTitle: 切换模型
+---
+
+在使用 Agno 时，您可能需要在不同的模型之间切换。虽然 Agno 支持 20+ 个模型提供商，但在不同提供商之间切换可能会导致兼容性问题。在同一提供商内切换模型通常更安全、更可靠。
+
+## 推荐方法
+
+**安全：**在同一提供商内切换模型（OpenAI → OpenAI，Google → Google）  
+**有风险：**在不同提供商之间切换（OpenAI ↔ Google ↔ Anthropic）
+
+跨提供商切换是有风险的，因为模型提供商之间的消息历史通常不可互换，因为某些提供商需要其他提供商不需要的消息。但是，我们正在积极努力提高互操作性。
+
+## 安全的模型切换
+
+切换模型最安全的方法是更改模型 ID，同时保持相同的提供商：
+
+```python
+from uuid import uuid4
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai.chat import OpenAIChat
+
+db = SqliteDb(db_file="tmp/agent_sessions.db")
+
+session_id = str(uuid4())
+user_id = "user@example.com"
+
+# 使用昂贵的模型创建初始代理
+expensive_agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    instructions="You are a helpful assistant for technical discussions.",
+    db=db,
+    add_history_to_context=True,
+)
+
+# 进行对话
+expensive_agent.print_response(
+    "Explain quantum computing basics", session_id=session_id, user_id=user_id
+)
+expensive_agent.print_response(
+    "What are the main applications?", session_id=session_id, user_id=user_id
+)
+
+# 在同一提供商内切换到预算模型（安全）
+budget_agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    instructions="You are a helpful assistant for technical discussions.",
+    db=db,
+    add_history_to_context=True,
+)
+
+# 继续对话 - 通过 session_id 共享历史记录
+budget_agent.print_response(
+    "Can you summarize our discussion so far?", session_id=session_id, user_id=user_id
+)
+```
+
+## 跨提供商切换
+
+在提供商之间切换可能会导致兼容性问题，不建议在没有充分测试的情况下用于生产环境：
+
+```python
+from uuid import uuid4
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai.chat import OpenAIChat
+from agno.models.google import Gemini
+
+db = SqliteDb(db_file="tmp/cross_provider_demo.db")
+
+session_id = str(uuid4())
+user_id = "user@example.com"
+
+# 创建 OpenAI 代理
+openai_agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    instructions="You are a helpful assistant.",
+    db=db,
+    add_history_to_context=True,
+)
+
+# 与 OpenAI 进行对话
+openai_agent.print_response(
+    "Explain machine learning basics", session_id=session_id, user_id=user_id
+)
+openai_agent.print_response(
+    "What about deep learning?", session_id=session_id, user_id=user_id
+)
+
+# 现在使用相同的会话切换到 Google Gemini
+gemini_agent = Agent(
+    model=Gemini(id="gemini-2.0-flash-exp"),
+    instructions="You are a helpful assistant.",
+    db=db,
+    add_history_to_context=True,
+)
+
+# 这可能可以工作，但由于消息格式差异会有不可预测的结果
+gemini_agent.print_response(
+    "Continue our discussion about machine learning", session_id=session_id, user_id=user_id
+)
+# 注意：Gemini 可能无法正确解释 OpenAI 的消息历史格式
+```
+
+## 了解更多
+
+- [所有支持的模型](/basics/models/overview)
+- [环境变量设置](/faq/environment-variables)

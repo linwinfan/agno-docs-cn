@@ -1,0 +1,4258 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Agno",
+  "colors": {
+    "primary": "#FF4017",
+    "light": "#FF4017",
+    "dark": "#FF4017"
+  },
+  "favicon": "/favicon.png",
+  "contextual": {
+    "options": ["copy", "mcp", "cursor", "chatgpt", "claude"]
+  },
+  "logo": {
+    "light": "/logo/black.svg",
+    "dark": "/logo/white.svg"
+  },
+  "background": {
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#111113"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Github",
+        "icon": "github",
+        "href": "https://github.com/agno-agi/agno"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "试用 AgentOS",
+      "href": "https://os.agno.com"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/AgnoAgi",
+      "github": "https://github.com/agno-agi/agno",
+      "discord": "https://agno.link/discord",
+      "youtube": "https://agno.link/youtube",
+      "website": "https://agno.com"
+    }
+  },
+  "fonts": {
+    "heading": {
+      "family": "Inter",
+      "weight": 750,
+      "display": "swap"
+    },
+    "body": {
+      "family": "Inter",
+      "weight": 400,
+      "display": "swap"
+    }
+  },
+  "scripts": [],
+  "integrations": {
+    "gtm": {
+      "tagId": "GTM-WBTFNG7M"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "首页",
+        "groups": [
+          {
+            "group": "概述",
+            "pages": ["index"]
+          }
+        ]
+      },
+      {
+        "tab": "文档",
+        "groups": [
+          {
+            "group": "入门指南",
+            "pages": [
+              "introduction",
+              "get-started/quickstart",
+              "get-started/performance",
+              "get-started/getting-help"
+            ]
+          },
+          {
+            "group": "基础概念",
+            "pages": [
+              {
+                "group": "智能体",
+                "pages": [
+                  "basics/agents/overview",
+                  "basics/agents/building-agents",
+                  "basics/agents/running-agents",
+                  "basics/agents/debugging-agents",
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      {
+                        "group": "基础流程",
+                        "pages": [
+                          "basics/agents/usage/basic",
+                          "basics/agents/usage/basic-async",
+                          "basics/agents/usage/streaming",
+                          "basics/agents/usage/instructions",
+                          "basics/agents/usage/tools",
+                          "basics/agents/usage/debug"
+                        ]
+                      },
+                      {
+                        "group": "核心功能",
+                        "pages": [
+                          "basics/agents/usage/agent-with-storage",
+                          "basics/agents/usage/agent-with-memory",
+                          "basics/agents/usage/agent-with-knowledge"
+                        ]
+                      },
+                      {
+                        "group": "其他",
+                        "pages": [
+                          "basics/agents/usage/run-response-events",
+                          "basics/agents/usage/intermediate-steps",
+                          "basics/agents/usage/agent-run-metadata",
+                          "basics/agents/usage/cancel-a-run",
+                          "basics/agents/usage/debug-level",
+                          "basics/agents/usage/scenario-testing",
+                          "basics/agents/usage/tool-call-limit"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "团队",
+                "pages": [
+                  "basics/teams/overview",
+                  "basics/teams/building-teams",
+                  "basics/teams/running-teams",
+                  "basics/teams/delegation",
+                  "basics/teams/debugging-teams",
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      {
+                        "group": "基础流程",
+                        "pages": [
+                          "basics/teams/usage/basic-flows/basic-team",
+                          "basics/teams/usage/basic-flows/basic-streaming",
+                          "basics/teams/usage/basic-flows/stream-events",
+                          "basics/teams/usage/basic-flows/response-as-variable",
+                          "basics/teams/usage/basic-flows/respond-directly",
+                          "basics/teams/usage/basic-flows/delegate-to-all-members"
+                        ]
+                      },
+                      {
+                        "group": "异步流程",
+                        "pages": [
+                          "basics/teams/usage/async-flows/basic-team",
+                          "basics/teams/usage/async-flows/basic-streaming",
+                          "basics/teams/usage/async-flows/stream-events",
+                          "basics/teams/usage/async-flows/respond-directly",
+                          "basics/teams/usage/async-flows/delegate-to-all-members"
+                        ]
+                      },
+                      {
+                        "group": "其他",
+                        "pages": [
+                          "basics/teams/usage/other/run-as-cli",
+                          "basics/teams/usage/other/team-exponential-backoff",
+                          "basics/teams/usage/other/model-inheritance"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "工作流",
+                "pages": [
+                  "basics/workflows/overview",
+                  "basics/workflows/building-workflows",
+                  "basics/workflows/running-workflows",
+                  {
+                    "group": "工作流模式",
+                    "pages": [
+                      "basics/workflows/workflow-patterns/overview",
+                      "basics/workflows/workflow-patterns/sequential",
+                      "basics/workflows/workflow-patterns/fully-python-workflow",
+                      "basics/workflows/workflow-patterns/step-based-workflow",
+                      "basics/workflows/workflow-patterns/custom-function-step-workflow",
+                      "basics/workflows/workflow-patterns/conditional-workflow",
+                      "basics/workflows/workflow-patterns/parallel-workflow",
+                      "basics/workflows/workflow-patterns/iterative-workflow",
+                      "basics/workflows/workflow-patterns/branching-workflow",
+                      "basics/workflows/workflow-patterns/grouped-steps-workflow",
+                      "basics/workflows/workflow-patterns/advanced-workflow-patterns"
+                    ]
+                  },
+                  "basics/workflows/additional-data",
+                  "basics/workflows/conversational-workflows",
+                  "basics/workflows/access-previous-steps",
+                  "basics/workflows/early-stop",
+                  "basics/workflows/workflow-tools",
+                  "basics/workflows/background-execution",
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      {
+                        "group": "基础工作流",
+                        "pages": [
+                          "basics/workflows/usage/function-instead-of-steps",
+                          "basics/workflows/usage/sequence-of-functions-and-agents",
+                          "basics/workflows/usage/sequence-of-steps",
+                          "basics/workflows/usage/step-with-function",
+                          "basics/workflows/usage/step-with-function-streaming-agentos",
+                          "basics/workflows/usage/class-based-executor",
+                          "basics/workflows/usage/async-events-streaming",
+                          "basics/workflows/usage/workflow-using-steps",
+                          "basics/workflows/usage/workflow-using-steps-nested"
+                        ]
+                      },
+                      {
+                        "group": "条件执行",
+                        "pages": [
+                          "basics/workflows/usage/condition-steps-workflow-stream",
+                          "basics/workflows/usage/condition-with-list-of-steps",
+                          "basics/workflows/usage/condition-and-parallel-steps-stream"
+                        ]
+                      },
+                      {
+                        "group": "并行执行",
+                        "pages": [
+                          "basics/workflows/usage/parallel-steps-workflow",
+                          "basics/workflows/usage/parallel-and-custom-function-step-streaming-agentos"
+                        ]
+                      },
+                      {
+                        "group": "循环执行",
+                        "pages": [
+                          "basics/workflows/usage/loop-steps-workflow",
+                          "basics/workflows/usage/loop-with-parallel-steps-stream"
+                        ]
+                      },
+                      {
+                        "group": "Conditional Branching (Router)",
+                        "pages": [
+                          "basics/workflows/usage/router-steps-workflow",
+                          "basics/workflows/usage/router-with-loop-steps",
+                          "basics/workflows/usage/selector-for-image-video-generation-pipelines"
+                        ]
+                      },
+                      {
+                        "group": "对话工作流",
+                        "pages": [
+                          "basics/workflows/usage/basic-workflow-agent",
+                          "basics/workflows/usage/conversational-workflow-with-conditional-step"
+                        ]
+                      },
+                      {
+                        "group": "高级概念",
+                        "pages": [
+                          "basics/workflows/usage/early-stop-workflow",
+                          "basics/workflows/usage/step-with-function-additional-data",
+                          "basics/workflows/usage/access-multiple-previous-steps-output",
+                          "basics/workflows/usage/store-events-and-events-to-skip-in-a-workflow",
+                          "basics/workflows/usage/structured-io-at-each-step-level",
+                          "basics/workflows/usage/workflow-with-input-schema",
+                          "basics/workflows/usage/workflow-cancellation"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "输入与输出",
+                "pages": [
+                  "basics/input-output/overview",
+                  {
+                    "group": "与智能体一起使用",
+                    "pages": [
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/input-output/agent/usage/input-as-dict",
+                          "basics/input-output/agent/usage/input-as-list",
+                          "basics/input-output/agent/usage/input-as-message",
+                          "basics/input-output/agent/usage/input-as-messages-list",
+                          "basics/input-output/agent/usage/input-schema-on-agent",
+                          "basics/input-output/agent/usage/input-schema-on-agent-as-typed-dict",
+                          "basics/input-output/agent/usage/output-model",
+                          "basics/input-output/agent/usage/parser-model",
+                          "basics/input-output/agent/usage/parser-model-ollama",
+                          "basics/input-output/agent/usage/parser-model-stream",
+                          "basics/input-output/agent/usage/response-as-variable",
+                          "basics/input-output/agent/usage/structured-input",
+                          "basics/input-output/agent/usage/output-schema-on-run",
+                          "basics/input-output/agent/usage/json-schema-output"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "与团队一起使用",
+                    "pages": [
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/input-output/team/usage/input-as-dict",
+                          "basics/input-output/team/usage/input-as-list",
+                          "basics/input-output/team/usage/input-as-messages-list",
+                          "basics/input-output/team/usage/few-shot-learning",
+                          "basics/input-output/team/usage/pydantic-model-output",
+                          "basics/input-output/team/usage/pydantic-model-as-input",
+                          "basics/input-output/team/usage/team-with-output-model",
+                          "basics/input-output/team/usage/structured-output-streaming",
+                          "basics/input-output/team/usage/async-structured-output-streaming",
+                          "basics/input-output/team/usage/input-schema-on-team",
+                          "basics/input-output/team/usage/output-schema-on-run",
+                          "basics/input-output/team/usage/json-schema-output"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "与工作流一起使用",
+                    "pages": [
+                      {
+                        "group": "使用方法",
+                        "pages": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "会话",
+                "pages": [
+                  "basics/sessions/overview",
+                  {
+                    "group": "持久化会话",
+                    "pages": [
+                      "basics/sessions/persisting-sessions/overview",
+                      "basics/sessions/persisting-sessions/storage-control"
+                    ]
+                  },
+                  "basics/sessions/session-management",
+                  "basics/sessions/history-management",
+                  "basics/sessions/session-summaries",
+                  "basics/sessions/workflow-sessions",
+                  {
+                    "group": "指标",
+                    "pages": [
+                      "basics/sessions/metrics/overview",
+                      {
+                        "group": "智能体指标",
+                        "pages": [
+                          "basics/sessions/metrics/agent",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "basics/sessions/metrics/usage/agent-extra-metrics",
+                              "basics/sessions/metrics/usage/agent-metrics"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "团队指标",
+                        "pages": [
+                          "basics/sessions/metrics/team",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "basics/sessions/metrics/usage/team-metrics"
+                            ]
+                          }
+                        ]
+                      },
+                      "basics/sessions/metrics/workflow"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "数据库",
+                "pages": [
+                  "basics/database/overview",
+                  "basics/database/migrations"
+                ]
+              },
+              {
+                "group": "模型",
+                "pages": [
+                  "basics/models/overview",
+                  "basics/models/model-as-string",
+                  "basics/models/compatibility",
+                  "basics/models/cache-response"
+                ]
+              },
+              {
+                "group": "工具",
+                "pages": [
+                  "basics/tools/overview",
+                  {
+                    "group": "智能体工具",
+                    "pages": [
+                      "basics/tools/agent",
+                      {
+                        "group": "使用方法",
+                        "pages": []
+                      }
+                    ]
+                  },
+                  {
+                    "group": "团队工具",
+                    "pages": [
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/tools/usage/team-with-custom-tools",
+                          "basics/tools/usage/team-with-tool-hooks",
+                          "basics/tools/usage/async-team-with-tools"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "创建自己的工具",
+                    "pages": [
+                      "basics/tools/creating-tools/overview",
+                      "basics/tools/creating-tools/python-functions",
+                      "basics/tools/creating-tools/toolkits"
+                    ]
+                  },
+                  "basics/tools/hooks",
+                  {
+                    "group": "MCP",
+                    "pages": [
+                      "basics/tools/mcp/overview",
+                      "basics/tools/mcp/mcp-toolbox",
+                      "basics/tools/mcp/multiple-servers",
+                      {
+                        "group": "传输方式",
+                        "pages": [
+                          "basics/tools/mcp/transports/stdio",
+                          "basics/tools/mcp/transports/streamable_http",
+                          "basics/tools/mcp/transports/sse"
+                        ]
+                      },
+                      "basics/tools/mcp/server-params",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/tools/mcp/usage/airbnb",
+                          "basics/tools/mcp/usage/github",
+                          "basics/tools/mcp/usage/notion",
+                          "basics/tools/mcp/usage/parallel",
+                          "basics/tools/mcp/usage/pipedream-auth",
+                          "basics/tools/mcp/usage/pipedream-slack",
+                          "basics/tools/mcp/usage/pipedream-google-calendar",
+                          "basics/tools/mcp/usage/pipedream-linkedin",
+                          "basics/tools/mcp/usage/stagehand",
+                          "basics/tools/mcp/usage/stripe",
+                          "basics/tools/mcp/usage/supabase"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "推理工具",
+                    "pages": [
+                      "basics/tools/reasoning_tools/reasoning-tools",
+                      "basics/tools/reasoning_tools/workflow-tools",
+                      "basics/tools/reasoning_tools/knowledge-tools",
+                      "basics/tools/reasoning_tools/memory-tools"
+                    ]
+                  },
+                  "basics/tools/tool-call-limit",
+                  "basics/tools/selecting-tools",
+                  "basics/tools/caching",
+                  "basics/tools/attaching-tools",
+                  "basics/tools/exceptions"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "上下文管理",
+            "pages": [
+              {
+                "group": "上下文工程",
+                "pages": [
+                  "basics/context/overview",
+                  {
+                    "group": "用于智能体",
+                    "pages": [
+                      "basics/context/agent/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/context/agent/usage/datetime-instructions",
+                          "basics/context/agent/usage/dynamic-instructions",
+                          "basics/context/agent/usage/few-shot-learning",
+                          "basics/context/agent/usage/filter-tool-calls-from-history",
+                          "basics/context/agent/usage/instructions",
+                          "basics/context/agent/usage/instructions-via-function",
+                          "basics/context/agent/usage/location-instructions"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "用于团队",
+                    "pages": [
+                      "basics/context/team/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/context/team/usage/filter-tool-calls-from-history"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "聊天历史",
+                "pages": [
+                  "basics/chat-history/overview",
+                  {
+                    "group": "智能体聊天历史",
+                    "pages": [
+                      "basics/chat-history/agent/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/chat-history/agent/usage/chat-history"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "团队聊天历史",
+                    "pages": [
+                      "basics/chat-history/team/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/chat-history/team/usage/respond-directly-with-history",
+                          "basics/chat-history/team/usage/team-history",
+                          "basics/chat-history/team/usage/history-of-members",
+                          "basics/chat-history/team/usage/share-member-interactions"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "工作流历史",
+                    "pages": [
+                      "basics/chat-history/workflow/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/chat-history/workflow/usage/single-step-continuous-execution-workflow",
+                          "basics/chat-history/workflow/usage/workflow-with-history-enabled-for-steps",
+                          "basics/chat-history/workflow/usage/enable-history-for-step",
+                          "basics/chat-history/workflow/usage/get-history-in-function",
+                          "basics/chat-history/workflow/usage/multi-purpose-cli",
+                          "basics/chat-history/workflow/usage/intent-routing-with-history"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "状态管理",
+                "pages": [
+                  "basics/state/overview",
+                  {
+                    "group": "智能体会话状态",
+                    "pages": [
+                      "basics/state/agent/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/state/agent/usage/session-state-basic",
+                          "basics/state/agent/usage/session-state-in-instructions",
+                          "basics/state/agent/usage/session-state-in-context",
+                          "basics/state/agent/usage/session-state-advanced",
+                          "basics/state/agent/usage/session-state-multiple-users",
+                          "basics/state/agent/usage/agentic-session-state",
+                          "basics/state/agent/usage/dynamic-session-state",
+                          "basics/state/agent/usage/change-state-on-run",
+                          "basics/state/agent/usage/last-n-session-messages"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "团队会话状态",
+                    "pages": [
+                      "basics/state/team/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/state/team/usage/agentic-session-state",
+                          "basics/state/team/usage/change-state-on-run",
+                          "basics/state/team/usage/session-state-in-instructions",
+                          "basics/state/team/usage/share-member-interactions"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "工作流会话状态",
+                    "pages": [
+                      "basics/state/workflows/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/state/workflows/usage/access-session-state-in-custom-python-function-step",
+                          "basics/state/workflows/usage/access-session-state-in-condition-evaluator-function",
+                          "basics/state/workflows/usage/access-session-state-in-router-selector-function"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "上下文压缩",
+                "tag": "beta",
+                "pages": [
+                  "basics/context-compression/overview",
+                  "basics/context-compression/token-counting"
+                ]
+              },
+              {
+                "group": "知识",
+                "pages": [
+                  "basics/knowledge/overview",
+                  "basics/knowledge/how-it-works",
+                  {
+                    "group": "入门指南",
+                    "pages": [
+                      "basics/knowledge/getting-started",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/knowledge/getting-started/usage/include-exclude-files",
+                          "basics/knowledge/getting-started/usage/remove-content",
+                          "basics/knowledge/getting-started/usage/remove-vectors",
+                          "basics/knowledge/getting-started/usage/skip-if-exists",
+                          "basics/knowledge/getting-started/usage/sync-operations",
+                          {
+                            "group": "远程内容",
+                            "pages": [
+                              "basics/knowledge/getting-started/usage/gcs-content",
+                              "basics/knowledge/getting-started/usage/s3-content"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "具有知识的智能体",
+                    "pages": [
+                      "basics/knowledge/agents/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/knowledge/agents/usage/agentic-rag-lancedb",
+                          "basics/knowledge/agents/usage/agentic-rag-pgvector",
+                          "basics/knowledge/agents/usage/agentic-rag-with-reranking",
+                          "basics/knowledge/agents/usage/rag-sentence-transformer",
+                          "basics/knowledge/agents/usage/rag-with-lance-db-and-sqlite",
+                          "basics/knowledge/agents/usage/traditional-rag-lancedb",
+                          "basics/knowledge/agents/usage/traditional-rag-pgvector"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "具有知识的团队",
+                    "pages": [
+                      "basics/knowledge/teams/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/knowledge/teams/usage/team-with-knowledge",
+                          "basics/knowledge/teams/usage/team-with-knowledge-filters",
+                          "basics/knowledge/teams/usage/team-with-agentic-knowledge-filters",
+                          {
+                            "group": "分布式RAG",
+                            "pages": [
+                              "basics/knowledge/teams/usage/distributed-rag-pgvector",
+                              "basics/knowledge/teams/usage/distributed-rag-lancedb",
+                              "basics/knowledge/teams/usage/distributed-rag-with-reranking"
+                            ]
+                          },
+                          {
+                            "group": "搜索协调",
+                            "pages": [
+                              "basics/knowledge/teams/usage/coordinated-agentic-rag",
+                              "basics/knowledge/teams/usage/coordinated-reasoning-rag",
+                              "basics/knowledge/teams/usage/distributed-infinity-search"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "basics/knowledge/terminology",
+                  "basics/knowledge/knowledge-bases",
+                  "basics/knowledge/content-types",
+                  "basics/knowledge/content-db",
+                  {
+                    "group": "搜索与检索",
+                    "pages": [
+                      "basics/knowledge/search-and-retrieval/overview",
+                      "basics/knowledge/search-and-retrieval/hybrid-search",
+                      "basics/knowledge/search-and-retrieval/custom-retriever",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          {
+                            "group": "搜索类型",
+                            "pages": [
+                              "basics/knowledge/search-and-retrieval/usage/vector-search",
+                              "basics/knowledge/search-and-retrieval/usage/keyword-search",
+                              "basics/knowledge/search-and-retrieval/usage/hybrid-search"
+                            ]
+                          },
+                          {
+                            "group": "智能体搜索",
+                            "pages": [
+                              "basics/knowledge/search-and-retrieval/usage/agentic-rag",
+                              "basics/knowledge/search-and-retrieval/usage/agentic-rag-with-reasoning",
+                              "basics/knowledge/search-and-retrieval/usage/agentic-rag-infinity-reranker",
+                              "basics/knowledge/search-and-retrieval/usage/agentic-rag-with-lightrag",
+                              "basics/knowledge/search-and-retrieval/usage/agentic-rag-pgvector",
+                              "basics/knowledge/search-and-retrieval/usage/agentic-rag-lancedb",
+                              "basics/knowledge/search-and-retrieval/usage/agentic-rag-with-reranking"
+                            ]
+                          },
+                          {
+                            "group": "传统RAG",
+                            "pages": [
+                              "basics/knowledge/search-and-retrieval/usage/traditional-rag-pgvector",
+                              "basics/knowledge/search-and-retrieval/usage/traditional-rag-lancedb",
+                              "basics/knowledge/search-and-retrieval/usage/rag-with-lance-db-and-sqlite",
+                              "basics/knowledge/search-and-retrieval/usage/rag-sentence-transformer"
+                            ]
+                          },
+                          {
+                            "group": "自定义检索器",
+                            "pages": [
+                              "basics/knowledge/search-and-retrieval/usage/custom-retriever",
+                              "basics/knowledge/search-and-retrieval/usage/async-custom-retriever"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "读取器",
+                    "pages": [
+                      "basics/knowledge/readers/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          {
+                            "group": "ArXiv读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/arxiv-reader",
+                              "basics/knowledge/readers/usage/arxiv-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "CSV读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/csv-reader",
+                              "basics/knowledge/readers/usage/csv-reader-async",
+                              "basics/knowledge/readers/usage/csv-url-reader"
+                            ]
+                          },
+                          {
+                            "group": "字段标记CSV读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/field-labeled-csv-reader"
+                            ]
+                          },
+                          {
+                            "group": "Firecrawl读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/firecrawl-reader",
+                              "basics/knowledge/readers/usage/firecrawl-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "JSON读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/json-reader",
+                              "basics/knowledge/readers/usage/json-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "Markdown读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/markdown-reader",
+                              "basics/knowledge/readers/usage/markdown-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "PDF读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/pdf-reader",
+                              "basics/knowledge/readers/usage/pdf-reader-async",
+                              "basics/knowledge/readers/usage/pdf-password-reader",
+                              "basics/knowledge/readers/usage/pdf-url-password-reader"
+                            ]
+                          },
+                          {
+                            "group": "PPTX读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/pptx-reader",
+                              "basics/knowledge/readers/usage/pptx-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "网络搜索读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/web-search-reader",
+                              "basics/knowledge/readers/usage/web-search-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "网站读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/website-reader",
+                              "basics/knowledge/readers/usage/website-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "Wikipedia读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/wikipedia-reader",
+                              "basics/knowledge/readers/usage/wikipedia-reader-async"
+                            ]
+                          },
+                          {
+                            "group": "YouTube读取器",
+                            "pages": [
+                              "basics/knowledge/readers/usage/youtube-reader",
+                              "basics/knowledge/readers/usage/youtube-reader-async"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "分块",
+                    "pages": [
+                      "basics/knowledge/chunking/overview",
+                      "basics/knowledge/chunking/fixed-size-chunking",
+                      "basics/knowledge/chunking/document-chunking",
+                      "basics/knowledge/chunking/csv-row-chunking",
+                      "basics/knowledge/chunking/markdown-chunking",
+                      "basics/knowledge/chunking/agentic-chunking",
+                      "basics/knowledge/chunking/semantic-chunking",
+                      "basics/knowledge/chunking/recursive-chunking",
+                      "basics/knowledge/chunking/custom-chunking"
+                    ]
+                  },
+                  {
+                    "group": "嵌入",
+                    "pages": [
+                      "basics/knowledge/embedder/overview",
+                      {
+                        "group": "OpenAI",
+                        "pages": [
+                          "basics/knowledge/embedder/openai/overview",
+                          "basics/knowledge/embedder/openai/usage/openai-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Gemini",
+                        "pages": [
+                          "basics/knowledge/embedder/gemini/overview",
+                          "basics/knowledge/embedder/gemini/usage/gemini-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Ollama",
+                        "pages": [
+                          "basics/knowledge/embedder/ollama/overview",
+                          "basics/knowledge/embedder/ollama/usage/ollama-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Azure OpenAI",
+                        "pages": [
+                          "basics/knowledge/embedder/azure-openai/overview",
+                          "basics/knowledge/embedder/azure-openai/usage/azure-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Cohere",
+                        "pages": [
+                          "basics/knowledge/embedder/cohere/overview",
+                          "basics/knowledge/embedder/cohere/usage/cohere-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Fireworks",
+                        "pages": [
+                          "basics/knowledge/embedder/fireworks/overview",
+                          "basics/knowledge/embedder/fireworks/usage/fireworks-embedder"
+                        ]
+                      },
+                      {
+                        "group": "HuggingFace",
+                        "pages": [
+                          "basics/knowledge/embedder/huggingface/overview",
+                          "basics/knowledge/embedder/huggingface/usage/huggingface-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Mistral",
+                        "pages": [
+                          "basics/knowledge/embedder/mistral/overview",
+                          "basics/knowledge/embedder/mistral/usage/mistral-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Jina",
+                        "pages": [
+                          "basics/knowledge/embedder/jina/overview",
+                          "basics/knowledge/embedder/jina/usage/jina-embedder"
+                        ]
+                      },
+                      {
+                        "group": "LangDB",
+                        "pages": [
+                          "basics/knowledge/embedder/langdb/overview",
+                          "basics/knowledge/embedder/langdb/usage/langdb-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Nebius",
+                        "pages": [
+                          "basics/knowledge/embedder/nebius/overview",
+                          "basics/knowledge/embedder/nebius/usage/nebius-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Qdrant FastEmbed",
+                        "pages": [
+                          "basics/knowledge/embedder/qdrant-fastembed/overview",
+                          "basics/knowledge/embedder/qdrant-fastembed/usage/qdrant-fastembed"
+                        ]
+                      },
+                      {
+                        "group": "Sentence Transformers",
+                        "pages": [
+                          "basics/knowledge/embedder/sentencetransformers/overview",
+                          "basics/knowledge/embedder/sentencetransformers/usage/sentence-transformer-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Together",
+                        "pages": [
+                          "basics/knowledge/embedder/together/overview",
+                          "basics/knowledge/embedder/together/usage/together-embedder"
+                        ]
+                      },
+                      {
+                        "group": "Voyage AI",
+                        "pages": [
+                          "basics/knowledge/embedder/voyageai/overview",
+                          "basics/knowledge/embedder/voyageai/usage/voyageai-embedder"
+                        ]
+                      },
+                      {
+                        "group": "AWS Bedrock",
+                        "pages": [
+                          "basics/knowledge/embedder/aws-bedrock/overview",
+                          "basics/knowledge/embedder/aws-bedrock/usage/aws-bedrock-embedder"
+                        ]
+                      },
+                      {
+                        "group": "VLLM",
+                        "pages": [
+                          "basics/knowledge/embedder/vllm/overview",
+                          "basics/knowledge/embedder/vllm/usage/vllm-embedder"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "过滤结果",
+                    "pages": [
+                      "basics/knowledge/filters/overview",
+                      "basics/knowledge/filters/manual-filters",
+                      "basics/knowledge/filters/agentic-filters",
+                      "basics/knowledge/filters/advanced-filtering",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/knowledge/filters/usage/agentic-filtering",
+                          "basics/knowledge/filters/usage/async-filtering",
+                          "basics/knowledge/filters/usage/filter-expressions",
+                          "basics/knowledge/filters/usage/filtering",
+                          "basics/knowledge/filters/usage/filtering-on-load",
+                          "basics/knowledge/filters/usage/filtering-with-invalid-keys",
+                          {
+                            "group": "向量数据库过滤",
+                            "pages": [
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-chroma-db",
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-lance-db",
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-milvus-db",
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-mongo-db",
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-pgvector",
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-pinecone",
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-weaviate",
+                              "basics/knowledge/filters/usage/vector-dbs/filtering-surreal-db"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "basics/vectordb/overview",
+                  "basics/knowledge/performance-tips"
+                ]
+              },
+              {
+                "group": "记忆",
+                "pages": [
+                  "basics/memory/overview",
+                  {
+                    "group": "使用记忆",
+                    "pages": [
+                      "basics/memory/working-with-memories/overview",
+                      "basics/memory/working-with-memories/memory-optimization",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          {
+                            "group": "存储使用",
+                            "pages": [
+                              "basics/memory/working-with-memories/usage/mongodb-memory",
+                              "basics/memory/working-with-memories/usage/postgres-memory",
+                              "basics/memory/working-with-memories/usage/sqlite-memory",
+                              "basics/memory/working-with-memories/usage/redis-memory"
+                            ]
+                          },
+                          {
+                            "group": "记忆管理器使用",
+                            "pages": [
+                              "basics/memory/working-with-memories/usage/standalone-memory",
+                              "basics/memory/working-with-memories/usage/memory-creation",
+                              "basics/memory/working-with-memories/usage/custom-memory-instructions",
+                              "basics/memory/working-with-memories/usage/memory-search",
+                              "basics/memory/working-with-memories/usage/memory-optimization"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "具有记忆的智能体",
+                    "pages": [
+                      "basics/memory/agent/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/memory/agent/usage/agent-with-memory",
+                          "basics/memory/agent/usage/agentic-memory",
+                          "basics/memory/agent/usage/agents-share-memory",
+                          "basics/memory/agent/usage/custom-memory-manager",
+                          "basics/memory/agent/usage/multi-user-multi-session-chat",
+                          "basics/memory/agent/usage/multi-user-multi-session-chat-concurrent",
+                          "basics/memory/agent/usage/share-memory-and-history-between-agents"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "具有记忆的团队",
+                    "pages": [
+                      "basics/memory/team/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/memory/team/usage/team-with-memory-manager",
+                          "basics/memory/team/usage/team-with-agentic-memory"
+                        ]
+                      }
+                    ]
+                  },
+                  "basics/memory/best-practices"
+                ]
+              },
+              {
+                "group": "文化",
+                "tag": "experimental",
+                "pages": ["basics/culture/overview"]
+              },
+              {
+                "group": "依赖注入",
+                "pages": [
+                  "basics/dependencies/overview",
+                  {
+                    "group": "智能体依赖注入",
+                    "pages": [
+                      "basics/dependencies/agent/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/dependencies/agent/usage/add-dependencies-run",
+                          "basics/dependencies/agent/usage/add-dependencies-to-context",
+                          "basics/dependencies/agent/usage/access-dependencies-in-tool"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "团队依赖注入",
+                    "pages": [
+                      "basics/dependencies/team/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/dependencies/team/usage/add-dependencies-run",
+                          "basics/dependencies/team/usage/add-dependencies-to-context",
+                          "basics/dependencies/team/usage/reference-dependencies",
+                          "basics/dependencies/team/usage/access-dependencies-in-tool"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "group": "执行控制",
+            "pages": [
+              {
+                "group": "钩子",
+                "pages": [
+                  "basics/hooks/overview",
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      {
+                        "group": "智能体",
+                        "pages": [
+                          "basics/hooks/usage/agent/input-validation-pre-hook",
+                          "basics/hooks/usage/agent/input-transformation-pre-hook",
+                          "basics/hooks/usage/agent/output-validation-post-hook",
+                          "basics/hooks/usage/agent/output-transformation-post-hook"
+                        ]
+                      },
+                      {
+                        "group": "团队",
+                        "pages": [
+                          "basics/hooks/usage/team/input-validation-pre-hook",
+                          "basics/hooks/usage/team/input-transformation-pre-hook",
+                          "basics/hooks/usage/team/output-validation-post-hook",
+                          "basics/hooks/usage/team/output-transformation-post-hook"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "护栏",
+                "pages": [
+                  "basics/guardrails/overview",
+                  {
+                    "group": "内置护栏",
+                    "pages": [
+                      "basics/guardrails/included/prompt-injection",
+                      "basics/guardrails/included/pii",
+                      "basics/guardrails/included/openai-moderation"
+                    ]
+                  },
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      {
+                        "group": "智能体",
+                        "pages": [
+                          "basics/guardrails/usage/agent/pii-detection",
+                          "basics/guardrails/usage/agent/prompt-injection",
+                          "basics/guardrails/usage/agent/openai-moderation"
+                        ]
+                      },
+                      {
+                        "group": "团队",
+                        "pages": [
+                          "basics/guardrails/usage/team/pii-detection",
+                          "basics/guardrails/usage/team/prompt-injection",
+                          "basics/guardrails/usage/team/openai-moderation"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "人在回路",
+                "pages": [
+                  "basics/hitl/overview",
+                  "basics/hitl/user-confirmation",
+                  "basics/hitl/user-input",
+                  "basics/hitl/dynamic-user-input",
+                  "basics/hitl/external-execution",
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      "basics/hitl/usage/agentic-user-input",
+                      {
+                        "group": "需要确认",
+                        "pages": [
+                          "basics/hitl/usage/confirmation-required",
+                          "basics/hitl/usage/confirmation-required-async",
+                          "basics/hitl/usage/confirmation-required-mixed-tools",
+                          "basics/hitl/usage/confirmation-required-multiple-tools",
+                          "basics/hitl/usage/confirmation-required-stream-async",
+                          "basics/hitl/usage/confirmation-required-toolkit",
+                          "basics/hitl/usage/confirmation-required-with-history",
+                          "basics/hitl/usage/confirmation-required-with-run-id"
+                        ]
+                      },
+                      {
+                        "group": "需要用户输入",
+                        "pages": [
+                          "basics/hitl/usage/user-input-required",
+                          "basics/hitl/usage/user-input-required-all-fields",
+                          "basics/hitl/usage/user-input-required-async",
+                          "basics/hitl/usage/user-input-required-stream-async"
+                        ]
+                      },
+                      {
+                        "group": "外部工具执行",
+                        "pages": [
+                          "basics/hitl/usage/external-tool-execution",
+                          "basics/hitl/usage/external-tool-execution-async",
+                          "basics/hitl/usage/external-tool-execution-stream-async",
+                          "basics/hitl/usage/external-tool-execution-toolkit"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "运行取消",
+                "pages": [
+                  "execution-control/run-cancellation/overview",
+                  "execution-control/run-cancellation/agent-cancel-run",
+                  "execution-control/run-cancellation/team-cancel-run",
+                  "execution-control/run-cancellation/workflow-cancel-run"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "附加功能",
+            "pages": [
+              {
+                "group": "推理",
+                "pages": [
+                  "basics/reasoning/overview",
+                  {
+                    "group": "推理模型",
+                    "pages": [
+                      "basics/reasoning/reasoning-models",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          {
+                            "group": "Azure AI Foundry",
+                            "pages": [
+                              "basics/reasoning/usage/models/azure-ai-foundry/azure-ai-foundry"
+                            ]
+                          },
+                          {
+                            "group": "Azure OpenAI",
+                            "pages": [
+                              "basics/reasoning/usage/models/azure-openai/o1",
+                              "basics/reasoning/usage/models/azure-openai/o3",
+                              "basics/reasoning/usage/models/azure-openai/reasoning-model-gpt4-1"
+                            ]
+                          },
+                          {
+                            "group": "DeepSeek",
+                            "pages": [
+                              "basics/reasoning/usage/models/deepseek/deepseek-reasoner"
+                            ]
+                          },
+                          {
+                            "group": "Groq",
+                            "pages": [
+                              "basics/reasoning/usage/models/groq/groq",
+                              "basics/reasoning/usage/models/groq/groq-plus-claude"
+                            ]
+                          },
+                          {
+                            "group": "Ollama",
+                            "pages": [
+                              "basics/reasoning/usage/models/ollama/ollama"
+                            ]
+                          },
+                          {
+                            "group": "OpenAI",
+                            "pages": [
+                              "basics/reasoning/usage/models/openai/o1-pro",
+                              "basics/reasoning/usage/models/openai/gpt5-mini",
+                              "basics/reasoning/usage/models/openai/gpt5-mini-tools",
+                              "basics/reasoning/usage/models/openai/o4-mini",
+                              "basics/reasoning/usage/models/openai/reasoning-model-gpt4-1",
+                              "basics/reasoning/usage/models/openai/reasoning-summary",
+                              "basics/reasoning/usage/models/openai/reasoning-effort"
+                            ]
+                          },
+                          {
+                            "group": "XAI",
+                            "pages": [
+                              "basics/reasoning/usage/models/xai/reasoning-effort"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "推理工具",
+                    "pages": [
+                      "basics/reasoning/reasoning-tools",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/reasoning/usage/tools/reasoning-tools",
+                          "basics/reasoning/usage/tools/azure-openai-reasoning-tools",
+                          "basics/reasoning/usage/tools/ollama-reasoning-tools",
+                          "basics/reasoning/usage/tools/openai-reasoning-tools",
+                          "basics/reasoning/usage/tools/vercel-reasoning-tools",
+                          "basics/reasoning/usage/tools/cerebras-llama-reasoning-tools",
+                          "basics/reasoning/usage/tools/claude-reasoning-tools",
+                          "basics/reasoning/usage/tools/gemini-reasoning-tools",
+                          "basics/reasoning/usage/tools/groq-reasoning-tools",
+                          "basics/reasoning/usage/tools/capture-reasoning-content-reasoning-tools",
+                          "basics/reasoning/usage/tools/knowledge-tools",
+                          "basics/reasoning/usage/tools/capture-reasoning-content-knowledge-tools",
+                          "basics/reasoning/usage/tools/reasoning-tool-team",
+                          "basics/reasoning/usage/tools/knowledge-tool-team"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "推理智能体",
+                    "pages": [
+                      "basics/reasoning/reasoning-agents",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/reasoning/usage/agents/basic-cot",
+                          "basics/reasoning/usage/agents/capture-reasoning-content-cot",
+                          "basics/reasoning/usage/agents/non-reasoning-model-cot",
+                          "basics/reasoning/usage/agents/team-cot"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "多模态",
+                "pages": [
+                  "basics/multimodal/overview",
+                  {
+                    "group": "多模态智能体",
+                    "pages": [
+                      "basics/multimodal/agent/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/multimodal/agent/usage/image-to-text",
+                          "basics/multimodal/agent/usage/image-to-structured-output",
+                          "basics/multimodal/agent/usage/image-input-high-fidelity",
+                          "basics/multimodal/agent/usage/image-to-image-agent",
+                          "basics/multimodal/agent/usage/file-input-for-tool",
+                          "basics/multimodal/agent/usage/image-input-for-tool",
+                          "basics/multimodal/agent/usage/image-to-audio",
+                          "basics/multimodal/agent/usage/audio-to-text",
+                          "basics/multimodal/agent/usage/audio-input-output",
+                          "basics/multimodal/agent/usage/audio-multi-turn",
+                          "basics/multimodal/agent/usage/audio-sentiment-analysis",
+                          "basics/multimodal/agent/usage/audio-streaming",
+                          "basics/multimodal/agent/usage/video-caption-agent",
+                          "basics/multimodal/agent/usage/video-to-shorts",
+                          "basics/multimodal/agent/usage/generate-image-with-intermediate-steps",
+                          "basics/multimodal/agent/usage/generate-video-using-models-lab",
+                          "basics/multimodal/agent/usage/generate-video-using-replicate",
+                          "basics/multimodal/agent/usage/agent-same-run-image-analysis",
+                          "basics/multimodal/agent/usage/agent-using-multimodal-tool-response-in-runs"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "多模态团队",
+                    "pages": [
+                      "basics/multimodal/team/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/multimodal/team/usage/audio-sentiment-analysis",
+                          "basics/multimodal/team/usage/audio-to-text",
+                          "basics/multimodal/team/usage/generate-image-with-team",
+                          "basics/multimodal/team/usage/image-to-image-transformation",
+                          "basics/multimodal/team/usage/image-to-structured-output",
+                          "basics/multimodal/team/usage/image-to-text",
+                          "basics/multimodal/team/usage/video-caption-generation"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "图像",
+                    "pages": [
+                      "basics/multimodal/images/image-input",
+                      "basics/multimodal/images/image-output",
+                      "basics/multimodal/images/image-generation",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/multimodal/images/usage/generate-image",
+                          "basics/multimodal/images/usage/image-to-audio",
+                          "basics/multimodal/images/usage/image-to-image",
+                          "basics/multimodal/images/usage/image-to-text"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "音频",
+                    "pages": [
+                      "basics/multimodal/audio/audio_input",
+                      "basics/multimodal/audio/audio_generation",
+                      "basics/multimodal/audio/audio_output",
+                      "basics/multimodal/audio/speech-to-text",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/multimodal/audio/usage/audio-input-output",
+                          "basics/multimodal/audio/usage/audio-to-text",
+                          "basics/multimodal/audio/usage/audio-sentiment-analysis",
+                          "basics/multimodal/audio/usage/blog-to-podcast",
+                          "basics/multimodal/audio/usage/audio-multi-turn",
+                          "basics/multimodal/audio/usage/audio-streaming",
+                          "basics/multimodal/audio/usage/generate-music-agent"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "视频",
+                    "pages": [
+                      "basics/multimodal/video/video_input",
+                      "basics/multimodal/video/video_generation",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/multimodal/video/usage/generate-video-models-lab",
+                          "basics/multimodal/video/usage/generate-video-replicate",
+                          "basics/multimodal/video/usage/video-caption",
+                          "basics/multimodal/video/usage/video-to-shorts"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "文件",
+                    "pages": [
+                      "basics/multimodal/files/file_input",
+                      "basics/multimodal/files/file_generation"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "追踪",
+                "tag": "beta",
+                "pages": [
+                  "basics/tracing/overview",
+                  "basics/tracing/basic-setup",
+                  "basics/tracing/db-functions",
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      "basics/tracing/usage/basic-agent-tracing",
+                      "basics/tracing/usage/basic-team-tracing"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "评估",
+                "pages": [
+                  "basics/evals/overview",
+                  {
+                    "group": "准确性",
+                    "pages": [
+                      "basics/evals/accuracy/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/evals/accuracy/usage/basic",
+                          "basics/evals/accuracy/usage/accuracy-async",
+                          "basics/evals/accuracy/usage/accuracy-comparison",
+                          "basics/evals/accuracy/usage/accuracy-db-logging",
+                          "basics/evals/accuracy/usage/accuracy-with-given-answer",
+                          "basics/evals/accuracy/usage/accuracy-with-tools",
+                          "basics/evals/accuracy/usage/accuracy-with-teams"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "性能",
+                    "pages": [
+                      "basics/evals/performance/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/evals/performance/usage/performance-simple-response",
+                          "basics/evals/performance/usage/performance-async",
+                          "basics/evals/performance/usage/performance-agent-instantiation",
+                          "basics/evals/performance/usage/performance-instantiation-with-tool",
+                          "basics/evals/performance/usage/performance-with-storage",
+                          "basics/evals/performance/usage/performance-with-memory",
+                          "basics/evals/performance/usage/performance-team-instantiation",
+                          "basics/evals/performance/usage/performance-team-with-memory",
+                          "basics/evals/performance/usage/performance-db-logging"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "可靠性",
+                    "pages": [
+                      "basics/evals/reliability/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/evals/reliability/usage/basic",
+                          "basics/evals/reliability/usage/reliability-async",
+                          "basics/evals/reliability/usage/reliability-db-logging",
+                          "basics/evals/reliability/usage/reliability-single-tool",
+                          "basics/evals/reliability/usage/reliability-with-multiple-tools",
+                          "basics/evals/reliability/usage/reliability-with-teams",
+                          "basics/evals/reliability/usage/reliability-team-advanced"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "智能体作为评判者",
+                    "pages": [
+                      "basics/evals/agent-as-judge/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-basic",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-async",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-binary",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-batch",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-custom-evaluator",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-with-guidelines",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-post-hook",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-team",
+                          "basics/evals/agent-as-judge/usage/agent-as-judge-team-post-hook-async"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "basics/custom-logging",
+              "basics/telemetry",
+              "basics/agent-ui/overview"
+            ]
+          },
+          {
+            "group": "集成",
+            "pages": [
+              {
+                "group": "模型提供商",
+                "pages": [
+                  "integrations/models/model-index",
+                  {
+                    "group": "原生模型提供商",
+                    "pages": [
+                      {
+                        "group": "Anthropic",
+                        "pages": [
+                          "integrations/models/native/anthropic/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/anthropic/usage/basic",
+                              "integrations/models/native/anthropic/usage/basic-stream",
+                              "integrations/models/native/anthropic/usage/betas",
+                              "integrations/models/native/anthropic/usage/code-execution",
+                              "integrations/models/native/anthropic/usage/context-management",
+                              "integrations/models/native/anthropic/usage/skills",
+                              "integrations/models/native/anthropic/usage/tool-use",
+                              "integrations/models/native/anthropic/usage/structured-output",
+                              "integrations/models/native/anthropic/usage/structured-output-stream",
+                              "integrations/models/native/anthropic/usage/structured-output-strict-tools",
+                              "integrations/models/native/anthropic/usage/knowledge",
+                              "integrations/models/native/anthropic/usage/file-upload",
+                              "integrations/models/native/anthropic/usage/image-input-bytes",
+                              "integrations/models/native/anthropic/usage/image-input-url",
+                              "integrations/models/native/anthropic/usage/pdf-input-bytes",
+                              "integrations/models/native/anthropic/usage/pdf-input-local",
+                              "integrations/models/native/anthropic/usage/pdf-input-url",
+                              "integrations/models/native/anthropic/usage/prompt-caching",
+                              "integrations/models/native/anthropic/usage/cache-response",
+                              "integrations/models/native/anthropic/usage/web-fetch"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Cohere",
+                        "pages": [
+                          "integrations/models/native/cohere/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/cohere/usage/basic",
+                              "integrations/models/native/cohere/usage/basic-stream",
+                              "integrations/models/native/cohere/usage/image-agent",
+                              "integrations/models/native/cohere/usage/tool-use",
+                              "integrations/models/native/cohere/usage/structured-output",
+                              "integrations/models/native/cohere/usage/storage",
+                              "integrations/models/native/cohere/usage/knowledge"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Dashscope",
+                        "pages": [
+                          "integrations/models/native/dashscope/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/dashscope/usage/basic",
+                              "integrations/models/native/dashscope/usage/basic-stream",
+                              "integrations/models/native/dashscope/usage/tool-use",
+                              "integrations/models/native/dashscope/usage/image-agent",
+                              "integrations/models/native/dashscope/usage/image-agent-bytes",
+                              "integrations/models/native/dashscope/usage/structured-output",
+                              "integrations/models/native/dashscope/usage/thinking-agent"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "DeepSeek",
+                        "pages": [
+                          "integrations/models/native/deepseek/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/deepseek/usage/basic",
+                              "integrations/models/native/deepseek/usage/basic-stream",
+                              "integrations/models/native/deepseek/usage/tool-use",
+                              "integrations/models/native/deepseek/usage/structured-output"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Google",
+                        "pages": [
+                          "integrations/models/native/google/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/google/usage/basic",
+                              "integrations/models/native/google/usage/basic-stream",
+                              "integrations/models/native/google/usage/structured-output",
+                              "integrations/models/native/google/usage/tool-use",
+                              "integrations/models/native/google/usage/storage",
+                              "integrations/models/native/google/usage/knowledge",
+                              "integrations/models/native/google/usage/image-input",
+                              "integrations/models/native/google/usage/image-input-file-upload",
+                              "integrations/models/native/google/usage/image-generation",
+                              "integrations/models/native/google/usage/image-generation-stream",
+                              "integrations/models/native/google/usage/image-editing",
+                              "integrations/models/native/google/usage/imagen-tool",
+                              "integrations/models/native/google/usage/imagen-tool-advanced",
+                              "integrations/models/native/google/usage/vertexai",
+                              "integrations/models/native/google/usage/grounding",
+                              "integrations/models/native/google/usage/url-context",
+                              "integrations/models/native/google/usage/url-context-with-search",
+                              "integrations/models/native/google/usage/flash-thinking",
+                              "integrations/models/native/google/usage/audio-input-bytes-content",
+                              "integrations/models/native/google/usage/audio-input-file-upload",
+                              "integrations/models/native/google/usage/audio-input-local-file-upload",
+                              "integrations/models/native/google/usage/pdf-input-local",
+                              "integrations/models/native/google/usage/pdf-input-url",
+                              "integrations/models/native/google/usage/video-input-bytes-content",
+                              "integrations/models/native/google/usage/video-input-file-upload",
+                              "integrations/models/native/google/usage/video-input-local-file-upload"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Meta",
+                        "pages": [
+                          "integrations/models/native/meta/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/meta/usage/basic",
+                              "integrations/models/native/meta/usage/basic-stream",
+                              "integrations/models/native/meta/usage/async-basic",
+                              "integrations/models/native/meta/usage/async-stream",
+                              "integrations/models/native/meta/usage/tool-use",
+                              "integrations/models/native/meta/usage/async-tool-use",
+                              "integrations/models/native/meta/usage/structured-output",
+                              "integrations/models/native/meta/usage/image-input-bytes",
+                              "integrations/models/native/meta/usage/knowledge",
+                              "integrations/models/native/meta/usage/memory"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Mistral",
+                        "pages": [
+                          "integrations/models/native/mistral/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/mistral/usage/basic",
+                              "integrations/models/native/mistral/usage/basic-stream",
+                              "integrations/models/native/mistral/usage/async-basic",
+                              "integrations/models/native/mistral/usage/async-basic-stream",
+                              "integrations/models/native/mistral/usage/tool-use",
+                              "integrations/models/native/mistral/usage/async-tool-use",
+                              "integrations/models/native/mistral/usage/memory",
+                              "integrations/models/native/mistral/usage/structured-output",
+                              "integrations/models/native/mistral/usage/structured-output-with-tool-use",
+                              "integrations/models/native/mistral/usage/async-structured-output",
+                              "integrations/models/native/mistral/usage/image-bytes-input-agent",
+                              "integrations/models/native/mistral/usage/image-compare-agent",
+                              "integrations/models/native/mistral/usage/image-file-input-agent",
+                              "integrations/models/native/mistral/usage/image-ocr-with-structured-output",
+                              "integrations/models/native/mistral/usage/image-transcribe-document-agent",
+                              "integrations/models/native/mistral/usage/mistral-small"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "OpenAI",
+                        "pages": [
+                          {
+                            "group": "OpenAI聊天完成",
+                            "pages": [
+                              "integrations/models/native/openai/completion/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/native/openai/completion/usage/basic",
+                                  "integrations/models/native/openai/completion/usage/basic-stream",
+                                  "integrations/models/native/openai/completion/usage/tool-use",
+                                  "integrations/models/native/openai/completion/usage/structured-output",
+                                  "integrations/models/native/openai/completion/usage/storage",
+                                  "integrations/models/native/openai/completion/usage/knowledge",
+                                  "integrations/models/native/openai/completion/usage/image-agent",
+                                  "integrations/models/native/openai/completion/usage/audio-input-agent",
+                                  "integrations/models/native/openai/completion/usage/audio-output-agent",
+                                  "integrations/models/native/openai/completion/usage/generate-images",
+                                  "integrations/models/native/openai/completion/usage/reasoning-effort",
+                                  "integrations/models/native/openai/completion/usage/cache-response"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "group": "OpenAI响应",
+                            "pages": [
+                              "integrations/models/native/openai/responses/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/native/openai/responses/usage/agent-flex-tier",
+                                  "integrations/models/native/openai/responses/usage/async-basic",
+                                  "integrations/models/native/openai/responses/usage/async-basic-stream",
+                                  "integrations/models/native/openai/responses/usage/async-tool-use",
+                                  "integrations/models/native/openai/responses/usage/basic",
+                                  "integrations/models/native/openai/responses/usage/basic-stream",
+                                  "integrations/models/native/openai/responses/usage/db",
+                                  "integrations/models/native/openai/responses/usage/deep-research-agent",
+                                  "integrations/models/native/openai/responses/usage/image-agent",
+                                  "integrations/models/native/openai/responses/usage/image-agent-bytes",
+                                  "integrations/models/native/openai/responses/usage/image-agent-with-memory",
+                                  "integrations/models/native/openai/responses/usage/image-generation-agent",
+                                  "integrations/models/native/openai/responses/usage/knowledge",
+                                  "integrations/models/native/openai/responses/usage/memory",
+                                  "integrations/models/native/openai/responses/usage/pdf-input-local",
+                                  "integrations/models/native/openai/responses/usage/pdf-input-url",
+                                  "integrations/models/native/openai/responses/usage/reasoning-o3-mini",
+                                  "integrations/models/native/openai/responses/usage/structured-output",
+                                  "integrations/models/native/openai/responses/usage/tool-use",
+                                  "integrations/models/native/openai/responses/usage/tool-use-gpt-5",
+                                  "integrations/models/native/openai/responses/usage/tool-use-o3",
+                                  "integrations/models/native/openai/responses/usage/tool-use-stream",
+                                  "integrations/models/native/openai/responses/usage/verbosity-control",
+                                  "integrations/models/native/openai/responses/usage/websearch-builtin-tool",
+                                  "integrations/models/native/openai/responses/usage/zdr-reasoning-agent"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Perplexity",
+                        "pages": [
+                          "integrations/models/native/perplexity/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/perplexity/usage/basic",
+                              "integrations/models/native/perplexity/usage/basic-stream",
+                              "integrations/models/native/perplexity/usage/async-basic",
+                              "integrations/models/native/perplexity/usage/async-basic-stream",
+                              "integrations/models/native/perplexity/usage/knowledge",
+                              "integrations/models/native/perplexity/usage/memory",
+                              "integrations/models/native/perplexity/usage/structured-output"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Vercel",
+                        "pages": [
+                          "integrations/models/native/vercel/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/vercel/usage/basic",
+                              "integrations/models/native/vercel/usage/basic-stream",
+                              "integrations/models/native/vercel/usage/image-agent",
+                              "integrations/models/native/vercel/usage/knowledge",
+                              "integrations/models/native/vercel/usage/tool-use"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "XAI",
+                        "pages": [
+                          "integrations/models/native/xai/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/native/xai/usage/basic",
+                              "integrations/models/native/xai/usage/basic-stream",
+                              "integrations/models/native/xai/usage/tool-use",
+                              "integrations/models/native/xai/usage/basic-async",
+                              "integrations/models/native/xai/usage/basic-async-stream",
+                              "integrations/models/native/xai/usage/tool-use",
+                              "integrations/models/native/xai/usage/tool-use-stream",
+                              "integrations/models/native/xai/usage/async-tool-use",
+                              "integrations/models/native/xai/usage/structured-output",
+                              "integrations/models/native/xai/usage/image-agent",
+                              "integrations/models/native/xai/usage/image-agent-bytes",
+                              "integrations/models/native/xai/usage/live-search-agent",
+                              "integrations/models/native/xai/usage/live-search-agent-stream",
+                              "integrations/models/native/xai/usage/reasoning-agent"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "本地模型提供商",
+                    "pages": [
+                      {
+                        "group": "Ollama",
+                        "pages": [
+                          "integrations/models/local/ollama/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/local/ollama/usage/basic",
+                              "integrations/models/local/ollama/usage/basic-stream",
+                              "integrations/models/local/ollama/usage/cloud",
+                              "integrations/models/local/ollama/usage/async-basic",
+                              "integrations/models/local/ollama/usage/async-basic-stream",
+                              "integrations/models/local/ollama/usage/tool-use",
+                              "integrations/models/local/ollama/usage/tool-use-stream",
+                              "integrations/models/local/ollama/usage/db",
+                              "integrations/models/local/ollama/usage/knowledge",
+                              "integrations/models/local/ollama/usage/memory",
+                              "integrations/models/local/ollama/usage/demo-deepseek-r1",
+                              "integrations/models/local/ollama/usage/demo-gemma",
+                              "integrations/models/local/ollama/usage/demo-phi4",
+                              "integrations/models/local/ollama/usage/demo-qwen",
+                              "integrations/models/local/ollama/usage/image-agent",
+                              "integrations/models/local/ollama/usage/multimodal",
+                              "integrations/models/local/ollama/usage/set-client",
+                              "integrations/models/local/ollama/usage/set-temperature",
+                              "integrations/models/local/ollama/usage/storage",
+                              "integrations/models/local/ollama/usage/structured-output"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "LlamaCpp",
+                        "pages": [
+                          "integrations/models/local/llama-cpp/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/local/llama-cpp/usage/basic",
+                              "integrations/models/local/llama-cpp/usage/basic-stream",
+                              "integrations/models/local/llama-cpp/usage/structured-output",
+                              "integrations/models/local/llama-cpp/usage/tool-use",
+                              "integrations/models/local/llama-cpp/usage/tool-use-stream"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "LM Studio",
+                        "pages": [
+                          "integrations/models/local/lmstudio/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/local/lmstudio/usage/basic",
+                              "integrations/models/local/lmstudio/usage/basic-stream",
+                              "integrations/models/local/lmstudio/usage/tool-use",
+                              "integrations/models/local/lmstudio/usage/structured-output",
+                              "integrations/models/local/lmstudio/usage/storage",
+                              "integrations/models/local/lmstudio/usage/knowledge",
+                              "integrations/models/local/lmstudio/usage/image-agent"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "VLLM",
+                        "pages": [
+                          "integrations/models/local/vllm/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/local/vllm/usage/basic",
+                              "integrations/models/local/vllm/usage/basic-stream",
+                              "integrations/models/local/vllm/usage/async-basic",
+                              "integrations/models/local/vllm/usage/async-basic-stream",
+                              "integrations/models/local/vllm/usage/code-generation",
+                              "integrations/models/local/vllm/usage/storage",
+                              "integrations/models/local/vllm/usage/memory",
+                              "integrations/models/local/vllm/usage/structured-output",
+                              "integrations/models/local/vllm/usage/tool-use",
+                              "integrations/models/local/vllm/usage/async-tool-use"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "云模型提供商",
+                    "pages": [
+                      {
+                        "group": "AWS",
+                        "pages": [
+                          {
+                            "group": "AWS Bedrock",
+                            "pages": [
+                              "integrations/models/cloud/aws-bedrock/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/cloud/aws-bedrock/usage/basic",
+                                  "integrations/models/cloud/aws-bedrock/usage/basic-stream",
+                                  "integrations/models/cloud/aws-bedrock/usage/tool-use",
+                                  "integrations/models/cloud/aws-bedrock/usage/structured-output",
+                                  "integrations/models/cloud/aws-bedrock/usage/storage",
+                                  "integrations/models/cloud/aws-bedrock/usage/knowledge",
+                                  "integrations/models/cloud/aws-bedrock/usage/image-agent"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "group": "AWS Claude",
+                            "pages": [
+                              "integrations/models/cloud/aws-claude/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/cloud/aws-claude/usage/basic",
+                                  "integrations/models/cloud/aws-claude/usage/basic-stream",
+                                  "integrations/models/cloud/aws-claude/usage/tool-use",
+                                  "integrations/models/cloud/aws-claude/usage/structured-output",
+                                  "integrations/models/cloud/aws-claude/usage/storage",
+                                  "integrations/models/cloud/aws-claude/usage/knowledge"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Azure",
+                        "pages": [
+                          {
+                            "group": "Azure AI Foundry",
+                            "pages": [
+                              "integrations/models/cloud/azure-ai-foundry/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/cloud/azure-ai-foundry/usage/basic",
+                                  "integrations/models/cloud/azure-ai-foundry/usage/basic-stream",
+                                  "integrations/models/cloud/azure-ai-foundry/usage/knowledge",
+                                  "integrations/models/cloud/azure-ai-foundry/usage/storage",
+                                  "integrations/models/cloud/azure-ai-foundry/usage/structured-output",
+                                  "integrations/models/cloud/azure-ai-foundry/usage/tool-use"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "group": "Azure OpenAI",
+                            "pages": [
+                              "integrations/models/cloud/azure-openai/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/cloud/azure-openai/usage/basic",
+                                  "integrations/models/cloud/azure-openai/usage/basic-stream",
+                                  "integrations/models/cloud/azure-openai/usage/knowledge",
+                                  "integrations/models/cloud/azure-openai/usage/storage",
+                                  "integrations/models/cloud/azure-openai/usage/structured-output",
+                                  "integrations/models/cloud/azure-openai/usage/tool-use"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "IBM WatsonX",
+                        "pages": [
+                          "integrations/models/cloud/ibm-watsonx/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/cloud/ibm-watsonx/usage/basic",
+                              "integrations/models/cloud/ibm-watsonx/usage/basic-stream",
+                              "integrations/models/cloud/ibm-watsonx/usage/async-basic-stream",
+                              "integrations/models/cloud/ibm-watsonx/usage/async-basic",
+                              "integrations/models/cloud/ibm-watsonx/usage/tool-use",
+                              "integrations/models/cloud/ibm-watsonx/usage/async-tool-use",
+                              "integrations/models/cloud/ibm-watsonx/usage/structured-output",
+                              "integrations/models/cloud/ibm-watsonx/usage/storage",
+                              "integrations/models/cloud/ibm-watsonx/usage/knowledge",
+                              "integrations/models/cloud/ibm-watsonx/usage/image-agent-bytes"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Vertex AI",
+                        "pages": [
+                          "integrations/models/cloud/vertexai-claude/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/cloud/vertexai-claude/usage/basic",
+                              "integrations/models/cloud/vertexai-claude/usage/basic-stream",
+                              "integrations/models/cloud/vertexai-claude/usage/tool-use",
+                              "integrations/models/cloud/vertexai-claude/usage/structured-output",
+                              "integrations/models/cloud/vertexai-claude/usage/pdf-input-local",
+                              "integrations/models/cloud/vertexai-claude/usage/pdf-input-url",
+                              "integrations/models/cloud/vertexai-claude/usage/pdf-input-bytes",
+                              "integrations/models/cloud/vertexai-claude/usage/image-input-bytes",
+                              "integrations/models/cloud/vertexai-claude/usage/image-input-url"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Model Gateways & Aggregators",
+                    "pages": [
+                      {
+                        "group": "AIML API",
+                        "pages": [
+                          "integrations/models/gateways/aimlapi/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": []
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Cerebras",
+                        "pages": [
+                          {
+                            "group": "Cerebras",
+                            "pages": [
+                              "integrations/models/gateways/cerebras/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/gateways/cerebras/usage/basic",
+                                  "integrations/models/gateways/cerebras/usage/basic-stream",
+                                  "integrations/models/gateways/cerebras/usage/tool-use",
+                                  "integrations/models/gateways/cerebras/usage/structured-output",
+                                  "integrations/models/gateways/cerebras/usage/storage",
+                                  "integrations/models/gateways/cerebras/usage/knowledge"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "group": "Cerebras OpenAI",
+                            "pages": [
+                              "integrations/models/gateways/cerebras-openai/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/gateways/cerebras-openai/usage/basic",
+                                  "integrations/models/gateways/cerebras-openai/usage/basic-stream",
+                                  "integrations/models/gateways/cerebras-openai/usage/tool-use",
+                                  "integrations/models/gateways/cerebras-openai/usage/structured-output",
+                                  "integrations/models/gateways/cerebras-openai/usage/storage",
+                                  "integrations/models/gateways/cerebras-openai/usage/knowledge"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "CometAPI",
+                        "pages": [
+                          "integrations/models/gateways/cometapi/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": []
+                          }
+                        ]
+                      },
+                      {
+                        "group": "DeepInfra",
+                        "pages": [
+                          "integrations/models/gateways/deepinfra/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/deepinfra/usage/basic",
+                              "integrations/models/gateways/deepinfra/usage/basic-stream",
+                              "integrations/models/gateways/deepinfra/usage/tool-use",
+                              "integrations/models/gateways/deepinfra/usage/structured-output"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Fireworks",
+                        "pages": [
+                          "integrations/models/gateways/fireworks/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/fireworks/usage/basic",
+                              "integrations/models/gateways/fireworks/usage/basic-stream",
+                              "integrations/models/gateways/fireworks/usage/tool-use",
+                              "integrations/models/gateways/fireworks/usage/structured-output"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Groq",
+                        "pages": [
+                          "integrations/models/gateways/groq/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/groq/usage/basic",
+                              "integrations/models/gateways/groq/usage/basic-stream",
+                              "integrations/models/gateways/groq/usage/tool-use",
+                              "integrations/models/gateways/groq/usage/structured-output",
+                              "integrations/models/gateways/groq/usage/storage",
+                              "integrations/models/gateways/groq/usage/knowledge",
+                              "integrations/models/gateways/groq/usage/image-agent",
+                              "integrations/models/gateways/groq/usage/deep-knowledge",
+                              "integrations/models/gateways/groq/usage/browser-search",
+                              "integrations/models/gateways/groq/usage/metrics",
+                              "integrations/models/gateways/groq/usage/reasoning-agent",
+                              "integrations/models/gateways/groq/usage/transcription-agent",
+                              "integrations/models/gateways/groq/usage/translation-agent"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Hugging Face",
+                        "pages": [
+                          "integrations/models/gateways/huggingface/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/huggingface/usage/basic",
+                              "integrations/models/gateways/huggingface/usage/basic-stream",
+                              "integrations/models/gateways/huggingface/usage/async-basic",
+                              "integrations/models/gateways/huggingface/usage/async-basic-stream",
+                              "integrations/models/gateways/huggingface/usage/llama-essay-writer",
+                              "integrations/models/gateways/huggingface/usage/tool-use"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "LangDB",
+                        "pages": [
+                          "integrations/models/gateways/langdb/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/langdb/usage/basic",
+                              "integrations/models/gateways/langdb/usage/basic-stream",
+                              "integrations/models/gateways/langdb/usage/data-analyst",
+                              "integrations/models/gateways/langdb/usage/structured-output",
+                              "integrations/models/gateways/langdb/usage/tool-use"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "LiteLLM",
+                        "pages": [
+                          {
+                            "group": "LiteLLM",
+                            "pages": [
+                              "integrations/models/gateways/litellm/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/gateways/litellm/usage/basic",
+                                  "integrations/models/gateways/litellm/usage/basic-stream",
+                                  "integrations/models/gateways/litellm/usage/async-basic",
+                                  "integrations/models/gateways/litellm/usage/async-basic-stream",
+                                  "integrations/models/gateways/litellm/usage/tool-use",
+                                  "integrations/models/gateways/litellm/usage/async-tool-use",
+                                  "integrations/models/gateways/litellm/usage/audio-input-agent",
+                                  "integrations/models/gateways/litellm/usage/knowledge",
+                                  "integrations/models/gateways/litellm/usage/structured-output",
+                                  "integrations/models/gateways/litellm/usage/storage"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "group": "LiteLLM OpenAI",
+                            "pages": [
+                              "integrations/models/gateways/litellm-openai/overview",
+                              {
+                                "group": "使用方法",
+                                "pages": [
+                                  "integrations/models/gateways/litellm-openai/usage/basic",
+                                  "integrations/models/gateways/litellm-openai/usage/basic-stream",
+                                  "integrations/models/gateways/litellm-openai/usage/tool-use"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Nebius",
+                        "pages": [
+                          "integrations/models/gateways/nebius/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/nebius/usage/basic",
+                              "integrations/models/gateways/nebius/usage/basic-stream",
+                              "integrations/models/gateways/nebius/usage/tool-use",
+                              "integrations/models/gateways/nebius/usage/structured-output",
+                              "integrations/models/gateways/nebius/usage/storage",
+                              "integrations/models/gateways/nebius/usage/knowledge"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Nexus",
+                        "pages": [
+                          "integrations/models/gateways/nexus/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/nexus/usage/basic",
+                              "integrations/models/gateways/nexus/usage/basic-stream",
+                              "integrations/models/gateways/nexus/usage/async-basic",
+                              "integrations/models/gateways/nexus/usage/async-basic-stream",
+                              "integrations/models/gateways/nexus/usage/tool-use",
+                              "integrations/models/gateways/nexus/usage/async-tool-use"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "NVIDIA",
+                        "pages": [
+                          "integrations/models/gateways/nvidia/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/nvidia/usage/basic",
+                              "integrations/models/gateways/nvidia/usage/basic-stream",
+                              "integrations/models/gateways/nvidia/usage/async-basic",
+                              "integrations/models/gateways/nvidia/usage/async-basic-stream",
+                              "integrations/models/gateways/nvidia/usage/tool-use",
+                              "integrations/models/gateways/nvidia/usage/async-tool-use"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "OpenRouter",
+                        "pages": [
+                          "integrations/models/gateways/openrouter/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": []
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Portkey",
+                        "pages": [
+                          "integrations/models/gateways/portkey/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/portkey/usage/basic",
+                              "integrations/models/gateways/portkey/usage/basic-stream",
+                              "integrations/models/gateways/portkey/usage/tool-use",
+                              "integrations/models/gateways/portkey/usage/tool-use-stream",
+                              "integrations/models/gateways/portkey/usage/structured-output"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Requesty",
+                        "pages": [
+                          "integrations/models/gateways/requesty/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/requesty/usage/basic",
+                              "integrations/models/gateways/requesty/usage/basic-stream",
+                              "integrations/models/gateways/requesty/usage/tool-use",
+                              "integrations/models/gateways/requesty/usage/structured-output"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Sambanova",
+                        "pages": [
+                          "integrations/models/gateways/sambanova/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": []
+                          }
+                        ]
+                      },
+                      {
+                        "group": "SiliconFlow",
+                        "pages": [
+                          "integrations/models/gateways/siliconflow/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/siliconflow/usage/async-basic-stream",
+                              "integrations/models/gateways/siliconflow/usage/async-basic",
+                              "integrations/models/gateways/siliconflow/usage/async-tool-use",
+                              "integrations/models/gateways/siliconflow/usage/basic",
+                              "integrations/models/gateways/siliconflow/usage/basic-stream",
+                              "integrations/models/gateways/siliconflow/usage/tool-use"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "group": "Together",
+                        "pages": [
+                          "integrations/models/gateways/together/overview",
+                          {
+                            "group": "使用方法",
+                            "pages": [
+                              "integrations/models/gateways/together/usage/basic",
+                              "integrations/models/gateways/together/usage/basic-stream",
+                              "integrations/models/gateways/together/usage/image-agent",
+                              "integrations/models/gateways/together/usage/image-agent-bytes",
+                              "integrations/models/gateways/together/usage/image-agent-memory",
+                              "integrations/models/gateways/together/usage/structured-output",
+                              "integrations/models/gateways/together/usage/tool-use"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "integrations/models/openai-like"
+                ]
+              },
+              {
+                "group": "Database Providers",
+                "pages": [
+                  "integrations/database/index",
+                  {
+                    "group": "PostgreSQL",
+                    "pages": [
+                      "integrations/database/postgres/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/postgres/usage/postgres-for-agent",
+                          "integrations/database/postgres/usage/postgres-for-team",
+                          "integrations/database/postgres/usage/postgres-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Async PostgreSQL",
+                    "pages": [
+                      "integrations/database/async-postgres/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/async-postgres/usage/async-postgres-for-agent",
+                          "integrations/database/async-postgres/usage/async-postgres-for-team",
+                          "integrations/database/async-postgres/usage/async-postgres-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "MySQL",
+                    "pages": [
+                      "integrations/database/mysql/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/mysql/usage/mysql-for-agent",
+                          "integrations/database/mysql/usage/mysql-for-team",
+                          "integrations/database/mysql/usage/mysql-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Async MySQL",
+                    "pages": [
+                      "integrations/database/async-mysql/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/async-mysql/usage/async-mysql-for-agent",
+                          "integrations/database/async-mysql/usage/async-mysql-for-team",
+                          "integrations/database/async-mysql/usage/async-mysql-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "SQLite",
+                    "pages": [
+                      "integrations/database/sqlite/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/sqlite/usage/sqlite-for-agent",
+                          "integrations/database/sqlite/usage/sqlite-for-team",
+                          "integrations/database/sqlite/usage/sqlite-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Async SQLite",
+                    "pages": [
+                      "integrations/database/async-sqlite/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/async-sqlite/usage/async-sqlite-for-agent",
+                          "integrations/database/async-sqlite/usage/async-sqlite-for-team",
+                          "integrations/database/async-sqlite/usage/async-sqlite-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "In-Memory",
+                    "pages": [
+                      "integrations/database/in-memory/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/in-memory/usage/in-memory-for-agent",
+                          "integrations/database/in-memory/usage/in-memory-for-team",
+                          "integrations/database/in-memory/usage/in-memory-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "DynamoDB",
+                    "pages": [
+                      "integrations/database/dynamodb/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/dynamodb/usage/dynamodb-for-agent",
+                          "integrations/database/dynamodb/usage/dynamodb-for-team",
+                          "integrations/database/dynamodb/usage/dynamodb-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "MongoDB",
+                    "pages": [
+                      "integrations/database/mongo/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/mongo/usage/mongodb-for-agent",
+                          "integrations/database/mongo/usage/mongodb-for-team",
+                          "integrations/database/mongo/usage/mongodb-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Async MongoDB",
+                    "pages": [
+                      "integrations/database/async-mongo/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/async-mongo/usage/async-mongodb-for-agent",
+                          "integrations/database/async-mongo/usage/async-mongodb-for-team",
+                          "integrations/database/async-mongo/usage/async-mongodb-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "JSON",
+                    "pages": [
+                      "integrations/database/json/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/json/usage/json-for-agent",
+                          "integrations/database/json/usage/json-for-team",
+                          "integrations/database/json/usage/json-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Singlestore",
+                    "pages": [
+                      "integrations/database/singlestore/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/singlestore/usage/singlestore-for-agent",
+                          "integrations/database/singlestore/usage/singlestore-for-team",
+                          "integrations/database/singlestore/usage/singlestore-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "SurrealDB",
+                    "pages": [
+                      "integrations/database/surrealdb/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/surrealdb/usage/surrealdb-for-agent",
+                          "integrations/database/surrealdb/usage/surrealdb-for-team",
+                          "integrations/database/surrealdb/usage/surrealdb-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Redis",
+                    "pages": [
+                      "integrations/database/redis/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/redis/usage/redis-for-agent",
+                          "integrations/database/redis/usage/redis-for-team",
+                          "integrations/database/redis/usage/redis-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "GCS",
+                    "pages": [
+                      "integrations/database/gcs/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/gcs/usage/gcs-for-agent",
+                          "integrations/database/gcs/usage/gcs-for-team",
+                          "integrations/database/gcs/usage/gcs-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Firestore",
+                    "pages": [
+                      "integrations/database/firestore/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/database/firestore/usage/firestore-for-agent",
+                          "integrations/database/firestore/usage/firestore-for-team",
+                          "integrations/database/firestore/usage/firestore-for-workflow"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Supabase",
+                    "pages": ["integrations/database/supabase/overview"]
+                  },
+                  {
+                    "group": "Neon",
+                    "pages": ["integrations/database/neon/overview"]
+                  },
+                  "integrations/database/selecting-tables"
+                ]
+              },
+              {
+                "group": "Vector Databases",
+                "pages": [
+                  "integrations/vectordb/index",
+                  {
+                    "group": "PgVector",
+                    "pages": [
+                      "integrations/vectordb/pgvector/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/pgvector/usage/pgvector-db",
+                          "integrations/vectordb/pgvector/usage/async-pgvector-db",
+                          "integrations/vectordb/pgvector/usage/pgvector-hybrid-search"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "LanceDB",
+                    "pages": [
+                      "integrations/vectordb/lancedb/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/lancedb/usage/lance-db",
+                          "integrations/vectordb/lancedb/usage/async-lance-db",
+                          "integrations/vectordb/lancedb/usage/lance-db-hybrid-search"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Pinecone",
+                    "pages": [
+                      "integrations/vectordb/pinecone/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/pinecone/usage/pinecone-db",
+                          "integrations/vectordb/pinecone/usage/async-pinecone-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Qdrant",
+                    "pages": [
+                      "integrations/vectordb/qdrant/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/qdrant/usage/qdrant-db",
+                          "integrations/vectordb/qdrant/usage/async-qdrant-db",
+                          "integrations/vectordb/qdrant/usage/qdrant-db-hybrid-search"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Chroma",
+                    "pages": [
+                      "integrations/vectordb/chroma/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/chroma/usage/chroma-db",
+                          "integrations/vectordb/chroma/usage/async-chroma-db",
+                          "integrations/vectordb/chroma/usage/chroma-hybrid-search"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Milvus",
+                    "pages": [
+                      "integrations/vectordb/milvus/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/milvus/usage/milvus-db",
+                          "integrations/vectordb/milvus/usage/async-milvus-db",
+                          "integrations/vectordb/milvus/usage/milvus-db-hybrid-search",
+                          "integrations/vectordb/milvus/usage/async-milvus-db-hybrid-search"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Weaviate",
+                    "pages": [
+                      "integrations/vectordb/weaviate/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/weaviate/usage/weaviate-db",
+                          "integrations/vectordb/weaviate/usage/async-weaviate-db",
+                          "integrations/vectordb/weaviate/usage/weaviate-db-hybrid-search"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Couchbase",
+                    "pages": [
+                      "integrations/vectordb/couchbase/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/couchbase/usage/couchbase-db",
+                          "integrations/vectordb/couchbase/usage/async-couchbase-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Cassandra",
+                    "pages": [
+                      "integrations/vectordb/cassandra/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/cassandra/usage/cassandra-db",
+                          "integrations/vectordb/cassandra/usage/async-cassandra-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Clickhouse",
+                    "pages": [
+                      "integrations/vectordb/clickhouse/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/clickhouse/usage/clickhouse-db",
+                          "integrations/vectordb/clickhouse/usage/async-clickhouse-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Singlestore",
+                    "pages": [
+                      "integrations/vectordb/singlestore/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/singlestore/usage/singlestore-db",
+                          "integrations/vectordb/singlestore/usage/async-singlestore-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Redis",
+                    "pages": [
+                      "integrations/vectordb/redis/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/redis/usage/redis-db",
+                          "integrations/vectordb/redis/usage/async-redis-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "MongoDB",
+                    "pages": [
+                      "integrations/vectordb/mongodb/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/mongodb/usage/mongo-db",
+                          "integrations/vectordb/mongodb/usage/async-mongo-db",
+                          "integrations/vectordb/mongodb/usage/mongo-db-hybrid-search"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Azure Cosmos DB MongoDB vCore",
+                    "pages": [
+                      "integrations/vectordb/azure_cosmos_mongodb/overview",
+                      {
+                        "group": "使用方法"
+                      }
+                    ]
+                  },
+                  {
+                    "group": "SurrealDB",
+                    "pages": [
+                      "integrations/vectordb/surrealdb/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/surrealdb/usage/surreal-db",
+                          "integrations/vectordb/surrealdb/usage/async-surreal-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "LightRAG",
+                    "pages": [
+                      "integrations/vectordb/lightrag/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/lightrag/usage/lightrag-db",
+                          "integrations/vectordb/lightrag/usage/async-lightrag-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Upstash",
+                    "pages": [
+                      "integrations/vectordb/upstash/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/upstash/usage/upstash-db",
+                          "integrations/vectordb/upstash/usage/async-upstash-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "LangChain",
+                    "pages": [
+                      "integrations/vectordb/langchain/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/langchain/usage/langchain-db",
+                          "integrations/vectordb/langchain/usage/async-langchain-db"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "LlamaIndex",
+                    "pages": [
+                      "integrations/vectordb/llamaindex/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/vectordb/llamaindex/usage/llamaindex-db",
+                          "integrations/vectordb/llamaindex/usage/async-llamaindex-db"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Toolkits",
+                "pages": [
+                  "integrations/toolkits/overview",
+                  {
+                    "group": "Search",
+                    "pages": [
+                      "integrations/toolkits/search/arxiv",
+                      "integrations/toolkits/search/baidusearch",
+                      "integrations/toolkits/search/duckduckgo",
+                      "integrations/toolkits/search/exa",
+                      "integrations/toolkits/search/hackernews",
+                      "integrations/toolkits/search/linkup",
+                      "integrations/toolkits/search/parallel",
+                      "integrations/toolkits/search/pubmed",
+                      "integrations/toolkits/search/searxng",
+                      "integrations/toolkits/search/serpapi",
+                      "integrations/toolkits/search/serper",
+                      "integrations/toolkits/search/tavily",
+                      "integrations/toolkits/search/valyu",
+                      "integrations/toolkits/search/wikipedia",
+                      "integrations/toolkits/search/bravesearch"
+                    ]
+                  },
+                  {
+                    "group": "Social",
+                    "pages": [
+                      "integrations/toolkits/social/discord",
+                      "integrations/toolkits/social/email",
+                      "integrations/toolkits/social/gmail",
+                      "integrations/toolkits/social/reddit",
+                      "integrations/toolkits/social/slack",
+                      "integrations/toolkits/social/telegram",
+                      "integrations/toolkits/social/twilio",
+                      "integrations/toolkits/social/webex",
+                      "integrations/toolkits/social/whatsapp",
+                      "integrations/toolkits/social/x",
+                      "integrations/toolkits/social/zoom"
+                    ]
+                  },
+                  {
+                    "group": "Web Scraping",
+                    "pages": [
+                      "integrations/toolkits/web-scrape/agentql",
+                      "integrations/toolkits/web-scrape/browserbase",
+                      "integrations/toolkits/web-scrape/crawl4ai",
+                      "integrations/toolkits/web-scrape/firecrawl",
+                      "integrations/toolkits/web-scrape/jina-reader",
+                      "integrations/toolkits/web-scrape/newspaper",
+                      "integrations/toolkits/web-scrape/newspaper4k",
+                      "integrations/toolkits/web-scrape/spider",
+                      "integrations/toolkits/web-scrape/trafilatura",
+                      "integrations/toolkits/web-scrape/website",
+                      "integrations/toolkits/web-scrape/scrapegraph",
+                      "integrations/toolkits/web-scrape/oxylabs",
+                      "integrations/toolkits/web-scrape/brightdata"
+                    ]
+                  },
+                  {
+                    "group": "Data",
+                    "pages": [
+                      "integrations/toolkits/database/csv",
+                      "integrations/toolkits/database/duckdb",
+                      "integrations/toolkits/database/google-bigquery",
+                      "integrations/toolkits/database/neo4j",
+                      "integrations/toolkits/database/pandas",
+                      "integrations/toolkits/database/postgres",
+                      "integrations/toolkits/database/redshift",
+                      "integrations/toolkits/database/sql",
+                      "integrations/toolkits/database/zep"
+                    ]
+                  },
+                  {
+                    "group": "Local",
+                    "pages": [
+                      "integrations/toolkits/local/calculator",
+                      "integrations/toolkits/local/docker",
+                      "integrations/toolkits/local/file",
+                      "integrations/toolkits/local/local-file-system",
+                      "integrations/toolkits/local/python",
+                      "integrations/toolkits/local/shell",
+                      "integrations/toolkits/local/sleep"
+                    ]
+                  },
+                  {
+                    "group": "File Generation",
+                    "pages": [
+                      "integrations/toolkits/file-generation/file-generation"
+                    ]
+                  },
+                  {
+                    "group": "模型",
+                    "pages": [
+                      "integrations/toolkits/models/azure-openai",
+                      "integrations/toolkits/models/gemini",
+                      "integrations/toolkits/models/groq",
+                      "integrations/toolkits/models/morph",
+                      "integrations/toolkits/models/nebius",
+                      "integrations/toolkits/models/openai"
+                    ]
+                  },
+                  {
+                    "group": "Additional Toolkits",
+                    "pages": [
+                      "integrations/toolkits/others/airflow",
+                      "integrations/toolkits/others/apify",
+                      "integrations/toolkits/others/aws-lambda",
+                      "integrations/toolkits/others/aws-ses",
+                      "integrations/toolkits/others/bitbucket",
+                      "integrations/toolkits/others/brandfetch",
+                      "integrations/toolkits/others/calcom",
+                      "integrations/toolkits/others/cartesia",
+                      "integrations/toolkits/others/clickup",
+                      "integrations/toolkits/others/composio",
+                      "integrations/toolkits/others/confluence",
+                      "integrations/toolkits/others/custom-api",
+                      "integrations/toolkits/others/dalle",
+                      "integrations/toolkits/others/daytona",
+                      "integrations/toolkits/others/desi-vocal",
+                      "integrations/toolkits/others/eleven-labs",
+                      "integrations/toolkits/others/e2b",
+                      "integrations/toolkits/others/evm",
+                      "integrations/toolkits/others/fal",
+                      "integrations/toolkits/others/financial-datasets",
+                      "integrations/toolkits/others/giphy",
+                      "integrations/toolkits/others/github",
+                      "integrations/toolkits/others/google-maps",
+                      "integrations/toolkits/others/googlecalendar",
+                      "integrations/toolkits/others/google-sheets",
+                      "integrations/toolkits/others/jira",
+                      "integrations/toolkits/others/knowledge",
+                      "integrations/toolkits/others/linear",
+                      "integrations/toolkits/others/lumalabs",
+                      "integrations/toolkits/others/mem0",
+                      "integrations/toolkits/others/mlx-transcribe",
+                      "integrations/toolkits/others/models-labs",
+                      "integrations/toolkits/others/nano-banana",
+                      "integrations/toolkits/others/moviepy",
+                      "integrations/toolkits/others/notion",
+                      "integrations/toolkits/others/opencv",
+                      "integrations/toolkits/others/openbb",
+                      "integrations/toolkits/others/openweather",
+                      "integrations/toolkits/others/reasoning",
+                      "integrations/toolkits/others/replicate",
+                      "integrations/toolkits/others/resend",
+                      "integrations/toolkits/others/spotify",
+                      "integrations/toolkits/others/shopify",
+                      "integrations/toolkits/others/todoist",
+                      "integrations/toolkits/others/trello",
+                      "integrations/toolkits/others/user-control-flow",
+                      "integrations/toolkits/others/visualization",
+                      "integrations/toolkits/others/web-browser",
+                      "integrations/toolkits/others/webtools",
+                      "integrations/toolkits/others/yfinance",
+                      "integrations/toolkits/others/youtube",
+                      "integrations/toolkits/others/zendesk"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "记忆",
+                "pages": ["integrations/memory/memori"]
+              },
+              {
+                "group": "Observability",
+                "pages": [
+                  "integrations/observability/overview",
+                  "integrations/observability/agentops",
+                  "integrations/observability/arize",
+                  "integrations/observability/atla",
+                  "integrations/observability/langdb",
+                  "integrations/observability/langfuse",
+                  "integrations/observability/langsmith",
+                  "integrations/observability/langtrace",
+                  "integrations/observability/langwatch",
+                  "integrations/observability/maxim",
+                  "integrations/observability/openlit",
+                  "integrations/observability/traceloop",
+                  "integrations/observability/weave"
+                ]
+              },
+              {
+                "group": "Other Integrations",
+                "pages": [
+                  {
+                    "group": "Discord Bot",
+                    "pages": [
+                      "integrations/discord/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": [
+                          "integrations/discord/usage/basic",
+                          "integrations/discord/usage/agent-with-media",
+                          "integrations/discord/usage/agent-with-user-memory"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Testing",
+                    "pages": [
+                      "integrations/testing/overview",
+                      {
+                        "group": "使用方法",
+                        "pages": ["integrations/testing/usage/basic"]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "how-to/install",
+              {
+                "group": "Migrate to Agno v2",
+                "pages": ["how-to/v2-changelog", "how-to/v2-migration"]
+              },
+              "how-to/workflows-migration",
+              "how-to/cursor-rules",
+              "how-to/contribute"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "AgentOS",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "agent-os/introduction",
+              "agent-os/creating-your-first-os",
+              "agent-os/connecting-your-os",
+              {
+                "group": "Control Plane",
+                "pages": [
+                  "agent-os/control-plane",
+                  "agent-os/features/chat-interface",
+                  "agent-os/features/knowledge-management",
+                  "agent-os/features/session-tracking",
+                  "agent-os/features/memories",
+                  "agent-os/features/tracing"
+                ]
+              },
+              {
+                "group": "Security & Authorization",
+                "pages": [
+                  "agent-os/security/overview",
+                  "agent-os/security/rbac"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "AgentOS",
+            "pages": [
+              "agent-os/overview",
+              {
+                "group": "AgentOS API",
+                "pages": ["agent-os/api/authentication", "agent-os/api/usage"]
+              },
+              {
+                "group": "MCP",
+                "pages": ["agent-os/mcp/mcp", "agent-os/mcp/tools"]
+              },
+              {
+                "group": "Bring Your Own FastAPI App",
+                "pages": [
+                  "agent-os/custom-fastapi/overview",
+                  "agent-os/custom-fastapi/override-routes"
+                ]
+              },
+              {
+                "group": "Middleware",
+                "pages": [
+                  "agent-os/middleware/overview",
+                  "agent-os/middleware/custom",
+                  "agent-os/middleware/jwt"
+                ]
+              },
+              {
+                "group": "知识",
+                "pages": [
+                  "agent-os/knowledge/manage-knowledge",
+                  "agent-os/knowledge/filter-knowledge"
+                ]
+              },
+              "agent-os/config",
+              "agent-os/background-tasks/overview",
+              "agent-os/lifespan",
+              {
+                "group": "Client",
+                "tag": "beta",
+                "pages": [
+                  "agent-os/client/overview"
+                ]
+              },
+              {
+                "group": "Remote Execution",
+                "tag": "beta",
+                "pages": [
+                  "agent-os/remote-execution/overview",
+                  "agent-os/remote-execution/remote-agent",
+                  "agent-os/remote-execution/remote-team",
+                  "agent-os/remote-execution/remote-workflow",
+                  "agent-os/remote-execution/gateway"
+                ]
+              },
+              {
+                "group": "Interfaces",
+                "pages": [
+                  "agent-os/interfaces/overview",
+                  "agent-os/interfaces/whatsapp/introduction",
+                  "agent-os/interfaces/a2a/introduction",
+                  "agent-os/interfaces/ag-ui/introduction",
+                  "agent-os/interfaces/slack/introduction"
+                ]
+              },
+              {
+                "group": "追踪",
+                "tag": "beta",
+                "pages": [
+                  "agent-os/tracing/overview",
+                  {
+                    "group": "使用方法",
+                    "pages": [
+                      "agent-os/tracing/usage/basic-agent-tracing",
+                      "agent-os/tracing/usage/basic-team-tracing",
+                      "agent-os/tracing/usage/basic-workflow-tracing",
+                      "agent-os/tracing/usage/agent-with-knowledge-tracing",
+                      "agent-os/tracing/usage/agent-with-reasoning-tools-tracing",
+                      "agent-os/tracing/usage/tracing-with-multi-db-scenario",
+                      "agent-os/tracing/usage/tracing-with-multi-db-scenario-and-tracing-flag"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "group": "使用方法",
+            "pages": [
+              "agent-os/usage/demo",
+              "agent-os/usage/extra-configuration",
+              "agent-os/usage/hitl",
+              "agent-os/usage/database-migrations",
+              {
+                "group": "MCP",
+                "pages": [
+                  "agent-os/usage/mcp/enable-mcp-example",
+                  "agent-os/usage/mcp/mcp-tools-example"
+                ]
+              },
+              {
+                "group": "Middleware",
+                "pages": [
+                  "agent-os/usage/middleware/custom-middleware",
+                  "agent-os/usage/middleware/jwt-middleware",
+                  "agent-os/usage/middleware/jwt-cookies",
+                  "agent-os/usage/middleware/custom-fastapi-jwt"
+                ]
+              },
+              {
+                "group": "RBAC",
+                "pages": [
+                  "agent-os/usage/rbac/basic",
+                  "agent-os/usage/rbac/advanced-scopes",
+                  "agent-os/usage/rbac/per-agent-permissions",
+                  "agent-os/usage/rbac/custom-scope-mappings"
+                ]
+              },
+              {
+                "group": "Background Tasks",
+                "pages": [
+                  "agent-os/usage/background-hooks-global",
+                  "agent-os/usage/background-hooks-decorator",
+                  "agent-os/usage/background-output-evaluation"
+                ]
+              },
+              {
+                "group": "Client",
+                "pages": [
+                  "agent-os/usage/client/basic-client",
+                  "agent-os/usage/client/run-agents",
+                  "agent-os/usage/client/run-teams",
+                  "agent-os/usage/client/run-workflows",
+                  "agent-os/usage/client/session-management",
+                  "agent-os/usage/client/memory-operations",
+                  "agent-os/usage/client/knowledge-search"
+                ]
+              },
+              {
+                "group": "Remote Execution",
+                "pages": [
+                  "agent-os/usage/remote-execution/remote-agent",
+                  "agent-os/usage/remote-execution/remote-team",
+                  "agent-os/usage/remote-execution/gateway"
+                ]
+              },
+              {
+                "group": "Interfaces",
+                "pages": [
+                  {
+                    "group": "WhatsApp",
+                    "pages": [
+                      "agent-os/usage/interfaces/whatsapp/basic",
+                      "agent-os/usage/interfaces/whatsapp/image-generation-tools",
+                      "agent-os/usage/interfaces/whatsapp/reasoning-agent",
+                      "agent-os/usage/interfaces/whatsapp/image-generation-model",
+                      "agent-os/usage/interfaces/whatsapp/agent-with-media",
+                      "agent-os/usage/interfaces/whatsapp/agent-with-user-memory"
+                    ]
+                  },
+                  {
+                    "group": "A2A",
+                    "pages": [
+                      "agent-os/usage/interfaces/a2a/basic",
+                      "agent-os/usage/interfaces/a2a/agent-with-tools",
+                      "agent-os/usage/interfaces/a2a/team"
+                    ]
+                  },
+                  {
+                    "group": "AG-UI",
+                    "pages": [
+                      "agent-os/usage/interfaces/ag-ui/basic",
+                      "agent-os/usage/interfaces/ag-ui/agent-with-tools",
+                      "agent-os/usage/interfaces/ag-ui/team"
+                    ]
+                  },
+                  {
+                    "group": "Slack",
+                    "pages": [
+                      "agent-os/usage/interfaces/slack/basic",
+                      "agent-os/usage/interfaces/slack/agent-with-user-memory",
+                      "agent-os/usage/interfaces/slack/reasoning-agent",
+                      "agent-os/usage/interfaces/slack/research-workflow"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "示例",
+        "groups": [
+          {
+            "group": "Tutorials",
+            "hidden": true,
+            "pages": ["tutorials/overview", "tutorials/social-media-agent"]
+          },
+          {
+            "group": "入门指南",
+            "hidden": true,
+            "pages": [
+              "examples/getting-started/introduction",
+              "examples/getting-started/01-basic-agent",
+              "examples/getting-started/02-agent-with-tools",
+              "examples/getting-started/03-agent-with-knowledge",
+              "examples/getting-started/04-write-your-own-tool",
+              "examples/getting-started/05-structured-output",
+              "examples/getting-started/06-agent-with-storage",
+              "examples/getting-started/07-agent-state",
+              "examples/getting-started/08-agent-context",
+              "examples/getting-started/09-agent-session",
+              "examples/getting-started/10-user-memories-and-summaries",
+              "examples/getting-started/11-retry-function-call",
+              "examples/getting-started/12-human-in-the-loop",
+              "examples/getting-started/13-image-agent",
+              "examples/getting-started/14-image-generation",
+              "examples/getting-started/15-video-generation",
+              "examples/getting-started/16-audio-agent",
+              "examples/getting-started/17-agent-team",
+              "examples/getting-started/18-research-agent-exa",
+              "examples/getting-started/19-blog-generator-workflow"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": ["examples/use-cases/overview"]
+          },
+          {
+            "group": "Agent Examples",
+            "pages": [
+              "examples/use-cases/agents/overview",
+              "examples/use-cases/agents/learn-concepts",
+              {
+                "group": "Basic Examples",
+                "pages": [
+                  "examples/use-cases/agents/agno-assist",
+                  "examples/use-cases/agents/research-agent",
+                  "examples/use-cases/agents/web-extraction-agent"
+                ]
+              },
+              {
+                "group": "Advanced Examples",
+                "pages": [
+                  "examples/use-cases/agents/competitor-analysis-agent",
+                  "examples/use-cases/agents/youtube-agent",
+                  "examples/use-cases/agents/deep_research_agent_exa",
+                  "examples/use-cases/agents/deep_knowledge",
+                  {
+                    "group": "Content & Media",
+                    "pages": [
+                      "examples/use-cases/agents/recipe-creator",
+                      "examples/use-cases/agents/tweet-analysis-agent",
+                      "examples/use-cases/agents/social_media_agent",
+                      "examples/use-cases/agents/media_trend_analysis_agent",
+                      "examples/use-cases/agents/reddit-post-generator",
+                      "examples/use-cases/agents/recipe_rag_image",
+                      "examples/use-cases/agents/speech-to-text-agent"
+                    ]
+                  },
+                  {
+                    "group": "Research & Knowledge",
+                    "pages": [
+                      "examples/use-cases/agents/books-recommender",
+                      "examples/use-cases/agents/study-partner",
+                      "examples/use-cases/agents/meeting_summarizer_agent"
+                    ]
+                  },
+                  {
+                    "group": "Business & Analysis",
+                    "pages": [
+                      "examples/use-cases/agents/legal_consultant",
+                      "examples/use-cases/agents/startup-analyst-agent"
+                    ]
+                  },
+                  {
+                    "group": "Personal Assistants",
+                    "pages": [
+                      "examples/use-cases/agents/movie-recommender",
+                      "examples/use-cases/agents/shopping_partner",
+                      "examples/use-cases/agents/travel-planner",
+                      "examples/use-cases/agents/translation_agent"
+                    ]
+                  },
+                  {
+                    "group": "MCP Integration",
+                    "pages": ["examples/use-cases/agents/airbnb_mcp"]
+                  },
+                  {
+                    "group": "Tools & Utilities",
+                    "pages": [
+                      "examples/use-cases/agents/readme_generator",
+                      "examples/use-cases/agents/run_as_cli"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Team Examples",
+            "pages": [
+              "examples/use-cases/teams/overview",
+              "examples/use-cases/teams/learn-concepts",
+              {
+                "group": "Basic Examples",
+                "pages": [
+                  "examples/use-cases/teams/content_team",
+                  "examples/use-cases/teams/ai_support_team"
+                ]
+              },
+              {
+                "group": "Advanced Examples",
+                "pages": [
+                  "examples/use-cases/teams/hackernews_team",
+                  "examples/use-cases/teams/multi_language_team",
+                  "examples/use-cases/teams/reasoning_team",
+                  "examples/use-cases/teams/news_agency_team",
+                  "examples/use-cases/teams/discussion_team",
+                  "examples/use-cases/teams/autonomous_startup_team"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Workflow Examples",
+            "pages": [
+              "examples/use-cases/workflows/overview",
+              "examples/use-cases/workflows/learn-concepts",
+              {
+                "group": "Basic Examples",
+                "pages": [
+                  "examples/use-cases/workflows/startup-idea-validator",
+                  "examples/use-cases/workflows/blog-post-generator"
+                ]
+              },
+              {
+                "group": "Advanced Examples",
+                "pages": [
+                  "examples/use-cases/workflows/investment-report-generator",
+                  "examples/use-cases/workflows/employee-recruiter",
+                  "examples/use-cases/workflows/notion-knowledge-manager",
+                  "examples/use-cases/workflows/company-description"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "参考文档",
+        "groups": [
+          {
+            "group": "Agno SDK Reference",
+            "pages": [
+              {
+                "group": "智能体",
+                "pages": [
+                  "reference/agents/agent",
+                  "reference/agents/remote-agent"
+                ]
+              },
+              {
+                "group": "团队",
+                "pages": [
+                  "reference/teams/team",
+                  "reference/teams/remote-team"
+                ]
+              },
+              {
+                "group": "工作流",
+                "pages": [
+                  "reference/workflows/workflow",
+                  "reference/workflows/remote-workflow",
+                  "reference/workflows/step",
+                  "reference/workflows/step_input",
+                  "reference/workflows/step_output",
+                  "reference/workflows/conditional-steps",
+                  "reference/workflows/parallel-steps",
+                  "reference/workflows/router-steps",
+                  "reference/workflows/loop-steps",
+                  "reference/workflows/steps-step"
+                ]
+              },
+              {
+                "group": "AgentOS",
+                "pages": [
+                  "reference/agent-os/agent-os",
+                  "reference/agent-os/configuration",
+                  "reference/agent-os/client",
+                  "reference/agent-os/authorization-config",
+                  "reference/agent-os/jwt-middleware"
+                ]
+              },
+              {
+                "group": "Runs",
+                "pages": [
+                  "reference/agents/run-response",
+                  "reference/teams/team-response",
+                  "reference/workflows/run-output",
+                  "reference/run/run-context"
+                ]
+              },
+              {
+                "group": "会话",
+                "pages": [
+                  "reference/session/summary_manager",
+                  "reference/agents/session",
+                  "reference/teams/session",
+                  "reference/workflows/session"
+                ]
+              },
+              {
+                "group": "记忆",
+                "pages": ["reference/memory/memory"]
+              },
+              {
+                "group": "上下文压缩",
+                "pages": ["reference/compression/compression-manager"]
+              },
+              {
+                "group": "数据库",
+                "pages": [
+                  "reference/storage/postgres",
+                  "reference/storage/sqlite",
+                  "reference/storage/mongodb",
+                  "reference/storage/in_memory",
+                  "reference/storage/mysql",
+                  "reference/storage/redis",
+                  "reference/storage/dynamodb",
+                  "reference/storage/singlestore",
+                  "reference/storage/surrealdb",
+                  "reference/storage/firestore",
+                  "reference/storage/json",
+                  "reference/storage/gcs",
+                  "reference/storage/migrations"
+                ]
+              },
+              {
+                "group": "追踪",
+                "pages": ["reference/tracing/trace", "reference/tracing/span"]
+              },
+              {
+                "group": "钩子",
+                "pages": [
+                  "reference/hooks/pre-hooks",
+                  "reference/hooks/post-hooks"
+                ]
+              },
+              {
+                "group": "护栏",
+                "pages": [
+                  "reference/hooks/base-guardrail",
+                  "reference/hooks/openai-moderation-guardrail",
+                  "reference/hooks/pii-guardrail",
+                  "reference/hooks/prompt-injection-guardrail"
+                ]
+              },
+              {
+                "group": "模型",
+                "pages": [
+                  "reference/models/model",
+                  "reference/models/openai",
+                  "reference/models/aimlapi",
+                  "reference/models/ollama",
+                  "reference/models/anthropic",
+                  "reference/models/cohere",
+                  "reference/models/deepinfra",
+                  "reference/models/deepseek",
+                  "reference/models/gemini",
+                  "reference/models/groq",
+                  "reference/models/huggingface",
+                  "reference/models/meta",
+                  "reference/models/mistral",
+                  "reference/models/nebius",
+                  "reference/models/nvidia",
+                  "reference/models/perplexity",
+                  "reference/models/requesty",
+                  "reference/models/together",
+                  "reference/models/xai",
+                  "reference/models/vercel",
+                  "reference/models/bedrock",
+                  "reference/models/bedrock-claude",
+                  "reference/models/azure",
+                  "reference/models/azure-open-ai",
+                  "reference/models/fireworks",
+                  "reference/models/openrouter",
+                  "reference/models/sambanova",
+                  "reference/models/internlm",
+                  "reference/models/ollama-tools",
+                  "reference/models/openai-like",
+                  "reference/models/ibm-watsonx"
+                ]
+              },
+              {
+                "group": "工具",
+                "pages": [
+                  "reference/tools/decorator",
+                  "reference/tools/toolkit",
+                  "reference/tools/retry-agent-run",
+                  "reference/tools/stop-agent-run"
+                ]
+              },
+              {
+                "group": "知识",
+                "pages": [
+                  "reference/knowledge/knowledge",
+                  {
+                    "group": "Embedders",
+                    "pages": [
+                      "reference/knowledge/embedder/azure-openai",
+                      "reference/knowledge/embedder/cohere",
+                      "reference/knowledge/embedder/fastembed",
+                      "reference/knowledge/embedder/fireworks",
+                      "reference/knowledge/embedder/gemini",
+                      "reference/knowledge/embedder/huggingface",
+                      "reference/knowledge/embedder/mistral",
+                      "reference/knowledge/embedder/nebius",
+                      "reference/knowledge/embedder/ollama",
+                      "reference/knowledge/embedder/openai",
+                      "reference/knowledge/embedder/sentence-transformer",
+                      "reference/knowledge/embedder/together",
+                      "reference/knowledge/embedder/vllm",
+                      "reference/knowledge/embedder/voyageai"
+                    ]
+                  },
+                  {
+                    "group": "读取器",
+                    "pages": [
+                      "reference/knowledge/reader/base",
+                      "reference/knowledge/reader/arxiv",
+                      "reference/knowledge/reader/csv",
+                      "reference/knowledge/reader/field-labeled-csv",
+                      "reference/knowledge/reader/docx",
+                      "reference/knowledge/reader/json",
+                      "reference/knowledge/reader/pdf",
+                      "reference/knowledge/reader/pptx",
+                      "reference/knowledge/reader/text",
+                      "reference/knowledge/reader/website",
+                      "reference/knowledge/reader/youtube",
+                      "reference/knowledge/reader/firecrawl",
+                      "reference/knowledge/reader/wikipedia",
+                      "reference/knowledge/reader/web-search"
+                    ]
+                  },
+                  {
+                    "group": "Rerankers",
+                    "pages": ["reference/knowledge/reranker/cohere"]
+                  },
+                  {
+                    "group": "分块",
+                    "pages": [
+                      "reference/knowledge/chunking/fixed-size",
+                      "reference/knowledge/chunking/agentic",
+                      "reference/knowledge/chunking/semantic",
+                      "reference/knowledge/chunking/recursive",
+                      "reference/knowledge/chunking/document",
+                      "reference/knowledge/chunking/csv-row",
+                      "reference/knowledge/chunking/markdown"
+                    ]
+                  },
+                  {
+                    "group": "远程内容",
+                    "pages": [
+                      "reference/knowledge/remote-content/gcs-content",
+                      "reference/knowledge/remote-content/s3-content"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Vector Databases",
+                "hidden": true,
+                "pages": [
+                  "reference/vector-db/cassandra",
+                  "reference/vector-db/chromadb",
+                  "reference/vector-db/couchbase",
+                  "reference/vector-db/clickhouse",
+                  "reference/vector-db/lancedb",
+                  "reference/vector-db/milvus",
+                  "reference/vector-db/mongodb",
+                  "reference/vector-db/pgvector",
+                  "reference/vector-db/pinecone",
+                  "reference/vector-db/qdrant",
+                  "reference/vector-db/singlestore",
+                  "reference/vector-db/weaviate",
+                  "reference/vector-db/surrealdb"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "AgentOS API Reference",
+            "pages": [
+              "reference-api/overview",
+              {
+                "group": "Core",
+                "pages": ["reference-api/schema/core/get-os-configuration"]
+              },
+              {
+                "group": "Agents",
+                "pages": [
+                  "reference-api/schema/agents/list-all-agents",
+                  "reference-api/schema/agents/get-agent-details",
+                  "reference-api/schema/agents/create-agent-run",
+                  "reference-api/schema/agents/cancel-agent-run",
+                  "reference-api/schema/agents/continue-agent-run"
+                ]
+              },
+              {
+                "group": "团队",
+                "pages": [
+                  "reference-api/schema/teams/list-all-teams",
+                  "reference-api/schema/teams/get-team-details",
+                  "reference-api/schema/teams/create-team-run",
+                  "reference-api/schema/teams/cancel-team-run"
+                ]
+              },
+              {
+                "group": "工作流",
+                "pages": [
+                  "reference-api/schema/workflows/list-all-workflows",
+                  "reference-api/schema/workflows/get-workflow-details",
+                  "reference-api/schema/workflows/execute-workflow",
+                  "reference-api/schema/workflows/cancel-workflow-run"
+                ]
+              },
+              {
+                "group": "会话",
+                "pages": [
+                  "reference-api/schema/sessions/list-sessions",
+                  "reference-api/schema/sessions/get-session-by-id",
+                  "reference-api/schema/sessions/get-session-runs",
+                  "reference-api/schema/sessions/get-run-by-id",
+                  "reference-api/schema/sessions/create-new-session",
+                  "reference-api/schema/sessions/update-session",
+                  "reference-api/schema/sessions/rename-session",
+                  "reference-api/schema/sessions/delete-session",
+                  "reference-api/schema/sessions/delete-multiple-sessions"
+                ]
+              },
+              {
+                "group": "记忆",
+                "pages": [
+                  "reference-api/schema/memory/list-memories",
+                  "reference-api/schema/memory/get-memory-by-id",
+                  "reference-api/schema/memory/get-memory-topics",
+                  "reference-api/schema/memory/get-user-memory-statistics",
+                  "reference-api/schema/memory/create-memory",
+                  "reference-api/schema/memory/update-memory",
+                  "reference-api/schema/memory/delete-memory",
+                  "reference-api/schema/memory/delete-multiple-memories"
+                ]
+              },
+              {
+                "group": "追踪",
+                "tag": "beta",
+                "pages": [
+                  "reference-api/schema/tracing/list-traces",
+                  "reference-api/schema/tracing/get-trace-detail",
+                  "reference-api/schema/tracing/get-trace-session-stats"
+                ]
+              },
+              {
+                "group": "评估",
+                "pages": [
+                  "reference-api/schema/evals/list-evaluation-runs",
+                  "reference-api/schema/evals/get-evaluation-run",
+                  "reference-api/schema/evals/execute-evaluation",
+                  "reference-api/schema/evals/update-evaluation-run",
+                  "reference-api/schema/evals/delete-evaluation-runs"
+                ]
+              },
+              {
+                "group": "知识",
+                "pages": [
+                  "reference-api/schema/knowledge/get-config",
+                  "reference-api/schema/knowledge/list-content",
+                  "reference-api/schema/knowledge/get-content-by-id",
+                  "reference-api/schema/knowledge/get-content-status",
+                  "reference-api/schema/knowledge/search-knowledge",
+                  "reference-api/schema/knowledge/upload-content",
+                  "reference-api/schema/knowledge/update-content",
+                  "reference-api/schema/knowledge/delete-all-content",
+                  "reference-api/schema/knowledge/delete-content-by-id"
+                ]
+              },
+              {
+                "group": "指标",
+                "pages": [
+                  "reference-api/schema/metrics/get-agentos-metrics",
+                  "reference-api/schema/metrics/refresh-metrics"
+                ]
+              },
+              {
+                "group": "Interfaces",
+                "pages": [
+                  {
+                    "group": "A2A",
+                    "pages": [
+                      "reference-api/schema/a2a/get-agent-card",
+                      "reference-api/schema/a2a/get-team-card",
+                      "reference-api/schema/a2a/get-workflow-card",
+                      "reference-api/schema/a2a/stream-message-agent",
+                      "reference-api/schema/a2a/stream-message-team",
+                      "reference-api/schema/a2a/stream-message-workflow",
+                      "reference-api/schema/a2a/run-message-agent",
+                      "reference-api/schema/a2a/run-message-team",
+                      "reference-api/schema/a2a/run-message-workflow",
+                      "reference-api/schema/a2a/send-message",
+                      "reference-api/schema/a2a/stream-message"
+                    ]
+                  },
+                  {
+                    "group": "AGUI",
+                    "pages": [
+                      "reference-api/schema/agui/get-status",
+                      "reference-api/schema/agui/run-agent"
+                    ]
+                  },
+                  {
+                    "group": "Slack",
+                    "pages": ["reference-api/schema/slack/slack-events"]
+                  },
+                  {
+                    "group": "Whatsapp",
+                    "pages": [
+                      "reference-api/schema/whatsapp/status",
+                      "reference-api/schema/whatsapp/verify-webhook",
+                      "reference-api/schema/whatsapp/webhook"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Database migrations",
+                "pages": [
+                  "reference-api/schema/database/migrate-all-databases",
+                  "reference-api/schema/database/migrate-database"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "部署",
+        "groups": [
+          {
+            "group": "Deploying your AgentOS",
+            "pages": ["deploy/overview"]
+          },
+          {
+            "group": "Templates",
+            "pages": [
+              "deploy/templates",
+              {
+                "group": "Docker",
+                "pages": [
+                  "templates/agent-infra-docker/introduction",
+                  "templates/agent-infra-docker/run-local",
+                  "templates/agent-infra-docker/run-prd"
+                ]
+              },
+              {
+                "group": "AWS",
+                "pages": [
+                  "templates/agent-infra-aws/introduction",
+                  "templates/agent-infra-aws/run-local",
+                  "templates/agent-infra-aws/run-aws",
+                  {
+                    "group": "AWS Template Management",
+                    "pages": [
+                      "templates/infra-management/development-app",
+                      "templates/infra-management/production-app",
+                      "templates/infra-management/install",
+                      "templates/infra-management/python-packages",
+                      "templates/infra-management/secrets",
+                      "templates/infra-management/env-vars",
+                      "templates/infra-management/database-tables",
+                      "templates/infra-management/ci-cd",
+                      "templates/infra-management/domain-https",
+                      "templates/infra-management/ssh-access",
+                      "templates/infra-management/infra-settings",
+                      "templates/infra-management/git-repo",
+                      "templates/infra-management/new-users",
+                      "templates/infra-management/format-and-validate"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Railway",
+                "pages": [
+                  "templates/agent-infra-railway/introduction",
+                  "templates/agent-infra-railway/run-local",
+                  "templates/agent-infra-railway/run-prd"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Agno Infra",
+            "pages": [
+              "deploy/agno-infra",
+              {
+                "group": "CLI Reference",
+                "pages": [
+                  "reference/agno-infra/cli/ws/create",
+                  "reference/agno-infra/cli/ws/up",
+                  "reference/agno-infra/cli/ws/down",
+                  "reference/agno-infra/cli/ws/restart",
+                  "reference/agno-infra/cli/ws/patch",
+                  "reference/agno-infra/cli/ws/config",
+                  "reference/agno-infra/cli/ws/delete"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "常见问题",
+        "groups": [
+          {
+            "group": "FAQs",
+            "pages": [
+              "faq/environment-variables",
+              "faq/tpm-issues",
+              "faq/agentos-connection",
+              "faq/openai-key-request-for-other-models",
+              "faq/structured-outputs",
+              "faq/When-to-use-a-Workflow-vs-a-Team-in-Agno",
+              "faq/switching-models",
+              "faq/connecting-to-tableplus",
+              "faq/could-not-connect-to-docker",
+              "faq/rbac-auth-failed"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/"
+    },
+    {
+      "source": "/get-started",
+      "destination": "/getting-started/quickstart"
+    },
+    {
+      "source": "/introduction/monitoring",
+      "destination": "/integrations/observability/overview"
+    },
+    {
+      "source": "/introduction/playground",
+      "destination": "/agent-os/introduction"
+    },
+    {
+      "source": "/agents",
+      "destination": "/basics/agents/overview"
+    },
+    {
+      "source": "/agents/introduction",
+      "destination": "/basics/agents/overview"
+    },
+    {
+      "source": "/agents/memory",
+      "destination": "/basics/memory/overview"
+    },
+    {
+      "source": "/agents/structured-output",
+      "destination": "/basics/input-output/agent"
+    },
+    {
+      "source": "/agents/context",
+      "destination": "/basics/context/agent"
+    },
+    {
+      "source": "/agents/multimodal",
+      "destination": "/basics/multimodal/overview"
+    },
+    {
+      "source": "/agents/storage",
+      "destination": "/basics/database/overview"
+    },
+    {
+      "source": "/agents/tools",
+      "destination": "/basics/tools/overview"
+    },
+    {
+      "source": "/agents/user-control-flow",
+      "destination": "/basics/hitl/overview"
+    },
+    {
+      "source": "/applications/ag-ui/introduction",
+      "destination": "/agent-os/interfaces/ag-ui/introduction"
+    },
+    {
+      "source": "/applications/discord/introduction",
+      "destination": "/integrations/discord/overview"
+    },
+    {
+      "source": "/applications/fastapi/introduction",
+      "destination": "/agent-os/custom-fastapi/overview"
+    },
+    {
+      "source": "/applications/playground/introduction",
+      "destination": "/agent-os/introduction"
+    },
+    {
+      "source": "/chunking/agentic-chunking",
+      "destination": "/basics/knowledge/chunking/agentic-chunking"
+    },
+    {
+      "source": "/chunking/document-chunking",
+      "destination": "/basics/knowledge/chunking/document-chunking"
+    },
+    {
+      "source": "/chunking/fixed-size-chunking",
+      "destination": "/basics/knowledge/chunking/fixed-size-chunking"
+    },
+    {
+      "source": "/chunking/recursive-chunking",
+      "destination": "/basics/knowledge/chunking/recursive-chunking"
+    },
+    {
+      "source": "/embedder",
+      "destination": "/basics/knowledge/embedder/overview"
+    },
+    {
+      "source": "/embedder/introduction",
+      "destination": "/basics/knowledge/embedder/overview"
+    },
+    {
+      "source": "/embedder/fireworks",
+      "destination": "/basics/knowledge/embedder/fireworks"
+    },
+    {
+      "source": "/embedder/gemini",
+      "destination": "/basics/knowledge/embedder/gemini"
+    },
+    {
+      "source": "/embedder/mistral",
+      "destination": "/basics/knowledge/embedder/mistral"
+    },
+    {
+      "source": "/embedder/nebius",
+      "destination": "/basics/knowledge/embedder/nebius"
+    },
+    {
+      "source": "/embedder/openai",
+      "destination": "/basics/knowledge/embedder/openai"
+    },
+    {
+      "source": "/embedder/qdrant-fastembed",
+      "destination": "/basics/knowledge/embedder/qdrant-fastembed/overview"
+    },
+    {
+      "source": "/embedder/together",
+      "destination": "/basics/knowledge/embedder/together"
+    },
+    {
+      "source": "/embedder/voyageai",
+      "destination": "/basics/knowledge/embedder/voyageai"
+    },
+    {
+      "source": "/evals/performance",
+      "destination": "/basics/evals/performance"
+    },
+    {
+      "source": "/evals/platform",
+      "destination": "/basics/evals/overview"
+    },
+    {
+      "source": "/evals/reliability",
+      "destination": "/basics/evals/reliability"
+    },
+    {
+      "source": "/tools/introduction",
+      "destination": "/basics/tools/overview"
+    },
+    {
+      "source": "/vectordb/couchbase",
+      "destination": "/integrations/vectordb/couchbase/overview"
+    },
+    {
+      "source": "/vectordb/weaviate",
+      "destination": "/integrations/vectordb/weaviate/overview"
+    },
+    {
+      "source": "/models/litellm",
+      "destination": "/integrations/models/gateways/litellm/overview"
+    },
+    {
+      "source": "/observability/langfuse",
+      "destination": "/integrations/observability/langfuse"
+    },
+    {
+      "source": "/workspaces/introduction",
+      "destination": "/agent-os/introduction"
+    },
+    {
+      "source": "/agent-api/introduction",
+      "destination": "/reference-api/overview"
+    },
+    {
+      "source": "/agent-os/configuration",
+      "destination": "/agent-os/config"
+    },
+    {
+      "source": "/agent-ui/introduction",
+      "destination": "/basics/agent-ui/overview"
+    },
+    {
+      "source": "/basics/knowledge/vectordb/lightrag",
+      "destination": "/integrations/vectordb/lightrag/overview"
+    },
+    {
+      "source": "/basics/multimodal/speech-to-text",
+      "destination": "/basics/multimodal/audio/speech-to-text"
+    },
+    {
+      "source": "/basics/reasoning/introduction",
+      "destination": "/basics/reasoning/overview"
+    },
+    {
+      "source": "/basics/agents/running-your-agent",
+      "destination": "/basics/agents/running-agents"
+    },
+    {
+      "source": "/basics/agents/run",
+      "destination": "/basics/agents/running-agents"
+    },
+    {
+      "source": "/basics/teams/run",
+      "destination": "/basics/teams/running-teams"
+    },
+    {
+      "source": "/basics/workflows/run_workflow",
+      "destination": "/basics/workflows/running-workflows"
+    }
+  ]
+}

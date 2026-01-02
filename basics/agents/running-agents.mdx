@@ -1,0 +1,470 @@
+---
+title: 运行智能体
+sidebarTitle: 运行智能体
+description: 学习如何运行您的智能体并处理它们的输出。
+---
+
+通过调用 `Agent.run()` 或 `Agent.arun()` 来运行您的智能体。它们的工作方式如下：
+
+1. 智能体构建要发送给模型的上下文（系统消息、用户消息、聊天历史、用户记忆、会话状态和其他相关输入）。
+2. 智能体将此上下文发送给模型。
+3. 模型处理输入并响应消息或工具调用。
+4. 如果模型进行工具调用，智能体执行它并将结果返回给模型。
+5. 模型处理更新的上下文，重复此循环直到产生没有任何工具调用的最终消息。
+6. 智能体将此最终响应返回给调用者。
+
+## 基本执行
+
+`Agent.run()` 函数运行智能体并返回输出——要么作为 `RunOutput` 对象，要么作为 `RunOutputEvent` 对象流（当 `stream=True` 时）。例如：
+
+```python
+from agno.agent import Agent, RunOutput
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+from agno.utils.pprint import pprint_run_response
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+# 运行智能体并将响应作为变量返回
+response: RunOutput = agent.run("趋势初创公司和产品。")
+
+# 以 markdown 格式打印响应
+pprint_run_response(response, markdown=True)
+```
+
+<Tip>
+您也可以使用 `Agent.arun()` 异步运行智能体。请参阅此[示例](/basics/agents/usage/basic-async)。
+</Tip>
+
+## 运行输入
+
+`input` 参数是要发送给智能体的输入。它可以是字符串、列表、字典、消息、pydantic 模型或消息列表。例如：
+
+```python
+# 字符串输入
+agent.run("Hello, how are you?")
+
+# 列表输入
+agent.run(["Hello", "how are you?"])
+
+# 字典输入
+agent.run({"message": "Hello, how are you?"})
+
+# 消息输入
+from agno.agent import Agent
+from agno.models.message import Message
+
+message = Message(
+    role="user",
+    content="Hello, how are you?"
+)
+agent.run(message)
+
+# Pydantic 模型输入
+from pydantic import BaseModel
+
+class UserInput(BaseModel):
+    message: str
+
+input_data = UserInput(message="Hello, how are you?")
+agent.run(input_data)
+
+# 消息列表输入
+messages = [
+    Message(role="user", content="Hello"),
+    Message(role="assistant", content="Hi there!"),
+    Message(role="user", content="How are you?")
+]
+agent.run(messages)
+```
+
+## 运行输出
+
+`Agent.run()` 返回一个 `RunOutput` 对象，包含智能体的响应。`RunOutput` 对象具有以下属性：
+
+```python
+from agno.agent import Agent, RunOutput
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+response: RunOutput = agent.run("趋势初创公司和产品。")
+
+# 访问响应内容
+print(response.content)
+
+# 访问运行状态
+print(response.run_id)
+print(response.agent_id)
+print(response.session_id)
+print(response.user_id)
+
+# 访问工具调用
+print(response.tools)
+
+# 访问指标
+print(response.metrics)
+
+# 访问会话状态
+print(response.session_state)
+```
+
+## 流式传输
+
+您可以通过设置 `stream=True` 来流式传输智能体的响应。这对于聊天应用程序和实时反馈很有用。
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+# 流式传输响应
+stream = agent.run("趋势初创公司和产品。", stream=True)
+
+for chunk in stream:
+    if chunk.event == "content":
+        print(chunk.content, end="")
+```
+
+## 流式传输内部事件
+
+当流式传输时，智能体会发出各种事件，让您能够实时监控执行过程。
+
+```python
+from agno.agent import Agent, RunEvent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+stream = agent.run("趋势初创公司和产品。", stream=True)
+
+for chunk in stream:
+    if chunk.event == RunEvent.run_started:
+        print("智能体开始运行")
+    elif chunk.event == RunEvent.run_content:
+        print(chunk.content, end="")
+    elif chunk.event == RunEvent.run_tool_call:
+        print(f"调用工具: {chunk.tool_call.name}")
+    elif chunk.event == RunEvent.run_tool_response:
+        print(f"工具响应: {chunk.tool_response.result}")
+    elif chunk.event == RunEvent.run_completed:
+        print("智能体运行完成")
+```
+
+## 处理事件
+
+您可以使用 `RunEvent` 枚举来处理不同类型的事件：
+
+```python
+from agno.agent import Agent, RunEvent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+stream = agent.run("趋势初创公司和产品。", stream=True)
+
+for chunk in stream:
+    match chunk.event:
+        case RunEvent.run_started:
+            print("🚀 智能体开始运行")
+        case RunEvent.run_content:
+            print(chunk.content, end="")
+        case RunEvent.run_tool_call:
+            print(f"🔧 调用工具: {chunk.tool_call.name}")
+        case RunEvent.run_tool_response:
+            print(f"📋 工具响应: {chunk.tool_response.result}")
+        case RunEvent.run_completed:
+            print("✅ 智能体运行完成")
+        case RunEvent.run_failed:
+            print(f"❌ 智能体运行失败: {chunk.error}")
+        case _:
+            print(f"📝 未知事件: {chunk.event}")
+```
+
+## 事件类型
+
+### run_started
+
+当智能体开始运行时发出。
+
+```python
+{
+    "event": "run_started",
+    "run_id": "123",
+    "agent_id": "123",
+    "session_id": "123",
+    "user_id": "123"
+}
+```
+
+### run_content
+
+当智能体生成内容时发出。
+
+```python
+{
+    "event": "run_content",
+    "content": "Hello, world!"
+}
+```
+
+### run_tool_call
+
+当智能体调用工具时发出。
+
+```python
+{
+    "event": "run_tool_call",
+    "tool_call": {
+        "name": "hackernews_top_stories",
+        "arguments": {"limit": 5}
+    }
+}
+```
+
+### run_tool_response
+
+当工具返回响应时发出。
+
+```python
+{
+    "event": "run_tool_response",
+    "tool_response": {
+        "name": "hackernews_top_stories",
+        "result": [...]
+    }
+}
+```
+
+### run_completed
+
+当智能体完成运行时发出。
+
+```python
+{
+    "event": "run_completed",
+    "run_id": "123",
+    "agent_id": "123",
+    "session_id": "123",
+    "user_id": "123"
+}
+```
+
+### run_failed
+
+当智能体运行失败时发出。
+
+```python
+{
+    "event": "run_failed",
+    "run_id": "123",
+    "agent_id": "123",
+    "session_id": "123",
+    "user_id": "123",
+    "error": "Something went wrong"
+}
+```
+
+## 自定义事件
+
+您可以创建自定义事件来扩展智能体的功能：
+
+```python
+from agno.agent import Agent, RunEvent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+class CustomEvent(RunEvent):
+    custom_event = "custom_event"
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+# 发出自定义事件
+agent.emit_event(CustomEvent(data="自定义数据"))
+```
+
+## 指定运行用户和会话
+
+您可以为运行指定用户和会话：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+# 指定用户和会话
+response = agent.run(
+    "趋势初创公司和产品。",
+    user_id="user123",
+    session_id="session123"
+)
+```
+
+## 传递图像/音频/视频/文件
+
+您可以向智能体传递多媒体内容：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.storage.agent.sqlite import SqliteAgentStorage
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+    storage=SqliteAgentStorage(table_name="agent_sessions"),
+)
+
+# 传递图像
+response = agent.run(
+    "这张图片中有什么？",
+    images=["path/to/image.jpg"]
+)
+
+# 传递音频
+response = agent.run(
+    "这段音频中说了什么？",
+    audio=["path/to/audio.mp3"]
+)
+
+# 传递视频
+response = agent.run(
+    "这段视频中发生了什么？",
+    video=["path/to/video.mp4"]
+)
+
+# 传递文件
+response = agent.run(
+    "总结这个文档。",
+    files=["path/to/document.pdf"]
+)
+```
+
+## 传递输出模式
+
+您可以指定输出模式来控制智能体的响应格式：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+from pydantic import BaseModel
+
+class ReportOutput(BaseModel):
+    title: str
+    summary: str
+    key_points: list[str]
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。",
+    output_model=ReportOutput,
+)
+
+response = agent.run("趋势初创公司和产品。")
+
+# 访问结构化输出
+print(response.output_model.title)
+print(response.output_model.summary)
+print(response.output_model.key_points)
+```
+
+## 暂停和继续运行
+
+您可以暂停和继续智能体的运行：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+# 开始运行
+stream = agent.run("趋势初创公司和产品。", stream=True)
+
+# 暂停运行
+agent.pause_run(run_id="run123")
+
+# 继续运行
+agent.resume_run(run_id="run123")
+```
+
+## 取消运行
+
+您可以取消正在运行的智能体：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="就该主题写一份报告。只输出报告。",
+    markdown=True,
+)
+
+# 开始运行
+stream = agent.run("趋势初创公司和产品。", stream=True)
+
+# 取消运行
+agent.cancel_run(run_id="run123")
+```
+
+## 开发者资源
+
+- 查看[智能体架构](/reference/agents/agent)
+- 查看[运行响应架构](/reference/agents/run-response)
+- 查看[实践指南](https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/README.md)

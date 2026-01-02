@@ -1,0 +1,127 @@
+---
+title: 人在环
+---
+
+本示例展示如何在您的 Agno 工具中实现人在环功能。
+它展示了如何：
+- 为工具添加前置钩子以进行用户确认
+- 在工具执行期间处理用户输入
+- 根据用户选择优雅地取消操作
+
+一些实际应用：
+- 在执行前确认敏感操作
+- 在进行 API 调用前审查
+- 验证数据转换
+- 在关键系统中批准自动化操作
+
+## 代码
+
+```python human_in_the_loop.py
+import json
+from textwrap import dedent
+
+import httpx
+from agno.agent import Agent
+from agno.tools import tool
+from agno.utils import pprint
+from rich.console import Console
+from rich.prompt import Prompt
+
+console = Console()
+
+
+@tool(requires_confirmation=True)
+def get_top_hackernews_stories(num_stories: int) -> str:
+    """从 Hacker News 获取热门故事。
+
+    Args:
+        num_stories (int): 要检索的故事数量
+
+    Returns:
+        str: 包含故事详情的 JSON 字符串
+    """
+    # 获取热门故事 ID
+    response = httpx.get("https://hacker-news.firebaseio.com/v0/topstories.json")
+    story_ids = response.json()
+
+    # 生成故事详情
+    all_stories = []
+    for story_id in story_ids[:num_stories]:
+        story_response = httpx.get(
+            f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json"
+        )
+        story = story_response.json()
+        if "text" in story:
+            story.pop("text", None)
+        all_stories.append(story)
+    return json.dumps(all_stories)
+
+
+# 使用精通技术的个性和清晰指令初始化智能体
+agent = Agent(
+    description="一个获取和总结 Hacker News 故事的科技新闻助手",
+    instructions=dedent("""\
+        您是一位热情的科技记者
+
+        您的职责：
+        - 以引人入胜和信息丰富的方式呈现 Hacker News 故事
+        - 提供您收集信息的清晰摘要
+
+        风格指南：
+        - 使用表情符号使您的回应更有吸引力
+        - 保持摘要简洁但信息丰富
+        - 以友好的科技主题署名结束\
+    """),
+    tools=[get_top_hackernews_stories],
+    markdown=True,
+)
+
+# 示例问题尝试：
+# - "当前前 3 个 HN 故事是什么？"
+# - "向我显示来自 Hacker News 的最新故事"
+# - "获取前 5 个故事（您可以尝试接受和拒绝确认）"
+response = agent.run("前 2 个 hackernews 故事是什么？")
+
+for requirement in run_response.active_requirements:
+    if requirement.needs_confirmation:
+        # 请求确认
+        console.print(
+            f"工具名称 [bold blue]{requirement.tool.tool_name}({requirement.tool.tool_args})[/] 需要确认。"
+        )
+        message = (
+            Prompt.ask("您想继续吗？", choices=["y", "n"], default="y")
+            .strip()
+            .lower()
+        )
+
+        # 确认或拒绝要求
+        if message == "n":
+            requirement.reject()
+        else:
+            requirement.confirm()
+
+run_response = agent.continue_run(
+    run_id=run_response.run_id,
+    requirements=run_response.requirements,
+)
+pprint.pprint_run_response(run_response)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python human_in_the_loop.py
+    ```
+  </Step>
+
+</Steps>

@@ -1,0 +1,37 @@
+---
+title: JSON for Agent
+sidebarTitle: Agent
+---
+
+Agno 支持 using 本地 JSON files 作为智能体的存储后端 using the `JsonDb` class.
+
+## 使用方法
+
+```python json_for_agent.py
+"""Run `pip install ddgs openai` to install dependencies."""
+
+from agno.agent import Agent
+from agno.db.json import JsonDb
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+# Setup the JSON database
+db = JsonDb(db_path="tmp/json_db")
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    db=db,
+    tools=[DuckDuckGoTools()],
+    add_history_to_context=True,
+)
+agent.print_response("How many people live in Canada?")
+agent.print_response("What is their national anthem called?")
+```
+
+## 参数
+
+<Snippet file="db-json-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/blob/main/cookbook/07_数据库/json_db/json_for_智能体.py)

@@ -1,0 +1,343 @@
+---
+title: 自定义日志
+sidebarTitle: 自定义日志
+description: 学习如何在您的 Agno 设置中使用自定义日志
+keywords: [自定义日志, 日志, python 日志, 日志配置]
+---
+
+您可以为 Agno 提供自己的日志配置，以替代默认配置。
+
+如果您需要系统以任何特定格式记录日志，这将非常有用。
+
+## 指定自定义日志配置
+
+您可以通过使用 `configure_agno_logging` 函数配置 Agno 使用您自己的日志配置。
+
+```python
+import logging
+
+from agno.agent import Agent
+from agno.utils.log import configure_agno_logging, log_info
+
+# 设置自定义日志记录器
+custom_logger = logging.getLogger("custom_logger")
+handler = logging.StreamHandler()
+formatter = logging.Formatter("[CUSTOM_LOGGER] %(levelname)s: %(message)s")
+handler.setFormatter(formatter)
+custom_logger.addHandler(handler)
+custom_logger.setLevel(logging.INFO)
+custom_logger.propagate = False
+
+# 配置 Agno 使用自定义日志记录器
+configure_agno_logging(custom_default_logger=custom_logger)
+
+# 所有日志现在将使用自定义日志记录器
+log_info("这是使用我们的自定义日志记录器！")
+
+agent = Agent()
+agent.print_response("2+2 等于多少？")
+```
+
+## 日志记录到文件
+
+您可以配置 Agno 将日志记录到文件而不是控制台：
+
+```python
+import logging
+from pathlib import Path
+
+from agno.agent import Agent
+from agno.utils.log import configure_agno_logging, log_info
+
+# 创建文件日志记录器
+file_logger = logging.getLogger("file_logger")
+file_handler = logging.FileHandler(
+    Path("logs/agno.log"),
+    mode="a",
+    encoding="utf-8"
+)
+formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+file_handler.setFormatter(formatter)
+file_logger.addHandler(file_handler)
+file_logger.setLevel(logging.INFO)
+file_logger.propagate = False
+
+# 配置 Agno 使用文件日志记录器
+configure_agno_logging(custom_default_logger=file_logger)
+
+agent = Agent()
+agent.print_response("日志记录到文件示例")
+```
+
+## 日志级别配置
+
+```python
+import logging
+
+from agno.utils.log import configure_agno_logging
+
+# 设置不同的日志级别
+debug_logger = logging.getLogger("debug_logger")
+debug_logger.setLevel(logging.DEBUG)
+
+info_logger = logging.getLogger("info_logger")
+info_logger.setLevel(logging.INFO)
+
+warning_logger = logging.getLogger("warning_logger")
+warning_logger.setLevel(logging.WARNING)
+
+error_logger = logging.getLogger("error_logger")
+error_logger.setLevel(logging.ERROR)
+
+# 配置不同组件的日志记录器
+configure_agno_logging(
+    custom_default_logger=info_logger,
+    model_logger=debug_logger,
+    tool_logger=warning_logger,
+    agent_logger=error_logger
+)
+```
+
+## 结构化日志
+
+```python
+import logging
+import json
+from datetime import datetime
+
+class StructuredFormatter(logging.Formatter):
+    def format(self, record):
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno
+        }
+        
+        if record.exc_info:
+            log_entry["exception"] = self.formatException(record.exc_info)
+        
+        return json.dumps(log_entry, ensure_ascii=False)
+
+# 使用结构化格式化器
+structured_logger = logging.getLogger("structured_logger")
+structured_handler = logging.StreamHandler()
+structured_handler.setFormatter(StructuredFormatter())
+structured_logger.addHandler(structured_handler)
+structured_logger.setLevel(logging.INFO)
+
+configure_agno_logging(custom_default_logger=structured_logger)
+```
+
+## 日志轮转
+
+```python
+import logging
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+# 设置日志轮转
+rotating_handler = RotatingFileHandler(
+    Path("logs/agno.log"),
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5,
+    encoding="utf-8"
+)
+
+rotating_logger = logging.getLogger("rotating_logger")
+rotating_logger.addHandler(rotating_handler)
+rotating_logger.setLevel(logging.INFO)
+
+configure_agno_logging(custom_default_logger=rotating_logger)
+```
+
+## 最佳实践
+
+### 1. 日志级别选择
+
+- **DEBUG**: 详细的调试信息，开发阶段使用
+- **INFO**: 一般信息，生产环境推荐
+- **WARNING**: 警告信息，需要关注的问题
+- **ERROR**: 错误信息，需要立即处理的问题
+
+### 2. 日志格式
+
+- 使用结构化格式便于解析和分析
+- 包含时间戳、模块、函数名等信息
+- 避免在生产环境中记录敏感信息
+
+### 3. 性能考虑
+
+- 使用异步日志记录避免阻塞
+- 合理设置日志级别，避免过多日志
+- 考虑日志文件大小和轮转策略
+
+### 4. 安全考虑
+
+- 不要在日志中记录敏感信息
+- 使用加密传输日志
+- 定期清理旧的日志文件
+
+## 高级配置
+
+### 多进程日志
+
+```python
+import logging
+from logging.handlers import QueueHandler, QueueListener
+from multiprocessing import Process
+
+# 设置多进程日志队列
+log_queue = Queue()
+queue_handler = QueueHandler(log_queue)
+
+# 配置队列监听器
+queue_listener = QueueListener(log_queue)
+queue_listener.start()
+
+# 在子进程中配置日志
+def setup_worker_logging():
+    import logging
+    from agno.utils.log import configure_agno_logging
+    
+    worker_logger = logging.getLogger("worker")
+    worker_handler = logging.StreamHandler()
+    worker_logger.addHandler(worker_handler)
+    configure_agno_logging(custom_default_logger=worker_logger)
+
+# 启动工作进程
+Process(target=setup_worker_logging)
+```
+
+### 日志过滤
+
+```python
+import logging
+
+class LevelFilter(logging.Filter):
+    def __init__(self, level):
+        super().__init__()
+        self.level = level
+    
+    def filter(self, record):
+        return record.levelno >= self.level
+
+# 为不同组件设置不同的日志级别
+agent_logger = logging.getLogger("agent")
+agent_logger.addFilter(LevelFilter(logging.WARNING))
+
+configure_agno_logging(agent_logger=agent_logger)
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 日志不显示
+
+**问题**: 配置的自定义日志不生效
+**解决方案**:
+1. 检查 `propagate` 设置是否正确
+2. 确认日志级别配置
+3. 验证日志处理器是否正确添加
+4. 检查是否有多个日志记录器冲突
+
+#### 性能问题
+
+**问题**: 日志记录影响性能
+**解决方案**:
+1. 调整日志级别到适当级别
+2. 使用异步日志记录
+3. 优化日志格式化逻辑
+4. 考虑使用缓冲写入
+
+#### 文件权限问题
+
+**问题**: 无法写入日志文件
+**解决方案**:
+1. 检查文件路径是否存在
+2. 验证写入权限
+3. 确保目录存在且有写入权限
+4. 检查磁盘空间是否充足
+
+## 示例配置
+
+### 开发环境配置
+
+```python
+import logging
+from agno.utils.log import configure_agno_logging
+
+# 开发环境详细日志
+dev_logger = logging.getLogger("dev")
+dev_handler = logging.StreamHandler()
+dev_formatter = logging.Formatter(
+    "[%(asctime)s] %(name)s [%(levelname)s] %(message)s "
+    "[%(pathname)s:%(lineno)d]"
+)
+dev_handler.setFormatter(dev_formatter)
+dev_logger.addHandler(dev_handler)
+dev_logger.setLevel(logging.DEBUG)
+
+configure_agno_logging(custom_default_logger=dev_logger)
+```
+
+### 生产环境配置
+
+```python
+import logging
+from agno.utils.log import configure_agno_logging
+
+# 生产环境简化日志
+prod_logger = logging.getLogger("prod")
+prod_handler = logging.FileHandler(
+    "logs/production.log",
+    encoding="utf-8"
+)
+prod_formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+prod_handler.setFormatter(prod_formatter)
+prod_logger.addHandler(prod_handler)
+prod_logger.setLevel(logging.INFO)
+
+configure_agno_logging(custom_default_logger=prod_logger)
+```
+
+### 测试环境配置
+
+```python
+import logging
+import tempfile
+from agno.utils.log import configure_agno_logging
+
+# 测试环境临时日志
+with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
+    test_logger = logging.getLogger("test")
+    test_handler = logging.FileHandler(temp_file.name)
+    test_formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    test_handler.setFormatter(test_formatter)
+    test_logger.addHandler(test_handler)
+    test_logger.setLevel(logging.DEBUG)
+    
+    configure_agno_logging(custom_default_logger=test_logger)
+    
+    # 在此作用域内使用测试日志
+    # ... 测试代码 ...
+    
+    # 临时文件会自动删除
+```
+
+## 下一步
+
+- 查看[智能体日志](/basics/agents/logging)
+- 了解[团队日志](/basics/teams/logging)
+- 探索[工作流日志](/basics/workflows/logging)
+- 查看[追踪日志](/basics/tracing/overview)

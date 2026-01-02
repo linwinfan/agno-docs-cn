@@ -1,0 +1,670 @@
+---
+title: "远程智能体"
+sidebarTitle: "远程智能体"
+description: "执行托管在远程 AgentOS 实例上的智能体"
+---
+
+`RemoteAgent` 允许您执行运行在远程 AgentOS 实例上的智能体，就像它们是本地智能体一样。这支持分布式架构，其中专门的智能体运行在不同的服务器上。
+
+## 先决条件
+
+您需要一个运行中的 AgentOS 实例，其中至少包含一个智能体。请参阅[创建您的第一个OS](/agent-os/creating-your-first-os)来设置一个。
+
+## 基本用法
+
+```python
+import asyncio
+from agno.agent import RemoteAgent
+
+async def main():
+    # 连接到远程智能体
+    agent = RemoteAgent(
+        base_url="http://remote-server:7778",  # 本地测试使用 localhost
+        agent_id="assistant-agent",
+    )
+    
+    # 运行智能体
+    response = await agent.arun("法国的首都是哪里？")
+    print(response.content)
+
+asyncio.run(main())
+```
+
+## 流式响应
+
+实时流式传输响应以获得更好的用户体验：
+
+```python
+from agno.agent import RemoteAgent
+
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",  # 本地测试使用 localhost
+    agent_id="assistant-agent",
+)
+
+async for event in agent.arun(
+    "给我讲一个勇敢骑士的故事",
+    stream=True,
+):
+    if hasattr(event, "content") and event.content:
+        print(event.content, end="", flush=True)
+```
+
+## 高级配置
+
+### 1. 认证和安全
+
+```python
+from agno.agent import RemoteAgent
+
+# 使用 JWT 令牌认证
+agent = RemoteAgent(
+    base_url="https://secure-agentos.example.com",
+    agent_id="assistant-agent",
+    headers={
+        "Authorization": "Bearer your-jwt-token",
+        "X-Client-ID": "your-client-id"
+    },
+    verify_ssl=True  # 启用 SSL 验证
+)
+
+# 使用 API 密钥认证
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",
+    agent_id="assistant-agent",
+    headers={
+        "X-API-Key": "your-api-key"
+    }
+)
+```
+
+### 2. 超时和重试
+
+```python
+from agno.agent import RemoteAgent
+
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",
+    agent_id="assistant-agent",
+    timeout=30,  # 请求超时时间（秒）
+    max_retries=3,  # 最大重试次数
+    retry_delay=1,  # 重试延迟（秒）
+    backoff_factor=2  # 指数退避因子
+)
+```
+
+### 3. 连接池
+
+```python
+from agno.agent import RemoteAgent
+from agno.agent.connection import ConnectionPool
+
+# 创建连接池
+pool = ConnectionPool(
+    base_url="http://remote-server:7778",
+    max_connections=10,
+    keep_alive_timeout=30
+)
+
+# 使用连接池的智能体
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",
+    agent_id="assistant-agent",
+    connection_pool=pool
+)
+```
+
+## 执行模式
+
+### 1. 同步执行
+
+```python
+from agno.agent import RemoteAgent
+
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",
+    agent_id="assistant-agent"
+)
+
+# 同步执行（阻塞）
+response = agent.run("解释量子计算的基本原理")
+print(response.content)
+```
+
+### 2. 异步执行
+
+```python
+import asyncio
+from agno.agent import RemoteAgent
+
+async def main():
+    agent = RemoteAgent(
+        base_url="http://remote-server:7778",
+        agent_id="assistant-agent"
+    )
+    
+    # 异步执行（非阻塞）
+    task = asyncio.create_task(
+        agent.arun("分析市场趋势并提供建议")
+    )
+    
+    # 在等待时执行其他任务
+    print("智能体正在处理请求...")
+    
+    # 获取结果
+    response = await task
+    print(response.content)
+
+asyncio.run(main())
+```
+
+### 3. 批量执行
+
+```python
+import asyncio
+from agno.agent import RemoteAgent
+
+async def main():
+    agent = RemoteAgent(
+        base_url="http://remote-server:7778",
+        agent_id="assistant-agent"
+    )
+    
+    # 批量执行多个任务
+    tasks = [
+        agent.arun(f"分析主题 {i}: {topic}")
+        for i, topic in enumerate([
+            "人工智能发展趋势",
+            "区块链技术应用", 
+            "量子计算突破",
+            "生物技术创新"
+        ])
+    ]
+    
+    # 并行执行所有任务
+    responses = await asyncio.gather(*tasks)
+    
+    # 处理结果
+    for i, response in enumerate(responses):
+        print(f"主题 {i} 的分析结果:")
+        print(response.content)
+        print("-" * 50)
+
+asyncio.run(main())
+```
+
+## 错误处理
+
+### 1. 基本错误处理
+
+```python
+from agno.agent import RemoteAgent
+from agno.agent.exceptions import (
+    RemoteAgentError,
+    ConnectionError,
+    AuthenticationError,
+    TimeoutError
+)
+
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",
+    agent_id="assistant-agent"
+)
+
+try:
+    response = agent.run("执行复杂任务")
+    print(response.content)
+    
+except ConnectionError as e:
+    print(f"连接错误: {e}")
+    # 实施重试逻辑或备用方案
+    
+except AuthenticationError as e:
+    print(f"认证失败: {e}")
+    # 重新获取认证令牌
+    
+except TimeoutError as e:
+    print(f"请求超时: {e}")
+    # 增加超时时间或优化任务
+    
+except RemoteAgentError as e:
+    print(f"远程智能体错误: {e}")
+    # 处理其他远程执行错误
+```
+
+### 2. 高级错误处理
+
+```python
+import asyncio
+from agno.agent import RemoteAgent
+from agno.agent.exceptions import RemoteAgentError
+
+class RobustRemoteAgent:
+    def __init__(self, base_url: str, agent_id: str):
+        self.agent = RemoteAgent(
+            base_url=base_url,
+            agent_id=agent_id,
+            max_retries=3,
+            retry_delay=1
+        )
+        self.fallback_responses = {
+            "default": "抱歉，我现在无法处理您的请求，请稍后再试。",
+            "network": "网络连接出现问题，请检查您的网络设置。",
+            "auth": "认证失败，请重新登录。"
+        }
+    
+    async def safe_run(self, message: str) -> str:
+        """安全执行，带有错误恢复"""
+        try:
+            response = await self.agent.arun(message)
+            return response.content
+            
+        except ConnectionError:
+            # 网络错误 - 实施回退策略
+            return self.fallback_responses["network"]
+            
+        except AuthenticationError:
+            # 认证错误 - 可能需要重新认证
+            await self.reauthenticate()
+            return self.fallback_responses["auth"]
+            
+        except TimeoutError:
+            # 超时 - 尝试简化任务
+            simplified_message = f"简要回答: {message}"
+            try:
+                response = await self.agent.arun(simplified_message, timeout=10)
+                return response.content
+            except:
+                return self.fallback_responses["default"]
+                
+        except Exception as e:
+            # 其他错误 - 记录并返回默认响应
+            print(f"未预期的错误: {e}")
+            return self.fallback_responses["default"]
+    
+    async def reauthenticate(self):
+        """重新认证逻辑"""
+        # 实现重新获取令牌的逻辑
+        pass
+
+# 使用健壮的远程智能体
+async def main():
+    robust_agent = RobustRemoteAgent(
+        "http://remote-server:7778",
+        "assistant-agent"
+    )
+    
+    response = await robust_agent.safe_run("解释机器学习")
+    print(response)
+
+asyncio.run(main())
+```
+
+## 性能优化
+
+### 1. 缓存机制
+
+```python
+import hashlib
+import json
+from typing import Dict, Optional
+from agno.agent import RemoteAgent
+
+class CachedRemoteAgent:
+    def __init__(self, base_url: str, agent_id: str, cache_ttl: int = 300):
+        self.agent = RemoteAgent(base_url, agent_id)
+        self.cache: Dict[str, Dict] = {}
+        self.cache_ttl = cache_ttl
+    
+    def _generate_cache_key(self, message: str) -> str:
+        """生成缓存键"""
+        return hashlib.md5(message.encode()).hexdigest()
+    
+    def _is_cache_valid(self, cache_entry: Dict) -> bool:
+        """检查缓存是否有效"""
+        import time
+        return time.time() - cache_entry["timestamp"] < self.cache_ttl
+    
+    async def cached_run(self, message: str) -> str:
+        """带缓存的执行"""
+        cache_key = self._generate_cache_key(message)
+        
+        # 检查缓存
+        if cache_key in self.cache:
+            cache_entry = self.cache[cache_key]
+            if self._is_cache_valid(cache_entry):
+                return cache_entry["response"]
+        
+        # 执行请求
+        response = await self.agent.arun(message)
+        
+        # 缓存结果
+        self.cache[cache_key] = {
+            "response": response.content,
+            "timestamp": time.time()
+        }
+        
+        return response.content
+
+# 使用缓存智能体
+async def main():
+    cached_agent = CachedRemoteAgent(
+        "http://remote-server:7778",
+        "assistant-agent"
+    )
+    
+    # 第一次请求会执行远程调用
+    response1 = await cached_agent.cached_run("什么是人工智能？")
+    print(response1)
+    
+    # 第二次请求会从缓存获取结果
+    response2 = await cached_agent.cached_run("什么是人工智能？")
+    print(response2)
+
+asyncio.run(main())
+```
+
+### 2. 连接复用
+
+```python
+from agno.agent import RemoteAgent
+from agno.agent.connection import PersistentConnection
+
+class ConnectionPoolManager:
+    def __init__(self, base_url: str, max_connections: int = 5):
+        self.base_url = base_url
+        self.max_connections = max_connections
+        self.connections = []
+        self.available_connections = []
+    
+    async def get_connection(self) -> PersistentConnection:
+        """获取可用连接"""
+        if self.available_connections:
+            return self.available_connections.pop()
+        
+        if len(self.connections) < self.max_connections:
+            connection = PersistentConnection(self.base_url)
+            await connection.connect()
+            self.connections.append(connection)
+            return connection
+        
+        # 等待可用连接
+        return await self._wait_for_connection()
+    
+    async def release_connection(self, connection: PersistentConnection):
+        """释放连接"""
+        if connection.is_healthy():
+            self.available_connections.append(connection)
+        else:
+            # 移除不健康的连接
+            self.connections.remove(connection)
+            await connection.close()
+    
+    async def _wait_for_connection(self) -> PersistentConnection:
+        """等待可用连接"""
+        import asyncio
+        while not self.available_connections:
+            await asyncio.sleep(0.1)
+        return self.available_connections.pop()
+
+# 使用连接池管理器
+async def main():
+    pool_manager = ConnectionPoolManager("http://remote-server:7778")
+    
+    # 创建多个智能体实例共享连接池
+    agents = [
+        RemoteAgent(
+            base_url="http://remote-server:7778",
+            agent_id="assistant-agent",
+            connection_manager=pool_manager
+        )
+        for _ in range(3)
+    ]
+    
+    # 并行执行任务
+    tasks = [
+        agent.arun(f"处理任务 {i}")
+        for i, agent in enumerate(agents)
+    ]
+    
+    responses = await asyncio.gather(*tasks)
+    
+    for i, response in enumerate(responses):
+        print(f"任务 {i} 结果: {response.content[:50]}...")
+
+asyncio.run(main())
+```
+
+## 监控和调试
+
+### 1. 执行监控
+
+```python
+import time
+import logging
+from agno.agent import RemoteAgent
+
+class MonitoredRemoteAgent(RemoteAgent):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.metrics = {
+            "total_requests": 0,
+            "successful_requests": 0,
+            "failed_requests": 0,
+            "total_response_time": 0,
+            "cache_hits": 0
+        }
+        self.logger = logging.getLogger(__name__)
+    
+    async def arun(self, message: str, **kwargs):
+        start_time = time.time()
+        self.metrics["total_requests"] += 1
+        
+        try:
+            self.logger.info(f"开始执行远程智能体: {message[:50]}...")
+            
+            response = await super().arun(message, **kwargs)
+            
+            response_time = time.time() - start_time
+            self.metrics["successful_requests"] += 1
+            self.metrics["total_response_time"] += response_time
+            
+            self.logger.info(
+                f"执行成功，耗时 {response_time:.2f}s，"
+                f"响应长度 {len(response.content)}"
+            )
+            
+            return response
+            
+        except Exception as e:
+            self.metrics["failed_requests"] += 1
+            self.logger.error(f"执行失败: {e}")
+            raise
+    
+    def get_metrics(self) -> Dict:
+        """获取性能指标"""
+        if self.metrics["total_requests"] > 0:
+            avg_response_time = (
+                self.metrics["total_response_time"] / 
+                self.metrics["successful_requests"]
+                if self.metrics["successful_requests"] > 0
+                else 0
+            )
+            success_rate = (
+                self.metrics["successful_requests"] / 
+                self.metrics["total_requests"]
+            )
+            
+            return {
+                **self.metrics,
+                "avg_response_time": avg_response_time,
+                "success_rate": success_rate
+            }
+        
+        return self.metrics
+
+# 使用监控智能体
+async def main():
+    monitored_agent = MonitoredRemoteAgent(
+        base_url="http://remote-server:7778",
+        agent_id="assistant-agent"
+    )
+    
+    # 执行一些测试请求
+    for i in range(5):
+        try:
+            response = await monitored_agent.arun(f"测试请求 {i+1}")
+            print(f"请求 {i+1} 成功")
+        except Exception as e:
+            print(f"请求 {i+1} 失败: {e}")
+    
+    # 查看指标
+    metrics = monitored_agent.get_metrics()
+    print("\n性能指标:")
+    for key, value in metrics.items():
+        print(f"  {key}: {value}")
+
+asyncio.run(main())
+```
+
+### 2. 调试工具
+
+```python
+from agno.agent import RemoteAgent
+import json
+
+class DebugRemoteAgent(RemoteAgent):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.debug_mode = kwargs.get("debug", False)
+        self.request_log = []
+    
+    async def arun(self, message: str, **kwargs):
+        if self.debug_mode:
+            print(f"[DEBUG] 发送请求: {message}")
+            print(f"[DEBUG] 参数: {kwargs}")
+        
+        # 记录请求
+        self.request_log.append({
+            "timestamp": time.time(),
+            "message": message,
+            "kwargs": kwargs
+        })
+        
+        try:
+            response = await super().arun(message, **kwargs)
+            
+            if self.debug_mode:
+                print(f"[DEBUG] 响应状态: {response.status}")
+                print(f"[DEBUG] 响应长度: {len(response.content)}")
+                print(f"[DEBUG] 响应预览: {response.content[:100]}...")
+            
+            return response
+            
+        except Exception as e:
+            if self.debug_mode:
+                print(f"[DEBUG] 错误详情: {e}")
+                import traceback
+                traceback.print_exc()
+            raise
+    
+    def get_request_log(self) -> list:
+        """获取请求日志"""
+        return self.request_log
+    
+    def export_debug_info(self, filename: str):
+        """导出调试信息"""
+        debug_info = {
+            "agent_config": {
+                "base_url": self.base_url,
+                "agent_id": self.agent_id
+            },
+            "request_log": self.request_log,
+            "metrics": self.get_metrics() if hasattr(self, 'get_metrics') else {}
+        }
+        
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(debug_info, f, indent=2, ensure_ascii=False)
+        
+        print(f"调试信息已导出到: {filename}")
+
+# 使用调试智能体
+async def main():
+    debug_agent = DebugRemoteAgent(
+        base_url="http://remote-server:7778",
+        agent_id="assistant-agent",
+        debug=True
+    )
+    
+    # 执行测试请求
+    await debug_agent.arun("测试调试功能")
+    
+    # 导出调试信息
+    debug_agent.export_debug_info("debug_info.json")
+
+asyncio.run(main())
+```
+
+## 最佳实践
+
+### 1. 连接管理
+
+- **连接复用**: 使用连接池减少连接开销
+- **健康检查**: 定期检查连接状态
+- **优雅关闭**: 正确关闭连接避免资源泄漏
+
+### 2. 错误处理
+
+- **分类处理**: 区分不同类型的错误
+- **重试策略**: 实施智能重试机制
+- **降级方案**: 准备备用方案处理服务不可用
+
+### 3. 性能优化
+
+- **缓存策略**: 缓存频繁请求的结果
+- **批量处理**: 合并多个小请求
+- **异步并发**: 利用异步处理提高吞吐量
+
+### 4. 安全考虑
+
+- **认证管理**: 安全存储和管理认证信息
+- **传输加密**: 使用 HTTPS 保护数据传输
+- **访问控制**: 实施适当的权限控制
+
+## 故障排除
+
+### 常见问题
+
+#### 连接被拒绝
+
+**问题**: 无法连接到远程 AgentOS 实例
+**解决方案**:
+1. 检查服务端是否运行
+2. 验证 URL 和端口配置
+3. 检查防火墙设置
+4. 确认网络连通性
+
+#### 认证失败
+
+**问题**: 认证令牌无效或过期
+**解决方案**:
+1. 验证令牌格式和有效性
+2. 检查令牌过期时间
+3. 重新获取有效令牌
+4. 确认服务端认证配置
+
+#### 响应超时
+
+**问题**: 请求响应时间过长
+**解决方案**:
+1. 增加超时时间设置
+2. 检查网络延迟
+3. 优化服务端性能
+4. 考虑使用流式响应
+
+## 下一步
+
+- 查看[RemoteTeam](/agent-os/remote-execution/remote-team)
+- 了解[RemoteWorkflow](/agent-os/remote-execution/remote-workflow)
+- 探索[AgentOSClient](/reference/agent-os/client)
+- 查看[AgentOS 网关](/agent-os/remote-execution/gateway)

@@ -1,0 +1,181 @@
+---
+title: 用户记忆和会话摘要
+---
+
+本示例展示如何创建具有持久化内存的智能体，存储：
+1. 个性化用户记忆 - 关于特定用户了解的事实和偏好
+2. 会话摘要 - 对话中的关键点和上下文
+3. 聊天历史 - 存储在 SQLite 中以实现持久化
+
+关键功能：
+- 在 SQLite 数据库中存储用户特定记忆
+- 维护会话摘要以提供上下文
+- 跨会话继续对话并保持记忆
+- 在响应中引用之前的上下文和用户信息
+
+示例：
+用户："我叫 John，住在纽约"
+智能体：*创建关于 John 位置的记忆*
+
+用户："你记得关于我的什么？"
+智能体：*回忆之前关于 John 的记忆*
+
+## 代码
+
+```python user_memories.py
+import json
+from textwrap import dedent
+from typing import List, Optional
+
+import typer
+from agno.agent import Agent
+from agno.db.base import SessionType
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.session import AgentSession
+from rich.console import Console
+from rich.json import JSON
+from rich.panel import Panel
+from rich.prompt import Prompt
+
+
+def create_agent(user: str = "user"):
+    session_id: Optional[str] = None
+
+    # 询问用户是否要开始新会话或继续现有会话
+    new = typer.confirm("您想开始新会话吗？")
+
+    # 初始化智能体会话和记忆的存储
+    db = SqliteDb(db_file="tmp/agents.db")
+
+    if not new:
+        existing_sessions: List[AgentSession] = db.get_sessions(
+            user_id=user, session_type=SessionType.AGENT
+        )  # type: ignore
+        if len(existing_sessions) > 0:
+            session_id = existing_sessions[0].session_id
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        user_id=user,
+        session_id=session_id,
+        enable_user_memories=True,
+        enable_session_summaries=True,
+        db=db,
+        add_history_to_context=True,
+        num_history_runs=3,
+        # 增强的系统提示以获得更好的个性和记忆使用
+        description=dedent("""\
+        您是一个乐于助人且友好的 AI 助手，具有出色的记忆能力。
+        - 记住关于用户的重要细节并自然地引用它们
+        - 在保持精确和有用的同时保持温暖、积极的语气
+        - 适当时，回顾之前的对话和记忆
+        - 对您记住或不记住的内容始终保持诚实"""),
+    )
+
+    if session_id is None:
+        session_id = agent.session_id
+        if session_id is not None:
+            print(f"开始会话：{session_id}\n")
+        else:
+            print("开始会话\n")
+    else:
+        print(f"继续会话：{session_id}\n")
+
+    return agent
+
+
+def print_agent_memory(agent):
+    """打印智能体记忆系统的当前状态"""
+    console = Console()
+
+    # 打印聊天历史
+    messages = agent.get_session_messages()
+    console.print(
+        Panel(
+            JSON(
+                json.dumps(
+                    [m.model_dump(include={"role", "content"}) for m in messages],
+                    indent=4,
+                ),
+            ),
+            title=f"会话 ID {agent.session_id} 的聊天历史",
+            expand=True,
+        )
+    )
+
+    # 打印用户记忆
+    user_memories = agent.get_user_memories(user_id=agent.user_id)
+    if user_memories:
+        memories_data = [memory.to_dict() for memory in user_memories]
+        console.print(
+            Panel(
+                JSON(json.dumps(memories_data, indent=4)),
+                title=f"用户 ID {agent.user_id} 的记忆",
+                expand=True,
+            )
+        )
+
+    # 打印会话摘要
+    try:
+        session_summary = agent.get_session_summary()
+        if session_summary:
+            console.print(
+                Panel(
+                    JSON(
+                        json.dumps(session_summary.to_dict(), indent=4),
+                    ),
+                    title=f"会话 ID {agent.session_id} 的会话摘要",
+                    expand=True,
+                )
+            )
+        else:
+            console.print(
+                "会话摘要：尚未创建（摘要在多次交互后创建）"
+            )
+    except Exception as e:
+        console.print(f"会话摘要错误：{e}")
+
+
+def main(user: str = "user"):
+    """带记忆显示的交互式聊天循环"""
+    agent = create_agent(user)
+
+    print("尝试这些示例输入：")
+    print("- '我叫 [姓名]，住在 [城市]'")
+    print("- '我喜欢 [爱好/兴趣]'")
+    print("- '你记得关于我的什么？'")
+    print("- '到目前为止我们讨论了什么？'\n")
+
+    exit_on = ["exit", "quit", "bye"]
+    while True:
+        message = Prompt.ask(f"[bold] :sunglasses: {user} [/bold]")
+        if message in exit_on:
+            break
+
+        agent.print_response(input=message, stream=True, markdown=True)
+        print_agent_memory(agent)
+
+
+if __name__ == "__main__":
+    typer.run(main)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai sqlalchemy agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python user_memories.py
+    ```
+  </Step>
+
+</Steps>

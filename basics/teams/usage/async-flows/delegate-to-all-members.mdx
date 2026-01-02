@@ -1,0 +1,148 @@
+---
+title: 异步协作团队
+sidebarTitle: 委派给所有成员
+description: 这个示例演示了由AI智能体组成的协作团队，异步协同工作以跨不同平台研究主题。
+---
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch delegate_to_all_members.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python delegate_to_all_members.py
+    """
+    这个示例演示了由AI智能体组成的协作团队，协同工作以跨不同平台研究主题。
+
+    该团队由两个专业智能体组成：
+    1. Reddit 研究员 - 使用 DuckDuckGo 查找和分析相关的 Reddit 帖子
+    2. HackerNews 研究员 - 使用 HackerNews API 查找和分析相关的 HackerNews 帖子
+
+    这些智能体以"协作"模式工作，意味着它们：
+    - 同时被分配相同的任务
+    - 通过讨论努力达成共识
+    - 由引导讨论的团队负责人协调
+
+    团队负责人主持讨论并确定何时达成共识。
+
+    这种设置适用于：
+    - 从不同的在线社区获得多样化的观点
+    - 跨平台交叉引用信息
+    - 让智能体协作形成更全面的分析
+    - 通过结构化讨论得出平衡的结论
+
+    """
+
+    import asyncio
+    from textwrap import dedent
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+    from agno.tools.duckduckgo import DuckDuckGoTools
+    from agno.tools.hackernews import HackerNewsTools
+
+    reddit_researcher = Agent(
+        name="Reddit Researcher",
+        role="Research a topic on Reddit",
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[DuckDuckGoTools()],
+        add_name_to_context=True,
+        instructions=dedent("""
+        You are a Reddit researcher.
+        You will be given a topic to research on Reddit.
+        You will need to find the most relevant posts on Reddit.
+        """),
+    )
+
+    hackernews_researcher = Agent(
+        name="HackerNews Researcher",
+        model=OpenAIChat("gpt-5-mini"),
+        role="Research a topic on HackerNews.",
+        tools=[HackerNewsTools()],
+        add_name_to_context=True,
+        instructions=dedent("""
+        You are a HackerNews researcher.
+        You will be given a topic to research on HackerNews.
+        You will need to find the most relevant posts on HackerNews.
+        """),
+    )
+
+
+    agent_team = Team(
+        name="Discussion Team",
+        model=OpenAIChat("gpt-5-mini"),
+        members=[
+            reddit_researcher,
+            hackernews_researcher,
+        ],
+        instructions=[
+            "You are a discussion master.",
+            "You have to stop the discussion when you think the team has reached a consensus.",
+        ],
+        delegate_to_all_members=True,
+        markdown=True,
+        show_members_responses=True,
+    )
+
+
+    async def main():
+        """Main async function demonstrating collaborative team mode."""
+        await agent_team.aprint_response(
+            input="Start the discussion on the topic: 'What is the best way to learn to code?'",
+            stream=True,
+        )
+
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python delegate_to_all_members.py
+    ```
+    
+    ```bash Windows
+    python delegate_to_all_members.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/async_flows" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+

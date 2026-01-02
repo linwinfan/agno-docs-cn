@@ -1,0 +1,66 @@
+---
+title: Meta
+sidebarTitle: 概览
+description: Learn how to use Meta 模型s in Agno.
+---
+
+Meta offers a suite of powerful multi-modal language 模型s known for their strong performance across a wide range of tasks, including superior text understanding and visual intelligence.
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `Llama-4-Scout-17B`: Excellent performance for most general tasks, including multi-modal scenarios.
+- `Llama-3.3-70B`: Powerful instruction-以下 模型 for complex reasoning tasks.
+
+Explore all the 模型s [here](https://llama.developer.meta.com/docs/模型s).
+
+## Authentication
+
+Set your `LLAMA_API_KEY` environment variable:
+
+<CodeGroup>
+  ```bash Mac export LLAMA_API_KEY=YOUR_API_KEY ``` ```bash Windows setx
+  LLAMA_API_KEY YOUR_API_KEY ```
+</CodeGroup>
+
+## Example
+
+Use `Llama` with your `Agent`:
+
+<CodeGroup>
+```python agent.py
+from agno.agent import Agent
+from agno.models.meta import Llama
+
+agent = Agent(
+model=Llama(
+id="Llama-4-Maverick-17B-128E-Instruct-FP8",
+),
+markdown=True
+)
+
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/meta/usage/basic). </Note>
+
+## Parameters
+
+| Parameter    | Type               | Default                                       | Description                                                           |
+| ------------ | ------------------ | --------------------------------------------- | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"meta-llama/Meta-Llama-3.1-405B-Instruct"` | The id of the Meta 模型 to use                                      |
+| `name`       | `str`              | `"MetaLlama"`                               | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Meta"`                                     | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                                        | The API key for Meta (defaults to META_API_KEY env var)              |
+| `base_url`   | `str`              | `"https://api.llama-api.com"`               | The base URL for the Meta API                                         |
+
+### OpenAI-like Parameters
+
+`LlamaOpenAI` 支持 all parameters from [OpenAI Like](/reference/models/openai-like).
+
+## 资源
+
+- [Meta AI Models](https://llama.developer.meta.com/docs/模型s)
+- [Llama API Documentation](https://llama.developer.meta.com/docs/overview)
+```

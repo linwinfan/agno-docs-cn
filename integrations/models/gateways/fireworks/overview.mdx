@@ -1,0 +1,63 @@
+---
+title: Fireworks
+sidebarTitle: 概览
+description: Learn how to use Fireworks 模型s in Agno.
+---
+
+Fireworks is a 平台 for providing endpoints for Large Language 模型s.
+
+## Authentication
+
+Set your `FIREWORKS_API_KEY` environment variable. Get your key from [here](https://fireworks.ai/account/api-keys).
+
+<CodeGroup>
+
+```bash Mac
+export FIREWORKS_API_KEY=***
+```
+
+```bash Windows
+setx FIREWORKS_API_KEY ***
+```
+
+</CodeGroup>
+
+## Prompt caching
+
+Prompt caching will happen automatically using our `Fireworks` 模型. You can read 更多功能 about how Fireworks handle caching in [their docs](https://docs.fireworks.ai/guides/prompt-caching#using-prompt-caching).
+
+## Example
+
+Use `Fireworks` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.fireworks import Fireworks
+
+agent = Agent(
+    model=Fireworks(id="accounts/fireworks/models/firefunction-v2"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/fireworks/usage/basic). </Note>
+
+## Parameters
+
+| Parameter    | Type               | Default                                                    | Description                                                           |
+| ------------ | ------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"accounts/fireworks/models/llama-v3p1-405b-instruct"`   | The id of the Fireworks 模型 to use                                 |
+| `name`       | `str`              | `"Fireworks"`                                              | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Fireworks"`                                              | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                                                     | The API key for Fireworks (defaults to FIREWORKS_API_KEY env var)    |
+| `base_url`   | `str`              | `"https://api.fireworks.ai/推理/v1"`                 | The base URL for the Fireworks API                                    |
+
+`Fireworks` extends the OpenAI-兼容 interface and 支持 most parameters from the [OpenAI 模型](/integrations/models/native/openai/completion/overview).

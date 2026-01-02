@@ -1,0 +1,93 @@
+---
+title: Zep
+description: The ZepTools toolkit enables an Agent to interact with a Zep 记忆 system, providing 功能 to store, retrieve, and search 记忆 数据 associated with user sessions.
+sidebarTitle: Zep
+keywords: [zep, database]
+---
+
+**ZepTools** enable an Agent to interact with a Zep 记忆 system, providing 功能 to store, retrieve, and search 记忆 数据 associated with user sessions.
+
+## Prerequisites
+
+The ZepTools require the `zep-云` Python package and a Zep API key.
+
+```shell
+pip install zep-cloud
+```
+
+```shell
+export ZEP_API_KEY=your_api_key
+```
+
+## Example
+
+The 以下 example demonstrates how to create an 智能体 with access to Zep 记忆:
+
+```python cookbook/14_tools/zep_tools.py
+import time
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.zep import ZepTools
+
+# Initialize the ZepTools
+zep_tools = ZepTools(user_id="agno", session_id="agno-session", add_instructions=True)
+
+# Initialize the Agent
+agent = Agent(
+    model=OpenAIChat(),
+    tools=[zep_tools],
+    dependencies={"memory": zep_tools.get_zep_memory(memory_type="context")},
+    add_dependencies_to_context=True,
+)
+
+# Interact with the Agent so that it can learn about the user
+agent.print_response("My name is John Billings")
+agent.print_response("I live in NYC")
+agent.print_response("I'm going to a concert tomorrow")
+
+# Allow the memories to sync with Zep database
+time.sleep(10)
+
+# Refresh the context
+agent.context["memory"] = zep_tools.get_zep_memory(memory_type="context")
+
+# Ask the Agent about the user
+agent.print_response("What do you know about me?")
+```
+
+## Toolkit 参数
+
+| Parameter                | Type     | Default | Description                                           |
+| ------------------------ | -------- | ------- | ----------------------------------------------------- |
+| `session_id`             | `str`    | `None`  | Optional session ID. Auto-generated if not provided.  |
+| `user_id`                | `str`    | `None`  | Optional user ID. Auto-generated if not provided.     |
+| `api_key`                | `str`    | `None`  | Zep API key. If not provided, uses ZEP_API_KEY env var. |
+| `ignore_assistant_messages` | `bool` | `False` | Whether to ignore assistant messages when adding to 记忆. |
+| `enable_add_zep_message`        | `bool`   | `True`  | Add a message to the current Zep session 记忆.        |
+| `enable_get_zep_记忆`         | `bool`   | `True`  | Retrieve 记忆 for the current Zep session.       |
+| `enable_search_zep_记忆`      | `bool`   | `True`  | Search the Zep 记忆 store for relevant information.   |
+| `instructions`           | `str`    | `None`  | Custom instructions for using the Zep tools.          |
+| `add_instructions`       | `bool`   | `False` | Whether to add default instructions.                  |
+
+## Toolkit Functions
+
+| Function | Description |
+| -------- | ----------- |
+| `add_zep_message` | Adds a message to the current Zep session 记忆. Takes `role` (str) for the message sender and `content` (str) for the message text. Returns a confirmation or error message. |
+| `get_zep_记忆` | Retrieves 记忆 for the current Zep session. Takes optional `记忆_type` (str) parameter with options "context" (default), "summary", or "messages". Returns the requested 记忆 content or an error. |
+| `search_zep_记忆` | Searches the Zep 记忆 store for relevant information. Takes `query` (str) to find relevant facts and optional `search_scope` (str) parameter with options "messages" (default) or "summary". Returns search results or an error message. |
+
+## Async Toolkit
+
+The `ZepAsyncTools` class extends the `ZepTools` class and provides 异步 versions of the toolkit functions.
+
+
+
+## 开发者资源
+
+- 查看 [Tools](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/tools/zep.py)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/14_tools/zep_tools.py)
+- 查看 [Async Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/14_tools/zep_async_tools.py)
+
+

@@ -1,0 +1,159 @@
+---
+title: 演示
+description: AgentOS 演示和示例
+sidebarTitle: 演示
+keywords: [演示, 示例, agentos, 快速开始]
+---
+
+本页面提供了 AgentOS 的各种演示和示例，帮助您快速了解和使用 AgentOS 的功能。
+
+## 快速开始示例
+
+### 1. 基本智能体示例
+
+创建一个简单的智能体：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+agent = Agent(
+    name="助手",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="你是一个有用的助手。"
+)
+
+response = agent.run("你好！")
+print(response.content)
+```
+
+### 2. 团队协作示例
+
+创建一个智能体团队：
+
+```python
+from agno.agent import Agent
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+
+# 创建团队成员
+researcher = Agent(
+    name="研究员",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="你是一个研究员，负责收集信息。"
+)
+
+writer = Agent(
+    name="写作者",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="你是一个写作者，负责整理内容。"
+)
+
+# 创建团队
+team = Team(
+    name="研究团队",
+    agents=[researcher, writer],
+    instructions="协同完成研究任务。"
+)
+
+response = team.run("研究人工智能的最新发展")
+print(response.content)
+```
+
+### 3. 工作流示例
+
+创建一个工作流：
+
+```python
+from agno.workflow import Workflow
+from agno.models.openai import OpenAIChat
+
+workflow = Workflow(
+    name="数据分析工作流",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="执行数据分析流程。"
+)
+
+response = workflow.run("分析销售数据")
+print(response.content)
+```
+
+## 高级示例
+
+### 1. 带知识库的智能体
+
+```python
+from agno.agent import Agent
+from agno.knowledge.pdf import PdfKnowledgeBase
+from agno.models.openai import OpenAIChat
+
+# 创建知识库
+knowledge_base = PdfKnowledgeBase(
+    path="document.pdf"
+)
+
+# 创建带知识库的智能体
+agent = Agent(
+    name="知识库助手",
+    model=OpenAIChat(id="gpt-4"),
+    knowledge=knowledge_base,
+    instructions="基于提供的文档回答问题。"
+)
+```
+
+### 2. 带工具的智能体
+
+```python
+from agno.agent import Agent
+from agno.tools.web import WebTools
+from agno.models.openai import OpenAIChat
+
+agent = Agent(
+    name="网络助手",
+    model=OpenAIChat(id="gpt-4"),
+    tools=[WebTools()],
+    instructions="使用网络工具获取信息。"
+)
+```
+
+### 3. 自定义中间件
+
+```python
+from agno.os import AgentOS
+from agno.os.middleware import JWTMiddleware
+
+agent_os = AgentOS(
+    agents=[agent],
+    middleware=[
+        JWTMiddleware(
+            secret_key="your-secret-key"
+        )
+    ]
+)
+```
+
+## 运行示例
+
+### 本地运行
+
+```bash
+python example.py
+```
+
+### 使用 AgentOS 服务
+
+```python
+from agno.os import AgentOS
+
+agent_os = AgentOS(agents=[agent])
+agent_os.serve(port=7777)
+```
+
+## 更多示例
+
+- 查看[客户端使用示例](/agent-os/usage/client)
+- 了解[接口使用指南](/agent-os/usage/interfaces)
+- 探索[MCP 集成](/agent-os/usage/mcp)
+- 学习[中间件配置](/agent-os/usage/middleware)
+- 掌握[RBAC 权限控制](/agent-os/usage/rbac)
+- 了解[远程执行](/agent-os/usage/remote-execution)

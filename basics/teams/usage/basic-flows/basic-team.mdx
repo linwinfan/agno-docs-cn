@@ -1,0 +1,133 @@
+---
+title: 基础团队
+sidebarTitle: 简单团队
+description: 这个示例演示了一个简单的 AI 智能体团队，它们协同工作以研究不同平台上的主题。
+---
+
+该团队由三个专业智能体组成：
+1. **HackerNews 研究员** - 使用 HackerNews API 查找和分析相关的 HackerNews 帖子
+2. **文章阅读器** - 从 URL 读取文章
+
+团队负责人通过以下方式协调智能体：
+- 给每个智能体分配特定任务
+- 为每个智能体提供清晰的指令
+- 收集和总结每个智能体的结果
+
+
+
+<Steps>
+
+  <Step title="Create a Python file">
+    ```bash
+    touch basic_team.py
+    ```
+  </Step>
+
+
+  <Step title="Add the following code to your Python file">
+
+    ```python basic_team.py
+    from typing import List
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+    from agno.tools.hackernews import HackerNewsTools
+    from agno.tools.newspaper4k import Newspaper4kTools
+    from pydantic import BaseModel, Field
+
+
+    class Article(BaseModel):
+        title: str = Field(..., description="The title of the article")
+        summary: str = Field(..., description="A summary of the article")
+        reference_links: List[str] = Field(
+            ..., description="A list of reference links to the article"
+        )
+
+
+    hn_researcher = Agent(
+        name="HackerNews 研究员",
+        model=OpenAIChat("gpt-5-mini"),
+        role="Gets top stories from hackernews.",
+        tools=[HackerNewsTools()],
+    )
+
+    article_reader = Agent(
+        name="Article Reader",
+        model=OpenAIChat("gpt-5-mini"),
+        role="Reads articles from URLs.",
+        tools=[Newspaper4kTools()],
+    )
+
+
+    hn_team = Team(
+        name="HackerNews Team",
+        model=OpenAIChat("gpt-5-mini"),
+        members=[hn_researcher, article_reader],
+        instructions=[
+            "首先，在 hackernews 上搜索用户询问的内容.",
+            "然后，请文章阅读器阅读这些故事的链接以获取更多信息.",
+            "重要：您必须为文章阅读器提供要阅读的链接.",
+            "然后，请网络搜索器搜索每个故事以获取更多信息.",
+            "最后, provide a thoughtful and engaging summary.",
+        ],
+        output_schema=Article,
+        add_member_tools_to_context=False,
+        markdown=True,
+        show_members_responses=True,
+    )
+
+
+    hn_team.print_response(
+        input="Write an article about the top 2 stories on hackernews", stream=True
+    )
+    ```
+
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="Install libraries">
+    ```bash
+    pip install -U agno openai newspaper4k
+    ```
+  </Step>
+
+  <Step title="Export your OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="Run Team">
+    <CodeGroup>
+    ```bash Mac
+    python basic_team.py
+    ```
+    
+    ```bash Windows
+    python basic_team.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Find All Cookbooks">
+  Explore all the available cookbooks in the Agno repository. Click the link below to view the code on GitHub:
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/basic_flows" target="_blank">
+    Agno Cookbooks on GitHub
+  </Link>
+</Step>
+</Steps>
+
+
+
+
+

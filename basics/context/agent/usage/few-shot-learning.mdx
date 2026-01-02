@@ -1,0 +1,157 @@
+---
+title: 使用附加输入进行少量学习
+---
+
+本示例演示了如何使用 `additional_input` 与智能体结合，通过少量学习来教授正确的响应模式，特别适用于客户支持场景。
+
+## 代码
+
+```python few_shot_learning.py
+"""
+本示例演示了如何使用 additional_input 与智能体结合
+通过少量学习来教授正确的响应模式。
+"""
+
+from agno.agent import Agent
+from agno.models.message import Message
+from agno.models.openai import OpenAIChat
+
+# 少量示例展示良好的支持模式
+support_examples = [
+    # 示例 1：简单问题解决
+    Message(role="user", content="我忘记了密码，无法登录"),
+    Message(
+        role="assistant",
+        content="""
+    我会立即帮您重置密码。
+
+    **重置密码的步骤：**
+    . 转到登录页面并点击"忘记密码"
+    . 输入您的电子邮件地址
+    . 检查您的电子邮件中的重置链接
+    . 点击链接创建新密码
+    . 使用包含大写、小写、数字和符号的强密码
+
+    如果5分钟内没有收到邮件，请检查您的垃圾邮件文件夹。如果您需要这些步骤的任何帮助，请告诉我！
+    """.strip(),
+    ),
+    # 示例 2：账单问题模式
+    Message(
+        role="user",
+        content="我被重复收取了同一订单的费用，我很沮丧！",
+    ),
+    Message(
+        role="assistant",
+        content="""
+    对于账单错误以及由此给您带来的沮丧，我深表歉意。
+
+    **立即行动计划：**
+    1. 我将调查您的账户以确认重复收费
+    2. 处理重复交易的全额退款
+    3. 通过检查您的支付方式设置确保这种情况不再发生
+    4. 退款处理完成后为您提供确认号码
+
+    退款通常需要3-5个工作日才能显示在您的账单上。作为对此不便的道歉，我还想为您提供下次订单10%的折扣。
+
+    关于此问题，还有其他我可以帮您的吗？
+    """.strip(),
+    ),
+    # 示例 3：技术支持模式
+    Message(role="user", content="当我尝试上传照片时，您的应用程序不断崩溃"),
+    Message(
+        role="assistant",
+        content="""
+    很抱歉您在上传照片时遇到崩溃问题。让我帮您解决这个问题。
+
+    **故障排除步骤：**
+    1. **检查应用程序版本：** 确保您从应用商店获得了最新版本
+    2. **重新启动应用程序：** 完全关闭并重新打开应用程序
+    3. **检查存储空间：** 确保您的设备有足够的存储空间（至少1GB可用）
+    4. **照片大小：** 尝试上传较小的照片（每张小于10MB）
+    5. **网络连接：** 确保您有稳定的互联网连接
+
+    **如果问题仍然存在：**
+    - 尝试一次只上传一张照片，而不是多张
+    - 在设备设置中清除应用程序缓存
+    - 重新启动您的设备
+
+    如果这些步骤都无法解决问题，请告诉我您的设备类型和操作系统版本，我会将此问题升级给我们的技术团队进行进一步调查。
+    """.strip(),
+    ),
+]
+
+if __name__ == "__main__":
+    # 创建带有少量学习的智能体
+    agent = Agent(
+        name="Customer Support Specialist",
+        model=OpenAIChat(id="gpt-5-mini"),
+        add_name_to_context=True,
+        additional_input=support_examples,  # 少量学习示例
+        instructions=[
+            "您是一位专业的客户支持专家。",
+            "始终保持同理心、专业性和以解决方案为导向。",
+            "提供清晰、可操作的步骤来解决客户问题。",
+            "遵循既定模式，提供一致、高质量的支持。",
+        ],
+        debug_mode=True,
+        markdown=True,
+    )
+
+    for i, example in enumerate(support_examples, 1):
+        print(f"📞 示例 {i}: {example}")
+        print("-" * 50)
+        agent.print_response(example)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上述代码。
+    ```bash
+    touch few_shot_learning.py
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python few_shot_learning.py
+    ```
+
+    ```bash Windows
+    python few_shot_learning.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有 Cookbook">
+    探索 Agno 仓库中所有可用的 cookbook。点击下面的链接在 GitHub 上查看代码：
+
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/context_management" target="_blank">
+      Agno Cookbook on GitHub
+    </Link>
+  </Step>
+</Steps>

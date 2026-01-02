@@ -1,0 +1,552 @@
+---
+title: "会话跟踪"
+sidebarTitle: "会话跟踪"
+description: "通过 AgentOS 界面监控、分析和管理智能体会话"
+---
+
+## 概述
+
+会话是持久的对话时间线，将输入、模型输出、工具、文件、指标和摘要绑定在单个 `session_id` 下。AgentOS 为智能体、团队和工作流持久化会话，以便您可以恢复工作、审计行为并随时间分析质量。
+
+- 会话收集有序的运行（每次运行包含消息、工具调用和指标）
+- 摘要和元数据帮助您搜索、分组和理解长历史记录
+- 可以通过指标选项卡监控每个会话的令牌使用情况
+- 检查与每个会话关联的智能体和模型的详细信息
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/agentos-session-management.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## 访问会话
+
+- 在侧边栏中打开`会话`部分
+- 如果配置了多个会话数据库，请从标题中的数据库选择器中选择一个
+- 使用标题选项卡在`智能体`和`团队`之间切换
+- 点击`重新加载页面`（刷新）同步列表和状态
+
+## 会话管理功能
+
+### 会话列表
+
+会话列表提供了所有会话的概览：
+
+| 列 | 描述 |
+|------|------|
+| **会话 ID** | 唯一标识符，用于引用特定会话 |
+| **智能体/团队** | 参与会话的智能体或团队名称 |
+| **开始时间** | 会话创建的时间戳 |
+| **最后活动** | 最后一次交互的时间 |
+| **消息数量** | 会话中的消息总数 |
+| **状态** | 当前会话状态（活跃、已暂停、已完成） |
+| **持续时间** | 会话的总持续时间 |
+
+### 会话详情
+
+点击任何会话可查看详细信息：
+
+#### 消息历史
+
+- **时间顺序**: 按时间顺序显示所有消息
+- **消息类型**: 区分用户消息和智能体响应
+- **工具调用**: 显示智能体使用的工具和结果
+- **文件附件**: 列出会话中共享的所有文件
+
+#### 会话指标
+
+```json
+{
+  "session_metrics": {
+    "total_messages": 25,
+    "user_messages": 12,
+    "agent_messages": 13,
+    "tool_calls": 8,
+    "total_tokens": 3420,
+    "input_tokens": 1850,
+    "output_tokens": 1570,
+    "average_response_time": "2.3s",
+    "session_duration": "15m 42s"
+  }
+}
+```
+
+#### 会话摘要
+
+自动生成的会话摘要：
+
+```yaml
+会话摘要:
+  主要话题: "产品功能讨论"
+  关键决策:
+    - 确定新功能优先级
+    - 选择技术实现方案
+    - 制定开发时间表
+  参与者: ["产品经理", "技术负责人", "UI 设计师"]
+  下一步行动: ["创建需求文档", "安排技术评审会议"]
+```
+
+## 高级会话功能
+
+### 会话分析
+
+#### 对话模式分析
+
+```python
+# 会话分析工具
+class SessionAnalyzer:
+    def __init__(self):
+        self.analysis_metrics = [
+            "engagement_level",    # 参与度
+            "topic_coherence",     # 主题连贯性
+            "response_quality",    # 响应质量
+            "goal_achievement",     # 目标达成度
+            "user_satisfaction"     # 用户满意度
+        ]
+    
+    def analyze_session(self, session_id):
+        """分析会话质量"""
+        session_data = self.get_session_data(session_id)
+        
+        analysis_results = {}
+        for metric in self.analysis_metrics:
+            analysis_results[metric] = self.calculate_metric(
+                session_data, 
+                metric
+            )
+        
+        return {
+            "session_id": session_id,
+            "analysis": analysis_results,
+            "overall_score": self.calculate_overall_score(analysis_results),
+            "recommendations": self.generate_recommendations(analysis_results)
+        }
+```
+
+#### 情感分析
+
+```python
+# 情感分析示例
+def analyze_sentiment(session_messages):
+    """分析会话中的情感倾向"""
+    sentiments = []
+    
+    for message in session_messages:
+        sentiment_score = analyze_message_sentiment(message.content)
+        sentiments.append({
+            "timestamp": message.timestamp,
+            "role": message.role,
+            "sentiment": sentiment_score,
+            "confidence": sentiment_score.confidence
+        })
+    
+    # 计算整体情感趋势
+    overall_sentiment = calculate_sentiment_trend(sentiments)
+    
+    return {
+        "message_sentiments": sentiments,
+        "overall_sentiment": overall_sentiment,
+        "sentiment_progression": get_sentiment_progression(sentiments)
+    }
+```
+
+### 会话导出
+
+#### 导出格式
+
+支持多种导出格式：
+
+```python
+# 会话导出器
+class SessionExporter:
+    def export_to_json(self, session_id):
+        """导出为 JSON 格式"""
+        session = self.get_session(session_id)
+        return {
+            "session_id": session.id,
+            "metadata": session.metadata,
+            "messages": [
+                {
+                    "id": msg.id,
+                    "role": msg.role,
+                    "content": msg.content,
+                    "timestamp": msg.timestamp.isoformat(),
+                    "tools": msg.tools_used
+                }
+                for msg in session.messages
+            ],
+            "metrics": session.metrics,
+            "summary": session.summary
+        }
+    
+    def export_to_csv(self, session_id):
+        """导出为 CSV 格式"""
+        session = self.get_session(session_id)
+        
+        csv_data = []
+        for message in session.messages:
+            csv_data.append({
+                "时间戳": message.timestamp,
+                "角色": message.role,
+                "内容": message.content[:100] + "...",
+                "工具使用": ", ".join(msg.tools_used),
+                "令牌数": message.token_count
+            })
+        
+        return csv_data
+    
+    def export_to_markdown(self, session_id):
+        """导出为 Markdown 格式"""
+        session = self.get_session(session_id)
+        
+        markdown = f"# 会话记录: {session.id}\n\n"
+        markdown += f"**开始时间**: {session.start_time}\n"
+        markdown += f"**参与者**: {session.participants}\n\n"
+        
+        for message in session.messages:
+            markdown += f"## {message.role} - {message.timestamp}\n\n"
+            markdown += f"{message.content}\n\n"
+            
+            if message.tools_used:
+                markdown += "### 工具使用\n"
+                for tool in message.tools_used:
+                    markdown += f"- {tool}\n"
+                markdown += "\n"
+        
+        return markdown
+```
+
+### 会话搜索
+
+#### 高级搜索
+
+```python
+# 会话搜索功能
+class SessionSearch:
+    def __init__(self):
+        self.search_index = SessionSearchIndex()
+    
+    def search_sessions(self, query, filters=None):
+        """搜索会话"""
+        search_params = {
+            "query": query,
+            "filters": filters or {},
+            "limit": 50,
+            "sort_by": "relevance"
+        }
+        
+        results = self.search_index.search(search_params)
+        
+        return {
+            "query": query,
+            "total_results": len(results),
+            "sessions": [
+                {
+                    "session_id": session.id,
+                    "title": session.title,
+                    "snippet": self.get_relevant_snippet(session, query),
+                    "relevance_score": session.relevance_score,
+                    "metadata": session.search_metadata
+                }
+                for session in results
+            ]
+        }
+    
+    def filter_by_date_range(self, sessions, start_date, end_date):
+        """按日期范围过滤"""
+        return [
+            session for session in sessions
+            if start_date <= session.start_time <= end_date
+        ]
+    
+    def filter_by_participant(self, sessions, participant):
+        """按参与者过滤"""
+        return [
+            session for session in sessions
+            if participant in session.participants
+        ]
+```
+
+## 会话配置
+
+### 会话设置
+
+```python
+# 会话配置
+session_config = {
+    "persistence": {
+        "auto_save": True,
+        "save_interval": "30s",
+        "max_session_duration": "24h"
+    },
+    "privacy": {
+        "data_retention": "90d",
+        "anonymization": False,
+        "encryption": True
+    },
+    "analytics": {
+        "enable_sentiment_analysis": True,
+        "enable_topic_modeling": True,
+        "enable_performance_tracking": True
+    },
+    "notifications": {
+        "long_session_alert": True,
+        "abnormal_behavior_alert": True,
+        "summary_generation": True
+    }
+}
+```
+
+### 智能体会话配置
+
+```python
+# 智能体会话配置
+agent_session_config = {
+    "auto_summarize": True,
+    "summary_frequency": "every_10_messages",
+    "context_window": "last_20_messages",
+    "memory_integration": True,
+    "tool_tracking": True,
+    "metrics_collection": {
+        "response_time": True,
+        "token_usage": True,
+        "tool_success_rate": True,
+        "user_satisfaction": True
+    }
+}
+```
+
+## 会话 API
+
+### 创建会话
+
+```python
+# 创建会话 API
+async def create_session(agent_id, user_id, metadata=None):
+    """创建新会话"""
+    session = Session(
+        agent_id=agent_id,
+        user_id=user_id,
+        metadata=metadata or {},
+        created_at=datetime.now(),
+        status="active"
+    )
+    
+    session_id = await session_store.create_session(session)
+    
+    return {
+        "session_id": session_id,
+        "status": "created",
+        "created_at": session.created_at.isoformat()
+    }
+```
+
+### 获取会话
+
+```python
+# 获取会话 API
+async def get_session(session_id, user_id):
+    """获取会话详情"""
+    session = await session_store.get_session(session_id)
+    
+    if not session or session.user_id != user_id:
+        return {"error": "会话不存在或无权限访问"}
+    
+    return {
+        "session_id": session.id,
+        "agent_id": session.agent_id,
+        "status": session.status,
+        "messages": [
+            {
+                "id": msg.id,
+                "role": msg.role,
+                "content": msg.content,
+                "timestamp": msg.timestamp.isoformat()
+            }
+            for msg in session.messages
+        ],
+        "metrics": session.metrics,
+        "summary": session.summary
+    }
+```
+
+### 更新会话
+
+```python
+# 更新会话 API
+async def update_session(session_id, user_id, updates):
+    """更新会话"""
+    session = await session_store.get_session(session_id)
+    
+    if not session or session.user_id != user_id:
+        return {"error": "会话不存在或无权限访问"}
+    
+    # 应用更新
+    for field, value in updates.items():
+        if hasattr(session, field):
+            setattr(session, field, value)
+    
+    session.updated_at = datetime.now()
+    
+    await session_store.update_session(session)
+    
+    return {"status": "updated", "session_id": session_id}
+```
+
+## 监控和分析
+
+### 会话指标
+
+```python
+# 会话指标监控
+async def get_session_metrics(time_range="7d"):
+    """获取会话指标"""
+    metrics = await session_store.get_metrics({
+        "time_range": time_range,
+        "metrics": [
+            "total_sessions",
+            "active_sessions",
+            "average_duration",
+            "message_count",
+            "tool_usage",
+            "user_satisfaction",
+            "error_rate"
+        ]
+    })
+    
+    return metrics
+```
+
+### 实时监控
+
+```python
+# 实时会话监控
+class SessionMonitor:
+    def __init__(self):
+        self.active_sessions = {}
+        self.alert_thresholds = {
+            "max_duration": "2h",
+            "max_messages": 100,
+            "error_rate": 0.1
+        }
+    
+    async def monitor_session(self, session_id):
+        """监控会话状态"""
+        session = await session_store.get_session(session_id)
+        
+        if session:
+            # 检查异常情况
+            alerts = []
+            
+            if self.check_long_session(session):
+                alerts.append("会话时间过长")
+            
+            if self.check_high_message_count(session):
+                alerts.append("消息数量过多")
+            
+            if self.check_high_error_rate(session):
+                alerts.append("错误率过高")
+            
+            if alerts:
+                await self.send_alerts(session_id, alerts)
+    
+    def check_long_session(self, session):
+        """检查会话是否过长"""
+        duration = datetime.now() - session.start_time
+        return duration > parse_duration(self.alert_thresholds["max_duration"])
+```
+
+## 最佳实践
+
+### 1. 会话组织
+
+- **清晰的命名**: 使用有意义的会话标题
+- **适当的分类**: 按项目或主题分类会话
+- **定期归档**: 将旧会话归档以保持列表整洁
+- **标签系统**: 使用标签标记重要会话
+
+### 2. 隐私保护
+
+- **数据最小化**: 只收集必要的会话数据
+- **定期清理**: 按照政策定期清理旧会话
+- **访问控制**: 实施适当的访问权限控制
+- **加密存储**: 对敏感会话数据进行加密
+
+### 3. 性能优化
+
+- **索引优化**: 建立高效的会话索引
+- **缓存策略**: 缓存常用会话数据
+- **分页加载**: 大量会话使用分页加载
+- **异步处理**: 使用异步操作提高响应速度
+
+### 4. 用户体验
+
+- **快速搜索**: 提供强大的会话搜索功能
+- **智能摘要**: 自动生成会话摘要
+- **上下文保持**: 在会话中保持上下文连贯性
+- **个性化推荐**: 基于历史会话推荐相关内容
+
+## 故障排除
+
+### 常见问题
+
+#### 会话无法加载
+
+**问题**: 会话列表无法加载
+**解决方案**:
+1. 检查 AgentOS 连接状态
+2. 验证会话数据库配置
+3. 确认用户权限设置
+4. 刷新页面重试
+
+#### 会话数据丢失
+
+**问题**: 会话数据意外丢失
+**解决方案**:
+1. 检查数据库连接状态
+2. 验证数据备份策略
+3. 查看错误日志
+4. 恢复备份数据
+
+#### 搜索结果不准确
+
+**问题**: 会话搜索结果不相关
+**解决方案**:
+1. 优化搜索索引配置
+2. 调整搜索权重设置
+3. 改进查询关键词
+4. 检查分词器配置
+
+### 调试工具
+
+```python
+# 会话调试工具
+async def debug_session_system():
+    """调试会话系统"""
+    # 检查会话存储状态
+    storage_status = await session_store.get_status()
+    print(f"存储状态: {storage_status}")
+    
+    # 检查活跃会话
+    active_sessions = await session_store.get_active_sessions()
+    print(f"活跃会话数: {len(active_sessions)}")
+    
+    # 测试会话创建
+    test_session = await create_session("test_agent", "test_user")
+    print(f"测试会话创建: {test_session}")
+
+asyncio.run(debug_session_system())
+```
+
+## 下一步
+
+- 了解[记忆功能](/agent-os/features/memories)
+- 探索[链路追踪](/agent-os/features/tracing)
+- 查看[聊天界面](/agent-os/features/chat-interface)
+- 了解[知识管理](/agent-os/features/knowledge-management)

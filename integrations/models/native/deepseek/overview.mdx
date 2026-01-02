@@ -1,0 +1,71 @@
+---
+title: DeepSeek
+sidebarTitle: 概览
+description: Learn how to use DeepSeek 模型s in Agno.
+---
+
+DeepSeek is a 平台 for providing endpoints for Large Language 模型s.
+See their library of 模型s [here](https://api-docs.deepseek.com/quick_start/pricing).
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `deepseek-chat` 模型 is good for most basic use-cases.
+- `deepseek-reasoner` 模型 is good for complex reasoning and multi-step tasks.
+
+DeepSeek does not have rate limits. See their [docs](https://api-docs.deepseek.com/quick_start/rate_limit) for information about how to deal with slower responses during high traffic.
+
+## Authentication
+
+Set your `DEEPSEEK_API_KEY` environment variable. Get your key from [here](https://平台.deepseek.com/api_keys).
+
+<CodeGroup>
+
+```bash Mac
+export DEEPSEEK_API_KEY=***
+```
+
+```bash Windows
+setx DEEPSEEK_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `DeepSeek` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.deepseek import DeepSeek
+
+agent = Agent(model=DeepSeek(id="deepseek-chat"), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/deepseek/usage/basic). </Note>
+
+## Parameters
+
+| Parameter    | Type               | Default                                        | Description                                                           |
+| ------------ | ------------------ | ---------------------------------------------- | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"deepseek-chat"`                              | The id of the DeepSeek 模型 to use                                  |
+| `name`       | `str`              | `"DeepSeek"`                                   | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"DeepSeek"`                                   | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                                         | The API key for DeepSeek (defaults to DEEPSEEK_API_KEY env var)      |
+| `base_url`   | `str`              | `"https://api.deepseek.com"`                   | The base URL for the DeepSeek API                                     |
+
+`DeepSeek` extends the OpenAI-兼容 interface and 支持 most parameters from the [OpenAI 模型](/integrations/models/native/openai/completion/overview).
+
+**Note**: DeepSeek's support for structured outputs is currently not fully 兼容, so `支持_原生_structured_outputs` is set to `False`.
+
+## Available Models
+
+- `deepseek-chat` - General-purpose conversational 模型, good for most use cases
+- `deepseek-reasoner` - Advanced reasoning 模型 optimized for complex problem-solving and multi-step tasks

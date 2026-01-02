@@ -1,0 +1,27 @@
+---
+title: 创建自己的工具
+sidebarTitle: 概述
+description: 学习如何编写自己的工具以及如何使用 `@tool` 装饰器来修改工具的行为。
+---
+
+在大多数生产情况下，您需要编写自己的工具。这就是为什么我们专注于在 Agno 中提供最佳的工具使用体验。
+
+规则很简单：
+
+- 任何 Python 函数都可以被智能体用作工具。
+- 使用 `@tool` 装饰器来修改此工具调用前后发生的事情。
+
+在 Agno 中创建工具有两种主要方式：
+1. 创建 Python 函数（可选使用 `@tool` 装饰器）
+2. 创建工具包
+
+## 了解更多
+
+<CardGroup>
+  <Card title="Python 函数作为工具" href="/basics/tools/creating-tools/python-functions">
+    学习如何使用 Python 函数创建工具。
+  </Card>
+  <Card title="工具包" href="/basics/tools/creating-tools/toolkits">
+    学习如何使用工具包创建工具。
+  </Card>
+</CardGroup>

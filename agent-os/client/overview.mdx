@@ -1,0 +1,487 @@
+---
+title: "AgentOS 客户端"
+sidebarTitle: "概述"
+description: "用于程序化访问 AgentOS 实例的 Python 客户端"
+---
+
+`AgentOSClient` 提供了一个 Python 接口，用于与运行的 AgentOS 实例交互。它使您能够：
+
+- **以编程方式运行智能体、团队和工作流**，支持流式响应
+- **管理会话**以在多次运行间保持对话持久性
+- **搜索和管理**连接的知识库中的知识
+- **访问**为用户存储的记忆
+- **监控追踪**以进行调试和可观测性
+
+## 快速开始
+
+```python
+import asyncio
+from agno.client import AgentOSClient
+
+async def main():
+    # 连接到 AgentOS
+    client = AgentOSClient(base_url="http://localhost:7777")
+    
+    # 获取配置和可用智能体
+    config = await client.aget_config()
+    print(f"连接到: {config.name or config.os_id}")
+    print(f"可用智能体: {[a.id for a in config.agents]}")
+    
+    # 运行智能体
+    if config.agents:
+        result = await client.run_agent(
+            agent_id=config.agents[0].id,
+            message="您好，您能如何帮助我？",
+        )
+        print(f"响应: {result.content}")
+
+asyncio.run(main())
+```
+
+## 流式响应
+
+客户端支持流式响应以进行实时响应处理：
+
+```python
+from agno.run.agent import RunContentEvent, RunCompletedEvent
+
+async for event in client.run_agent_stream(
+    agent_id="my-agent",
+    message="给我讲个故事",
+    user_id="user@example.com"
+):
+    if isinstance(event, RunContentEvent):
+        # 处理内容事件
+        print(event.content, end="", flush=True)
+    elif isinstance(event, RunCompletedEvent):
+        # 处理完成事件
+        print(f"\n\n运行完成，状态: {event.run.status}")
+```
+
+## 会话管理
+
+### 创建会话
+
+```python
+# 创建新会话
+session = await client.create_session(
+    agent_id="assistant",
+    user_id="user@example.com",
+    session_name="客户支持对话"
+)
+
+print(f"会话 ID: {session.session_id}")
+```
+
+### 使用现有会话
+
+```python
+# 在现有会话中运行智能体
+result = await client.run_agent(
+    agent_id="assistant",
+    message="继续我们之前的对话",
+    session_id=session.session_id,
+    user_id="user@example.com"
+)
+```
+
+### 获取会话历史
+
+```python
+# 获取会话消息
+messages = await client.aget_session_messages(
+    session_id=session.session_id
+)
+
+for message in messages:
+    print(f"{message.role}: {message.content}")
+```
+
+## 知识库管理
+
+### 搜索知识
+
+```python
+# 在知识库中搜索
+search_results = await client.asearch_knowledge(
+    query="机器学习算法",
+    limit=5
+)
+
+for result in search_results:
+    print(f"文档: {result.metadata.get('title', '未知')}")
+    print(f"内容: {result.content[:100]}...")
+    print(f"分数: {result.score}")
+```
+
+### 添加知识
+
+```python
+# 添加文档到知识库
+await client.aadd_knowledge(
+    content="这是一份关于人工智能的重要文档。",
+    metadata={
+        "title": "AI 基础",
+        "category": "技术文档",
+        "author": "张三"
+    }
+)
+```
+
+### 管理知识库
+
+```python
+# 获取知识库统计
+stats = await client.aget_knowledge_stats()
+print(f"总文档数: {stats.total_documents}")
+print(f"总向量数: {stats.total_vectors}")
+
+# 删除知识
+await client.adelete_knowledge(knowledge_id="doc_123")
+```
+
+## 记忆管理
+
+### 访问用户记忆
+
+```python
+# 获取用户记忆
+memories = await client.aget_user_memories(
+    user_id="user@example.com"
+)
+
+for memory in memories:
+    print(f"记忆: {memory.content}")
+    print(f"类型: {memory.memory_type}")
+    print(f"创建时间: {memory.created_at}")
+```
+
+### 添加用户记忆
+
+```python
+# 添加用户记忆
+await client.aadd_user_memory(
+    user_id="user@example.com",
+    content="用户偏好使用中文交流",
+    memory_type="preference"
+)
+```
+
+### 搜索记忆
+
+```python
+# 搜索用户记忆
+search_results = await client.asearch_user_memories(
+    user_id="user@example.com",
+    query="偏好"
+)
+```
+
+## 团队和工作流
+
+### 运行团队
+
+```python
+# 运行团队
+team_result = await client.run_team(
+    team_id="support-team",
+    message="我需要技术支持帮助",
+    user_id="customer@example.com"
+)
+
+print(f"团队响应: {team_result.content}")
+```
+
+### 运行工作流
+
+```python
+# 运行工作流
+workflow_result = await client.run_workflow(
+    workflow_id="onboarding-flow",
+    message="开始客户入职流程",
+    user_id="new-customer@example.com",
+    workflow_data={
+        "customer_name": "李四",
+        "plan": "premium"
+    }
+)
+
+print(f"工作流结果: {workflow_result.content}")
+```
+
+## 监控和调试
+
+### 获取追踪信息
+
+```python
+# 获取运行追踪
+traces = await client.aget_run_traces(
+    run_id="run_123"
+)
+
+for trace in traces:
+    print(f"追踪 ID: {trace.trace_id}")
+    print(f"智能体: {trace.agent_id}")
+    print(f"持续时间: {trace.duration_ms}ms")
+    print(f"状态: {trace.status}")
+```
+
+### 获取系统指标
+
+```python
+# 获取系统指标
+metrics = await client.aget_system_metrics()
+
+print(f"活跃会话: {metrics.active_sessions}")
+print(f"总请求数: {metrics.total_requests}")
+print(f"平均响应时间: {metrics.avg_response_time}ms")
+```
+
+### 监控错误
+
+```python
+# 获取错误日志
+errors = await client.aget_error_logs(
+    limit=10,
+    severity="error"
+)
+
+for error in errors:
+    print(f"错误: {error.message}")
+    print(f"时间: {error.timestamp}")
+    print(f"智能体: {error.agent_id}")
+```
+
+## 高级用法
+
+### 批量操作
+
+```python
+# 批量运行智能体
+requests = [
+    {"agent_id": "assistant", "message": "问题 1"},
+    {"agent_id": "translator", "message": "问题 2"},
+    {"agent_id": "analyzer", "message": "问题 3"}
+]
+
+results = await client.batch_run_agents(requests)
+
+for i, result in enumerate(results):
+    print(f"请求 {i+1}: {result.content}")
+```
+
+### 自定义配置
+
+```python
+# 自定义客户端配置
+client = AgentOSClient(
+    base_url="https://api.example.com",
+    api_key="your-api-key",
+    timeout=30,
+    max_retries=3,
+    retry_delay=1
+)
+```
+
+### 异常处理
+
+```python
+from agno.client.exceptions import AgentOSClientError
+
+async def safe_run_agent():
+    try:
+        result = await client.run_agent(
+            agent_id="assistant",
+            message="测试消息"
+        )
+        return result
+    except AgentOSClientError as e:
+        print(f"客户端错误: {e}")
+        return None
+    except Exception as e:
+        print(f"未知错误: {e}")
+        return None
+```
+
+## 认证
+
+### API 密钥认证
+
+```python
+# 使用 API 密钥
+client = AgentOSClient(
+    base_url="https://api.example.com",
+    api_key="your-api-key"
+)
+```
+
+### JWT 令牌认证
+
+```python
+# 使用 JWT 令牌
+client = AgentOSClient(
+    base_url="https://api.example.com",
+    token="your-jwt-token"
+)
+```
+
+### 自动令牌刷新
+
+```python
+# 配置自动令牌刷新
+async def refresh_token():
+    # 实现令牌刷新逻辑
+    return "new-jwt-token"
+
+client = AgentOSClient(
+    base_url="https://api.example.com",
+    token="current-jwt-token",
+    token_refresh_callback=refresh_token
+)
+```
+
+## 配置选项
+
+### 基本配置
+
+```python
+client = AgentOSClient(
+    base_url="http://localhost:7777",  # AgentOS 实例 URL
+    timeout=30,                        # 请求超时（秒）
+    max_retries=3,                     # 最大重试次数
+    retry_delay=1,                     # 重试延迟（秒）
+    verify_ssl=True                    # SSL 证书验证
+)
+```
+
+### 高级配置
+
+```python
+import httpx
+
+# 自定义 HTTP 客户端
+http_client = httpx.AsyncClient(
+    limits=httpx.Limits(max_keepalive_connections=20),
+    timeout=httpx.Timeout(30.0, connect=5.0)
+)
+
+client = AgentOSClient(
+    base_url="http://localhost:7777",
+    http_client=http_client,
+    headers={"User-Agent": "MyApp/1.0"}
+)
+```
+
+## 最佳实践
+
+### 1. 连接池管理
+
+```python
+# 重用客户端实例
+client = AgentOSClient(base_url="http://localhost:7777")
+
+# 在多个请求间重用
+async def process_requests():
+    for message in ["消息 1", "消息 2", "消息 3"]:
+        result = await client.run_agent(
+            agent_id="assistant",
+            message=message
+        )
+        print(result.content)
+```
+
+### 2. 错误重试
+
+```python
+# 实现指数退避重试
+import asyncio
+import random
+
+async def run_with_backoff(client, agent_id, message, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return await client.run_agent(agent_id, message)
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise
+            
+            # 指数退避 + 随机抖动
+            delay = (2 ** attempt) + random.uniform(0, 1)
+            await asyncio.sleep(delay)
+```
+
+### 3. 流式处理优化
+
+```python
+# 优化流式处理
+async def process_stream_efficiently(client, agent_id, message):
+    buffer = []
+    buffer_size = 100
+    
+    async for event in client.run_agent_stream(agent_id, message):
+        if isinstance(event, RunContentEvent):
+            buffer.append(event.content)
+            
+            # 批量处理缓冲区
+            if len(buffer) >= buffer_size:
+                chunk = "".join(buffer)
+                await process_chunk(chunk)
+                buffer.clear()
+    
+    # 处理剩余内容
+    if buffer:
+        chunk = "".join(buffer)
+        await process_chunk(chunk)
+
+async def process_chunk(chunk):
+    """处理内容块"""
+    # 实现您的处理逻辑
+    pass
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 1. 连接超时
+
+```python
+# 增加超时时间
+client = AgentOSClient(
+    base_url="http://localhost:7777",
+    timeout=60  # 增加到 60 秒
+)
+```
+
+#### 2. 认证失败
+
+```python
+# 检查认证状态
+try:
+    config = await client.aget_config()
+    print("认证成功")
+except AgentOSClientError as e:
+    print(f"认证失败: {e}")
+```
+
+#### 3. 流式连接中断
+
+```python
+# 实现流式重连
+async def run_with_reconnect(client, agent_id, message):
+    while True:
+        try:
+            async for event in client.run_agent_stream(agent_id, message):
+                yield event
+            break  # 正常完成
+        except Exception as e:
+            print(f"流式连接中断: {e}")
+            await asyncio.sleep(1)  # 等待后重连
+```
+
+## 下一步
+
+- 查看[AgentOS 配置](/agent-os/config)
+- 了解[API 使用](/agent-os/api/usage)
+- 探索[安全功能](/agent-os/security)
+- 查看[完整的 API 参考](/reference-api/overview)

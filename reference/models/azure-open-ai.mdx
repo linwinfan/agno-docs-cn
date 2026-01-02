@@ -1,0 +1,37 @@
+---
+title: Azure OpenAI
+sidebarTitle: Azure OpenAI
+---
+
+AzureOpenAI 模型提供对 Azure 托管的 OpenAI 模型的访问。
+
+## 参数
+
+| 参数                    | 类型                        | 默认值                         | 描述                                                                                                      |
+| ---------------------------- | --------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `id`                         | `str`                       | `"gpt-4o"`                     | 要使用的 Azure OpenAI 模型的 ID                                                                         |
+| `name`                       | `str`                       | `"AzureOpenAI"`                | 模型的名称                                                                                              |
+| `provider`                   | `str`                       | `"Azure"`                      | 模型的提供商                                                                                            |
+| `temperature`                | `Optional[float]`           | `None`                         | 控制模型输出的随机性（0.0 到 2.0）                                                                       |
+| `max_tokens`                 | `Optional[int]`             | `None`                         | 在响应中生成的最大 token 数量                                                                            |
+| `max_completion_tokens`      | `Optional[int]`             | `None`                         | 要生成的最大完成 token 数量                                                                              |
+| `frequency_penalty`          | `Optional[float]`           | `None`                         | 根据新 token 在文本中的出现频率对其进行惩罚（-2.0 到 2.0）                                               |
+| `presence_penalty`           | `Optional[float]`           | `None`                         | 根据新 token 是否在文本中出现过对其进行惩罚（-2.0 到 2.0）                                               |
+| `top_p`                      | `Optional[float]`           | `None`                         | 通过核采样控制多样性（0.0 到 1.0）                                                                       |
+| `stop`                       | `Optional[Union[str, List[str]]]` | `None`                   | 最多 4 个序列，API 在遇到这些序列时将停止生成更多 token                                                  |
+| `seed`                       | `Optional[int]`             | `None`                         | 用于确定性采样的随机种子                                                                                  |
+| `logprobs`                   | `Optional[bool]`            | `None`                         | 是否返回输出 token 的对数概率                                                                             |
+| `top_logprobs`               | `Optional[int]`             | `None`                         | 返回对数概率的最可能 token 数量（0 到 20）                                                                |
+| `user`                       | `Optional[str]`             | `None`                         | 表示您的最终用户的唯一标识符                                                                              |
+| `request_params`             | `Optional[Dict[str, Any]]`  | `None`                         | 要包含在请求中的额外参数                                                                                  |
+| `azure_endpoint`             | `Optional[str]`             | `None`                         | Azure 端点 URL（默认为 AZURE_OPENAI_ENDPOINT 环境变量）                                                  |
+| `api_key`                    | `Optional[str]`             | `None`                         | Azure OpenAI 的 API 密钥（默认为 AZURE_OPENAI_API_KEY 环境变量）                                          |
+| `api_version`                | `str`                       | `"2024-12-01-preview"`         | 要使用的 API 版本                                                                                        |
+| `azure_ad_token`             | `Optional[str]`             | `None`                         | 用于身份验证的 Azure AD 令牌                                                                              |
+| `azure_ad_token_provider`    | `Optional[Any]`             | `None`                         | 用于身份验证的 Azure AD 令牌提供者                                                                        |
+| `timeout`                    | `Optional[float]`           | `None`                         | 请求超时时间（秒）                                                                                        |
+| `max_retries`                | `Optional[int]`             | `None`                         | 失败请求的最大重试次数                                                                                    |
+| `client_params`              | `Optional[Dict[str, Any]]`  | `None`                         | 客户端配置的额外参数                                                                                      |
+| `retries`                    | `int`                       | `0`                            | 在抛出 ModelProviderError 之前尝试的重试次数                                                               |
+| `delay_between_retries`      | `int`                       | `1`                            | 重试之间的延迟（秒）                                                                                      |
+| `exponential_backoff`        | `bool`                      | `False`                        | 如果为 True，每次重试之间的延迟会翻倍                                                                     |

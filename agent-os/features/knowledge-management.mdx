@@ -1,0 +1,625 @@
+---
+title: "知识管理"
+sidebarTitle: "知识管理"
+description: "在 AgentOS 中为您的智能体上传、组织和管理知识"
+---
+
+## 概述
+
+上传文件、添加网页或粘贴文本来为您的智能体构建可搜索的知识库。AgentOS 索引内容并显示处理状态，以便您可以跟踪哪些内容已准备就绪。
+
+<Note>
+  <strong>前提条件</strong>: 您的 AgentOS 必须已连接并处于活动状态。如果您看到"已断开连接"或"未活动"，请查看您的<a href="/agent-os/connecting-your-os">连接设置</a>。
+</Note>
+
+## 访问知识库
+
+- 在侧边栏中打开`知识`部分
+- 如果配置了多个知识数据库，请从标题中的数据库选择器中选择一个
+- 使用`刷新`按钮同步状态和内容
+
+# 知识管理
+- **查看内容**: 浏览您的知识库内容
+- **添加内容**: 上传新文档、添加 URL 或直接输入文本
+- **编辑内容**: 修改现有知识条目的元数据
+- **删除内容**: 移除过时的内容
+
+## 您可以添加的内容
+
+- **文件**: `.pdf`, `.csv`, `.json`, `.txt`, `.doc`, `.docx`, `.md`, `.xlsx`, `.xls`, `.pptx`
+
+- **网页**: 网站 URL（页面）或直接文件链接
+- **文本**: 直接输入或粘贴内容
+
+<Tip>
+  可用的处理选项（读取器和分块器）由您的操作系统提供，可能因文件/URL 类型而异。
+</Tip>
+
+## 添加内容
+
+### 1. 开始上传
+
+- 点击`添加新内容`，然后选择`文件`、`网页`或`文本`
+
+### 2. 文件上传
+
+#### 支持的文件格式
+
+| 格式 | 描述 | 推荐用途 |
+|------|------|----------|
+| PDF | 文档格式 | 技术手册、研究报告、合同文档 |
+| CSV | 数据表格 | 数据分析、统计报告、客户列表 |
+| JSON | 结构化数据 | 配置文件、API 响应、数据交换 |
+| TXT | 纯文本 | 笔记、日志文件、简单文档 |
+| DOC/DOCX | Word 文档 | 报告、提案、文档模板 |
+| MD | Markdown | 技术文档、README、项目说明 |
+| XLS/XLSX | Excel 表格 | 财务数据、项目计划、库存清单 |
+| PPTX | PowerPoint 演示文稿 | 培训材料、产品介绍、会议记录 |
+
+#### 上传步骤
+
+1. 点击`文件`选项卡
+2. 选择要上传的文件或拖放文件到上传区域
+3. 配置处理选项：
+   - **分块策略**: 选择如何分割文档
+   - **元数据**: 添加标题、描述、标签
+   - **访问权限**: 设置谁可以访问此内容
+4. 点击`上传并处理`
+
+#### 批量上传
+
+```python
+# 批量上传示例
+import asyncio
+from agno.client import AgentOSClient
+
+async def batch_upload_knowledge():
+    client = AgentOSClient(base_url="http://localhost:7777")
+    
+    files_to_upload = [
+        "技术手册.pdf",
+        "产品规格.docx", 
+        "客户数据.csv",
+        "项目计划.xlsx"
+    ]
+    
+    for file_path in files_to_upload:
+        with open(file_path, "rb") as f:
+            result = await client.upload_knowledge_file(
+                file=f,
+                metadata={
+                    "category": "技术文档",
+                    "department": "研发部",
+                    "version": "1.0"
+                }
+            )
+            print(f"上传 {file_path}: {result.status}")
+
+asyncio.run(batch_upload_knowledge())
+```
+
+### 3. 网页内容
+
+#### 添加网页
+
+1. 点击`网页`选项卡
+2. 输入网页 URL
+3. 配置抓取选项：
+   - **抓取深度**: 跟随链接的深度
+   - **内容过滤**: 只抓取特定类型的内容
+   - **更新频率**: 自动更新内容的频率
+4. 点击`添加并处理`
+
+#### 网站批量抓取
+
+```python
+# 批量抓取网站示例
+async def batch_scrape_websites():
+    urls = [
+        "https://docs.example.com/getting-started",
+        "https://docs.example.com/api-reference",
+        "https://docs.example.com/tutorials",
+        "https://blog.example.com/ai-insights"
+    ]
+    
+    for url in urls:
+        result = await client.add_web_content(
+            url=url,
+            scrape_config={
+                "depth": 2,  # 跟随链接深度
+                "include_images": False,
+                "update_frequency": "weekly"
+            }
+        )
+        print(f"抓取 {url}: {result.status}")
+
+asyncio.run(batch_scrape_websites())
+```
+
+### 4. 文本内容
+
+#### 直接添加文本
+
+1. 点击`文本`选项卡
+2. 输入或粘贴文本内容
+3. 设置元数据：
+   - **标题**: 内容标题
+   - **描述**: 内容描述
+   - **标签**: 相关标签
+4. 点击`添加到知识库`
+
+#### 文本格式建议
+
+```markdown
+# 标题
+
+## 概述
+简要描述内容要点
+
+## 详细信息
+- 要点 1: 详细说明
+- 要点 2: 详细说明
+- 要点 3: 详细说明
+
+## 注意事项
+- 重要提醒
+- 使用建议
+- 相关链接
+```
+
+## 知识库管理
+
+### 内容组织
+
+#### 分类系统
+
+```yaml
+知识分类:
+  技术文档:
+    - API 文档
+    - 开发指南
+    - 故障排除
+  产品信息:
+    - 产品手册
+    - 规格说明
+    - 价格信息
+  政策法规:
+    - 公司政策
+    - 行业法规
+    - 合规要求
+```
+
+#### 标签管理
+
+```python
+# 标签管理示例
+knowledge_tags = {
+    "技术": ["API", "开发", "数据库", "安全"],
+    "产品": ["功能", "规格", "价格", "发布"],
+    "支持": ["FAQ", "故障排除", "教程", "最佳实践"],
+    "业务": ["销售", "市场", "客户", "合作伙伴"]
+}
+
+# 为内容添加标签
+def add_tags_to_content(content_id, tags):
+    for tag in tags:
+        client.add_content_tag(
+            content_id=content_id,
+            tag=tag,
+            category=get_tag_category(tag)
+        )
+```
+
+### 内容搜索
+
+#### 基本搜索
+
+```python
+# 基本搜索示例
+search_results = await client.search_knowledge(
+    query="如何配置数据库连接",
+    limit=10,
+    filters={
+        "content_type": ["pdf", "md"],
+        "tags": ["技术", "数据库"],
+        "date_range": "last_30_days"
+    }
+)
+```
+
+#### 高级搜索
+
+```python
+# 高级搜索配置
+advanced_search = {
+    "query": "机器学习算法比较",
+    "filters": {
+        "file_types": ["pdf", "docx"],
+        "departments": ["研发部", "数据科学团队"],
+        "date_range": {
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+        },
+        "tags": ["机器学习", "算法"],
+        "authors": ["张三", "李四"]
+    },
+    "ranking": {
+        "method": "semantic",
+        "boost_recent": True,
+        "boost_views": True
+    },
+    "pagination": {
+        "page": 1,
+        "per_page": 20
+    }
+}
+```
+
+### 内容更新
+
+#### 版本控制
+
+```python
+# 内容版本管理
+async def update_content_with_version(content_id, new_content, version_notes):
+    result = await client.update_knowledge_content(
+        content_id=content_id,
+        content=new_content,
+        version_info={
+            "version": "2.1.0",
+            "notes": version_notes,
+            "author": "张三",
+            "changes": [
+                "更新 API 端点信息",
+                "添加新示例代码",
+                "修正错误描述"
+            ]
+        }
+    )
+    return result
+```
+
+#### 自动更新
+
+```python
+# 自动更新配置
+auto_update_config = {
+    "web_content": {
+        "frequency": "daily",
+        "time": "02:00",
+        "retry_failed": True,
+        "max_retries": 3
+    },
+    "file_monitoring": {
+        "watch_directories": ["/docs", "/manuals"],
+        "file_patterns": ["*.pdf", "*.md", "*.docx"],
+        "auto_upload": True
+    }
+}
+```
+
+## 高级功能
+
+### 智能分块
+
+#### 分块策略
+
+```python
+# 智能分块配置
+chunking_strategies = {
+    "semantic": {
+        "description": "基于语义分块",
+        "chunk_size": 1000,
+        "overlap": 200,
+        "language": "zh-CN"
+    },
+    "fixed_size": {
+        "description": "固定大小分块", 
+        "chunk_size": 500,
+        "overlap": 50
+    },
+    "paragraph": {
+        "description": "按段落分块",
+        "min_paragraph_length": 100,
+        "max_paragraph_length": 2000
+    },
+    "markdown": {
+        "description": "Markdown 结构分块",
+        "preserve_structure": True,
+        "chunk_headers": True
+    }
+}
+```
+
+#### 自定义分块器
+
+```python
+# 自定义分块器
+from agno.knowledge.chunkers import BaseChunker
+
+class CustomChunker(BaseChunker):
+    def __init__(self, chunk_size=800, overlap=100):
+        super().__init__()
+        self.chunk_size = chunk_size
+        self.overlap = overlap
+    
+    def chunk(self, content):
+        """自定义分块逻辑"""
+        # 实现您的分块算法
+        chunks = []
+        # ... 分块实现
+        return chunks
+
+# 使用自定义分块器
+chunker = CustomChunker(chunk_size=1000, overlap=150)
+```
+
+### 向量化
+
+#### 嵌入模型配置
+
+```python
+# 嵌入模型配置
+embedding_config = {
+    "model": "text-embedding-3-small",
+    "dimension": 1536,
+    "batch_size": 100,
+    "language": "zh-CN",
+    "normalization": True
+}
+
+# 向量化内容
+async def vectorize_content(content_id):
+    result = await client.vectorize_knowledge(
+        content_id=content_id,
+        embedding_config=embedding_config
+    )
+    return result
+```
+
+#### 向量数据库
+
+```python
+# 向量数据库配置
+vector_db_config = {
+    "provider": "pgvector",
+    "connection_string": "postgresql://user:pass@localhost/knowledge",
+    "table_name": "knowledge_vectors",
+    "index_type": "hnsw",
+    "index_parameters": {
+        "m": 16,
+        "ef_construction": 64
+    }
+}
+```
+
+### 知识图谱
+
+#### 实体关系提取
+
+```python
+# 实体关系提取
+entity_extraction_config = {
+    "entities": ["人物", "组织", "产品", "技术", "地点"],
+    "relations": ["工作于", "属于", "使用", "位于"],
+    "confidence_threshold": 0.8,
+    "language": "zh-CN"
+}
+
+async def extract_entities(content_id):
+    result = await client.extract_entities(
+        content_id=content_id,
+        config=entity_extraction_config
+    )
+    return result
+```
+
+#### 知识图谱查询
+
+```python
+# 知识图谱查询
+async def query_knowledge_graph(entity, relation=None):
+    query = {
+        "entity": entity,
+        "relation": relation,
+        "max_depth": 3,
+        "limit": 50
+    }
+    
+    result = await client.query_knowledge_graph(query)
+    return result
+```
+
+## 权限和安全
+
+### 访问控制
+
+#### 基于角色的权限
+
+```python
+# 权限配置
+access_control = {
+    "roles": {
+        "admin": {
+            "permissions": ["read", "write", "delete", "manage"],
+            "scope": "all"
+        },
+        "editor": {
+            "permissions": ["read", "write", "edit"],
+            "scope": "department"
+        },
+        "viewer": {
+            "permissions": ["read"],
+            "scope": "assigned"
+        }
+    },
+    "content_access": {
+        "public": ["viewer"],
+        "internal": ["editor", "admin"],
+        "confidential": ["admin"]
+    }
+}
+```
+
+#### 内容加密
+
+```python
+# 内容加密配置
+encryption_config = {
+    "encryption_at_rest": True,
+    "encryption_in_transit": True,
+    "key_rotation": "quarterly",
+    "algorithm": "AES-256-GCM"
+}
+```
+
+### 数据隐私
+
+#### 敏感信息检测
+
+```python
+# 敏感信息检测
+sensitive_data_patterns = {
+    "phone": r"\b1[3-9]\d{9}\b",
+    "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+    "id_card": r"\b\d{17}[\dXx]\b",
+    "credit_card": r"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b"
+}
+
+async def scan_sensitive_content(content_id):
+    result = await client.scan_sensitive_data(
+        content_id=content_id,
+        patterns=sensitive_data_patterns
+    )
+    return result
+```
+
+## 监控和分析
+
+### 使用统计
+
+```python
+# 知识库使用统计
+async def get_knowledge_analytics():
+    analytics = await client.get_knowledge_analytics({
+        "time_range": "last_30_days",
+        "metrics": [
+            "search_queries",
+            "content_views",
+            "download_count",
+            "user_engagement"
+        ]
+    })
+    return analytics
+```
+
+### 性能监控
+
+```python
+# 性能监控指标
+performance_metrics = {
+    "search_latency": {
+        "target": "< 500ms",
+        "alert_threshold": "1000ms"
+    },
+    "indexing_speed": {
+        "target": "> 1000 docs/min",
+        "alert_threshold": "< 500 docs/min"
+    },
+    "storage_usage": {
+        "warning_threshold": "80%",
+        "critical_threshold": "90%"
+    }
+}
+```
+
+## 最佳实践
+
+### 1. 内容组织
+
+- **一致的命名规范**: 使用清晰的文件和目录命名
+- **逻辑分类**: 按主题、部门或项目组织内容
+- **版本控制**: 为重要文档维护版本历史
+- **定期清理**: 移除过时和重复的内容
+
+### 2. 质量控制
+
+- **内容审核**: 确保内容的准确性和时效性
+- **格式标准化**: 统一文档格式和结构
+- **元数据完整**: 为所有内容添加适当的元数据
+- **质量评分**: 建立内容质量评估体系
+
+### 3. 搜索优化
+
+- **关键词优化**: 使用相关关键词和同义词
+- **标签系统**: 建立全面的标签分类体系
+- **搜索分析**: 分析搜索模式以改进内容组织
+- **用户反馈**: 收集用户反馈以优化搜索结果
+
+### 4. 安全管理
+
+- **访问控制**: 实施最小权限原则
+- **定期审计**: 定期审查访问权限和内容访问日志
+- **数据备份**: 建立定期备份机制
+- **安全培训**: 为用户提供安全使用培训
+
+## 故障排除
+
+### 常见问题
+
+#### 上传失败
+
+**问题**: 文件上传失败
+**解决方案**:
+1. 检查文件格式是否支持
+2. 验证文件大小是否超过限制
+3. 确认网络连接稳定
+4. 检查存储空间是否充足
+
+#### 搜索结果不准确
+
+**问题**: 搜索结果不相关
+**解决方案**:
+1. 检查分块配置是否合适
+2. 验证嵌入模型是否正确配置
+3. 优化查询关键词
+4. 调整搜索权重设置
+
+#### 索引速度慢
+
+**问题**: 内容索引速度慢
+**解决方案**:
+1. 增加处理资源
+2. 优化分块策略
+3. 使用批量处理
+4. 考虑分布式处理
+
+### 调试工具
+
+```python
+# 知识库调试工具
+async def debug_knowledge_base():
+    # 检查索引状态
+    index_status = await client.get_index_status()
+    print(f"索引状态: {index_status}")
+    
+    # 检查内容统计
+    content_stats = await client.get_content_statistics()
+    print(f"内容统计: {content_stats}")
+    
+    # 测试搜索功能
+    test_search = await client.search_knowledge(
+        query="测试查询",
+        limit=5
+    )
+    print(f"搜索测试结果: {len(test_search)} 条记录")
+
+asyncio.run(debug_knowledge_base())
+```
+
+## 下一步
+
+- 了解[记忆功能](/agent-os/features/memories)
+- 查看[会话跟踪](/agent-os/features/session-tracking)
+- 探索[链路追踪](/agent-os/features/tracing)
+- 查看[AgentOS 配置](/agent-os/config)

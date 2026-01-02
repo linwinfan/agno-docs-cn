@@ -1,0 +1,110 @@
+---
+title: 带记忆的智能体
+description: 学习如何为您的智能体提供持久记忆
+mode: wide
+---
+
+此示例向您展示如何与智能体一起使用持久记忆。
+
+每次运行后，用户记忆会被创建/更新。
+
+要启用此功能，请在智能体配置中设置 `enable_user_memories=True`。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch agent_with_memory.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python agent_with_memory.py
+    from uuid import uuid4
+
+    from agno.agent.agent import Agent
+    from agno.db.postgres import PostgresDb
+    from agno.models.openai import OpenAIChat
+    from rich.pretty import pprint
+
+    db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
+
+    db = PostgresDb(db_url=db_url)
+
+    db.clear_memories()
+
+    session_id = str(uuid4())
+    john_doe_id = "john_doe@example.com"
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        db=db,
+        enable_user_memories=True,
+    )
+
+    agent.print_response(
+        "我的名字是约翰·多伊，我喜欢在周末去山里徒步。",
+        stream=True,
+        user_id=john_doe_id,
+        session_id=session_id,
+    )
+
+    agent.print_response(
+        "我的爱好是什么？", stream=True, user_id=john_doe_id, session_id=session_id
+    )
+
+    memories = agent.get_user_memories(user_id=john_doe_id)
+    print("约翰·多伊的记忆：")
+    pprint(memories)
+
+    agent.print_response(
+        "好的，我不再喜欢徒步了，我现在更喜欢踢足球。",
+        stream=True,
+        user_id=john_doe_id,
+        session_id=session_id,
+    )
+
+    # 您也可以从智能体获取用户记忆
+    memories = agent.get_user_memories(user_id=john_doe_id)
+    print("约翰·多伊的记忆：")
+    pprint(memories)
+
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai psycopg rich
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python agent_with_memory.py
+    ```
+
+    ```bash Windows
+    python agent_with_memory.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

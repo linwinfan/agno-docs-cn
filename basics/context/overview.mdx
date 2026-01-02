@@ -1,0 +1,69 @@
+---
+title: 上下文工程
+sidebarTitle: 概述
+description: 了解如何为您的智能体、团队和工作流编写提示和其他上下文工程技术。
+keywords: [上下文, 上下文工程, 系统消息, 用户消息, 提示, 提示工程]
+---
+
+上下文工程是设计和控制发送给语言模型的信息（上下文）以指导其行为和输出的过程。
+在实践中，构建上下文归结为一个问题："哪些信息最有可能实现期望的结果？"
+
+在 Agno 中，这意味着精心制作系统消息，其中包括智能体或团队描述、指令和其他相关设置。通过深思熟虑地构建此上下文，您可以：
+
+- 引导您的智能体或团队朝向特定的行为或角色。
+- 限制或扩展您的智能体或团队的能力。
+- 确保输出的一致性、相关性，并与您的应用需求保持一致。
+- 启用高级用例，如多步推理、工具使用或结构化输出。
+
+有效的上下文工程是一个迭代过程：优化系统消息，尝试不同的描述和指令，并使用模式、委派和工具集成等功能。
+
+Agno 智能体的上下文包括以下内容：
+- **系统消息**：系统消息是发送给智能体或团队的主要上下文，包括所有附加上下文
+- **用户消息**：用户消息是发送给智能体或团队的消息。
+- **聊天历史**：聊天历史是智能体或团队与用户之间对话的历史记录。
+- **附加输入**：任何少量示例或其他附加输入，这些都会添加到上下文中。
+
+
+## 上下文缓存
+
+大多数模型提供商都支持系统和用户消息的缓存，尽管不同提供商的实现方式有所不同。
+
+通用方法是缓存重复内容和常见指令，然后在后续请求中将这些缓存内容作为系统消息的前缀重用。
+换句话说，如果模型支持，您可以通过将静态内容放在系统消息的开头来减少发送给模型的令牌数量。
+
+Agno 的上下文构建设计将最可能的静态内容放在系统消息的开头。
+如果您希望微调这一点，建议的方法是手动设置系统消息。
+
+一些提示缓存的示例：
+- [OpenAI 的提示缓存](https://platform.openai.com/docs/guides/prompt-caching)
+- [Anthropic 提示缓存](https://docs.claude.com/en/docs/build-with-claude/prompt-caching) -> 查看 [Agno 示例](/integrations/models/native/anthropic/usage/prompt-caching)
+- [OpenRouter 提示缓存](https://openrouter.ai/docs/features/prompt-caching)
+
+
+## 了解更多
+<CardGroup cols={3}>
+  <Card
+    title="智能体的上下文工程"
+    icon="robot"
+    iconType="duotone"
+    href="/basics/context/agent"
+  >
+    了解使用智能体进行上下文工程的详细信息。
+  </Card>
+  <Card
+    title="团队的上下文工程"
+    icon="users"
+    iconType="duotone"
+    href="/basics/context/team"
+  >
+    了解使用团队进行上下文工程的详细信息。
+  </Card>
+  <Card
+    title="聊天历史"
+    icon="history"
+    iconType="duotone"
+    href="/basics/chat-history/overview"
+  >
+    了解聊天历史的详细信息。
+  </Card>
+</CardGroup>

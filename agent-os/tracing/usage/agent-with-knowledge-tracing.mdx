@@ -1,0 +1,181 @@
+---
+title: 带知识库的智能体追踪
+description: 学习如何在 AgentOS 中追踪使用知识库的智能体
+sidebarTitle: 带知识库的智能体追踪
+keywords: [追踪, 可观察性, 智能体, 知识库, agno, opentelemetry]
+mode: wide
+---
+
+此示例展示如何在 AgentOS 中追踪使用知识库的智能体。知识库查询和检索过程都会被完整追踪。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch agent_with_knowledge_tracing.py
+    ```
+  </Step>
+
+  <Step title="添加以下代码到您的 Python 文件">
+    ```python agent_with_knowledge_tracing.py
+    from agno.agent import Agent
+    from agno.db.sqlite import SqliteDb
+    from agno.models.openai import OpenAIChat
+    from agno.os import AgentOS
+    from agno.knowledge.pdf import PdfKnowledgeBase
+    from agno.vectordb.pgvector import PgVectorDb
+
+    # 设置数据库
+    db = SqliteDb(db_file="tmp/traces.db")
+    vector_db = PgVectorDb(
+        db_url="postgresql+psycopg://ai:ai@localhost:5432/ai",
+        embed_dim=1536
+    )
+
+    # 创建知识库
+    knowledge_base = PdfKnowledgeBase(
+        vector_db=vector_db,
+        reader="local",
+        n_results=3
+    )
+    knowledge_base.load("path/to/your/document.pdf")
+
+    # 创建带知识库的智能体
+    agent = Agent(
+        name="知识库智能体",
+        model=OpenAIChat(id="gpt-4"),
+        knowledge=knowledge_base,
+        instructions="你是一个知识库助手，请基于提供的文档回答问题。",
+        db=db,
+    )
+
+    # 设置启用了追踪的 AgentOS
+    agent_os = AgentOS(
+        description="带知识库的智能体追踪示例",
+        agents=[agent],
+        tracing=True,
+    )
+    app = agent_os.get_app()
+
+    if __name__ == "__main__":
+        agent_os.serve(app="agent_with_knowledge_tracing:app", reload=True)
+    ```
+  </Step>
+
+  <Step title="运行应用程序">
+    ```bash
+    python agent_with_knowledge_tracing.py
+    ```
+  </Step>
+
+  <Step title="查看知识库追踪">
+    在 [AgentOS UI](https://os.agno.com/traces) 中，您将看到：
+    
+    - 知识库搜索追踪
+    - 文档检索过程
+    - 向量化计算详情
+    - 相似度匹配结果
+  </Step>
+
+</Steps>
+
+## 知识库追踪数据
+
+### 知识库搜索追踪
+
+```json
+{
+  "trace_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b",
+  "span_name": "knowledge.search",
+  "attributes": {
+    "knowledge.type": "pdf",
+    "search.query": "什么是机器学习？",
+    "n_results": 3,
+    "vector_db": "pgvector"
+  },
+  "events": [
+    {
+      "name": "search.start",
+      "timestamp": "2024-01-01T12:00:00Z"
+    },
+    {
+      "name": "vector.search",
+      "attributes": {
+        "embedding_dim": 1536,
+        "similarity_threshold": 0.7
+      }
+    },
+    {
+      "name": "search.complete",
+      "timestamp": "2024-01-01T12:00:02Z",
+      "attributes": {
+        "results_found": 3,
+        "search_time_ms": 1500
+      }
+    }
+  ]
+}
+```
+
+### 文档检索追踪
+
+```json
+{
+  "trace_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b",
+  "span_name": "document.retrieve",
+  "attributes": {
+    "document.id": "doc_123",
+    "document.type": "pdf",
+    "chunk_size": 1000,
+    "overlap": 200
+  },
+  "events": [
+    {
+      "name": "document.load",
+      "attributes": {
+        "file_size": 2048576,
+        "page_count": 10
+      }
+    },
+    {
+      "name": "text.extract",
+      "attributes": {
+        "extracted_length": 5000,
+        "extraction_time_ms": 500
+      }
+    }
+  ]
+}
+```
+
+## 性能优化
+
+### 知识库缓存追踪
+
+```python
+from agno.knowledge.cache import KnowledgeCache
+
+# 启用知识库缓存追踪
+knowledge_base = PdfKnowledgeBase(
+    vector_db=vector_db,
+    cache=KnowledgeCache(ttl=3600),  # 1小时缓存
+    enable_tracing=True
+)
+```
+
+### 批量处理优化
+
+```python
+# 批量文档处理追踪
+knowledge_base.load_batch(
+    documents=["doc1.pdf", "doc2.pdf", "doc3.pdf"],
+    batch_size=10,
+    enable_progress_tracing=True
+)
+```
+
+## 下一步
+
+- 查看[带推理工具的智能体追踪](/agent-os/tracing/usage/agent-with-reasoning-tools-tracing)
+- 了解[团队追踪](/agent-os/tracing/usage/basic-team-tracing)
+- 探索[工作流追踪](/agent-os/tracing/usage/basic-workflow-tracing)

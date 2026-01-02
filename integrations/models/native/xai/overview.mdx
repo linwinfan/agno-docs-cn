@@ -1,0 +1,88 @@
+---
+title: xAI
+sidebarTitle: 概览
+description: Learn how to use xAI with Agno.
+---
+
+xAI is a 平台 for providing endpoints for Large Language 模型s.
+See their list of 模型s [here](https://docs.x.ai/docs/模型s).
+
+We recommend experimenting to find the best-suited 模型 for your use-case. The `grok-3` 模型 is good for most use-cases.
+
+## Authentication
+
+Set your `XAI_API_KEY` environment variable. You can get one [from xAI here](https://console.x.ai/).
+
+<CodeGroup>
+
+```bash Mac
+export XAI_API_KEY=sk-***
+```
+
+```bash Windows
+setx XAI_API_KEY sk-***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `xAI` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+
+from agno.agent import Agent
+from agno.models.xai import xAI
+
+agent = Agent(
+    model=xAI(id="grok-3"),
+    markdown=True
+)
+
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+## Live Search
+
+xAI 模型s support live search 功能 that can access real-time information:
+
+<CodeGroup>
+
+```python live_search.py
+from agno.agent import Agent
+from agno.models.xai import xAI
+
+agent = Agent(
+    model=xAI(
+        id="grok-3",
+        search_parameters={
+            "mode": "on",
+            "max_search_results": 20,
+            "return_citations": True,
+        },
+    ),
+    markdown=True,
+)
+
+agent.print_response("What's the latest news about AI developments?")
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/xai/usage/basic). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"grok-beta"`                  | The id of the xAI 模型 to use                                       |
+| `name`       | `str`              | `"xAI"`                        | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"xAI"`                        | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for xAI (defaults to XAI_API_KEY env var)                |
+| `base_url`   | `str`              | `"https://api.x.ai/v1"`       | The base URL for the xAI API                                         |
+
+`xAI` also 支持 the params of [OpenAI](/reference/models/openai).

@@ -1,0 +1,47 @@
+---
+title: 取消运行
+sidebarTitle: 概述
+description: 学习如何取消智能体、团队或工作流的运行。
+---
+
+运行取消功能提供了停止正在运行的智能体、团队或工作流执行的能力。这个功能对于管理长时间运行的操作、实现超时，或允许用户中断进程非常有用。
+
+## 工作原理
+
+`cancel_run()` 函数将运行标记为取消。执行在当前步骤完成后优雅地停止，确保操作干净地完成，不会使资源处于不一致状态。
+
+**取消行为：**
+- **非流式运行**：返回 `RunOutput` 对象，状态设置为 `RunStatus.cancelled`。
+- **流式运行**：取消发生时发出 `RunCancelledEvent`。
+
+## 取消方法
+
+<CardGroup cols={3}>
+  <Card
+    title="智能体运行取消"
+    icon="user-astronaut"
+    iconType="duotone"
+    href="/execution-control/run-cancellation/agent-cancel-run"
+  >
+    以编程方式或通过 API 端点取消智能体运行。
+  </Card>
+  <Card
+    title="团队运行取消"
+    icon="users"
+    iconType="duotone"
+    href="/execution-control/run-cancellation/team-cancel-run"
+  >
+    取消团队运行并处理成员运行取消。
+  </Card>
+  <Card
+    title="工作流运行取消"
+    icon="diagram-project"
+    iconType="duotone"
+    href="/execution-control/run-cancellation/workflow-cancel-run"
+  >
+    取消工作流执行并管理步骤级取消。
+  </Card>
+</CardGroup>
+
+
+

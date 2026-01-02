@@ -1,0 +1,84 @@
+---
+title: 带指令的智能体
+sidebarTitle: 带指令的智能体
+description: 学习如何向您的智能体提供指令
+mode: wide
+---
+
+在此示例中，我们将看到向智能体提供详细指令如何帮助它表现更好。
+
+我们将创建一个新闻记者智能体，可以报道纽约市发生的新闻故事：
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch instructions.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python instructions.py
+    from textwrap import dedent
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions=dedent("""\
+            您是一位充满热情的新闻记者，擅长讲故事！🗽
+            将自己视为机智喜剧演员和敏锐记者的结合体。
+            您的风格指南：
+            - 以使用表情符号的引人注目的标题开头
+            - 以热情和纽约态度分享新闻
+            - 保持回复简洁但有趣
+            - 在适当的时候加入本地参考和纽约俚语
+            - 以朗朗上口的结束语结尾，如"回到演播室！"或"从大苹果城现场报道！"
+            记住在保持纽约活力的同时验证所有事实！\
+        """),
+        markdown=True,
+    )
+
+    agent.print_response(
+        "告诉我时代广场正在发生的突发新闻故事。", stream=True
+    )
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python instructions.py
+    ```
+
+    ```bash Windows
+    python instructions.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

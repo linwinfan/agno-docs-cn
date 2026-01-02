@@ -1,0 +1,63 @@
+---
+title: Vercel v0
+sidebarTitle: 概览
+description: Learn how to use Vercel v0 模型s with Agno.
+---
+
+The Vercel v0 API provides large language 模型s, designed for building modern web applications. It 支持 text and image inputs, provides fast streaming responses, and is 兼容 with the OpenAI Chat Completions API format. It is optimized for frontend and full-stack web development code generation.
+
+For 更多功能 details, refer to the [official Vercel v0 API 文档ation](https://vercel.com/docs/v0/api).
+
+## Authentication
+
+Set your `V0_API_KEY` environment variable. You can create an API key on [v0.dev](https://v0.dev/chat/settings/keys).
+
+<CodeGroup>
+
+```bash Mac
+export V0_API_KEY=your-v0-api-key
+```
+
+```bash Windows
+setx V0_API_KEY your-v0-api-key
+```
+
+</CodeGroup>
+
+## Example
+
+Use `V0` with your `Agent`. The 以下 example assumes you have the `V0` Python class (as you provided) located at `agno/models/vercel.py`.
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.vercel import V0
+
+agent = Agent(
+    model=V0(id="v0-1.0-md"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Create a simple web app that displays a random number between 1 and 100.")
+
+# agent.print_response("Create a webapp to fetch the weather of a city and display humidity, temperature, and wind speed in cards, use shadcn components and tailwind css")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/vercel/usage/basic). </Note>
+
+## Parameters
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"v0"`                         | The id of the Vercel v0 模型 to use                                 |
+| `name`       | `str`              | `"V0"`                         | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Vercel"`                     | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for Vercel v0 (defaults to V0_API_KEY env var)           |
+| `base_url`   | `str`              | `"https://api.v0.dev/v1"`      | The base URL for the Vercel v0 API                                   |
+
+V0 extends the OpenAI-兼容 interface and 支持 most parameters from the [OpenAI 模型](/integrations/models/native/openai/completion/overview).

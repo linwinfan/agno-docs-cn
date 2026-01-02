@@ -1,0 +1,71 @@
+---
+title: MCP 集成
+description: AgentOS MCP (Model Context Protocol) 集成指南
+sidebarTitle: MCP
+keywords: [mcp, model context protocol, agentos, 集成]
+---
+
+AgentOS 支持 MCP (Model Context Protocol) 来与外部模型服务集成。
+
+## MCP 配置
+
+### 基本配置
+
+```python
+from agno.os import AgentOS
+from agno.mcp import MCPServer
+
+# 创建 MCP 服务器
+mcp_server = MCPServer(
+    name="mcp-server",
+    port=8080
+)
+
+# 配置 AgentOS
+agent_os = AgentOS(
+    agents=[agent],
+    mcp_server=mcp_server
+)
+```
+
+### 连接外部 MCP 服务
+
+```python
+from agno.mcp import MCPClient
+
+# 创建 MCP 客户端
+mcp_client = MCPClient(
+    server_url="http://mcp-server:8080"
+)
+
+# 连接到外部服务
+await mcp_client.connect()
+```
+
+## MCP 工具
+
+### 注册 MCP 工具
+
+```python
+from agno.tools.mcp import MCPTool
+
+# 创建 MCP 工具
+mcp_tool = MCPTool(
+    name="mcp-calculator",
+    server_url="http://mcp-server:8080",
+    tool_name="calculator"
+)
+
+# 添加到智能体
+agent = Agent(
+    name="MCP 智能体",
+    tools=[mcp_tool]
+)
+```
+
+## 最佳实践
+
+- 确保 MCP 服务器安全配置
+- 使用适当的超时设置
+- 实施错误处理机制
+- 监控 MCP 连接状态

@@ -1,0 +1,142 @@
+---
+title: "部署您的 AgentOS"
+sidebarTitle: "概述"
+description: "如何将您的 AgentOS 投入生产环境"
+keywords: [deploy, production, fastapi, docker, aws, railway]
+---
+
+一旦您在本地构建并配置了您的 AgentOS，下一步就是将其投入生产环境。AgentOS 在底层暴露了一个 FastAPI 应用程序，这意味着您可以自由地将其部署到您喜欢的任何基础设施上，包括容器服务、无服务器架构、Kubernetes 或简单的虚拟机。
+
+将 FastAPI 应用程序部署到生产环境最可靠和便捷的方式是作为容器化服务。为了简化这个过程，我们为流行平台提供了现成的模板，包括 AWS ECS 和 Railway，更多模板即将推出。如果您更喜欢完全控制，也可以用几个文件将您的 AgentOS 转换为最小的生产仓库。
+
+在这里，我们将引导您完成整个过程：从普通的 Python 代码库开始，将其转换为生产就绪的 FastAPI 服务，使用 Docker 进行容器化，然后部署到您选择的平台。
+
+## 准备您的 Python 项目
+
+一个最小的 AgentOS 项目通常看起来像这样：
+
+```agentos
+├── agents/
+├── scripts/
+├── pyproject.toml
+├── requirements.txt
+├── Dockerfile
+└── app/main.py # 包含您的 AgentOS 应用
+```
+
+您的智能体、团队和工作流会自动挂载并准备提供服务。只要它们被添加到您的 AgentOS 实例中即可。
+
+## 添加生产就绪的 Dockerfile
+
+这是一个用于部署 AgentOS 的最小 Dockerfile：
+
+```docker
+FROM agnohq/python:3.12
+
+ENV PYTHONUNBUFFERED=1 \
+PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+COPY requirements.txt pyproject.toml ./
+RUN uv pip sync requirements.txt --system
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+```
+
+这创建了一个干净、生产友好的容器镜像。
+
+## 本地测试
+
+从项目根目录使用以下命令构建和运行容器：
+
+先决条件：
+
+- [Docker Desktop](https://docs.docker.com/get-docker/)
+- [Python 3.12](https://www.python.org/downloads/)
+- [Agno](https://github.com/agno-agi/agno)
+
+```bash
+docker buildx build --load -t agentos .
+```
+
+```bash
+docker run -p 8000:8000 agentos
+```
+
+访问 `http://localhost:8000/docs` 查看您的 AgentOS 文档。在这里，您可以查看您的 AgentOS FastAPI 应用程序的端点。
+
+## 部署选项
+
+您可以在任何支持 Docker 容器的地方部署 AgentOS。  
+为了快速开始，我们建议使用我们的部署模板之一。  
+在[这里](/deploy/templates)了解更多信息。
+
+---
+
+### AWS
+
+一个完全在 AWS 上运行的生产就绪配置：
+
+- 多架构 Docker 构建
+- 用于容器注册表的 Amazon ECR
+- 用于运行容器的 ECS Fargate 服务
+- 带 HTTPS 的应用程序负载均衡器
+- Amazon RDS (PostgreSQL)
+
+查看我们的 [AWS 模板](/templates/agent-infra-aws/introduction) 了解更多信息。
+
+---
+
+### 云提供商
+
+AgentOS 可以在任何支持 Docker 容器的云提供商上运行。例如：
+
+- Google Cloud Run
+- AWS App Runner
+- Azure Container Apps
+
+---
+
+### Railway
+
+一个简单快速的部署方法。Railway：
+
+- 构建您的 Dockerfile
+- 管理环境变量
+- 自动提供公共 HTTPS 域名
+
+查看我们的 [Railway 模板](/templates/agent-infra-railway/introduction) 了解更多信息。
+
+---
+
+### 托管平台
+
+与 Railway 类似，您可以使用其他接受 Dockerfile、管理环境变量并以最少配置托管您服务的平台。  
+这些平台的模板即将推出：
+
+- [Modal](https://modal.com/)
+- [Render](https://render.com/)
+- [DigitalOcean](https://www.digitalocean.com/)
+- [Fly.io](https://fly.io/)
+
+---
+
+## 下一步
+
+准备好部署了吗？  
+选择我们的一个模板来快速开始，以最少的设置在生产环境中运行 AgentOS。
+
+<Card
+  title="探索所有模板"
+  icon="robot"
+  iconType="duotone"
+  href="/deploy/templates"
+>
+  探索所有模板并快速开始。
+</Card>

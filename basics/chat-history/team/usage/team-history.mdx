@@ -1,0 +1,104 @@
+---
+title: 成员的团队历史
+sidebarTitle: 成员的团队历史
+---
+
+本示例演示了一个团队，其中团队领导者将请求路由到适当的成员，而成员直接向用户响应。
+
+通过使用 `add_team_history_to_members=True`，每个团队成员都可以访问团队的共享历史，使他们能够使用与其他成员之前交互的上下文。
+
+## 工作原理
+
+当 `add_team_history_to_members=True` 时，团队历史会附加到发送给成员的任务中：
+
+```
+<team_history_context>
+input: Hallo, wie heißt du? Meine Name ist John.
+response: Ich heiße ChatGPT.
+</team_history_context>
+```
+
+这使西班牙语智能体能够回忆起最初与德语智能体共享的名称"John"。
+
+## 代码
+
+```python team_history.py
+from uuid import uuid4
+
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+
+german_agent = Agent(
+    name="German Agent",
+    role="您回答德语问题。",
+    model=OpenAIChat(id="o3-mini"),
+)
+
+spanish_agent = Agent(
+    name="Spanish Agent",
+    role="您回答西班牙语问题。",
+    model=OpenAIChat(id="o3-mini"),
+)
+
+
+multi_lingual_q_and_a_team = Team(
+    name="多语言问答团队",
+    model=OpenAIChat("o3-mini"),
+    members=[german_agent, spanish_agent],
+    instructions=[
+        "您是一个多语言问答团队，可以用英语和西班牙语回答问题。您必须根据问题的语言将任务委派给适当的成员。",
+        "如果问题是德语，请委派给德语智能体。如果是西班牙语，请委派给西班牙语智能体。",
+        "始终将来自适当语言的响应翻译成英语，并显示原始响应和翻译后的响应。",
+    ],
+    db=SqliteDb(
+        db_file="tmp/multi_lingual_q_and_a_team.db"
+    ),  # 添加数据库以存储对话历史。这是历史功能正常工作的必要条件。
+    determine_input_for_members=False,  # 直接将输入发送给成员智能体，而不需要团队领导者合成自己的输入。
+    respond_directly=True,
+    add_team_history_to_members=True,  # 将用户与团队之间的所有交互发送给成员智能体。
+)
+
+
+session_id = f"conversation_{uuid4()}"
+
+# 首先向团队提供信息
+## 用德语提问
+multi_lingual_q_and_a_team.print_response(
+    "Hallo, wie heißt du? Meine Name ist John.", stream=True, session_id=session_id
+)
+
+# 然后观察他们回忆信息（下面的问题意思是："用我的名字讲一个2句话的故事"）
+## 用西班牙语跟进
+multi_lingual_q_and_a_team.print_response(
+    "Cuéntame una historia de 2 oraciones usando mi nombre real.",
+    stream=True,
+    session_id=session_id,
+)
+```
+
+## 使用方法
+
+<Steps>
+
+    <Snippet file="create-venv-step.mdx" />
+
+    <Step title="安装所需库">
+        ```bash
+        pip install agno openai
+        ```
+    </Step>
+
+    <Step title="设置环境变量">
+        ```bash
+        export OPENAI_API_KEY=****
+    </Step>
+
+    <Step title="运行智能体">
+        ```bash
+        python team_history.py
+        ```
+    </Step>
+
+</Steps>

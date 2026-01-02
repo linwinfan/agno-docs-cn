@@ -1,0 +1,373 @@
+---
+title: Agno v2.0 更新日志
+sidebarTitle: Agno v2.0 更新日志
+---
+
+<img height="200" src="/images/changelogs/agent_os_stack.png" />
+
+这是一个主要版本发布，引入了构建多智能体系统的全新方法。它还引入了 AgentOS，一个用于智能体的运行时环境。
+
+这是 Agno 库的一次重大重写，引入了各种新概念并对现有概念进行了更新。
+
+一些主要变化包括：
+
+- Agent、Team 和 Workflow 现在完全无状态。
+- Knowledge 现在是一个支持多种内容形式的单一解决方案。
+- 会话、记忆、评估等的存储已被简化
+
+## 常规变更
+
+<Accordion title="仓库更新">
+  - `/libs/agno` 已经过重构以适应 Agno 中的新概念并更好地组织。
+  - 所有与在 Agno 中管理工作空间和 agent 部署相关的代码已移至一个名为 `agno-infra` 的新包中。这是之前 `agno-aws` 和 `agno-docker` 包以及 CLI 和其他工具的组合。
+  - `agno-aws` 和 `agno-docker` 包已被弃用，将不再维护。
+  - 所有与 Agno CLI (`ag`) 相关的代码已移至此新的 `agno-infra` 包。
+  - 将 `AgentOS` 添加到 `agno` 中，作为构建多智能体系统的综合 API 解决方案。这也取代了 `Playground` 和其他 Apps。详见下文。
+  - Cookbook 已完全重构，具有新的和更有价值的 README、更好的概念覆盖和更多示例。
+</Accordion>
+
+<Accordion title="AgentOS">
+  - 引入 `AgentOS`，一个用于托管 agent、team 和 workflow 作为生产就绪 API 的系统。完整详情请参见 [AgentOS](/agent-os/introduction) 部分。
+  - 这增加了会话管理、内存管理、知识管理、评估管理和指标的路径。
+  - 这使你能够托管 agent、team 和 workflow，并使用 [Agent OS UI](https://os.agno.com) 来管理它们。
+</Accordion>
+
+<Accordion title="Apps 弃用">
+  - 移除了 `Playground`。其功能已被 `AgentOS` 取代。
+  - 移除了 `AGUIApp` 并替换为 `AgentOS` 上的 `AGUI` 接口。
+  - 移除了 `SlackApi` 并替换为 `AgentOS` 上的 `Slack` 接口。
+  - 移除了 `WhatsappApi` 并替换为 `AgentOS` 上的 `Whatsapp` 接口。
+  - 移除了 `FastAPIApp`。其功能已被 `AgentOS` 取代。
+  - `DiscordClient` 已移至 `/integrations/discord`。
+</Accordion>
+
+## 会话和运行状态
+
+- 我们对 `Agent`、`Team` 和 `Workflow` 的内部工作机制进行了重大更改，使它们完全无状态。
+- 这意味着 `agent_session`、`session_metrics`、`session_state` 等不应被视为在运行过程中会更新的有状态变量，而应被视为 agent 的"默认值"（如果可以在初始化时设置）。
+- 现在支持 `CustomEvent`，你可以继承它来创建自己的自定义事件，这些事件可以从你自己的工具中产生。详情请参见[文档](/basics/agents/running-agents#custom-events)。
+
+<Accordion title="Updates to Run Objects">
+  For agents:
+  - `RunResponse` -> `RunOutput`
+  - `RunResponseStartedEvent` -> `RunStartedEvent`
+  - `RunResponseContentEvent` -> `RunContentEvent`
+  - `RunResponseCompletedEvent` -> `RunCompletedEvent`
+  - `IntermediateRunResponseContentEvent` -> `IntermediateRunContentEvent`
+  - `RunResponseErrorEvent` -> `RunErrorEvent`
+  - `RunResponseCancelledEvent` -> `RunCancelledEvent`
+
+  For teams:
+  - `TeamRunResponse` -> `TeamRunOutput`
+  - `RunResponseStartedEvent` -> `RunStartedEvent`
+  - `RunResponseContentEvent` -> `RunContentEvent`
+  - `RunResponseCompletedEvent` -> `RunCompletedEvent`
+  - `IntermediateRunResponseContentEvent` -> `IntermediateRunContentEvent`
+  - `RunResponseErrorEvent` -> `RunErrorEvent`
+  - `RunResponseCancelledEvent` -> `RunCancelledEvent`
+
+  For workflows:
+  - `WorkflowRunResponse` -> `WorkflowRunOutput`
+  - `WorkflowRunResponseStartedEvent` -> `WorkflowRunStartedEvent`
+  - `WorkflowRunResponseContentEvent` -> `WorkflowRunContentEvent`
+  - `WorkflowRunResponseCompletedEvent` -> `WorkflowRunCompletedEvent`
+  - `WorkflowRunResponseErrorEvent` -> `WorkflowRunErrorEvent`
+  - `WorkflowRunResponseCancelledEvent` -> `WorkflowRunCancelledEvent`
+
+  - The import location for `RunOutput` (and events) has been moved to `agno.run.agent`.
+  - For `RunOutput`, `TeamRunOutput` and `WorkflowRunOutput` the `extra_data` attribute has been removed and the internal attributes are now top-level. This is `references`, `additional_input`, `reasoning_steps`, and `reasoning_messages`.
+  - `metadata` added to `RunOutput`, `TeamRunOutput` and `WorkflowRunOutput`. This represents all the set metadata for the run.
+</Accordion>
+
+<Accordion title="Updates to Session Objects">
+  - Session storage now stores `AgentSession`, `TeamSession` and `WorkflowSession` with new schemas. See full details in the [Session](/basics/sessions/overview) section.
+  - Session objects now have `runs` directly on it.
+  - Session objects support new convenience methods:
+    - `get_run` -> Get a specific run by ID.
+    - `get_session_summary` -> Get the session summary.
+    - `get_chat_history` -> Get an aggregated view of all messages for all runs in the session.
+</Accordion>
+
+<Accordion title="Updates to Metrics">
+  - `SessionMetrics` and `MessageMetrics` have been unified as a single `Metrics` class.
+  - `audio_tokens` has been renamed to `audio_total_tokens`.
+  - `input_audio_tokens` has been renamed to `audio_input_tokens`.
+  - `output_audio_tokens` has been renamed to `audio_output_tokens`.
+  - `cached_tokens` has been renamed to `cache_read_tokens`.
+  - `prompt_tokens` and `completion_tokens` have been removed (only `input_tokens` and `output_tokens` should be used)
+  - `prompt_tokens_details` and `completion_tokens_details` have been removed. Instead `provider_metrics` captures any provider-specific metrics.
+  - `time` has been renamed to `duration`.
+</Accordion>
+
+<Accordion title="Cancelling Runs">
+  - You can now cancel a run by calling `cancel_run` on the `Agent`, `Team` or `Workflow`.
+  - This will cancel the run and return a `RunCancelledEvent` during streaming, or set the `RunOutput.status` to `"cancelled"`.
+</Accordion>
+
+
+## 存储
+
+- `Agent`、`Team`、`Workflow` 和各种评估现在都支持单个 `db` 参数。这是为了启用该类实例的存储。这是会话、记忆、指标等持久化所必需的。
+- `storage` 和 `memory` 已从 `Agent`、`Team` 和 `Workflow` 中移除。
+
+<Accordion title="存储类更新">
+  - 这意味着所有之前的存储提供者都经过了重新设计。此外，会话存储、内存存储和评估存储现在都是一个单一的解决方案，称为"DB"。
+  - `PostgresStorage` -> `PostgresDb`
+  - `SqliteStorage` -> `SqliteDb`
+  - `MysqlStorage` -> `MysqlDb`
+  - `RedisStorage` -> `RedisDb`
+  - `MongoStorage` -> `MongoDb`
+  - `DynamoDBStorage` -> `DynamoDb`
+  - `SingleStoreStorage` -> `SingleStoreDb`
+  - `InMemoryStorage` -> `InMemoryDb`
+  - `JsonStorage` -> `JsonDb`
+  - `GCSJsonStorage` -> `GCSJsonDb`
+</Accordion>
+
+## 内存
+
+- 随着上述对存储的更改，内存已被简化。
+- `memory` 已从 `Agent` 和 `Team` 中移除。相反，内存现在通过 `enable_user_memories: bool`（像以前一样）启用并持久化在 `db` 实例中。
+- 对如何创建记忆的更改仍然可以通过在 `Agent` 或 `Team` 上重写 `MemoryManager` 类来完成。例如 `Agent(memory_manager=MyMemoryManager())`。
+- `AgentMemory` 和 `TeamMemory` 已被移除。
+
+## 知识
+
+- Knowledge 已完全重新设计。完整详情请参见 [Knowledge](/basics/knowledge/) 部分。
+- 你现在为所有类型的内容定义一个单一的 `Knowledge` 实例。文件（PDF、CSV 等）、URL 和其他。
+- agent 仍然可以在运行时使用你的知识库搜索信息。所有现有的 RAG 实现仍然受支持。
+- 为嵌入模型和向量数据库添加了**完整的 `async` 支持**。这对性能有重大影响，是使用 `knowledge.add_content_async(...)` 向知识库添加内容时的主要速度改进。
+- `AgentKnowledge` 和所有其他知识库类已被移除。
+- `embedder`、`document`、`chunking`、`reranker` 和 `reader` 的导入位置已移至 `agno.knowledge`。详情请参见[示例](/basics/knowledge/overview)。
+
+## 工具更新
+
+- 常规：
+  - 由于 Agent 和 Team 现在是无状态的，在函数内部使用来自 agent/team 对象的属性将使你能够访问在初始化该 agent/team 时设置的属性。例如，不应使用 `agent.session_state`，现在可以直接访问 `session_state`，它将具有会话的"当前"状态。
+  - 新的流程允许在工具执行期间生成的图像、音频和视频文件在 `FunctionExecutionResult` 对象中传回，这将确保这些工件在需要时可用于模型和 agent。
+- 所有处理媒体的工具（例如图像生成工具）现在正确地将此生成的媒体添加到 `RunOutput`，同时也使其可用于后续的模型调用。
+- 几乎所有工具包的接口都已更新，以提供更一致的开关特定工具的体验。变更列表太长，无法在此列出。我们建议你查看你具体使用的工具包以及它们是如何更新的。
+- `show_results` 现在默认为所有工具设置为 `True`。如果你只设置 `stop_after_tool_call=True`，那么 `show_results` 将自动设置为 `True`。
+- `images`、`videos`、`audio` 和 `files` 现在可作为工具的参数使用。详情请参见[文档](/basics/tools/overview)。
+
+## 媒体
+
+#### 移除
+
+- **移除了旧的工件类**：`ImageArtifact`、`VideoArtifact`、`AudioArtifact` 和 `AudioResponse` 类已完全移除，以支持统一的媒体类。
+
+#### 新的统一媒体架构
+
+- **统一的 `Image` 类**：现在服务所有用例（输入、输出、工件），具有标准化的 `content: Optional[bytes]` 字段用于原始图像数据
+- **统一的 `Audio` 类**：替换了 `AudioArtifact` 和 `AudioResponse`，具有一致的基于字节的内容存储和附加字段，如 `transcript`、`expires_at`、`sample_rate` 和 `channels`
+- **统一的 `Video` 类**：更新以处理所有视频用例，具有标准化的内容处理和元数据字段
+- **增强的 `File` 类**：更新以在 agent、team、workflow 和工具包上下文中无缝工作
+
+#### 新方法和功能
+
+- **`from_base64()` 类方法**：添加到 `Image`、`Audio` 和 `Video` 类，用于从 base64 编码内容创建实例（自动转换为原始字节）
+- **`get_content_bytes()` 方法**：将内容检索为原始字节，处理从 URL 或文件路径加载
+- **`to_base64()` 方法**：将内容转换为 base64 字符串用于传输/存储
+- **`to_dict()` 方法**：增强序列化，可选择包含 base64 内容
+
+#### 内容标准化
+
+- **基于字节的存储**：所有媒体内容现在存储为原始字节（`Optional[bytes]`），而不是混合的字符串/字节格式
+- **自动验证**：模型验证器确保只提供一个内容源（`url`、`filepath` 或 `content`）
+- **自动生成的 ID**：如果未提供，媒体对象会自动生成 UUID
+
+## 日志记录
+
+- 添加了对自定义日志记录器的支持。详情请参见[文档](/basics/custom-logging)。
+
+## Agent 更新
+
+<Accordion title="Agent 类更新">
+  - `agent_id` -> `id` -> 如果未设置 `id`，则使用 agent 的 `name` 自动生成，如果未设置 `name`，则使用随机 UUID。
+  - `search_previous_sessions_history` -> `search_session_history`
+  - `context` -> `dependencies`
+  - `add_context` -> `add_dependencies_to_context`
+  - `add_history_to_messages` -> `add_history_to_context`
+  - `add_name_to_instructions` -> `add_name_to_context`
+  - `add_datetime_to_instructions` -> `add_datetime_to_context`
+  - `add_location_to_instructions` -> `add_location_to_context`
+  - `add_messages` -> `additional_input`
+  - `extra_data` -> `metadata`
+  - `create_default_system_message` -> `build_context`
+  - `create_default_user_message` -> `build_user_context`
+  - 添加了 `send_media_to_model` -> 默认为 `True`。如果你不想将媒体（图像、音频、视频、文件）发送到模型，请设置为 False。如果你只需要工具的媒体，这很有用。
+  - 添加了 `store_media` -> 默认为 `True`。如果你不想在与会话一起持久化的 `RunOutput` 中存储任何媒体，请设置为 False。
+  - `num_history_responses` -> `num_history_runs`
+  - 移除了 `success_criteria` 和 `goal`
+  - 移除了 `team_session_id` 和 `workflow_session_id`。
+  - 移除了 `introduction`
+  - 移除了 `show_tool_calls` -> 这现在总是启用。
+  - 移除了 `team` 和 `team_data`
+  - 移除了 `respond_directly`、`add_transfer_instructions`、`team_response_separator` 和 `team_session_id`（因为 team 已从 `Agent` 中移除）
+  - 从 `Agent` 内部移除了所有 `team` 功能（即已弃用的 teams 实现已被移除）
+  - 从 `Agent` 中移除了所有 `monitoring`。使用新的 AgentOS 平台，监控使用你自己的数据完成。访问 [os.agno.com](https://os.agno.com) 开始使用。
+</Accordion>
+
+<Accordion title="输入和输出更新">
+  - `response_model` -> `output_schema`
+  - 添加了 `input_schema`（一个 pydantic 模型）来验证 agent 的输入。
+  - 将 `message` 更改为 `input`（这也替换了 `messages`）。`input` 可以是 `str`、`list`、`dict`、`Message`、`BaseModel` 或 `list[Message]` 类型。
+  - 如果提供了 `dict` 和 `input_schema`，字典将根据架构进行验证。
+  - 如果提供了 `BaseModel` 和 `input_schema`，模型将根据架构进行验证。
+  - `arun` 和 `acontinue_run` 与 `stream=True` 现在直接返回 `RunOutputEvent` 的异步迭代器，不再是协程。
+  - 向 `run`、`arun`、`print_response` 和 `aprint_response` 添加了 `debug_mode: bool` 来为特定运行启用调试模式。
+  - 向 `run`、`arun`、`print_response` 和 `aprint_response` 添加了 `add_history_to_context` 来将聊天历史添加到当前运行的上下文中。
+  - 向 `run`、`arun`、`print_response` 和 `aprint_response` 添加了 `dependencies` 来将依赖项添加到当前运行的上下文中。
+  - 向 `run`、`arun`、`print_response` 和 `aprint_response` 添加了 `metadata` 来设置当前运行的元数据。这与在 `Team` 对象上设置的元数据合并。
+  - 向 `Agent` 添加了 `get_run_output` 和 `get_last_run_output` 来按 ID 检索运行输出。
+</Accordion>
+
+<Accordion title="指标更新">
+  - 指标已简化和清理。
+  - 现在有 3 个级别的指标：
+    - `Message.metrics` -> 每条消息的指标（助手、工具等）。
+    - `RunOutput.metrics` -> 整个运行的聚合指标。
+    - `AgentSession.metrics` -> 整个会话的聚合指标。
+</Accordion>
+
+<Accordion title="知识更新">
+  - `knowledge` 现在是 `Knowledge` 的实例，而不是 `AgentKnowledge`。
+  - `retriever` -> `knowledge_retriever` -> 用于自定义检索器。
+  - `add_references` -> `add_knowledge_to_context` -> 启用传统 RAG。
+</Accordion>
+
+<Accordion title="内存更新">
+  - `add_memory_references` -> `add_memories_to_context`
+  - 你可以设置自定义 `memory_manager` 来在创建记忆时使用。
+  - 添加了 `get_user_memories` 来检索用户记忆。
+</Accordion>
+
+<Accordion title="会话更新">
+  - `add_session_summary_references` -> `add_session_summary_to_context`
+  - 你可以设置自定义 `session_summary_manager` 来在创建会话摘要时使用。
+  - 移除了 `session_name` 并替换为函数 `get_session_name` 和 `rename_session`。
+  - 添加了 `get_session` 来按 ID 检索会话。
+  - 添加了 `get_chat_history` 来从会话检索聊天历史。
+  - 添加了 `get_session_metrics` 来检索会话的指标。
+  - 添加了 `get_session_state` 来从会话检索会话状态。
+  - 添加了 `get_session_summary` 来从会话检索会话摘要。
+  - 由于 `Agent` 现在是无状态的，`agent_session`、`session_metrics`、`run_id`、`run_input`、`run_messages` 和 `run_response` 作为"粘性" agent 属性已被移除。
+  - 由于 `Agent` 现在是无状态的，`images`、`videos`、`audio` 不再作为 agent 属性可用。相反，这些可以在特定运行的 `RunOutput` 上访问。
+  - 移除了 `team_session_state` 和 `workflow_session_state`。只使用 `session_state`。
+  - 向 `Agent` 和 `Team` 添加了 `enable_agentic_state` 以允许 agent 通过工具调用更新会话状态。
+</Accordion>
+
+## Team updates
+
+<Accordion title="Updates to Team Class">
+  - Removed `mode` from `Team`. Instead there are attributes that can be used to control the behavior of the team:
+    - `respond_directly` -> If True, the team leader won't process responses from the members and instead will return them directly
+    - `delegate_to_all_members` -> If True, the team leader will delegate tasks to all members simultaneously, instead of one by one. When running async (using `arun`) members will run concurrently.
+    - `determine_input_for_members` -> `True` by default. Set to False if you want to send the run input directly to the member agents without the team leader synthesizing its own input.
+  - `team_id` -> `id` -> If `id` is not set, it is autogenerated using the `name` of the team, or a random UUID if the `name` is not set.
+  - `search_previous_sessions_history` -> `search_session_history`
+  - `context` -> `dependencies`
+  - `add_context` -> `add_dependencies_to_context`
+  - `add_history_to_messages` -> `add_history_to_context`
+  - `add_name_to_instructions` -> `add_name_to_context`
+  - `add_datetime_to_instructions` -> `add_datetime_to_context`
+  - `add_location_to_instructions` -> `add_location_to_context`
+  - `add_member_tools_to_system_message` -> `add_member_tools_to_context`
+  - `extra_data` -> `metadata`
+  - Added `additional_input` (works the same as for `Agent`)
+  - Added `store_member_responses: bool` to optionally store the member responses on the team run output object.
+  - Added `acli_app` to `Team` to enable the CLI app for the team in async mode.
+  - Added `send_media_to_model` -> `True` by default. Set to False if you don't want to send media (image, audio, video, files) to the model.  This is useful if you only want media for tools.
+  - Added `store_media` -> `True` by default. Set to False if you don't want to store any media in the `RunOutput` that is persisted with sessions.
+  - `num_history_responses` -> `num_history_runs`
+  - Removed `success_criteria`
+  - Removed `team_session_id` and `workflow_session_id`.
+  - Removed `enable_team_history`
+  - Removed `num_of_interactions_from_history`
+  - Removed `show_tool_calls` -> This is now just always enabled.
+  - Removed `enable_agentic_context`. `session_state` and `enable_agentic_state` should rather be used to manage state shared between the team and the members.
+  - Removed all `monitoring` from `Team`. With the new AgentOS platform, monitoring is done using your own data. Go to [os.agno.com](https://os.agno.com) to get started.
+</Accordion>
+
+<Accordion title="Updates to Input & Output">
+  - `response_model` -> `output_schema`
+  - Added `input_schema` (a pydantic model) to validate the input to the agent.
+  - Changed `message` to `input` (which also replaces `messages`). `input` can be of type `str`, `list`, `dict`, `Message`, `BaseModel`, or `list[Message]`.
+  - If a `dict` and `input_schema` is provided, the dict will be validated against the schema.
+  - If a `BaseModel` and `input_schema` is provided, the model will be validated against the schema.
+  - `arun` with `stream=True` now return an async iterator of `TeamRunOutputEvent` directly and is not a coroutine anymore.
+  - `debug_mode: bool` added to `run`, `arun`, `print_response` and `aprint_response` to enable debug mode for a specific run.
+  - `add_history_to_context` added to `run`, `arun`, `print_response` and `aprint_response` to add the chat history to the context for the current run.
+  - `dependencies` added to `run`, `arun`, `print_response` and `aprint_response` to add dependencies to the context for the current run.
+  - `metadata` added to `run`, `arun`, `print_response` and `aprint_response` to set the metadata for the current run. This is merged with the metadata set on the `Team` object.
+  - Added `get_run_output` and `get_last_run_output` to `Team` to retrieve a run output by ID.
+</Accordion>
+
+<Accordion title="Updates to Metrics">
+  - Metrics have been simplified and cleaned up.
+  - There are now 3 levels of metrics:
+    - `Message.metrics` -> Metrics for each message (assistant, tool, etc.).
+    - `RunOutput.metrics` -> Aggregated metrics for the whole run.
+    - `TeamSession.metrics` -> Aggregated metrics for the whole session.
+</Accordion>
+
+<Accordion title="Updates to Knowledge">
+  - `knowledge` is now an instance of `Knowledge` instead of `AgentKnowledge`.
+  - `retriever` -> `knowledge_retriever` -> For a custom retriever.
+  - `add_references` -> `add_knowledge_to_context` -> To enable traditional RAG.
+  - Added `update_knowledge` tool to update the knowledge base. Works the same as for `Agent`.
+</Accordion>
+
+<Accordion title="Updates to Memory">
+  - `add_memory_references` -> `add_memories_to_context`
+  - You can set a custom `memory_manager` to use when creating memories.
+  - Added `get_user_memories` to retrieve the user memories.
+</Accordion>
+
+<Accordion title="Updates to Sessions">
+  - `add_session_summary_references` -> `add_session_summary_to_context`
+  - You can set a custom `session_summary_manager` to use when creating session summaries.
+  - Removed `session_name` and replace with functions `get_session_name` and `rename_session`.
+  - Added `get_session` to retrieve a session by ID.
+  - Added `get_chat_history` to retrieve the chat history from a session.
+  - Added `get_session_metrics` to retrieve the metrics for a session.
+  - Added `get_session_state` to retrieve the session state from a session.
+  - Added `get_session_summary` to retrieve the session summary from a session.
+  - Because `Team` is now stateless, `team_session`, `session_metrics`, `run_id`, `run_input`, `run_messages` and `run_response` as "sticky" team attributes have been removed.
+  - Because `Team` is now stateless, `images`, `videos`, `audio` are no longer available as team attributes. Instead these can be accessed on the `TeamRunOutput` for a particular run.
+  - Removed `team_session_state` and `workflow_session_state`. Only `session_state` is used.
+  - Added `enable_agentic_state` to `Team` to allow the agent to update the session state with a tool call.
+</Accordion>
+
+## Workflow updates
+
+<Accordion title="Updates to Workflow Class">
+  - `workflow_id` -> `id` -> If `id` is not set, it is autogenerated using the `name` of the workflow, or a random UUID if the `name` is not set.
+  - Workflows "v1" has been completely removed and replaced with `Workflows v2`. See full details in the [Workflows](/basics/workflows) section.
+  - This means the import locations for "Workflows v2" is now `agno.workflows`.
+  - `extra_data` -> `metadata`
+  - Added `store_events` to `Workflow` to optionally store the events on the workflow run output object. Also added `events_to_skip` to skip certain events from being stored. This works the same as for `Agent` and `Team`.
+  - Added `store_executor_outputs` to `Workflow` to optionally store the agent/team responses on the workflow run output object.
+  - Added `input_schema` to `Workflow` to validate the input to the workflow.
+  - Added support for websocket streaming of the workflow. This is appropriate for long-running workflows that need to be streamed to a client. This is only available for `arun`.
+  - Removed all `monitoring` from `Workflow`. With the new AgentOS platform, monitoring is done using your own data. Go to [os.agno.com](https://os.agno.com) to get started.
+</Accordion>
+
+<Accordion title="Updates to Input & Output">
+  - Changed `message` to `input` (which also replaces `messages`). `input` can be of type `str`, `list`, `dict`, or `BaseModel`.
+  - If a `dict` and `input_schema` is provided, the dict will be validated against the schema.
+  - If a `BaseModel` and `input_schema` is provided, the model will be validated against the schema.
+  - `arun` with `stream=True` now return an async iterator of `WorkflowRunOutputEvent` directly and is not a coroutine anymore.
+  - `debug_mode: bool` added to `run`, `arun`, `print_response` and `aprint_response` to enable debug mode for a specific run.
+  - Added `get_run_output` and `get_last_run_output` to `Workflow` to retrieve a run output by ID.
+</Accordion>
+
+<Accordion title="Updates to Sessions">
+  - Removed `session_name` and replace with functions `get_session_name` and `rename_session`.
+  - Because `Workflow` is now stateless, `workflow_session`, `session_metrics`, `run_id`, `run_input`, `run_messages` and `run_response` as "sticky" workflow attributes have been removed.
+  - Because `Workflow` is now stateless, `images`, `videos`, `audio` are no longer available as workflow attributes. Instead these can be accessed on the `WorkflowRunOutput` for a particular run.
+  - Added `get_session` to retrieve a session by ID.
+  - Added `get_session_metrics` to retrieve the metrics for a session.
+  - Added `get_session_state` to retrieve the session state from a session.
+  - Added `get_session_summary` to retrieve the session summary from a session.
+</Accordion>

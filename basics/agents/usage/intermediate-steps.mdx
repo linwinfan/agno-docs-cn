@@ -1,0 +1,74 @@
+---
+title: 智能体中间步骤流式传输
+---
+
+此示例演示如何在智能体执行期间流式传输中间步骤，提供对工具调用和执行事件的可见性。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch intermediate_steps.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python intermediate_steps.py
+    from typing import Iterator
+
+    from agno.agent import Agent, RunOutputEvent
+    from agno.models.openai import OpenAIChat
+    from agno.tools.duckduckgo import DuckDuckGoTools
+    from rich.pretty import pprint
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[DuckDuckGoTools(stock_price=True)],
+        markdown=True,
+    )
+
+    run_stream: Iterator[RunOutputEvent] = agent.run(
+        "英伟达（NVDA）的股价是多少？", stream=True, stream_events=True
+    )
+    for chunk in run_stream:
+        pprint(chunk.to_dict())
+        print("---" * 20)
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai ddgs rich
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python intermediate_steps.py
+    ```
+
+    ```bash Windows
+    python intermediate_steps.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

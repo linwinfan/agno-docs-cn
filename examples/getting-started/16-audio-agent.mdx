@@ -1,0 +1,100 @@
+---
+title: 音频输入输出智能体
+---
+
+本示例展示如何创建能够处理音频输入并生成音频响应的 AI 智能体。您可以将此智能体用于各种基于语音的交互，从分析语音内容到生成自然听起来的响应。
+
+尝试的示例音频交互：
+- 上传对话录音进行分析
+- 让智能体用语音输出回答问题
+- 处理不同语言和口音
+- 分析语音中的语调和情感
+
+## 代码
+
+```python audio_input_output.py
+from textwrap import dedent
+
+import requests
+from agno.agent import Agent
+from agno.media import Audio
+from agno.models.openai import OpenAIChat
+from agno.utils.audio import write_audio_to_file
+
+# 创建 AI 语音交互智能体
+agent = Agent(
+    model=OpenAIChat(
+        id="gpt-5-mini-audio-preview",
+        modalities=["text", "audio"],
+        audio={"voice": "sage", "format": "wav"},
+    ),
+    description=dedent("""\
+        您是音频处理和语音交互方面的专家，能够理解
+        和分析口语内容，同时提供自然、引人入胜的语音响应。
+        您擅长理解语音中的上下文、情感和细微差别。\
+    """),
+    instructions=dedent("""\
+        作为语音交互专家，请遵循以下指导原则：
+        1. 仔细聆听音频输入以理解内容和上下文
+        2. 提供清晰、简洁的响应，解决主要观点
+        3. 生成语音响应时，保持自然、对话式的语气
+        4. 在分析中考虑说话者的语调和情感
+        5. 如果音频不清楚，请求澄清
+
+        专注于创建引人入胜和有用的语音交互！\
+    """),
+)
+
+# 获取音频文件并将其转换为 base64 编码字符串
+url = "https://openaiassets.blob.core.windows.net/$web/API/docs/audio/alloy.wav"
+response = requests.get(url)
+response.raise_for_status()
+
+# 处理音频并获取响应
+run_response = agent.run(
+    "这个录音中有什么？请分析内容和语调。",
+    audio=[Audio(content=response.content, format="wav")],
+)
+
+# 如果可用，保存音频响应
+if run_response.response_audio is not None:
+    write_audio_to_file(
+        audio=run_response.response_audio.content, filename="tmp/response.wav"
+    )
+
+# 更多示例交互尝试：
+"""
+尝试这些语音交互场景：
+1. "您能总结这个录音中讨论的主要观点吗？"
+2. "您在说话者的声音中检测到什么情感或语调？"
+3. "请提供语音模式和清晰度的详细分析"
+4. "您能识别任何背景噪音或音频质量问题吗？"
+5. "这个录音的整体背景和目的是什么？"
+
+注意：您可以将自己的音频文件转换为 base64 格式来使用。
+使用自己音频文件的示例：
+
+with open('your_audio.wav', 'rb') as audio_file:
+    audio_data = audio_file.read()
+    agent.run("分析这个音频", audio=[Audio(content=audio_data, format="wav")])
+"""
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai requests agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python audio_input_output.py
+    ```
+  </Step>
+
+</Steps>

@@ -1,0 +1,53 @@
+---
+title: Youtube
+---
+
+**YouTubeTools** enable an Agent to access captions and meta数据 of YouTube videos, when provided with a video URL.
+
+## Prerequisites
+
+The 以下 example requires the `youtube_transcript_api` library.
+
+```shell
+pip install -U youtube_transcript_api
+```
+
+## Example
+
+The 以下 智能体 will provide a summary of a YouTube video.
+
+```python cookbook/14_tools/youtube_tools.py
+from agno.agent import Agent
+from agno.tools.youtube import YouTubeTools
+
+agent = Agent(
+    tools=[YouTubeTools()],
+        description="You are a YouTube agent. Obtain the captions of a YouTube video and answer questions.",
+)
+
+agent.print_response("Summarize this video https://www.youtube.com/watch?v=Iv9dewmcFbs&t", markdown=True)
+```
+
+## Toolkit 参数
+
+| Param                | Type        | Default | Description                                                                        |
+| -------------------- | ----------- | ------- | ---------------------------------------------------------------------------------- |
+| `get_video_captions` | `bool`      | `True`  | Enables the functionality to retrieve video captions.                              |
+| `get_video_数据`     | `bool`      | `True`  | Enables the functionality to retrieve video meta数据 and other related 数据.       |
+| `languages`          | `List[str]` | -       | Specifies the list of languages for which 数据 should be retrieved, if applicable. |
+| `enable_get_video_captions` | `bool` | `True` | Enable the get_video_captions functionality. |
+| `enable_get_video_数据` | `bool` | `True` | Enable the get_video_数据 functionality. |
+| `enable_get_video_timestamps` | `bool` | `True` | Enable the get_video_timestamps functionality. |
+| `all` | `bool` | `False` | Enable all functionality. |
+## Toolkit Functions
+
+| Function                     | Description                                              |
+| ---------------------------- | -------------------------------------------------------- |
+| `get_youtube_video_captions` | This function retrieves the captions of a YouTube video. |
+| `get_youtube_video_数据`     | This function retrieves the meta数据 of a YouTube video. |
+| `get_youtube_video_timestamps` | This function retrieves the timestamps of a YouTube video. |
+
+## 开发者资源
+
+- 查看 [Tools](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/tools/youtube.py)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/14_tools/youtube_tools.py)

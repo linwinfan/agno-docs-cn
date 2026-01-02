@@ -1,0 +1,90 @@
+---
+title: 智能体上下文
+---
+
+本示例展示如何向智能体注入外部依赖。上下文在智能体运行时被评估，就像智能体的依赖注入一样。
+
+尝试的示例提示：
+- "总结 HackerNews 上的热门故事"
+- "当前有哪些热门科技讨论？"
+- "分析当前热门故事并识别趋势"
+- "今天最受点赞的故事是什么？"
+
+## 代码
+
+```python agent_context.py
+import json
+from textwrap import dedent
+
+import httpx
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+
+def get_top_hackernews_stories(num_stories: int = 5) -> str:
+    """获取并返回 HackerNews 的热门故事。
+
+    Args:
+        num_stories: 要检索的热门故事数量（默认：5）
+    Returns:
+        包含故事详情的 JSON 字符串（标题、URL、分数等）
+    """
+    # 获取热门故事
+    stories = [
+        {
+            k: v
+            for k, v in httpx.get(
+                f"https://hacker-news.firebaseio.com/v0/item/{id}.json"
+            )
+            .json()
+            .items()
+            if k != "kids"  # 排除讨论线程
+        }
+        for id in httpx.get(
+            "https://hacker-news.firebaseio.com/v0/topstories.json"
+        ).json()[:num_stories]
+    ]
+    return json.dumps(stories, indent=4)
+
+
+# 创建可以访问实时 HackerNews 数据的上下文感知智能体
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    # 上下文中的每个函数在智能体运行时被评估，
+    # 将其视为智能体的依赖注入
+    dependencies={"top_hackernews_stories": get_top_hackernews_stories},
+    # 或者，您可以手动将上下文添加到指令中。这会自动解析
+    instructions=dedent("""\
+        您是一位有洞察力的科技趋势观察者！📰
+
+        以下是 HackerNews 上的热门故事：
+        {top_hackernews_stories}\
+    """),
+    markdown=True,
+)
+
+# 示例用法
+agent.print_response(
+    "总结 HackerNews 上的热门故事并识别任何有趣的趋势。",
+    stream=True,
+)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai httpx agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python agent_context.py
+    ```
+  </Step>
+
+</Steps>

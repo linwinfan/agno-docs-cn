@@ -1,0 +1,80 @@
+---
+title: 记忆工具
+sidebarTitle: 记忆工具
+---
+
+`MemoryTools` 工具包使智能体能够通过创建、更新和删除操作来管理用户记忆。该工具包与提供的数据库集成，记忆存储在其中。
+
+该工具包实现了"思考 → 操作 → 分析"循环，使智能体能够：
+1. 思考记忆管理需求并规划操作
+2. 在数据库上执行记忆操作（添加、更新、删除）
+3. 分析结果以确保操作成功完成并满足要求
+
+这种方法使智能体能够跨对话持久存储、检索和管理用户信息、偏好和上下文。
+
+该工具包包括以下工具：
+
+- `think`：用于规划记忆操作、头脑风暴内容和完善方法的草稿板。这些想法对智能体保持内部，不向用户显示。
+- `get_memories`：从数据库获取当前用户的记忆列表。
+- `add_memory`：在数据库中创建具有指定内容和可选主题的新记忆。
+- `update_memory`：通过记忆 ID 修改现有记忆，允许更新内容和主题。
+- `delete_memory`：通过记忆 ID 从数据库中删除记忆。
+- `analyze`：评估记忆操作是否成功完成并产生预期结果。
+
+## 示例
+
+以下是如何使用 `MemoryTools` 工具包的示例：
+
+```python
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.tools.memory import MemoryTools
+
+# Create a database connection
+db = SqliteDb(
+    db_file="tmp/memory.db"
+)
+
+memory_tools = MemoryTools(
+    db=db,
+)
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[memory_tools],
+    markdown=True,
+)
+
+agent.print_response(
+    "My name is John Doe and I like to hike in the mountains on weekends. "
+    "I like to travel to new places and experience different cultures. "
+    "I am planning to travel to Africa in December. ",
+    user_id="john_doe@example.com",
+    stream=True
+)
+
+# This won't use the session history, but instead will use the memory tools to get the memories
+agent.print_response("What have you remembered about me?", stream=True, user_id="john_doe@example.com")
+```
+
+
+以下是您如何配置工具包：
+
+```python
+from agno.tools.memory import MemoryTools
+
+memory_tools = MemoryTools(
+    db=my_database,
+    enable_think=True,            # Enable the think tool (true by default)
+    enable_get_memories=True,     # Enable the get_memories tool (true by default)
+    enable_add_memory=True,       # Enable the add_memory tool (true by default)
+    enable_update_memory=True,    # Enable the update_memory tool (true by default)
+    enable_delete_memory=True,    # Enable the delete_memory tool (true by default)
+    enable_analyze=True,          # Enable the analyze tool (true by default)
+    add_instructions=True,        # Add default instructions
+    instructions=None,            # Optional custom instructions
+    add_few_shot=True,           # Add few-shot examples
+    few_shot_examples=None,      # Optional custom few-shot examples
+)
+```

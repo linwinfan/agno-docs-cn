@@ -1,0 +1,29 @@
+---
+title: In-Memory Storage
+sidebarTitle: 概览
+description: 学习使用 In-Memory 存储 for your Agents
+---
+
+Agno 支持 using In-Memory 存储 with the `InMemoryDb` class. By doing this, you will be able to use all 特性 that depend on having a 数据库, without having to set one up.
+
+<Warning>
+Using the In-Memory 存储 is not recommended for production applications.
+Use it for demos, testing and any other use case where you don't want to setup a 数据库.
+</Warning>
+
+## 使用方法
+
+```python
+from agno.agent import Agent
+from agno.db.in_memory import InMemoryDb
+
+# Setup in-memory database
+db = InMemoryDb()
+
+# Create agent with database
+agent = Agent(db=db)
+```
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/in_记忆/in_记忆_存储_for_智能体.py)

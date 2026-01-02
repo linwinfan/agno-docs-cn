@@ -1,0 +1,103 @@
+---
+title: 什么是分块？
+sidebarTitle: 概述
+description: 分块是将大型文档分解为更小片段的过程，以便进行有效的向量搜索和检索。
+keywords: [chunking, chunking strategies, chunker]
+---
+
+分块是将内容分解为可管理片段的过程，然后再将它们转换为嵌入并存储在向量数据库中。您选择的分块策略直接影响搜索质量和检索准确性。
+
+不同的分块策略服务于不同的目的。例如，在处理食谱书时，不同策略会产生不同结果：
+
+- **固定大小**：每500个字符分割文本（可能会在指令中间打断食谱）
+- **语义**：根据含义保持完整食谱在一起
+- **文档**：每页成为一个块
+
+策略影响您获得完整、相关结果还是碎片化片段。
+
+## 可用的分块策略
+
+<CardGroup cols={3}>
+  <Card title="固定大小分块" icon="ruler" href="/basics/knowledge/chunking/fixed-size-chunking">
+    将内容分割为具有指定大小和重叠的统一块。
+  </Card>
+  <Card title="语义分块" icon="brain" href="/basics/knowledge/chunking/semantic-chunking">
+    使用语义相似性来识别内容中的自然断点。
+  </Card>
+  <Card title="递归分块" icon="sitemap" href="/basics/knowledge/chunking/recursive-chunking">
+    使用多个分隔符递归分割内容以进行分层处理。
+  </Card>
+  <Card title="文档分块" icon="file-lines" href="/basics/knowledge/chunking/document-chunking">
+    通过将章节视为单个块来保留文档结构。
+  </Card>
+  <Card title="CSV行分块" icon="table" href="/basics/knowledge/chunking/csv-row-chunking">
+    通过将每行视为单个块来分割CSV文件。仅兼容CSV文件。
+  </Card>
+  <Card title="Markdown分块" icon="markdown" href="/basics/knowledge/chunking/markdown-chunking">
+    在保留标题结构和层次结构的同时分割markdown内容。仅兼容Markdown文件。
+  </Card>
+  <Card title="智能分块" icon="robot" href="/basics/knowledge/chunking/agentic-chunking">
+    使用AI智能确定最佳块边界。
+  </Card>
+  <Card title="自定义分块" icon="code" href="/basics/knowledge/chunking/custom-chunking">
+    为专门用例构建您自己的分块策略。
+  </Card>
+</CardGroup>
+
+## Using Chunking Strategies
+
+Chunking strategies are configured when setting up readers for your knowledge base:
+
+```python
+from agno.knowledge.chunking.semantic import SemanticChunking
+from agno.knowledge.reader.pdf_reader import PDFReader
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.pgvector import PgVector
+from agno.db.postgres import PostgresDb
+
+# Configure chunking strategy with a reader
+reader = PDFReader(
+    chunking_strategy=SemanticChunking(similarity_threshold=0.7)
+)
+
+# Set up ContentsDB - tracks content metadata
+contents_db = PostgresDb(
+    db_url="postgresql+psycopg://ai:ai@localhost:5532/ai",
+    knowledge_table="knowledge_contents"
+)
+
+# Set up vector database - stores embeddings
+vector_db = PgVector(
+    table_name="documents",
+    db_url="postgresql+psycopg://ai:ai@localhost:5532/ai"
+)
+
+# Create Knowledge with both databases
+knowledge = Knowledge(
+    name="Chunking Knowledge Base",
+    vector_db=vector_db,
+    contents_db=contents_db
+)
+
+# Add content with chunking applied
+knowledge.add_content(
+    path="documents/cookbook.pdf",
+    reader=reader,
+)
+```
+
+## Choosing a Strategy
+
+The choice of chunking strategy depends on your content type and use case:
+
+- **Text documents**: Semantic chunking maintains context and meaning
+- **Structured documents**: Document or Markdown chunking preserves hierarchy  
+- **Tabular data**: CSV Row chunking treats each row as a separate entity
+- **Mixed content**: Recursive chunking provides flexibility with multiple separators
+- **Uniform processing**: Fixed Size chunking ensures consistent chunk dimensions
+
+Each reader has a default chunking strategy that works well for its content type, but you can override it by specifying a `chunking_strategy` parameter when configuring the reader.
+
+<Note>
+Consider your specific use case and performance requirements when choosing a chunking strategy, since different strategies vary in processing time and memory usage.
+</Note>

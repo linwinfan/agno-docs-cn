@@ -1,0 +1,105 @@
+---
+title: 带团队历史的直接响应
+sidebarTitle: 直接响应 + 历史
+---
+
+本示例演示了一个团队，其中团队领导者将请求路由到适当的成员，而成员直接向用户响应。
+
+此外，团队通过 `add_history_to_context=True` 访问对话历史。
+
+```python respond_directly_with_history.py
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+
+
+def get_weather(city: str) -> str:
+    return f"The weather in {city} is sunny."
+
+
+weather_agent = Agent(
+    name="Weather Agent",
+    role="您是一个天气智能体，可以回答有关天气的问题。",
+    model=OpenAIChat(id="o3-mini"),
+    tools=[get_weather],
+)
+
+
+def get_news(topic: str) -> str:
+    return f"The news about {topic} is that it is going well!"
+
+
+news_agent = Agent(
+    name="News Agent",
+    role="您是一个新闻智能体，可以回答有关新闻的问题。",
+    model=OpenAIChat(id="o3-mini"),
+    tools=[get_news],
+)
+
+
+def get_activities(city: str) -> str:
+    return f"The activities in {city} are that it is going well!"
+
+
+activities_agent = Agent(
+    name="Activities Agent",
+    role="您是一个活动智能体，可以回答有关活动的问题。",
+    model=OpenAIChat(id="o3-mini"),
+    tools=[get_activities],
+)
+
+
+geo_search_team = Team(
+    name="地理搜索团队",
+    model=OpenAIChat("o3-mini"),
+    respond_directly=True,
+    members=[
+        weather_agent,
+        news_agent,
+        activities_agent,
+    ],
+    instructions="您是一个地理搜索智能体，可以回答有关城市天气、新闻和活动的问题。",
+    db=SqliteDb(
+        db_file="tmp/geo_search_team.db"
+    ),  # 添加数据库以存储对话历史
+    add_history_to_context=True,  # 确保团队领导者了解之前的请求
+)
+
+
+geo_search_team.print_response(
+    "我正在研究东京。那里的天气怎么样？", stream=True
+)
+
+geo_search_team.print_response(
+    "关于那个城市有什么最新新闻吗？", stream=True
+)
+
+geo_search_team.print_response("那个城市有哪些活动？", stream=True)
+```
+
+## 使用方法
+
+<Steps>
+
+    <Snippet file="create-venv-step.mdx" />
+
+    <Step title="安装所需库">
+        ```bash
+        pip install agno openai
+        ```
+    </Step>
+
+    <Step title="设置环境变量">
+        ```bash
+        export OPENAI_API_KEY=****
+        ```
+    </Step>
+
+    <Step title="运行智能体">
+        ```bash
+        python respond_directly_with_history.py
+        ```
+    </Step>
+
+</Steps>

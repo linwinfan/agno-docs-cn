@@ -1,0 +1,71 @@
+---
+title: Google Cloud Storage for Agent
+sidebarTitle: Agent
+---
+
+Agno 支持 using Google Cloud Storage (GCS) 作为智能体的存储后端 using the `GcsJsonDb` class. This 存储 backend stores session 数据 as JSON blobs in a GCS bucket.
+
+## 使用方法
+
+Configure your 智能体 with GCS 存储 to enable 云-based session persistence.
+
+```python gcs_for_agent.py
+import uuid
+import google.auth
+from agno.agent import Agent
+from agno.db.base import SessionType
+from agno.db.gcs_json import GcsJsonDb
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+# Obtain the default credentials and project id from your gcloud CLI session.
+credentials, project_id = google.auth.default()
+
+# Generate a unique bucket name using a base name and a UUID4 suffix.
+base_bucket_name = "example-gcs-bucket"
+unique_bucket_name = f"{base_bucket_name}-{uuid.uuid4().hex[:12]}"
+print(f"Using bucket: {unique_bucket_name}")
+
+# Initialize GCSJsonDb with explicit credentials, unique bucket name, and project.
+db = GcsJsonDb(
+    bucket_name=unique_bucket_name,
+    prefix="agent/",
+    project=project_id,
+    credentials=credentials,
+)
+
+# Initialize the Agno agent with the new storage backend and a DuckDuckGo search tool.
+agent1 = Agent(
+    db=db,
+    tools=[DuckDuckGoTools()],
+    add_history_to_context=True,
+    debug_mode=False,
+)
+
+# Execute sample queries.
+agent1.print_response("How many people live in Canada?")
+agent1.print_response("What is their national anthem called?")
+
+# Create a new agent and make sure it pursues the conversation
+agent2 = Agent(
+    db=db,
+    session_id=agent1.session_id,
+    tools=[DuckDuckGoTools()],
+    add_history_to_context=True,
+    debug_mode=False,
+)
+
+agent2.print_response("What's the name of the country we discussed?")
+agent2.print_response("What is that country's national sport?")
+```
+
+## Prerequisites
+
+<Snippet file="gcs-auth-存储.mdx" />
+
+## 参数
+
+<Snippet file="db-gcs-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/blob/main/cookbook/07_数据库/gcs/gcs_json_for_智能体.py)

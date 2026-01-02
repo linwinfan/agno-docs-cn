@@ -1,0 +1,432 @@
+---
+title: "AgentOS"
+sidebarTitle: "概述"
+description: "Agno 用于大规模部署和管理智能体系统的生产运行时和控制平面"
+keywords: [agentos, 智能体运行时, 控制平面, fastapi, 多智能体系统]
+---
+
+AgentOS 是 Agno 的生产运行时和控制平面，用于大规模部署和管理您的智能体系统。基于 [FastAPI](https://fastapi.tiangolo.com/) 构建，它提供了强大、可扩展的基础设施，您可以在开发期间本地运行，或部署到云环境进行生产工作负载。
+
+AgentOS 作为您的 AI 智能体、团队和工作流的中央枢纽，为执行、监控和管理提供统一的 API。无论您是运行单个智能体还是编排复杂的多智能体系统，AgentOS 都为您提供构建生产就绪的智能体应用程序的工具。
+
+使用 AgentOS，您可以：
+
+- **运行智能体/团队/工作流**: 为您的智能体、团队和工作流创建新的运行，可以使用新会话或现有会话。
+- **管理会话**: 检索、更新和删除会话。
+- **管理记忆**: 检索、更新和删除记忆。
+- **管理知识**: 管理知识库的内容。
+- **管理评估**: 检索、创建、删除和更新评估。
+
+<Note>
+这是驱动 [AgentOS 控制平面](/agent-os/control-plane) 的相同 API。但是，您也可以使用这些端点来驱动您自己的应用程序！
+</Note>
+
+查看完整的 [API 参考](/reference-api/overview) 了解更多详情。
+
+## 创建您的 AgentOS
+
+以下是创建 AgentOS 实例的基本示例：
+
+```python my_os.py
+from agno.os import AgentOS
+
+agent_os = AgentOS(
+  name="我的 AgentOS",
+  description="我的多智能体运行时",
+  agents=[basic_agent],
+  teams=[basic_team],
+  workflows=[basic_workflow]
+)
+
+app = agent_os.get_app()
+
+if __name__ == "__main__":
+    agent_os.serve(app="my_os:app", reload=True)
+```
+
+您可以通过向 `AgentOS` 类传递以下参数来配置 AgentOS 的行为：
+
+- `agents`: 要包含在 AgentOS 中的智能体列表
+- `teams`: 要包含在 AgentOS 中的团队列表
+- `workflows`: 要包含在 AgentOS 中的工作流列表
+- `knowledge`: AgentOS 的知识库
+- `memory`: AgentOS 的记忆存储
+- `storage`: AgentOS 的存储后端
+- `monitoring`: AgentOS 的监控配置
+- `security`: AgentOS 的安全设置
+
+## 核心概念
+
+### 智能体
+
+智能体是 AgentOS 的基本构建块。每个智能体都有特定的角色和功能：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 创建智能体
+customer_service_agent = Agent(
+    name="客服助手",
+    model=OpenAIChat(model="gpt-4o"),
+    instructions="您是一个专业的客服助手，帮助用户解决问题。",
+    tools=[knowledge_search, ticket_system]
+)
+```
+
+### 团队
+
+团队允许您将多个智能体组合在一起以完成复杂任务：
+
+```python
+from agno.team import Team
+
+# 创建团队
+support_team = Team(
+    name="技术支持团队",
+    agents=[customer_service_agent, technical_agent],
+    instructions="协作解决用户技术问题"
+)
+```
+
+### 工作流
+
+工作流定义了智能体和团队之间的协作模式：
+
+```python
+from agno.workflow import Workflow
+
+# 创建工作流
+support_workflow = Workflow(
+    name="客户支持流程",
+    agents=[customer_service_agent],
+    teams=[support_team],
+    steps=[
+        {"agent": "customer_service_agent", "action": "analyze_issue"},
+        {"team": "support_team", "action": "resolve_issue"},
+        {"agent": "customer_service_agent", "action": "follow_up"}
+    ]
+)
+```
+
+## 架构设计
+
+### 分层架构
+
+AgentOS 采用分层架构设计：
+
+```
+┌─────────────────────────────────────┐
+│           控制平面 UI                │
+├─────────────────────────────────────┤
+│           API 网关                   │
+├─────────────────────────────────────┤
+│          AgentOS 运行时               │
+├─────────────────────────────────────┤
+│  智能体  │  团队  │  工作流  │  知识库  │
+├─────────────────────────────────────┤
+│      存储层 (数据库/向量存储)         │
+└─────────────────────────────────────┘
+```
+
+### 微服务架构
+
+AgentOS 支持微服务架构模式：
+
+```yaml
+# 服务配置
+services:
+  agent_service:
+    replicas: 3
+    resources:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  team_service:
+    replicas: 2
+    resources:
+      memory: "1Gi"
+      cpu: "1000m"
+  
+  workflow_service:
+    replicas: 1
+    resources:
+      memory: "2Gi"
+      cpu: "2000m"
+```
+
+## 部署模式
+
+### 单机部署
+
+适用于开发和小规模部署：
+
+```python
+# 单机 AgentOS
+agent_os = AgentOS(
+    name="开发环境",
+    storage=LocalStorage("./data"),
+    monitoring=LocalMonitoring()
+)
+```
+
+### 分布式部署
+
+适用于生产环境：
+
+```python
+# 分布式 AgentOS
+agent_os = AgentOS(
+    name="生产环境",
+    storage=DistributedStorage(
+        hosts=["db1.example.com", "db2.example.com"]
+    ),
+    monitoring=DistributedMonitoring(
+        prometheus_url="http://prometheus.example.com"
+    )
+)
+```
+
+### 混合云部署
+
+结合本地和云资源：
+
+```python
+# 混合云 AgentOS
+agent_os = AgentOS(
+    name="混合云环境",
+    storage=HybridStorage(
+        local=LocalStorage("./cache"),
+        cloud=CloudStorage("s3://my-bucket")
+    )
+)
+```
+
+## 扩展性
+
+### 水平扩展
+
+通过添加更多实例来扩展处理能力：
+
+```python
+# 扩展配置
+scaling_config = {
+    "min_instances": 2,
+    "max_instances": 10,
+    "target_cpu": 70,  # 目标 CPU 使用率
+    "target_memory": 80  # 目标内存使用率
+}
+```
+
+### 垂直扩展
+
+通过增加资源来扩展单个实例：
+
+```python
+# 资源配置
+resource_config = {
+    "cpu": "4000m",  # 4 CPU 核心
+    "memory": "8Gi",  # 8 GB 内存
+    "gpu": "1"  # 1 GPU（可选）
+}
+```
+
+## 监控和可观测性
+
+### 指标收集
+
+AgentOS 内置了全面的指标收集：
+
+```python
+# 指标配置
+metrics = {
+    "request_count": "counter",
+    "response_time": "histogram",
+    "error_rate": "gauge",
+    "agent_performance": "summary"
+}
+```
+
+### 日志管理
+
+结构化日志记录和分析：
+
+```python
+import structlog
+
+# 配置结构化日志
+structlog.configure(
+    processors=[
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.add_log_level,
+        structlog.processors.JSONRenderer()
+    ]
+)
+```
+
+### 分布式追踪
+
+跨服务的请求追踪：
+
+```python
+from opentelemetry import trace
+
+# 配置分布式追踪
+tracer = trace.get_tracer(__name__)
+
+with tracer.start_as_current_span("process_request"):
+    # 处理请求
+    result = agent.process_request(request)
+```
+
+## 安全性
+
+### 认证和授权
+
+多层次的安全控制：
+
+```python
+# 安全配置
+security_config = {
+    "authentication": {
+        "type": "jwt",
+        "issuer": "https://auth.example.com",
+        "audience": "agentos-api"
+    },
+    "authorization": {
+        "rbac": {
+            "roles": ["admin", "user", "viewer"],
+            "permissions": ["read", "write", "execute"]
+        }
+    }
+}
+```
+
+### 数据加密
+
+保护静态和传输中的数据：
+
+```python
+# 加密配置
+encryption_config = {
+    "at_rest": {
+        "algorithm": "AES-256-GCM",
+        "key_rotation": "90d"
+    },
+    "in_transit": {
+        "protocol": "TLS 1.3",
+        "cipher_suites": ["ECDHE-RSA-AES256-GCM-SHA384"]
+    }
+}
+```
+
+## 性能优化
+
+### 缓存策略
+
+多层缓存提高响应速度：
+
+```python
+# 缓存配置
+cache_config = {
+    "l1_cache": {
+        "type": "memory",
+        "size": "1GB",
+        "ttl": "300s"
+    },
+    "l2_cache": {
+        "type": "redis",
+        "host": "redis.example.com",
+        "ttl": "3600s"
+    }
+}
+```
+
+### 连接池
+
+优化数据库连接管理：
+
+```python
+# 连接池配置
+pool_config = {
+    "max_connections": 100,
+    "min_connections": 10,
+    "connection_timeout": "30s",
+    "idle_timeout": "600s"
+}
+```
+
+## 最佳实践
+
+### 1. 环境分离
+
+为不同环境创建独立的配置：
+
+```python
+# 环境配置
+environments = {
+    "development": {
+        "debug": True,
+        "log_level": "DEBUG",
+        "monitoring": "minimal"
+    },
+    "staging": {
+        "debug": False,
+        "log_level": "INFO",
+        "monitoring": "full"
+    },
+    "production": {
+        "debug": False,
+        "log_level": "WARNING",
+        "monitoring": "comprehensive"
+    }
+}
+```
+
+### 2. 资源管理
+
+合理分配和监控资源使用：
+
+```python
+# 资源限制
+resource_limits = {
+    "max_memory_per_agent": "2GB",
+    "max_cpu_per_agent": "1000m",
+    "max_requests_per_minute": 1000,
+    "max_concurrent_sessions": 100
+}
+```
+
+### 3. 错误处理
+
+优雅的错误处理和恢复：
+
+```python
+# 错误处理策略
+error_handling = {
+    "retry_policy": {
+        "max_retries": 3,
+        "backoff_factor": 2,
+        "timeout": "30s"
+    },
+    "circuit_breaker": {
+        "failure_threshold": 5,
+        "recovery_timeout": "60s"
+    }
+}
+```
+
+## 下一步
+
+- 查看[创建您的第一个 OS](/agent-os/creating-your-first-os)开始使用
+- 了解[AgentOS 配置](/agent-os/config)选项
+- 探索[控制平面功能](/agent-os/control-plane)
+- 查看[部署指南](/deploy/overview)了解生产部署
+- 浏览[API 参考](/reference-api/overview)了解技术细节
+
+## 社区和支持
+
+- **GitHub**: [agno-agi/agno](https://github.com/agno-agi/agno)
+- **Discord**: [加入我们的社区](https://discord.gg/agno)
+- **文档**: [完整文档](https://docs.agno.com)
+- **博客**: [技术博客](https://blog.agno.com)

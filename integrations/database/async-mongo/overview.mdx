@@ -1,0 +1,47 @@
+---
+title: Async MongoDB
+sidebarTitle: 概览
+description: 学习使用 MongoDB 异步ly 作为智能体的数据库
+---
+
+Agno 支持 using [MongoDB](https://www.mongodb.com/) 异步ly, with the `AsyncMongoDb` class.
+
+<Tip>
+  **v2 Migration Support**: If you're upgrading from Agno v1, MongoDB is fully supported in the v2 migration script. See the [migration guide](/how-to/v2-migration) for details.
+</Tip>
+
+## 使用方法
+
+```python async_mongodb_for_agent.py
+from agno.agent import Agent
+from agno.db.mongo import AsyncMongoDb
+
+# MongoDB connection settings
+db_url = "mongodb://localhost:27017"
+
+db = AsyncMongoDb(db_url=db_url)
+
+# Setup your Agent with the Database
+agent = Agent(db=db)
+```
+
+### Run MongoDB
+
+安装 [docker desktop](https://docs.docker.com/desktop/install/mac-install/) 并运行 **MongoDB** 在端口 **27017** 使用：
+```bash
+docker run -d \
+  --name local-mongo \
+  -p 27017:27017 \
+  -e MONGO_INITDB_ROOT_USERNAME=mongoadmin \
+  -e MONGO_INITDB_ROOT_PASSWORD=secret \
+  mongo
+```
+
+
+## 参数
+
+<Snippet file="db-async-mongo-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/mongo/async_mongodb_for_智能体.py)

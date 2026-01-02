@@ -1,0 +1,348 @@
+---
+title: Agno 基础设施
+sidebarTitle: "Agno 基础设施"
+---
+
+Agno Infra SDK 应用最佳实践将您的 AgentOS 投入生产环境。它让您能够以 Python 代码的形式定义、部署和管理整个智能体系统。该库被 [AWS 模板](https://github.com/agno-agi/agent-infra-aws) 用于管理您的基础设施，更多云提供商的支持即将推出。
+
+## 创建新的 Agno Infra 项目
+
+运行 `ag infra create` 来创建一个新的基础设施项目，该命令会要求您选择一个启动器模板和基础设施项目名称。
+
+<CodeGroup>
+
+```bash Create Infra Project
+ag infra create
+```
+
+</CodeGroup>
+
+从可用模板列表中选择一个模板。
+
+## 启动基础设施资源
+
+运行 `ag infra up` 来启动即创建基础设施资源。这将使用 docker 在本地启动您的 AgentOS 实例和 PostgreSQL 数据库。
+
+<CodeGroup>
+
+```bash terminal
+ag infra up
+```
+
+```bash shorthand
+ag infra up dev:docker
+```
+
+```bash full options
+ag infra up --env dev --infra docker
+```
+
+```bash short options
+ag infra up -e dev -i docker
+```
+
+</CodeGroup>
+
+## 停止基础设施资源
+
+运行 `ag infra down` 来停止即删除基础设施资源
+
+<CodeGroup>
+
+```bash terminal
+ag infra down
+```
+
+```bash shorthand
+ag infra down dev:docker
+```
+
+```bash full options
+ag infra down --env dev --infra docker
+```
+
+```bash short options
+ag infra down -e dev -i docker
+```
+
+</CodeGroup>
+
+## 修补基础设施资源
+
+运行 `ag infra patch` 来修补即更新基础设施资源
+
+<CodeGroup>
+
+```bash terminal
+ag infra patch
+```
+
+```bash shorthand
+ag infra patch dev:docker
+```
+
+```bash full options
+ag infra patch --env dev --infra docker
+```
+
+```bash short options
+ag infra patch -e dev -i docker
+```
+
+</CodeGroup>
+
+<br />
+
+<Note>
+
+对于某些资源，`patch` 命令正在开发中。如需要，请使用 `restart`
+
+</Note>
+
+## 重启基础设施
+
+运行 `ag infra restart` 来停止资源并重新启动它们
+
+<CodeGroup>
+
+```bash terminal
+ag infra restart
+```
+
+```bash shorthand
+ag infra restart dev:docker
+```
+
+```bash full options
+ag infra restart --env dev --infra docker
+```
+
+```bash short options
+ag infra restart -e dev -i docker
+```
+
+</CodeGroup>
+
+## 命令选项
+
+<Note>运行 `ag infra up --help` 查看所有选项</Note>
+
+### 环境 (`--env`)
+
+使用 `--env` 或 `-e` 标志来过滤环境（dev/prd）
+
+<CodeGroup>
+
+```bash flag
+ag infra up --env dev
+```
+
+```bash shorthand
+ag infra up dev
+```
+
+```bash short options
+ag infra up -e dev
+```
+
+</CodeGroup>
+
+### 基础设施 (`--infra`)
+
+使用 `--infra` 或 `-i` 标志来过滤基础设施（docker/aws/k8s）
+
+<CodeGroup>
+
+```bash flag
+ag infra up --infra docker
+```
+
+```bash shorthand
+ag infra up :docker
+```
+
+```bash short options
+ag infra up -i docker
+```
+
+</CodeGroup>
+
+### 组 (`--group`)
+
+使用 `--group` 或 `-g` 标志来按资源组过滤。
+
+<CodeGroup>
+
+```bash flag
+ag infra up --group app
+```
+
+```bash full options
+ag infra up \
+  --env dev \
+  --infra docker \
+  --group app
+```
+
+```bash shorthand
+ag infra up dev:docker:app
+```
+
+```bash short options
+ag infra up \
+  -e dev \
+  -i docker \
+  -g app
+```
+
+</CodeGroup>
+
+### 名称 (`--name`)
+
+使用 `--name` 或 `-n` 标志来按资源名称过滤
+
+<CodeGroup>
+
+```bash flag
+ag infra up --name app
+```
+
+```bash full options
+ag infra up \
+  --env dev \
+  --infra docker \
+  --name app
+```
+
+```bash shorthand
+ag infra up dev:docker::app
+```
+
+```bash short options
+ag infra up \
+  -e dev \
+  -i docker \
+  -n app
+```
+
+</CodeGroup>
+
+### 类型 (`--type`)
+
+使用 `--type` 或 `-t` 标志来按资源类型过滤。
+
+<CodeGroup>
+
+```bash flag
+ag infra up --type container
+```
+
+```bash full options
+ag infra up \
+  --env dev \
+  --infra docker \
+  --type container
+```
+
+```bash shorthand
+ag infra up dev:docker:app::container
+```
+
+```bash short options
+ag infra up \
+  -e dev \
+  -i docker \
+  -t container
+```
+
+</CodeGroup>
+
+### 试运行 (`--dry-run`)
+
+`--dry-run` 或 `-dr` 标志可用于**试运行**命令。`ag infra up -dr` 只会打印资源，不会创建它们。
+
+<CodeGroup>
+
+```bash flag
+ag infra up --dry-run
+```
+
+```bash full options
+ag infra up \
+  --env dev \
+  --infra docker \
+  --dry-run
+```
+
+```bash shorthand
+ag infra up dev:docker -dr
+```
+
+```bash short options
+ag infra up \
+  -e dev \
+  -i docker \
+  -dr
+```
+
+</CodeGroup>
+
+### 显示调试日志 (`--debug`)
+
+使用 `--debug` 或 `-d` 标志来显示调试日志。
+
+<CodeGroup>
+
+```bash flag
+ag infra up -d
+```
+
+```bash full options
+ag infra up \
+  --env dev \
+  --infra docker \
+  -d
+```
+
+```bash shorthand
+ag infra up dev:docker -d
+```
+
+```bash short options
+ag infra up \
+  -e dev \
+  -i docker \
+  -d
+```
+
+</CodeGroup>
+
+### 强制重新创建镜像和容器 (`-f`)
+
+使用 `--force` 或 `-f` 标志来强制重新创建镜像和容器
+
+<CodeGroup>
+
+```bash flag
+ag infra up -f
+```
+
+```bash full options
+ag infra up \
+  --env dev \
+  --infra docker \
+  -f
+```
+
+```bash shorthand
+ag infra up dev:docker -f
+```
+
+```bash short options
+ag infra up \
+  -e dev \
+  -i docker \
+  -f
+```
+
+</CodeGroup>

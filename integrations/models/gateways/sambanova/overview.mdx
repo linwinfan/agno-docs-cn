@@ -1,0 +1,54 @@
+---
+title: Sambanova
+sidebarTitle: 概览
+description: Learn how to use Sambanova with Agno.
+---
+
+Sambanova is a 平台 for providing endpoints for Large Language 模型s. Note that Sambanova currently does not support function calling.
+
+## Authentication
+
+Set your `SAMBANOVA_API_KEY` environment variable. Get your key from [here](https://云.sambanova.ai/apis).
+
+<CodeGroup>
+
+```bash Mac
+export SAMBANOVA_API_KEY=***
+```
+
+```bash Windows
+setx SAMBANOVA_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Sambanova` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.sambanova import Sambanova
+
+agent = Agent(model=Sambanova(), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"Meta-Llama-3.1-8B-Instruct"`| The id of the SambaNova 模型 to use                                 |
+| `name`       | `str`              | `"SambaNova"`                  | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"SambaNova"`                  | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for SambaNova (defaults to SAMBANOVA_API_KEY env var)    |
+| `base_url`   | `str`              | `"https://api.sambanova.ai/v1"` | The base URL for the SambaNova API                                  |
+
+`Sambanova` also 支持 the params of [OpenAI](/reference/models/openai).

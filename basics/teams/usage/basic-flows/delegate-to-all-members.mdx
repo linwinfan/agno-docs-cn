@@ -1,0 +1,140 @@
+---
+title: 委派给所有成员（协作模式）
+sidebarTitle: 委派给所有成员
+description: 这个示例演示了由AI智能体组成的协作团队，协同工作以跨不同平台研究主题。
+---
+
+该团队由两个专业智能体组成：
+1. **Reddit 研究员** - 使用 DuckDuckGo 查找和分析相关的 Reddit 帖子
+2. **HackerNews 研究员** - 使用 HackerNews API 查找和分析相关的 HackerNews 帖子
+
+这些智能体通过使用 `delegate_to_all_members=True` 以协作模式工作，意味着它们：
+- 同时被分配相同的任务
+- 通过讨论努力达成共识
+- 由引导讨论的团队负责人协调
+
+团队负责人主持讨论并确定何时达成共识。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch delegate_to_all_members.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python delegate_to_all_members.py
+    import asyncio
+    from textwrap import dedent
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+    from agno.tools.duckduckgo import DuckDuckGoTools
+    from agno.tools.hackernews import HackerNewsTools
+
+    reddit_researcher = Agent(
+        name="Reddit 研究员",
+        role="在 Reddit 上研究主题",
+        model=OpenAIChat(id="o3-mini"),
+        tools=[DuckDuckGoTools()],
+        add_name_to_context=True,
+        instructions=dedent("""
+        您是一名 Reddit 研究员.
+        您将获得一个在 Reddit 上研究的主题.
+        您需要找到 Reddit 上最相关的帖子.
+        """),
+    )
+
+    hackernews_researcher = Agent(
+        name="HackerNews 研究员",
+        model=OpenAIChat("o3-mini"),
+        role="在 HackerNews 上研究主题。",
+        tools=[HackerNewsTools()],
+        add_name_to_context=True,
+        instructions=dedent("""
+        您是一名 HackerNews 研究员.
+        您将获得一个在 HackerNews 上研究的主题.
+        您需要找到 HackerNews 上最相关的帖子.
+        """),
+    )
+
+
+    agent_team = Team(
+        name="讨论团队",
+        model=OpenAIChat("o3-mini"),
+        members=[
+            reddit_researcher,
+            hackernews_researcher,
+        ],
+        instructions=[
+            "您是一名讨论主持人.",
+            "当您认为团队已达成共识时，您必须停止讨论.",
+        ],
+        markdown=True,
+        delegate_to_all_members=True,
+        show_members_responses=True,
+    )
+
+
+    async def main():
+        await agent_team.aprint_response(
+            input="开始关于以下主题的讨论: '学习编程的最佳方法是什么?'",
+            stream=True,
+            stream_intermediate_steps=True,
+        )
+
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python delegate_to_all_members.py
+    ```
+    
+    ```bash Windows
+    python delegate_to_all_members.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/basic_flows" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+
+
+
+

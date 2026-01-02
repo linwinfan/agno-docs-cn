@@ -1,0 +1,86 @@
+---
+title: 持久化会话存储
+---
+
+此示例演示如何使用 PostgreSQL 创建具有持久化会话存储的代理，使对话历史能够在不同运行之间保持。
+
+## 代码
+
+```python 01_persistent_session.py
+from agno.agent.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+
+db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
+
+db = PostgresDb(db_url=db_url, session_table="sessions")
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    db=db,
+    session_id="session_storage",
+    add_history_to_context=True,
+)
+
+agent.print_response("Tell me a new interesting fact about space")
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai psycopg2-binary
+    ```
+  </Step>
+
+  <Step title="设置 PostgreSQL">
+    ```bash
+    # Make sure PostgreSQL is running
+    # Update connection string in the code as needed
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+  </Step>
+
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上述代码。
+    ```bash
+    touch 01_persistent_session.py
+    ```
+  </Step>
+
+  <Step title="运行代理">
+    <CodeGroup>
+    ```bash Mac
+    python 01_persistent_session.py
+    ```
+    
+    ```bash Windows
+    python 01_persistent_session.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有示例代码">
+  探索 Agno 存储库中所有可用的示例代码。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/session" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>

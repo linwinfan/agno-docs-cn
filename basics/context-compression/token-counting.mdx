@@ -1,0 +1,111 @@
+﻿---
+title: Token计数
+sidebarTitle: Token计数
+description: 学习我们如何为上下文规划和基于token的压缩估算token数量。
+keywords:
+  [
+    token counting,
+    tokens,
+    context window,
+    compression,
+    tiktoken,
+    tokenizers,
+    tools,
+    schema,
+    multimodal,
+  ]
+---
+
+Token计数帮助您估算代理运行的上下文token数量。Token计数可用于基于token的上下文压缩和内存优化等功能。
+
+## 
+
+上下文可以包括：
+
+- **消息**
+  - 消息内容 - 包括系统消息、用户消息和助手消息内容。
+  - 工具调用参数和结果
+  - 可选的推理内容
+  - 多模态内容块
+- **工具**
+  - 工具定义可以是总token数量的重要部分，特别是在有大型参数模式或长描述的情况下。
+- **输出模式**
+  - 如果您使用输出模式，该模式会包含在token计数中。
+- **多模态附件**
+  - 附加到消息的图像、音频、视频和文件使用保守估算进行计数。
+
+<Warning>
+  Token数量是**估算值**。由于模型/提供者行为、隐藏/系统提示以及工具/模式的内部序列化方式，提供者计费和确切的token化可能会有所不同。
+</Warning>
+## 可选依赖项（推荐）
+
+为了获得更好的本地token计数估算，请安装tokenizers：
+
+`ash
+pip install -U tiktoken tokenizers
+`
+
+- 	iktoken: 在可用时用于OpenAI风格的token化。
+- 	okenizers: 在可用时用于某些开源tokenizers。
+- 如果给定模型两者都不可用，我们会回退到启发式估算。
+
+## 示例：计算token
+
+`python
+from pydantic import BaseModel
+
+```python
+from agno.models.message import Message
+from agno.models.openai import OpenAIChat
+
+
+class Answer(BaseModel):
+    answer: str
+
+
+model = OpenAIChat(id="gpt-4o")
+
+messages = [
+    Message(role="system", content="You are a concise assistant."),
+    Message(role="user", content="Summarize context compression in 2 sentences."),
+]
+
+# 工具定义可以作为OpenAI风格的工具字典传递
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_web",
+            "description": "Search the web for a query.",
+            "parameters": {
+                "type": "object",
+                "properties": {"query": {"type": "string"}},
+                "required": ["query"],
+            },
+        },
+    }
+]
+
+tokens = model.count_tokens(messages=messages, tools=tools, output_schema=Answer)
+print(f"Estimated tokens: {tokens}")
+`
+
+## 基于token的上下文压缩中的token计数
+
+当您设置 compress_token_limit 时，Agno在运行循环中检查估算的token数量，并在达到阈值时触发压缩。
+
+由于token计数可以包括**消息历史**、**工具定义**和**输出模式/响应格式**，它比仅计算消息文本更接近"真实"的请求大小。
+
+## 多模态估算
+
+Agno对多模态输入使用保守估算以支持上下文规划：
+
+- **图像**: 通过基于平铺的方法估算（视觉风格计数）
+- **音频**: 使用每秒token数估算
+- **视频**: 估算为与图像类似计算的帧数（如果fps/尺寸未知则使用保守默认值）
+- **文件**: 基于文件类型/大小估算
+
+## 注意事项：
+
+- Token计数仍处于Beta阶段。我们尽力提供估算，但我们不声称它在所有提供者和模型中都100%准确。请谨慎使用此token计数来计算成本。
+- 对于像Claude这样的某些提供者，我们能够调用确切的端点并获得准确的token计数。这尚未对所有提供者提供支持。

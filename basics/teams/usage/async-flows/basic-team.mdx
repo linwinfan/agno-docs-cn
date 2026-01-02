@@ -1,0 +1,145 @@
+---
+title: 异步协调团队
+sidebarTitle: 简单团队
+description: 这个示例演示了由AI智能体组成的简单团队，协同工作以跨不同平台研究主题。
+---
+
+
+该团队由三个专业智能体组成：
+1. **HackerNews 研究员** - 使用 HackerNews API 查找和分析相关的 HackerNews 帖子
+2. **文章阅读器** - 从 URL 读取文章
+
+团队负责人通过以下方式协调智能体：
+- 为每个智能体分配特定任务
+- 为每个智能体提供清晰的指令
+- 收集并汇总每个智能体的结果
+
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch basic_team.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python basic_team.py
+    import asyncio
+    from typing import List
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team import Team
+    from agno.tools.duckduckgo import DuckDuckGoTools
+    from agno.tools.hackernews import HackerNewsTools
+    from agno.tools.newspaper4k import Newspaper4kTools
+    from pydantic import BaseModel, Field
+
+
+    class Article(BaseModel):
+        title: str = Field(..., description="The title of the article")
+        summary: str = Field(..., description="A summary of the article")
+        reference_links: List[str] = Field(
+            ..., description="A list of reference links to the article"
+        )
+
+
+    hn_researcher = Agent(
+        name="HackerNews Researcher",
+        model=OpenAIChat(id="gpt-5-mini"),
+        role="Gets top stories from hackernews.",
+        tools=[HackerNewsTools()],
+    )
+
+    web_searcher = Agent(
+        name="Web Searcher",
+        model=OpenAIChat(id="gpt-5-mini"),
+        role="Searches the web for information on a topic",
+        tools=[DuckDuckGoTools()],
+        add_datetime_to_context=True,
+    )
+
+    article_reader = Agent(
+        name="Article Reader",
+        role="Reads articles from URLs.",
+        tools=[Newspaper4kTools()],
+    )
+
+
+    hn_team = Team(
+        name="HackerNews Team",
+        model=OpenAIChat(id="o3"),
+        members=[hn_researcher, web_searcher, article_reader],
+        instructions=[
+            "First, search hackernews for what the user is asking about.",
+            "Then, ask the article reader to read the links for the stories to get more information.",
+            "Important: you must provide the article reader with the links to read.",
+            "Then, ask the web searcher to search for each story to get more information.",
+            "最后, provide a thoughtful and engaging summary.",
+        ],
+        output_schema=Article,
+        add_member_tools_to_context=False,
+        markdown=True,
+        show_members_responses=True,
+    )
+
+
+    async def main():
+        """Main async function demonstrating coordinated team mode."""
+        await hn_team.aprint_response(
+            input="Write an article about the top 2 stories on hackernews"
+        )
+
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno openai ddgs newspaper4k
+    ```
+  </Step>
+
+  <Step title="设置您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python basic_team.py
+    ```
+
+    ```bash Windows
+    python basic_team.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/async_flows" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+

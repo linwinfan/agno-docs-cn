@@ -1,0 +1,52 @@
+---
+title: AgentOps
+description: Integrate Agno with AgentOps to send traces and logs to a centralized observability 平台.
+---
+
+## Integrating Agno with AgentOps
+
+[AgentOps](https://app.智能体ops.ai/) provides automatic instrumentation for your Agno 智能体s to track all operations including 智能体 interactions, team coordination, tool usage, and workflow execution.
+
+## Prerequisites
+
+1. **安装 AgentOps**
+
+   Ensure you have the AgentOps package installed:
+
+   ```bash
+   pip install agentops
+   ```
+
+2. **Authentication**
+   Go to [AgentOps](https://app.智能体ops.ai/) and copy your API key
+   ```bash
+   export AGENTOPS_API_KEY=<your-api-key>
+   ```
+
+## Logging Model Calls with AgentOps
+
+This example demonstrates how to use AgentOps to log 模型 calls.
+
+```python
+import agentops
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# Initialize AgentOps
+agentops.init()
+
+# Create and run an agent
+agent = Agent(model=OpenAIChat(id="gpt-5-mini"))
+response = agent.run("Share a 2 sentence horror story")
+
+# Print the response
+print(response.content)
+```
+
+## Notes
+
+- **Environment Variables**: Ensure your environment variable is correctly set for the AgentOps API key.
+- **Initialization**: Call `智能体ops.init()` to initialize AgentOps.
+- **AgentOps Docs**: [AgentOps Docs](https://docs.智能体ops.ai/v2/integrations/agno)
+
+Following these steps will integrate Agno with AgentOps, providing comprehensive logging and visualization for your AI 智能体s’ 模型 calls.

@@ -1,0 +1,326 @@
+---
+title: "什么是 AgentOS？"
+sidebarTitle: "介绍"
+description: "您的智能体系统的生产运行时和控制平面"
+---
+
+AgentOS 是 Agno 的生产就绪运行时，完全在您自己的基础设施内运行，确保您的智能体系统的完全数据隐私和控制。
+Agno 还提供了一个美观的 Web 界面，用于管理、监控和与您的 AgentOS 交互，没有任何数据会持久化到您的环境之外。
+
+<Check>
+在幕后，AgentOS 是一个 FastAPI 应用程序，您可以在本地或在云中运行。它被设计为易于部署和扩展。
+</Check>
+
+## 开始使用
+
+准备好开始使用 AgentOS 了吗？您需要执行以下操作：
+
+<CardGroup cols={2}>
+  <Card
+    title="创建您的第一个 OS"
+    icon="plus"
+    href="/agent-os/creating-your-first-os"
+  >
+    使用我们的模板从头开始设置新的 AgentOS 实例
+  </Card>
+  <Card
+    title="连接您的 AgentOS"
+    icon="link"
+    href="/agent-os/connecting-your-os"
+  >
+    了解如何将您的本地开发环境连接到平台
+  </Card>
+</CardGroup>
+
+## 安全与隐私优先
+
+AgentOS 的设计以企业安全性和数据隐私为基本原则，而不是事后考虑。
+
+<Frame>
+  <img
+    src="/images/agentos-secure-infra-illustration.png"
+    alt="AgentOS 安全和隐私架构"
+    style={{ borderRadius: "0.5rem" }}
+  />
+</Frame>
+
+### 完全的数据所有权
+
+- **您的基础设施，您的数据**: AgentOS 完全在您的云环境中运行
+- **零数据传输**: 没有对话、日志或指标被发送到外部服务
+
+### 企业级安全
+
+- **端到端加密**: 所有数据在传输和静态时都进行加密
+- **访问控制**: 细粒度的权限管理和身份验证
+- **审计日志**: 完整的操作审计跟踪
+- **合规性**: 符合 GDPR、SOC 2 等行业标准
+
+### 私有部署
+
+- **本地部署**: 在您的本地基础设施中部署 AgentOS
+- **云原生**: 支持所有主要云提供商（AWS、Azure、GCP）
+- **混合云**: 灵活的部署选项，满足您的需求
+
+## 核心功能
+
+### 智能体管理
+
+AgentOS 提供了完整的智能体生命周期管理：
+
+```python
+from agno.os import AgentOS
+from agno.agent import Agent
+
+# 创建智能体
+agent = Agent(
+    name="客服助手",
+    model="gpt-4o",
+    instructions="帮助用户解决问题"
+)
+
+# 在 AgentOS 中注册
+agent_os = AgentOS()
+agent_os.add_agents([agent])
+```
+
+### 团队协作
+
+将多个智能体组织成团队以完成复杂任务：
+
+```python
+from agno.team import Team
+
+# 创建团队
+support_team = Team(
+    name="技术支持团队",
+    agents=[agent1, agent2, agent3],
+    instructions="协作解决用户问题"
+)
+```
+
+### 工作流编排
+
+定义智能体和团队之间的工作流程：
+
+```python
+from agno.workflow import Workflow
+
+# 创建工作流
+workflow = Workflow(
+    name="客户支持流程",
+    steps=[
+        {"agent": "receptionist", "action": "triage"},
+        {"team": "technical_support", "action": "resolve"},
+        {"agent": "follow_up", "action": "check_satisfaction"}
+    ]
+)
+```
+
+### 知识管理
+
+集成企业知识库和文档：
+
+```python
+from agno.knowledge import PDFKnowledgeBase
+
+# 创建知识库
+knowledge = PDFKnowledgeBase(
+    path="./documents",
+    vector_db="pgvector"
+)
+```
+
+## 架构优势
+
+### 可扩展性
+
+- **水平扩展**: 轻松添加更多实例以处理增加的负载
+- **垂直扩展**: 为单个实例分配更多资源
+- **自动缩放**: 基于负载的自动缩放策略
+
+### 高可用性
+
+- **故障转移**: 自动故障转移和恢复
+- **负载均衡**: 智能负载分配
+- **健康检查**: 持续的健康监控
+
+### 性能优化
+
+- **缓存**: 多层缓存策略
+- **连接池**: 优化的数据库连接管理
+- **异步处理**: 高效的异步操作
+
+## 集成能力
+
+### 数据库支持
+
+AgentOS 支持多种数据库后端：
+
+- **PostgreSQL**: 主要的关系型数据库支持
+- **Redis**: 缓存和会话存储
+- **MongoDB**: 文档存储
+- **向量数据库**: Pinecone、Weaviate、Chroma 等
+
+### API 集成
+
+与现有系统无缝集成：
+
+```python
+# REST API 集成
+@app.post("/webhook/external")
+async def handle_webhook(request: Request):
+    # 处理外部系统事件
+    result = await agent_os.process_event(await request.json())
+    return {"status": "success", "result": result}
+```
+
+### 第三方服务
+
+集成流行的第三方服务：
+
+- **Slack**: 在 Slack 中接收通知
+- **Microsoft Teams**: 团队协作集成
+- **Zapier**: 自动化工作流
+- **Webhook**: 自定义 Webhook 集成
+
+## 监控和可观测性
+
+### 实时监控
+
+- **性能指标**: 响应时间、吞吐量、错误率
+- **资源使用**: CPU、内存、网络使用情况
+- **业务指标**: 用户活跃度、会话统计
+
+### 日志管理
+
+- **结构化日志**: JSON 格式的结构化日志
+- **日志聚合**: 集中式日志收集和分析
+- **搜索和过滤**: 强大的日志搜索功能
+
+### 警报系统
+
+- **自定义警报**: 基于阈值的智能警报
+- **多渠道通知**: 邮件、Slack、短信通知
+- **升级策略**: 自动警报升级
+
+## 部署选项
+
+### 容器化部署
+
+使用 Docker 和 Kubernetes：
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 8000
+
+CMD ["python", "my_os.py"]
+```
+
+### 云原生部署
+
+支持所有主要云平台：
+
+- **AWS**: ECS、EKS、Lambda
+- **Azure**: Container Instances、AKS
+- **GCP**: Cloud Run、GKE
+- **DigitalOcean**: App Platform、Kubernetes
+
+### 本地部署
+
+在本地环境中运行：
+
+```bash
+# 使用 Docker Compose
+docker-compose up -d
+
+# 或直接运行
+python my_os.py
+```
+
+## 开发体验
+
+### 开发工具
+
+- **热重载**: 开发时的自动重载
+- **调试支持**: 集成调试工具
+- **测试框架**: 内置测试支持
+
+### 文档和示例
+
+- **详细文档**: 全面的 API 和概念文档
+- **代码示例**: 丰富的示例代码
+- **最佳实践**: 行业最佳实践指南
+
+### 社区支持
+
+- **GitHub**: 开源代码仓库
+- **Discord**: 活跃的社区讨论
+- **博客**: 定期的技术更新和教程
+
+## 定价和许可
+
+### 开源版本
+
+- **免费使用**: 完全免费的开源版本
+- **社区支持**: 社区驱动的支持
+- **基本功能**: 核心功能完全可用
+
+### 企业版本
+
+- **高级功能**: 企业级高级功能
+- **专业支持**: 24/7 专业技术支持
+- **SLA 保证**: 服务水平协议保证
+- **定制开发**: 定制化开发服务
+
+## 下一步
+
+准备好深入了解 AgentOS 了吗？
+
+<CardGroup cols={2}>
+  <Card
+    title="快速开始"
+    icon="rocket"
+    href="/agent-os/creating-your-first-os"
+  >
+    在几分钟内运行您的第一个 AgentOS 实例
+  </Card>
+  <Card
+    title="配置指南"
+    icon="settings"
+    href="/agent-os/config"
+  >
+    了解如何配置和自定义您的 AgentOS
+  </Card>
+  <Card
+    title="部署指南"
+    icon="cloud"
+    href="/deploy/overview"
+  >
+    将 AgentOS 部署到生产环境
+  </Card>
+  <Card
+    title="API 参考"
+    icon="code"
+    href="/reference-api/overview"
+  >
+    探索完整的 API 文档
+  </Card>
+</CardGroup>
+
+## 获取帮助
+
+如果您有任何问题或需要帮助：
+
+- **文档**: [完整文档](https://docs.agno.com)
+- **GitHub**: [问题报告](https://github.com/agno-agi/agno/issues)
+- **Discord**: [社区讨论](https://discord.gg/agno)
+- **邮件**: support@agno.com
+
+加入我们的社区，与其他开发者一起构建下一代智能体应用程序！

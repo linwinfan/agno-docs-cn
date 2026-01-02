@@ -1,0 +1,664 @@
+---
+title: "记忆"
+sidebarTitle: "记忆"
+description: "在 AgentOS 中查看和管理智能体的持久化记忆存储"
+---
+
+## 概述
+
+AgentOS 中的记忆功能提供了一个集中视图，显示智能体在对话过程中学习和存储的关于您的信息。记忆使智能体能够跨对话回忆关于您的信息，从而实现个性化和上下文相关的交互。
+
+- 记忆在智能体运行期间创建和更新
+- 每个记忆都与特定的用户 ID 相关联，包含学习到的信息
+- 记忆包括内容、主题、时间戳以及生成它们的输入
+- 启用记忆的智能体可以逐渐了解您，并提供更相关的响应
+
+<Note>
+  <strong>前提条件</strong>: 您的 AgentOS 必须已连接并处于活动状态。如果您看到"已断开连接"或"未活动"，请查看您的<a href="/agent-os/connecting-your-os">连接设置</a>。
+</Note>
+
+## 访问记忆
+
+- 在侧边栏中打开`记忆`部分
+- 以时间顺序的表格格式查看所有存储的记忆
+- 点击`刷新`按钮同步最新的记忆更新
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/memory-table-usage.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## 记忆管理
+
+记忆界面允许您：
+
+1. **创建记忆** - 创建智能体在聊天会话期间可以引用的记忆
+2. **按主题查看** - 查看按主题类别组织的记忆
+3. **编辑记忆** - 根据需要更新或更正存储的信息
+4. **删除记忆** - 移除过时或不正确的信息
+5. **监控记忆创建** - 查看记忆创建的时间以及从什么输入生成
+
+<Tip>
+  <strong>最佳实践</strong>: 定期审查和清理记忆，确保信息的准确性和相关性。这有助于智能体提供更好的个性化体验。
+</Tip>
+
+## 记忆类型
+
+### 用户偏好记忆
+
+智能体学习和记住的用户偏好信息：
+
+```yaml
+用户偏好:
+  语言: "中文"
+  沟通风格: "正式但友好"
+  技术水平: "中级"
+  兴趣领域: ["人工智能", "数据分析", "产品管理"]
+  工作背景: "科技公司产品经理"
+```
+
+### 上下文记忆
+
+关于当前对话和项目的上下文信息：
+
+```yaml
+项目上下文:
+  项目名称: "智能客服系统"
+  当前阶段: "需求分析"
+  团队成员: ["张三", "李四", "王五"]
+  关键目标: "提高客户满意度 20%"
+  技术栈: ["Python", "FastAPI", "PostgreSQL"]
+```
+
+### 事实记忆
+
+关于用户和环境的客观事实：
+
+```yaml
+用户事实:
+  姓名: "李明"
+  公司: "智能科技有限公司"
+  职位: "高级产品经理"
+  工作地点: "北京"
+  团队规模: 15人
+  主要职责: ["产品规划", "需求分析", "跨部门协调"]
+```
+
+### 关系记忆
+
+用户与其他人员和实体的关系信息：
+
+```yaml
+关系网络:
+  上级: "王总 - 技术总监"
+  下属: ["小张 - 初级产品经理", "小李 - 产品助理"]
+  协作部门: ["技术部", "市场部", "客服部"]
+  外部伙伴: ["云服务提供商", "数据分析公司"]
+```
+
+## 记忆功能
+
+### 自动记忆创建
+
+智能体在对话过程中自动创建和更新记忆：
+
+```python
+# 智能体记忆创建示例
+class MemoryEnabledAgent:
+    def __init__(self):
+        self.memory_store = MemoryStore()
+    
+    async def process_message(self, message, user_id):
+        # 处理用户消息
+        response = await self.generate_response(message)
+        
+        # 自动提取和存储记忆
+        await self.extract_and_store_memory(
+            message=message,
+            response=response,
+            user_id=user_id
+        )
+        
+        return response
+    
+    async def extract_and_store_memory(self, message, response, user_id):
+        """提取和存储记忆"""
+        # 使用 NLP 技术提取关键信息
+        extracted_info = await self.analyze_conversation(message, response)
+        
+        # 存储为记忆
+        for info in extracted_info:
+            memory = Memory(
+                user_id=user_id,
+                content=info["content"],
+                topic=info["topic"],
+                confidence=info["confidence"],
+                source=f"对话: {message[:50]}..."
+            )
+            await self.memory_store.add_memory(memory)
+```
+
+### 记忆检索
+
+智能体在需要时检索相关记忆：
+
+```python
+# 记忆检索示例
+async def retrieve_relevant_memories(self, query, user_id, limit=5):
+    """检索相关记忆"""
+    # 向量搜索相关记忆
+    relevant_memories = await self.memory_store.search(
+        query=query,
+        user_id=user_id,
+        limit=limit
+    )
+    
+    # 按相关性和时间排序
+    sorted_memories = sorted(
+        relevant_memories,
+        key=lambda m: (m.relevance_score, m.timestamp),
+        reverse=True
+    )
+    
+    return sorted_memories
+
+# 在对话中使用记忆
+async def generate_contextual_response(self, message, user_id):
+    # 检索相关记忆
+    memories = await self.retrieve_relevant_memories(message, user_id)
+    
+    # 构建上下文
+    context = self.build_context_from_memories(memories)
+    
+    # 生成响应
+    response = await self.generate_response_with_context(
+        message=message,
+        context=context
+    )
+    
+    return response
+```
+
+### 记忆更新
+
+智能体可以更新现有记忆：
+
+```python
+# 记忆更新示例
+async def update_memory(self, memory_id, new_info, user_id):
+    """更新记忆"""
+    existing_memory = await self.memory_store.get_memory(memory_id)
+    
+    if existing_memory and existing_memory.user_id == user_id:
+        # 合并新旧信息
+        updated_content = self.merge_memory_content(
+            existing_memory.content,
+            new_info
+        )
+        
+        # 更新记忆
+        updated_memory = Memory(
+            id=memory_id,
+            content=updated_content,
+            updated_at=datetime.now(),
+            version=existing_memory.version + 1
+        )
+        
+        await self.memory_store.update_memory(updated_memory)
+        return True
+    
+    return False
+```
+
+## 高级记忆功能
+
+### 记忆分类
+
+自动将记忆分类到不同类别：
+
+```python
+# 记忆分类器
+class MemoryClassifier:
+    def __init__(self):
+        self.categories = {
+            "preferences": ["偏好", "喜欢", "不喜欢", "习惯"],
+            "context": ["项目", "工作", "当前", "正在进行"],
+            "facts": ["是", "叫做", "位于", "出生于"],
+            "relationships": ["朋友", "同事", "家人", "上级"],
+            "goals": ["目标", "计划", "想要", "希望"]
+        }
+    
+    def classify_memory(self, memory_content):
+        """分类记忆内容"""
+        scores = {}
+        
+        for category, keywords in self.categories.items():
+            score = sum(1 for keyword in keywords if keyword in memory_content)
+            scores[category] = score / len(keywords)
+        
+        # 返回得分最高的类别
+        return max(scores, key=scores.get)
+```
+
+### 记忆重要性评分
+
+评估记忆的重要性和持久性：
+
+```python
+# 记忆重要性评分
+class MemoryImportanceScorer:
+    def __init__(self):
+        self.importance_factors = {
+            "frequency": 0.3,      # 提及频率
+            "recency": 0.2,        # 时间新近性
+            "context_relevance": 0.25,  # 上下文相关性
+            "user_confirmation": 0.15,  # 用户确认
+            "emotional_weight": 0.1   # 情感权重
+        }
+    
+    def calculate_importance(self, memory):
+        """计算记忆重要性分数"""
+        scores = {}
+        
+        # 频率分数
+        scores["frequency"] = self.calculate_frequency_score(memory)
+        
+        # 时间分数
+        scores["recency"] = self.calculate_recency_score(memory)
+        
+        # 上下文相关性分数
+        scores["context_relevance"] = self.calculate_context_score(memory)
+        
+        # 用户确认分数
+        scores["user_confirmation"] = memory.user_confirmed
+        
+        # 情感权重分数
+        scores["emotional_weight"] = self.calculate_emotional_score(memory)
+        
+        # 加权总分
+        total_score = sum(
+            scores[factor] * weight 
+            for factor, weight in self.importance_factors.items()
+        )
+        
+        return min(total_score, 1.0)  # 限制在 0-1 范围内
+```
+
+### 记忆过期和清理
+
+自动管理记忆的生命周期：
+
+```python
+# 记忆生命周期管理
+class MemoryLifecycleManager:
+    def __init__(self):
+        self.retention_policies = {
+            "preferences": {"days": 365, "importance_threshold": 0.7},
+            "context": {"days": 90, "importance_threshold": 0.5},
+            "facts": {"days": 180, "importance_threshold": 0.6},
+            "relationships": {"days": 270, "importance_threshold": 0.8},
+            "goals": {"days": 120, "importance_threshold": 0.7}
+        }
+    
+    async def cleanup_expired_memories(self):
+        """清理过期记忆"""
+        for category, policy in self.retention_policies.items():
+            expired_memories = await self.find_expired_memories(
+                category=category,
+                days=policy["days"],
+                importance_threshold=policy["importance_threshold"]
+            )
+            
+            for memory in expired_memories:
+                await self.archive_memory(memory)
+    
+    async def archive_memory(self, memory):
+        """归档记忆而不是删除"""
+        archived_memory = ArchivedMemory(
+            original_id=memory.id,
+            content=memory.content,
+            archived_at=datetime.now(),
+            reason="expired"
+        )
+        
+        await self.memory_store.archive(archived_memory)
+        await self.memory_store.delete(memory.id)
+```
+
+## 记忆配置
+
+### 记忆存储配置
+
+```python
+# 记忆存储配置
+memory_config = {
+    "storage": {
+        "type": "postgresql",
+        "connection_string": "postgresql://user:pass@localhost/memories",
+        "table_name": "user_memories"
+    },
+    "indexing": {
+        "vector_index": True,
+        "embedding_model": "text-embedding-3-small",
+        "dimension": 1536
+    },
+    "retention": {
+        "default_days": 180,
+        "max_memories_per_user": 1000,
+        "cleanup_interval": "daily"
+    },
+    "privacy": {
+        "encryption": True,
+        "data_minimization": True,
+        "user_control": True
+    }
+}
+```
+
+### 智能体记忆配置
+
+```python
+# 智能体记忆配置
+agent_memory_config = {
+    "enabled": True,
+    "auto_extract": True,
+    "extraction_threshold": 0.7,
+    "max_memories_per_session": 10,
+    "memory_types": [
+        "user_preferences",
+        "conversation_context",
+        "learned_facts",
+        "relationship_info"
+    ],
+    "retrieval": {
+        "max_retrieved": 5,
+        "similarity_threshold": 0.8,
+        "boost_recent": True
+    }
+}
+```
+
+## 记忆 API
+
+### 创建记忆
+
+```python
+# 创建记忆 API
+async def create_memory(user_id, content, topic=None, metadata=None):
+    """创建新记忆"""
+    memory = Memory(
+        user_id=user_id,
+        content=content,
+        topic=topic or "general",
+        metadata=metadata or {},
+        created_at=datetime.now()
+    )
+    
+    # 验证记忆内容
+    if validate_memory_content(memory.content):
+        memory_id = await memory_store.add_memory(memory)
+        return {"status": "success", "memory_id": memory_id}
+    else:
+        return {"status": "error", "message": "无效的记忆内容"}
+```
+
+### 搜索记忆
+
+```python
+# 搜索记忆 API
+async def search_memories(user_id, query, filters=None):
+    """搜索用户记忆"""
+    search_params = {
+        "user_id": user_id,
+        "query": query,
+        "limit": 20,
+        "filters": filters or {}
+    }
+    
+    results = await memory_store.search(search_params)
+    
+    return {
+        "memories": results,
+        "total": len(results),
+        "query": query
+    }
+```
+
+### 更新记忆
+
+```python
+# 更新记忆 API
+async def update_memory(memory_id, user_id, updates):
+    """更新记忆"""
+    existing = await memory_store.get_memory(memory_id)
+    
+    if not existing or existing.user_id != user_id:
+        return {"status": "error", "message": "记忆不存在或无权限"}
+    
+    # 应用更新
+    for field, value in updates.items():
+        if hasattr(existing, field):
+            setattr(existing, field, value)
+    
+    existing.updated_at = datetime.now()
+    
+    await memory_store.update_memory(existing)
+    return {"status": "success", "memory": existing}
+```
+
+## 隐私和安全
+
+### 记忆加密
+
+```python
+# 记忆加密配置
+encryption_config = {
+    "field_level_encryption": [
+        "content",
+        "metadata"
+    ],
+    "algorithm": "AES-256-GCM",
+    "key_rotation": "quarterly",
+    "secure_storage": True
+}
+
+# 加密敏感记忆
+async def encrypt_sensitive_memory(memory):
+    """加密敏感记忆内容"""
+    if contains_sensitive_data(memory.content):
+        encrypted_content = await encrypt_data(memory.content)
+        memory.encrypted_content = encrypted_content
+        memory.content = "[已加密]"
+    
+    return memory
+```
+
+### 用户控制
+
+```python
+# 用户记忆控制
+class UserMemoryControl:
+    def __init__(self, user_id):
+        self.user_id = user_id
+    
+    async def get_memory_settings(self):
+        """获取用户的记忆设置"""
+        return await self.get_user_preferences(self.user_id, "memory")
+    
+    async def update_memory_settings(self, settings):
+        """更新记忆设置"""
+        valid_settings = validate_memory_settings(settings)
+        await self.update_user_preferences(
+            self.user_id, 
+            "memory", 
+            valid_settings
+        )
+    
+    async def delete_all_memories(self):
+        """删除所有用户记忆"""
+        confirmation = await self.request_user_confirmation(
+            "确定要删除所有记忆吗？此操作不可撤销。"
+        )
+        
+        if confirmation:
+            await self.memory_store.delete_user_memories(self.user_id)
+            return {"status": "success"}
+        else:
+            return {"status": "cancelled"}
+```
+
+## 监控和分析
+
+### 记忆使用统计
+
+```python
+# 记忆使用分析
+async def get_memory_analytics(user_id, time_range="30d"):
+    """获取记忆使用统计"""
+    analytics = await memory_store.get_analytics({
+        "user_id": user_id,
+        "time_range": time_range,
+        "metrics": [
+            "total_memories",
+            "memories_by_topic",
+            "creation_frequency",
+            "retrieval_frequency",
+            "memory_accuracy"
+        ]
+    })
+    
+    return analytics
+```
+
+### 记忆质量评估
+
+```python
+# 记忆质量评估
+class MemoryQualityAssessment:
+    def __init__(self):
+        self.quality_metrics = [
+            "accuracy",      # 准确性
+            "relevance",     # 相关性
+            "completeness",  # 完整性
+            "consistency",   # 一致性
+            "timeliness"     # 时效性
+        ]
+    
+    async def assess_memory_quality(self, memory_id):
+        """评估记忆质量"""
+        memory = await memory_store.get_memory(memory_id)
+        
+        scores = {}
+        for metric in self.quality_metrics:
+            scores[metric] = await self.evaluate_metric(memory, metric)
+        
+        overall_score = sum(scores.values()) / len(scores)
+        
+        return {
+            "memory_id": memory_id,
+            "scores": scores,
+            "overall_score": overall_score,
+            "assessment_date": datetime.now()
+        }
+```
+
+## 最佳实践
+
+### 1. 记忆内容管理
+
+- **定期审查**: 定期检查记忆的准确性和相关性
+- **分类标记**: 使用清晰的分类和标签组织记忆
+- **版本控制**: 保留重要记忆的变更历史
+- **隐私保护**: 避免存储敏感个人信息
+
+### 2. 记忆提取优化
+
+- **上下文感知**: 在合适的上下文中提取记忆
+- **质量过滤**: 只存储高质量、相关的信息
+- **去重处理**: 避免存储重复或相似的记忆
+- **用户确认**: 重要信息经过用户确认后存储
+
+### 3. 记忆检索策略
+
+- **相关性排序**: 按与当前查询的相关性排序
+- **时间权重**: 考虑记忆的时间新近性
+- **多样性保证**: 确保检索结果的多样性
+- **个性化调整**: 根据用户偏好调整检索策略
+
+### 4. 性能优化
+
+- **索引优化**: 建立高效的记忆索引
+- **缓存策略**: 缓存常用记忆和查询结果
+- **批量处理**: 批量处理记忆操作
+- **异步处理**: 使用异步操作提高响应速度
+
+## 故障排除
+
+### 常见问题
+
+#### 记忆创建失败
+
+**问题**: 智能体无法创建记忆
+**解决方案**:
+1. 检查记忆存储配置
+2. 验证用户权限设置
+3. 确认记忆内容格式正确
+4. 检查存储空间是否充足
+
+#### 记忆检索不准确
+
+**问题**: 检索到的记忆与查询不相关
+**解决方案**:
+1. 调整相似度阈值
+2. 优化记忆向量化配置
+3. 改进查询关键词
+4. 检查记忆分类是否正确
+
+#### 记忆过期过早
+
+**问题**: 有用记忆被过早清理
+**解决方案**:
+1. 调整重要性评分阈值
+2. 延长特定类别记忆的保留时间
+3. 增加用户确认机制
+4. 优化记忆重要性计算
+
+### 调试工具
+
+```python
+# 记忆调试工具
+async def debug_memory_system(user_id):
+    """调试记忆系统"""
+    # 检查记忆存储状态
+    storage_status = await memory_store.get_storage_status()
+    print(f"存储状态: {storage_status}")
+    
+    # 检查用户记忆统计
+    memory_stats = await memory_store.get_user_memory_stats(user_id)
+    print(f"用户记忆统计: {memory_stats}")
+    
+    # 测试记忆检索
+    test_query = "用户偏好"
+    search_results = await memory_store.search({
+        "user_id": user_id,
+        "query": test_query,
+        "limit": 5
+    })
+    print(f"搜索测试结果: {len(search_results)} 条记忆")
+
+asyncio.run(debug_memory_system("user_123"))
+```
+
+## 下一步
+
+- 了解[会话跟踪](/agent-os/features/session-tracking)
+- 探索[链路追踪](/agent-os/features/tracing)
+- 查看[聊天界面](/agent-os/features/chat-interface)
+- 了解[AgentOS 配置](/agent-os/config)

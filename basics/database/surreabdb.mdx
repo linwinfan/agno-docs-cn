@@ -1,0 +1,42 @@
+---
+title: SurreabDB
+description: 学习使用 SurreabDB 作为您的代理数据库
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [SurreabDB](https://surrealdb.com/) 作为数据库，通过 `SurrealDb` 类实现。
+
+您可以按照他们的[文档](https://surrealdb.com/docs)开始使用 SurreabDB。
+
+使用以下命令在本地运行 SurreabDB：
+
+```bash
+docker run --rm --pull always -p 8000:8000 surrealdb/surrealdb:latest start --user root --pass root
+```
+
+## 用法
+
+```python surrealdb_for_agent.py
+from agno.agent import Agent
+from agno.db.surrealdb import SurrealDb
+
+# SurrealDB 连接参数
+SURREALDB_URL = "ws://localhost:8000"
+SURREALDB_USER = "root"
+SURREALDB_PASSWORD = "root"
+SURREALDB_NAMESPACE = "agno"
+SURREALDB_DATABASE = "surrealdb_for_agent"
+
+creds = {"username": SURREALDB_USER, "password": SURREALDB_PASSWORD}
+db = SurrealDb(None, SURREALDB_URL, creds, SURREALDB_NAMESPACE, SURREALDB_DATABASE)
+
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-surrealdb-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/surrealdb/surrealdb_for_agent.py)

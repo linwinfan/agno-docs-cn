@@ -1,0 +1,301 @@
+---
+title: 构建团队
+sidebarTitle: 构建团队
+description: 学习如何使用 Agno 构建团队。
+keywords: [团队, 构建团队, 使用 agno 构建团队, 使用 agno 智能体构建团队]
+---
+
+要构建有效的团队，从简单开始——只需要一个模型、团队成员和指令。一旦这个可行，根据需要添加更多功能。
+
+这是一个具有专业化智能体的团队的简单示例：
+
+```python news_weather_team.py
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+# 创建专业化智能体
+news_agent = Agent(
+    id="news-agent",
+    name="新闻智能体",
+    role="获取最新新闻并提供摘要",
+    tools=[DuckDuckGoTools()]
+)
+
+weather_agent = Agent(
+    id="weather-agent",
+    name="天气智能体",
+    role="获取天气信息和预报",
+    tools=[DuckDuckGoTools()]
+)
+
+# 创建团队
+team = Team(
+    name="新闻和天气团队",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o"),
+    instructions="与团队成员协调以提供全面信息。根据用户的请求委派任务。"
+)
+
+team.print_response("东京的最新新闻和天气是什么？", stream=True)
+```
+
+<Tip>
+  建议为每个团队成员指定 `id`、`name` 和 `role` 字段，以便团队领导在委派请求时更好地识别。
+  `id` 用于在团队中和团队领导的上下文中识别团队成员。
+</Tip>
+
+<Note>
+团队成员如果未指定，会从父 `Team` 继承 `model` 参数。具有明确分配的 `model` 的成员会保留自己的模型。在嵌套团队结构中，继承总是从直接父级发生。
+</Note>
+
+## 团队组件
+
+### 团队领导
+
+团队领导负责协调团队成员和委派任务：
+
+```python
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 创建团队领导
+team_leader = Agent(
+    name="团队领导",
+    instructions="您是一个协调专家，负责分配任务给合适的团队成员。",
+)
+
+# 创建团队
+team = Team(
+    name="研究团队",
+    members=[team_leader, researcher, writer],
+    model=OpenAIChat(id="gpt-4o"),
+    instructions="协调团队工作以提供全面的研究报告。"
+)
+```
+
+### 团队成员
+
+团队成员是具有特定专业化的智能体：
+
+```python
+# 研究员智能体
+researcher = Agent(
+    id="researcher",
+    name="研究员",
+    role="收集和分析信息",
+    tools=[DuckDuckGoTools(), WikipediaTools()],
+    instructions="您是一个专业的研究员，专注于收集准确信息。"
+)
+
+# 写作者智能体
+writer = Agent(
+    id="writer",
+    name="写作者",
+    role="撰写清晰、引人入胜的内容",
+    instructions="您是一个专业写作者，擅长将复杂信息转化为易于理解的内容。"
+)
+```
+
+### 团队指令
+
+团队指令指导整个团队的行为：
+
+```python
+team = Team(
+    name="内容创作团队",
+    members=[researcher, writer],
+    instructions="""
+    1. 研究员首先收集相关信息
+    2. 写作者基于研究结果创建内容
+    3. 确保内容准确、有吸引力且易于理解
+    4. 使用 markdown 格式输出
+    """,
+    markdown=True,
+)
+```
+
+## 团队模式
+
+### 顺序执行
+
+团队成员按顺序完成任务：
+
+```python
+team = Team(
+    name="分析团队",
+    members=[data_analyst, report_writer],
+    instructions="按顺序分析数据并生成报告。"
+)
+
+response = team.run("分析销售数据并创建月度报告")
+```
+
+### 并行执行
+
+团队成员可以并行工作：
+
+```python
+team = Team(
+    name="研究团队",
+    members=[market_researcher, tech_researcher],
+    instructions="并行研究市场和技术的最新趋势。"
+)
+
+response = team.run("研究 AI 市场的最新发展")
+```
+
+### 委派模式
+
+团队领导智能地将任务委派给合适的成员：
+
+```python
+team = Team(
+    name="多任务团队",
+    members=[news_agent, weather_agent, sports_agent],
+    instructions="根据请求类型委派任务给合适的成员。"
+)
+
+response = team.run("今天的新闻、天气和体育赛事")
+```
+
+## 高级功能
+
+### 嵌套团队
+
+创建多层次的团队结构：
+
+```python
+# 子团队
+research_team = Team(
+    name="研究子团队",
+    members=[market_researcher, tech_researcher],
+    instructions="专注于研究工作。"
+)
+
+# 主团队
+main_team = Team(
+    name="主团队",
+    members=[team_leader, research_team],
+    instructions="协调各个子团队的工作。"
+)
+```
+
+### 动态团队
+
+根据需要动态调整团队成员：
+
+```python
+from agno.team import Team
+
+# 基础团队
+base_team = Team(
+    members=[general_agent],
+    instructions="处理一般请求。"
+)
+
+# 动态添加专家
+def create_expert_team(topic: str) -> Team:
+    if topic == "技术":
+        return Team(
+            members=[base_team, tech_expert],
+            instructions="处理技术相关请求。"
+        )
+    elif topic == "市场":
+        return Team(
+            members=[base_team, market_expert],
+            instructions="处理市场相关请求。"
+        )
+    else:
+        return base_team
+
+# 使用动态团队
+user_request = "分析最新的 AI 技术趋势"
+expert_team = create_expert_team("技术")
+response = expert_team.run(user_request)
+```
+
+### 团队记忆
+
+为团队添加记忆功能以保持上下文：
+
+```python
+from agno.team import Team
+from agno.memory.team import TeamMemory
+from agno.db.sqlite import SqliteDb
+
+team = Team(
+    name="记忆团队",
+    memory=TeamMemory(
+        db=mliteDb(db_file="team_memory.db"),
+        create_db=True
+    ),
+    add_history_to_context=True,
+    instructions="记住之前的对话以提供更好的响应。"
+)
+```
+
+## 最佳实践
+
+### 1. 明确角色定义
+
+为每个团队成员明确定义角色和职责：
+
+```python
+data_scientist = Agent(
+    id="data-scientist",
+    name="数据科学家",
+    role="专门处理数据分析和机器学习任务",
+    tools=[PythonTools(), PandasTools()],
+    instructions="""
+    您是一个数据科学家：
+    - 使用 Python 进行数据分析
+    - 创建可视化和报告
+    - 解释统计结果
+    """,
+)
+```
+
+### 2. 合理的团队规模
+
+保持团队规模适中以提高效率：
+
+```python
+# 好的实践：3-5 个成员的小团队
+small_team = Team(
+    members=[coordinator, researcher, writer, reviewer],
+    instructions="小团队协作完成项目。"
+)
+
+# 避免：过大的团队会导致协调困难
+large_team = Team(
+    members=[agent1, agent2, agent3, agent4, agent5, agent6, agent7, agent8],
+    instructions="大型团队协调工作。"  # 不推荐
+)
+```
+
+### 3. 清晰的指令
+
+提供清晰、具体的团队指令：
+
+```python
+team = Team(
+    instructions="""
+    作为内容创作团队，请：
+    1. 研究员收集准确信息
+    2. 写作者创建引人入胜的内容
+    3. 确保所有事实都经过验证
+    4. 使用 markdown 格式输出
+    5. 保持内容的专业性和准确性
+    """,
+)
+```
+
+## 下一步
+
+- 了解如何[运行团队](/basics/teams/running-teams)
+- 学习[调试团队](/basics/teams/debugging-teams)
+- 探索[委派模式](/basics/teams/delegation)
+- 查看[团队使用示例](/basics/teams/usage)

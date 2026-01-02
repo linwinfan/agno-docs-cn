@@ -1,0 +1,156 @@
+---
+title: AWS Bedrock
+sidebarTitle: 概览
+description: Learn how to use AWS Bedrock with Agno.
+---
+
+Use AWS Bedrock to access various foundation 模型s on AWS. Manage your access to 模型s [on the portal](https://us-east-1.console.aws.amazon.com/bedrock/home?region=us-east-1#/模型-catalog).
+
+See all the [AWS Bedrock foundational 模型s](https://docs.aws.amazon.com/bedrock/latest/userguide/模型s-supported.html). Not all Bedrock 模型s support all 特性. See the [supported 特性 for each 模型](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-推理-supported-模型s-特性.html).
+
+<Note>
+For async support with AWS Bedrock, you need to install `aioboto3`:
+```bash
+pip install aioboto3
+```
+</Note>
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- For a Mistral 模型 with generally good performance, look at `mistral.mistral-large-2402-v1:0`.
+- You can play with Amazon Nova 模型s. Use `amazon.nova-pro-v1:0` for general purpose tasks.
+- For Claude 模型s, see our [Claude 集成](/integrations/models/cloud/aws-claude/overview).
+
+
+## Authentication
+
+AWS Bedrock 支持 three authentication methods:
+
+### Method 1: Access Key and Secret Key (Recommended)
+
+Set your `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_REGION` environment variables.
+
+Get your keys from [here](https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/home).
+
+<CodeGroup>
+
+```bash Mac
+export AWS_ACCESS_KEY_ID=***
+export AWS_SECRET_ACCESS_KEY=***
+export AWS_REGION=***
+```
+
+```bash Windows
+setx AWS_ACCESS_KEY_ID ***
+setx AWS_SECRET_ACCESS_KEY ***
+setx AWS_REGION ***
+```
+
+</CodeGroup>
+
+Or pass them directly to the 模型:
+
+```python
+from agno.agent import Agent
+from agno.models.aws import AwsBedrock
+
+agent = Agent(
+    model=AwsBedrock(
+        id="mistral.mistral-large-2402-v1:0",
+        aws_access_key_id="your-access-key",
+        aws_secret_access_key="your-secret-key",
+        aws_region="us-east-1"
+    )
+)
+```
+
+### Method 2: SSO Authentication
+
+Use SSO authentication by leveraging your current AWS profile's authentication:
+
+```python
+from agno.agent import Agent
+from agno.models.aws import AwsBedrock
+
+agent = Agent(
+    model=AwsBedrock(
+        id="mistral.mistral-large-2402-v1:0",
+        aws_sso_auth=True,
+        aws_region="us-east-1"
+    )
+)
+```
+
+### Method 3: Boto3 Session
+
+Use a pre-configured boto3 Session for advanced authentication scenarios (including SSO, role assumption, etc.):
+
+```python
+from boto3.session import Session
+from agno.agent import Agent
+from agno.models.aws import AwsBedrock
+
+# Create a boto3 session with your preferred authentication
+session = Session(
+    aws_access_key_id="your-access-key",
+    aws_secret_access_key="your-secret-key",
+    region_name="us-east-1"
+)
+
+agent = Agent(
+    model=AwsBedrock(
+        id="mistral.mistral-large-2402-v1:0",
+        session=session
+    )
+)
+```
+
+<Note>
+The authentication methods are checked in this order: Session → API Key → Access Key/Secret Key. The first available method will be used.
+</Note>
+
+## Example
+
+Use `AwsBedrock` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.aws import AwsBedrock
+
+agent = Agent(
+    model=AwsBedrock(id="mistral.mistral-large-2402-v1:0"),
+    markdown=True
+)
+
+# Print the response on the terminal
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/cloud/aws-bedrock/usage/basic-stream). </Note>
+
+## Parameters
+
+
+| Parameter           | Type                       | Default                                      | Description                                                                                                                                                               |
+| ------------------- | -------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                | `str`                      | `"mistral.mistral-small-2402-v1:0"` | The specific 模型 ID used for generating responses.                                                                                                                      |
+| `name`              | `str`                      | `"AwsBedrock"`                | The name identifier for the AWS Bedrock 智能体.                                                                                                                                 |
+| `提供商`          | `str`                      | `"AwsBedrock"`                               | The 提供商 of the 模型.                                                                                                                                                |
+| `aws_access_key_id` | `Optional[str]`            | `None`                                       | The AWS access key ID for authentication. Can also be set via `AWS_ACCESS_KEY_ID` environment variable.                                                                  |
+| `aws_secret_access_key` | `Optional[str]`        | `None`                                       | The AWS secret access key for authentication. Can also be set via `AWS_SECRET_ACCESS_KEY` environment variable.                                                          |
+| `aws_region`        | `Optional[str]`            | `None`                                       | The AWS region to use for API requests. Can also be set via `AWS_REGION` environment variable.                                                                           |
+| `session`           | `Optional[Session]`        | `None`                                       | A boto3 Session object for advanced authentication scenarios (SSO, role assumption, etc.).                                                                                |
+| `aws_sso_auth`      | `Optional[bool]`           | `False`                                      | Removes the need for an access and secret access key by leveraging the current profile's authentication.                                                                 |
+| `max_tokens`        | `Optional[int]`            | `None`                                       | The maximum number of tokens to generate in the response.                                                                                                                 |
+| `temperature`       | `Optional[float]`          | `None`                                       | The sampling temperature to use, between 0 and 2. Higher values like 0.8 make the output 更多功能 random, while lower values like 0.2 make it 更多功能 focused and deterministic. |
+| `top_p`             | `Optional[float]`          | `None`                                       | The nucleus sampling parameter. The 模型 considers the results of the tokens with top_p probability mass.                                                                |
+| `stop_sequences`    | `Optional[List[str]]`      | `None`                                       | A list of sequences where the API will stop generating further tokens.                                                                                                    |
+| `request_params`    | `Optional[Dict[str, Any]]` | `None`                                       | Additional parameters for the request, provided as a dictionary.                                                                                                          |
+| `client_params`     | `Optional[Dict[str, Any]]` | `None`                                       | Additional client parameters for initializing the `AwsBedrock` client, provided as a dictionary.                                                                          |
+| `client`            | `Optional[AwsClient]`      | `None`                                       | A pre-configured AWS client instance.                                                                                                                                     |
+
+`AwsBedrock` is a subclass of the [Model](/reference/models/模型) class and has access to the same params.

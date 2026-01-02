@@ -1,0 +1,108 @@
+---
+title: 智能体 RAG
+---
+
+此示例应用程序展示如何构建一个复杂的 RAG（检索增强生成）系统，该系统利用知识库搜索与 LLM 结合，为数据提供深入洞察。
+
+## 智能体可以：
+- 处理和理解来自多个来源的文档（PDF、网站、文本文件）
+- 使用向量嵌入构建可搜索的知识库
+- 在会话之间维护对话上下文和记忆
+- 为响应提供相关引用和来源
+- 生成摘要并提取关键洞察
+- 回答后续问题和澄清
+
+## 智能体使用：
+- 向量相似性搜索以检索相关文档
+- 对话记忆以提供上下文响应
+- 引用跟踪以进行来源归属
+- 动态知识库更新
+
+<video
+  autoPlay
+  muted
+  controls
+  className="w-full aspect-video"
+  src="/videos/agentic_rag.mp4"
+></video>
+
+## 可尝试的示例查询：
+- "What are the key points from this document?"
+- "Can you summarize the main arguments and supporting evidence?"
+- "What are the important statistics and findings?"
+- "How does this relate to [topic X]?"
+- "What are the limitations or gaps in this analysis?"
+- "Can you explain [concept X] in more detail?"
+- "What other sources support or contradict these claims?"
+
+## Code
+
+The complete code is available in the [Agno repository](https://github.com/agno-agi/agno).
+
+## Usage
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/agno-agi/agno.git
+    cd agno
+    ```
+  </Step>
+
+  <Step title="Create virtual environment">
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    ```bash
+    pip install -r cookbook/02_examples/streamlit_apps/agentic_rag/requirements.txt
+    ```
+  </Step>
+
+  <Step title="Run PgVector">
+    First, install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/).
+
+    Then run either using the helper script:
+    ```bash
+    ./cookbook/scripts/run_pgvector.sh
+    ```
+
+    Or directly with Docker:
+    ```bash
+    docker run -d \
+      -e POSTGRES_DB=ai \
+      -e POSTGRES_USER=ai \
+      -e POSTGRES_PASSWORD=ai \
+      -e PGDATA=/var/lib/postgresql/data/pgdata \
+      -v pgvolume:/var/lib/postgresql/data \
+      -p 5532:5432 \
+      --name pgvector \
+      agnohq/pgvector:16
+    ```
+  </Step>
+
+
+  <Step title="Set up API keys">
+    ```bash
+    # Required
+    export OPENAI_API_KEY=***
+    # Optional
+    export ANTHROPIC_API_KEY=***
+    export GOOGLE_API_KEY=***
+
+    ```
+    We recommend using gpt-5-mini for optimal performance.
+  </Step>
+
+  <Step title="Launch the app">
+    ```bash
+    streamlit run cookbook/02_examples/streamlit_apps/agentic_rag/app.py
+    ```
+    Open localhost:8501 to start using the Agentic RAG.
+  </Step>
+</Steps>
+
+Need help? Join our [Discourse community](https://community.agno.com) for support!

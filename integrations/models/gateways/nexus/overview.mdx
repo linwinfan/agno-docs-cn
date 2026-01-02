@@ -1,0 +1,66 @@
+---
+title: Nexus
+sidebarTitle: 概览
+description: Learn how to use Nexus 模型s in Agno.
+---
+
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.0.6" cta="查看 release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.0.6">v2.0.6</Tooltip>
+</Badge>
+
+
+Nexus is a routing 平台 that provides endpoints for various Large Language Models through a 统一 API interface.
+
+Explore Nexus's 功能 and 文档ation [here](https://nexusrouter.com/).
+
+## Authentication
+
+Nexus requires API keys for the underlying 模型 提供商s. Set the appropriate environment variables for the 模型s you plan to use:
+
+<CodeGroup>
+
+```bash Mac
+export OPENAI_API_KEY=***
+export ANTHROPIC_API_KEY=***
+```
+
+```bash Windows
+setx OPENAI_API_KEY ***
+setx ANTHROPIC_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Nexus` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.nexus import Nexus
+
+agent = Agent(model=Nexus(id="anthropic/claude-sonnet-4-20250514"), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/nexus/usage/basic-stream). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"gpt-4o-mini"`                | The id of the 模型 to use through Nexus                             |
+| `name`       | `str`              | `"Nexus"`                      | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Nexus"`                      | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for Nexus (defaults to NEXUS_API_KEY env var)            |
+| `base_url`   | `str`              | `"https://api.nexusflow.ai/v1"` | The base URL for the Nexus API                                      |
+
+`Nexus` also 支持 the params of [OpenAI](/reference/models/openai).

@@ -1,0 +1,97 @@
+---
+title: Portkey
+sidebarTitle: 概览
+description: Learn how to use 模型s through the Portkey AI Gateway in Agno.
+---
+
+Portkey is an AI Gateway that provides a 统一 interface to access multiple AI 提供商s with advanced 特性 like routing, load balancing, retries, and observability. Use Portkey to build production-ready AI applications with better reliability and cost optimization.
+
+With Portkey, you can:
+
+- Route requests across multiple AI 提供商s
+- Implement fallback mechanisms for better reliability
+- Monitor and analyze your AI usage
+- Cache responses for cost optimization
+- Apply rate limiting and usage controls
+
+## Authentication
+
+You need both a Portkey API key and a virtual key for 模型 routing. Get them [from Portkey here](https://app.portkey.ai/).
+
+<CodeGroup>
+
+```bash Mac
+export PORTKEY_API_KEY=***
+export PORTKEY_VIRTUAL_KEY=***
+```
+
+```bash Windows
+setx PORTKEY_API_KEY ***
+setx PORTKEY_VIRTUAL_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Portkey` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.portkey import Portkey
+
+agent = Agent(
+    model=Portkey(id="gpt-5-mini"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("What is Portkey and why would I use it as an AI gateway?")
+```
+
+</CodeGroup>
+
+## Advanced Configuration
+
+You can configure Portkey with custom routing and retry policies:
+
+```python
+from agno.agent import Agent
+from agno.models.portkey import Portkey
+
+config = {
+    "strategy": {
+        "mode": "fallback"
+    },
+    "targets": [
+        {"virtual_key": "openai-key"},
+        {"virtual_key": "anthropic-key"}
+    ]
+}
+
+agent = Agent(
+    model=Portkey(
+        id="gpt-5-mini",
+        config=config,
+    ),
+)
+```
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/portkey/usage/basic-stream). </Note>
+
+## 参数
+
+| Parameter      | Type               | Default                        | Description                                                           |
+| -------------- | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`           | `str`              | `"gpt-4o-mini"`                | The id of the 模型 to use through Portkey                           |
+| `name`         | `str`              | `"Portkey"`                    | The name of the 模型                                                 |
+| `提供商`     | `str`              | `"Portkey"`                    | The 提供商 of the 模型                                             |
+| `api_key`      | `Optional[str]`    | `None`                         | The API key for Portkey (defaults to PORTKEY_API_KEY env var)        |
+| `base_url`     | `str`              | `"https://api.portkey.ai/v1"` | The base URL for the Portkey API                                      |
+| `virtual_key`  | `Optional[str]`    | `None`                         | The virtual key for the underlying 提供商                           |
+| `trace_id`     | `Optional[str]`    | `None`                         | Custom trace ID for request tracking                                  |
+| `config_id`    | `Optional[str]`    | `None`                         | Configuration ID for Portkey routing                                  |
+
+`Portkey` also 支持 the params of [OpenAI](/reference/models/openai).

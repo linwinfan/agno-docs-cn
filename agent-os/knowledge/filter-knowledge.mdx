@@ -1,0 +1,985 @@
+---
+title: 知识过滤
+description: 学习如何通过 Agno API 使用高级过滤表达式来实现精确的知识库过滤。
+keywords: [api, 过滤, filterexpr, 知识, 搜索, rest api]
+---
+
+当使用 AgentOS API 时，您可以应用过滤器来精确控制智能体搜索哪些知识库文档，而无需更改智能体代码。
+过滤表达式序列化为 JSON，并在服务器端自动重建，以实现强大的程序化过滤。
+
+## 两种过滤方法
+
+Agno 支持通过 API 过滤知识的两种方式：
+
+- 使用**字典过滤器**进行简单的"字段 = 值"查找
+- 当您需要 OR/NOT 逻辑或范围时使用**过滤表达式**
+
+### 1. 字典过滤器（简单）
+
+最适合直接的相等匹配。发送带有键值对的 JSON 对象：
+
+```json
+{"docs": "agno", "status": "published"}
+```
+
+### 2. 过滤表达式（高级）
+
+最适合具有完整逻辑控制的复杂过滤。发送结构化的过滤器对象：
+
+```json
+{"op": "AND", "conditions": [
+  {"op": "EQ", "key": "docs", "value": "agno"},
+  {"op": "GT", "key": "version", "value": 2}
+]}
+```
+
+<Tip>
+**何时使用哪种：**
+- 使用**字典过滤器**进行简单查询，如按类别或状态过滤
+- 当您需要 OR 逻辑、排除（NOT）或范围查询（GT/LT）时使用**过滤表达式**
+</Tip>
+
+## 过滤运算符
+
+过滤表达式支持一系列比较和逻辑运算符：
+
+### 比较运算符
+
+- **`EQ(key, value)`** - 相等：字段等于值
+- **`GT(key, value)`** - 大于：字段 > 值  
+- **`LT(key, value)`** - 小于：字段 `<` 值
+- **`GTE(key, value)`** - 大于等于：字段 `>=` 值
+- **`LTE(key, value)`** - 小于等于：字段 `<=` 值
+- **`NE(key, value)`** - 不等于：字段 `!=` 值
+- **`IN(key, [values])`** - 包含：字段在值列表中
+- **`NIN(key, [values])`** - 不包含：字段不在值列表中
+
+### 逻辑运算符
+
+- **`AND(conditions...)`** - 逻辑与：所有条件都必须为真
+- **`OR(conditions...)`** - 逻辑或：至少一个条件必须为真
+- **`NOT(condition)`** - 逻辑非：条件必须为假
+
+### 字符串运算符
+
+- **`CONTAINS(key, value)`** - 包含：字段包含指定字符串
+- **`STARTS_WITH(key, value)`** - 开始于：字段以指定字符串开始
+- **`ENDS_WITH(key, value)`** - 结束于：字段以指定字符串结束
+- **`REGEX(key, pattern)`** - 正则表达式：字段匹配正则表达式
+
+## 过滤表达式示例
+
+### 基础过滤
+
+```python
+# 简单相等过滤
+filter_eq = {
+    "op": "EQ",
+    "key": "category",
+    "value": "技术文档"
+}
+
+# 范围过滤
+filter_range = {
+    "op": "AND",
+    "conditions": [
+        {"op": "GTE", "key": "version", "value": 2.0},
+        {"op": "LTE", "key": "version", "value": 3.0}
+    ]
+}
+
+# 列表包含过滤
+filter_in = {
+    "op": "IN",
+    "key": "language",
+    "value": ["中文", "英文", "日文"]
+}
+```
+
+### 复杂逻辑过滤
+
+```python
+# 多条件 AND 过滤
+complex_and = {
+    "op": "AND",
+    "conditions": [
+        {"op": "EQ", "key": "status", "value": "published"},
+        {"op": "GT", "key": "priority", "value": 5},
+        {"op": "CONTAINS", "key": "title", "value": "安装指南"}
+    ]
+}
+
+# OR 条件过滤
+or_filter = {
+    "op": "OR",
+    "conditions": [
+        {"op": "EQ", "key": "category", "value": "FAQ"},
+        {"op": "EQ", "key": "category", "value": "帮助文档"},
+        {"op": "EQ", "key": "category", "value": "用户手册"}
+    ]
+}
+
+# 嵌套逻辑过滤
+nested_filter = {
+    "op": "AND",
+    "conditions": [
+        {"op": "EQ", "key": "status", "value": "published"},
+        {
+            "op": "OR",
+            "conditions": [
+                {"op": "GT", "key": "version", "value": 2.0},
+                {"op": "CONTAINS", "key": "tags", "value": "重要"}
+            ]
+        },
+        {
+            "op": "NOT",
+            "condition": {"op": "EQ", "key": "archived", "value": True}
+        }
+    ]
+}
+```
+
+### 字符串匹配过滤
+
+```python
+# 字符串包含过滤
+contains_filter = {
+    "op": "CONTAINS",
+    "key": "content",
+    "value": "安装步骤"
+}
+
+# 正则表达式过滤
+regex_filter = {
+    "op": "REGEX",
+    "key": "document_id",
+    "value": r"^DOC_\d{4}_\d{2}_\d{2}$"
+}
+
+# 多字符串条件过滤
+multi_string = {
+    "op": "AND",
+    "conditions": [
+        {"op": "STARTS_WITH", "key": "title", "value": "如何"},
+        {"op": "ENDS_WITH", "key": "title", "value": "指南"},
+        {"op": "CONTAINS", "key": "content", "value": "详细说明"}
+    ]
+}
+```
+
+## API 使用示例
+
+### 1. REST API 过滤
+
+```python
+import requests
+import json
+
+class KnowledgeFilterAPI:
+    def __init__(self, base_url, api_key):
+        self.base_url = base_url
+        self.api_key = api_key
+        self.headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+    
+    def search_with_dict_filter(self, query, dict_filter):
+        """使用字典过滤器搜索"""
+        url = f"{self.base_url}/api/v1/knowledge/search"
+        
+        payload = {
+            "query": query,
+            "filter": dict_filter,
+            "limit": 10
+        }
+        
+        response = requests.post(
+            url,
+            headers=self.headers,
+            json=payload
+        )
+        
+        return response.json()
+    
+    def search_with_expression_filter(self, query, expression_filter):
+        """使用表达式过滤器搜索"""
+        url = f"{self.base_url}/api/v1/knowledge/search"
+        
+        payload = {
+            "query": query,
+            "filter": expression_filter,
+            "limit": 10
+        }
+        
+        response = requests.post(
+            url,
+            headers=self.headers,
+            json=payload
+        )
+        
+        return response.json()
+    
+    def advanced_search(self, query, filters):
+        """高级搜索示例"""
+        # 组合多个过滤条件
+        combined_filter = {
+            "op": "AND",
+            "conditions": [
+                {"op": "EQ", "key": "status", "value": "published"},
+                {
+                    "op": "OR",
+                    "conditions": [
+                        {"op": "CONTAINS", "key": "title", "value": query},
+                        {"op": "CONTAINS", "key": "content", "value": query}
+                    ]
+                },
+                {"op": "GTE", "key": "relevance_score", "value": 0.7}
+            ]
+        }
+        
+        return self.search_with_expression_filter(query, combined_filter)
+
+# 使用 API 客户端
+api_client = KnowledgeFilterAPI(
+    base_url="https://your-agentos-instance.com",
+    api_key="your-api-key"
+)
+
+# 字典过滤搜索
+dict_results = api_client.search_with_dict_filter(
+    query="安装指南",
+    dict_filter={"category": "技术文档", "language": "中文"}
+)
+
+# 表达式过滤搜索
+expression_results = api_client.search_with_expression_filter(
+    query="故障排除",
+    expression_filter={
+        "op": "AND",
+        "conditions": [
+            {"op": "EQ", "key": "status", "value": "published"},
+            {"op": "GT", "key": "version", "value": 1.5},
+            {
+                "op": "OR",
+                "conditions": [
+                    {"op": "CONTAINS", "key": "title", "value": "故障"},
+                    {"op": "CONTAINS", "key": "tags", "value": "troubleshooting"}
+                ]
+            }
+        ]
+)
+```
+
+### 2. Python SDK 过滤
+
+```python
+from agno.knowledge.filters import FilterExpression, DictFilter
+from agno.agent import Agent
+
+class FilteredKnowledgeAgent:
+    def __init__(self, knowledge_base):
+        self.knowledge_base = knowledge_base
+        self.agent = Agent(
+            name="知识过滤助手",
+            knowledge=knowledge_base,
+            instructions="你是一个专业的知识助手，可以根据过滤条件搜索相关知识。"
+        )
+    
+    def search_with_filters(self, query, filter_conditions):
+        """使用过滤条件搜索"""
+        # 创建字典过滤器
+        if isinstance(filter_conditions, dict):
+            filter_obj = DictFilter(filter_conditions)
+        else:
+            filter_obj = FilterExpression(filter_conditions)
+        
+        # 执行过滤搜索
+        results = self.knowledge_base.search(
+            query=query,
+            filter=filter_obj,
+            limit=10
+        )
+        
+        return results
+    
+    def create_category_filter(self, categories):
+        """创建类别过滤器"""
+        return {
+            "op": "IN",
+            "key": "category",
+            "value": categories
+        }
+    
+    def create_date_range_filter(self, start_date, end_date):
+        """创建日期范围过滤器"""
+        return {
+            "op": "AND",
+            "conditions": [
+                {"op": "GTE", "key": "created_at", "value": start_date},
+                {"op": "LTE", "key": "created_at", "value": end_date}
+            ]
+        }
+    
+    def create_quality_filter(self, min_relevance=0.7, verified_only=True):
+        """创建质量过滤器"""
+        conditions = [
+            {"op": "GTE", "key": "relevance_score", "value": min_relevance}
+        ]
+        
+        if verified_only:
+            conditions.append({"op": "EQ", "key": "verified", "value": True})
+        
+        return {
+            "op": "AND",
+            "conditions": conditions
+        }
+
+# 使用过滤智能体
+filtered_agent = FilteredKnowledgeAgent(documents_knowledge)
+
+# 按类别搜索
+category_filter = filtered_agent.create_category_filter(["技术文档", "FAQ"])
+category_results = filtered_agent.search_with_filters("安装问题", category_filter)
+
+# 按日期范围搜索
+date_filter = filtered_agent.create_date_range_filter("2024-01-01", "2024-12-31")
+date_results = filtered_agent.search_with_filters("产品更新", date_filter)
+
+# 按质量搜索
+quality_filter = filtered_agent.create_quality_filter(min_relevance=0.8, verified_only=True)
+quality_results = filtered_agent.search_with_filters("最佳实践", quality_filter)
+```
+
+## 高级过滤模式
+
+### 1. 动态过滤构建器
+
+```python
+class FilterBuilder:
+    def __init__(self):
+        self.conditions = []
+    
+    def eq(self, key, value):
+        """添加相等条件"""
+        self.conditions.append({"op": "EQ", "key": key, "value": value})
+        return self
+    
+    def gt(self, key, value):
+        """添加大于条件"""
+        self.conditions.append({"op": "GT", "key": key, "value": value})
+        return self
+    
+    def gte(self, key, value):
+        """添加大于等于条件"""
+        self.conditions.append({"op": "GTE", "key": key, "value": value})
+        return self
+    
+    def lt(self, key, value):
+        """添加小于条件"""
+        self.conditions.append({"op": "LT", "key": key, "value": value})
+        return self
+    
+    def lte(self, key, value):
+        """添加小于等于条件"""
+        self.conditions.append({"op": "LTE", "key": key, "value": value})
+        return self
+    
+    def contains(self, key, value):
+        """添加包含条件"""
+        self.conditions.append({"op": "CONTAINS", "key": key, "value": value})
+        return self
+    
+    def in_list(self, key, values):
+        """添加列表包含条件"""
+        self.conditions.append({"op": "IN", "key": key, "value": values})
+        return self
+    
+    def and_(self, *conditions):
+        """添加 AND 条件组"""
+        if len(conditions) == 1:
+            self.conditions.append(conditions[0])
+        else:
+            self.conditions.append({
+                "op": "AND",
+                "conditions": list(conditions)
+            })
+        return self
+    
+    def or_(self, *conditions):
+        """添加 OR 条件组"""
+        if len(conditions) == 1:
+            self.conditions.append(conditions[0])
+        else:
+            self.conditions.append({
+                "op": "OR",
+                "conditions": list(conditions)
+            })
+        return self
+    
+    def not_(self, condition):
+        """添加 NOT 条件"""
+        self.conditions.append({
+            "op": "NOT",
+            "condition": condition
+        })
+        return self
+    
+    def build(self):
+        """构建最终过滤器"""
+        if len(self.conditions) == 0:
+            return {}
+        elif len(self.conditions) == 1:
+            return self.conditions[0]
+        else:
+            return {
+                "op": "AND",
+                "conditions": self.conditions
+            }
+
+# 使用过滤构建器
+builder = FilterBuilder()
+
+# 构建复杂过滤器
+complex_filter = (
+    builder
+    .eq("status", "published")
+    .gte("version", 2.0)
+    .and_(
+        builder.contains("title", "安装").conditions[0],
+        builder.or_(
+            builder.eq("category", "技术文档").conditions[0],
+            builder.eq("category", "用户手册").conditions[0]
+        ).conditions[0]
+    )
+    .not_(builder.eq("archived", True).conditions[0])
+    .build()
+)
+
+print(f"构建的过滤器: {json.dumps(complex_filter, indent=2, ensure_ascii=False)}")
+```
+
+### 2. 过滤器模板系统
+
+```python
+from typing import Dict, Any
+import json
+
+class FilterTemplate:
+    def __init__(self):
+        self.templates = {}
+        self._register_default_templates()
+    
+    def _register_default_templates(self):
+        """注册默认过滤器模板"""
+        self.templates["published_docs"] = {
+            "op": "EQ",
+            "key": "status",
+            "value": "published"
+        }
+        
+        self.templates["recent_docs"] = {
+            "op": "GTE",
+            "key": "created_at",
+            "value": "2024-01-01"
+        }
+        
+        self.templates["high_quality"] = {
+            "op": "AND",
+            "conditions": [
+                {"op": "GTE", "key": "relevance_score", "value": 0.8},
+                {"op": "EQ", "key": "verified", "value": True}
+            ]
+        }
+        
+        self.templates["technical_content"] = {
+            "op": "IN",
+            "key": "category",
+            "value": ["技术文档", "API参考", "开发指南"]
+        }
+    
+    def register_template(self, name: str, template: Dict[str, Any]):
+        """注册自定义模板"""
+        self.templates[name] = template
+    
+    def get_template(self, name: str) -> Dict[str, Any]:
+        """获取模板"""
+        if name not in self.templates:
+            raise ValueError(f"模板 '{name}' 不存在")
+        return self.templates[name]
+    
+    def combine_templates(self, operator: str, *template_names):
+        """组合多个模板"""
+        if operator not in ["AND", "OR"]:
+            raise ValueError("操作符必须是 'AND' 或 'OR'")
+        
+        conditions = []
+        for name in template_names:
+            conditions.append(self.get_template(name))
+        
+        return {
+            "op": operator,
+            "conditions": conditions
+        }
+    
+    def customize_template(self, template_name: str, **kwargs):
+        """自定义模板参数"""
+        template = self.get_template(template_name).copy()
+        
+        def update_nested(obj, updates):
+            """递归更新嵌套对象"""
+            for key, value in updates.items():
+                if "." in key:
+                    keys = key.split(".")
+                    current = obj
+                    for k in keys[:-1]:
+                        if k not in current:
+                            current[k] = {}
+                        current = current[k]
+                    current[keys[-1]] = value
+                else:
+                    obj[key] = value
+        
+        update_nested(template, kwargs)
+        return template
+
+# 使用过滤器模板
+template_system = FilterTemplate()
+
+# 注册自定义模板
+template_system.register_template("chinese_docs", {
+    "op": "AND",
+    "conditions": [
+        {"op": "EQ", "key": "language", "value": "中文"},
+        {"op": "GTE", "key": "quality_score", "value": 0.7}
+    ]
+})
+
+# 使用模板
+published_filter = template_system.get_template("published_docs")
+combined_filter = template_system.combine_templates("AND", "published_docs", "high_quality")
+
+# 自定义模板
+custom_filter = template_system.customize_template(
+    "recent_docs",
+    created_at="2024-06-01"
+)
+
+print(f"组合过滤器: {json.dumps(combined_filter, indent=2, ensure_ascii=False)}")
+```
+
+### 3. 过滤器性能优化
+
+```python
+import time
+from functools import lru_cache
+from typing import List, Dict, Any
+
+class OptimizedFilterEngine:
+    def __init__(self, knowledge_base):
+        self.knowledge_base = knowledge_base
+        self.filter_cache = {}
+        self.index_cache = {}
+    
+    @lru_cache(maxsize=1000)
+    def parse_filter_expression(self, filter_json: str):
+        """解析并缓存过滤器表达式"""
+        import json
+        return json.loads(filter_json)
+    
+    def create_field_index(self, field_name: str):
+        """为字段创建索引"""
+        if field_name in self.index_cache:
+            return self.index_cache[field_name]
+        
+        # 模拟索引创建
+        index = {}
+        for doc_id, doc_metadata in self.knowledge_base.get_all_metadata().items():
+            value = doc_metadata.get(field_name)
+            if value is not None:
+                if value not in index:
+                    index[value] = []
+                index[value].append(doc_id)
+        
+        self.index_cache[field_name] = index
+        return index
+    
+    def optimize_filter_execution(self, filter_expr: Dict[str, Any]):
+        """优化过滤器执行"""
+        # 分析过滤器结构
+        analysis = self._analyze_filter_complexity(filter_expr)
+        
+        # 根据分析结果优化执行顺序
+        if analysis["has_indexable_fields"]:
+            return self._execute_with_index_optimization(filter_expr, analysis)
+        else:
+            return self._execute_standard_filter(filter_expr)
+    
+    def _analyze_filter_complexity(self, filter_expr: Dict[str, Any]) -> Dict[str, Any]:
+        """分析过滤器复杂度"""
+        analysis = {
+            "has_indexable_fields": False,
+            "indexable_fields": [],
+            "complexity_score": 0,
+            "optimal_order": []
+        }
+        
+        def analyze_node(node, depth=0):
+            if isinstance(node, dict):
+                op = node.get("op")
+                if op in ["EQ", "IN"]:
+                    key = node.get("key")
+                    if key and self._has_index(key):
+                        analysis["has_indexable_fields"] = True
+                        analysis["indexable_fields"].append(key)
+                        analysis["complexity_score"] += 1
+                    else:
+                        analysis["complexity_score"] += 10
+                elif op in ["AND", "OR"]:
+                    conditions = node.get("conditions", [])
+                    for condition in conditions:
+                        analyze_node(condition, depth + 1)
+                    analysis["complexity_score"] += depth * 2
+                else:
+                    analysis["complexity_score"] += 5
+        
+        analyze_node(filter_expr)
+        return analysis
+    
+    def _has_index(self, field_name: str) -> bool:
+        """检查字段是否有索引"""
+        return field_name in self.index_cache
+    
+    def _execute_with_index_optimization(self, filter_expr: Dict[str, Any], analysis: Dict[str, Any]):
+        """使用索引优化执行过滤器"""
+        # 重新排序条件，优先使用索引字段
+        optimized_filter = self._reorder_by_indexability(filter_expr, analysis["indexable_fields"])
+        
+        # 使用索引执行
+        return self._execute_filter_with_indexes(optimized_filter)
+    
+    def _reorder_by_indexability(self, filter_expr: Dict[str, Any], indexable_fields: List[str]):
+        """按可索引性重新排序条件"""
+        if filter_expr.get("op") not in ["AND", "OR"]:
+            return filter_expr
+        
+        conditions = filter_expr.get("conditions", [])
+        indexed_conditions = []
+        non_indexed_conditions = []
+        
+        for condition in conditions:
+            if self._condition_uses_index(condition, indexable_fields):
+                indexed_conditions.append(condition)
+            else:
+                non_indexed_conditions.append(condition)
+        
+        # 索引条件优先
+        new_conditions = indexed_conditions + non_indexed_conditions
+        
+        return {
+            "op": filter_expr["op"],
+            "conditions": new_conditions
+        }
+    
+    def _condition_uses_index(self, condition: Dict[str, Any], indexable_fields: List[str]) -> bool:
+        """检查条件是否使用索引"""
+        if not isinstance(condition, dict):
+            return False
+        
+        key = condition.get("key")
+        return key in indexable_fields
+    
+    def _execute_filter_with_indexes(self, filter_expr: Dict[str, Any]):
+        """使用索引执行过滤器"""
+        start_time = time.time()
+        
+        # 实际执行逻辑
+        results = self.knowledge_base.search_with_filter(filter_expr)
+        
+        execution_time = time.time() - start_time
+        
+        return {
+            "results": results,
+            "execution_time": execution_time,
+            "optimization_used": True
+        }
+    
+    def _execute_standard_filter(self, filter_expr: Dict[str, Any]):
+        """执行标准过滤器"""
+        start_time = time.time()
+        
+        # 标准执行逻辑
+        results = self.knowledge_base.search_with_filter(filter_expr)
+        
+        execution_time = time.time() - start_time
+        
+        return {
+            "results": results,
+            "execution_time": execution_time,
+            "optimization_used": False
+        }
+
+# 使用优化的过滤器引擎
+optimized_engine = OptimizedFilterEngine(documents_knowledge)
+
+# 预创建索引
+optimized_engine.create_field_index("category")
+optimized_engine.create_field_index("status")
+optimized_engine.create_field_index("language")
+
+# 执行优化的过滤搜索
+filter_expr = {
+    "op": "AND",
+    "conditions": [
+        {"op": "EQ", "key": "category", "value": "技术文档"},
+        {"op": "EQ", "key": "status", "value": "published"},
+        {"op": "CONTAINS", "key": "title", "value": "安装"}
+    ]
+}
+
+results = optimized_engine.optimize_filter_execution(filter_expr)
+print(f"优化执行结果: {results}")
+```
+
+## 监控和调试
+
+### 1. 过滤器性能监控
+
+```python
+import time
+import statistics
+from collections import defaultdict
+from typing import Dict, List, Any
+
+class FilterPerformanceMonitor:
+    def __init__(self):
+        self.metrics = defaultdict(lambda: {
+            "execution_count": 0,
+            "total_time": 0.0,
+            "min_time": float('inf'),
+            "max_time": 0.0,
+            "error_count": 0,
+            "result_counts": []
+        })
+    
+    def record_execution(self, filter_expr: Dict[str, Any], execution_time: float, 
+                        result_count: int, success: bool = True):
+        """记录过滤器执行"""
+        filter_signature = self._get_filter_signature(filter_expr)
+        
+        metrics = self.metrics[filter_signature]
+        metrics["execution_count"] += 1
+        metrics["total_time"] += execution_time
+        metrics["min_time"] = min(metrics["min_time"], execution_time)
+        metrics["max_time"] = max(metrics["max_time"], execution_time)
+        metrics["result_counts"].append(result_count)
+        
+        if not success:
+            metrics["error_count"] += 1
+    
+    def _get_filter_signature(self, filter_expr: Dict[str, Any]) -> str:
+        """获取过滤器签名"""
+        import json
+        return json.dumps(filter_expr, sort_keys=True)
+    
+    def get_performance_report(self) -> Dict[str, Any]:
+        """获取性能报告"""
+        report = {}
+        
+        for filter_sig, metrics in self.metrics.items():
+            if metrics["execution_count"] > 0:
+                avg_time = metrics["total_time"] / metrics["execution_count"]
+                avg_results = statistics.mean(metrics["result_counts"]) if metrics["result_counts"] else 0
+                
+                report[filter_sig] = {
+                    "execution_count": metrics["execution_count"],
+                    "avg_execution_time": avg_time,
+                    "min_execution_time": metrics["min_time"],
+                    "max_execution_time": metrics["max_time"],
+                    "avg_result_count": avg_results,
+                    "error_rate": metrics["error_count"] / metrics["execution_count"],
+                    "success_rate": 1 - (metrics["error_count"] / metrics["execution_count"])
+                }
+        
+        return report
+    
+    def identify_slow_filters(self, threshold_ms: float = 1000.0) -> List[Dict[str, Any]]:
+        """识别慢速过滤器"""
+        slow_filters = []
+        
+        for filter_sig, metrics in self.metrics.items():
+            if metrics["execution_count"] > 0:
+                avg_time = metrics["total_time"] / metrics["execution_count"]
+                if avg_time > threshold_ms / 1000:  # 转换为秒
+                    slow_filters.append({
+                        "filter": filter_sig,
+                        "avg_time_ms": avg_time * 1000,
+                        "execution_count": metrics["execution_count"],
+                        "max_time_ms": metrics["max_time"] * 1000
+                    })
+        
+        return sorted(slow_filters, key=lambda x: x["avg_time_ms"], reverse=True)
+    
+    def suggest_optimizations(self) -> List[Dict[str, Any]]:
+        """建议优化方案"""
+        suggestions = []
+        
+        for filter_sig, metrics in self.metrics.items():
+            if metrics["execution_count"] > 10:  # 只分析执行次数较多的过滤器
+                avg_time = metrics["total_time"] / metrics["execution_count"]
+                
+                if avg_time > 0.5:  # 超过 500ms
+                    filter_expr = json.loads(filter_sig)
+                    
+                    # 分析过滤器复杂度
+                    complexity = self._analyze_filter_complexity(filter_expr)
+                    
+                    suggestion = {
+                        "filter": filter_sig,
+                        "issue": "执行时间过长",
+                        "avg_time_ms": avg_time * 1000,
+                        "analysis": complexity,
+                        "suggestions": []
+                    }
+                    
+                    # 根据分析结果提供建议
+                    if complexity["nested_level"] > 3:
+                        suggestion["suggestions"].append("考虑简化嵌套逻辑")
+                    
+                    if complexity["or_conditions"] > 5:
+                        suggestion["suggestions"].append("过多的 OR 条件，考虑使用 IN 操作符")
+                    
+                    if not complexity["uses_indexes"]:
+                        suggestion["suggestions"].append("添加字段索引以提高性能")
+                    
+                    if complexity["regex_patterns"] > 0:
+                        suggestion["suggestions"].append("正则表达式可能影响性能，考虑简化")
+                    
+                    if suggestion["suggestions"]:
+                        suggestions.append(suggestion)
+        
+        return suggestions
+    
+    def _analyze_filter_complexity(self, filter_expr: Dict[str, Any]) -> Dict[str, Any]:
+        """分析过滤器复杂度"""
+        complexity = {
+            "nested_level": 0,
+            "or_conditions": 0,
+            "and_conditions": 0,
+            "not_conditions": 0,
+            "uses_indexes": False,
+            "regex_patterns": 0,
+            "total_conditions": 0
+        }
+        
+        def analyze_node(node, level=0):
+            if isinstance(node, dict):
+                complexity["nested_level"] = max(complexity["nested_level"], level)
+                
+                op = node.get("op")
+                if op == "OR":
+                    complexity["or_conditions"] += 1
+                elif op == "AND":
+                    complexity["and_conditions"] += 1
+                elif op == "NOT":
+                    complexity["not_conditions"] += 1
+                elif op == "REGEX":
+                    complexity["regex_patterns"] += 1
+                elif op in ["EQ", "IN"] and node.get("key") in ["category", "status", "language"]:
+                    complexity["uses_indexes"] = True
+                
+                conditions = node.get("conditions", [])
+                for condition in conditions:
+                    analyze_node(condition, level + 1)
+                    complexity["total_conditions"] += 1
+        
+        analyze_node(filter_expr)
+        return complexity
+
+# 使用性能监控器
+monitor = FilterPerformanceMonitor()
+
+# 模拟记录执行数据
+monitor.record_execution(
+    {"op": "EQ", "key": "category", "value": "技术文档"},
+    0.1, 5, True
+)
+
+monitor.record_execution(
+    {"op": "AND", "conditions": [
+        {"op": "EQ", "key": "status", "value": "published"},
+        {"op": "CONTAINS", "key": "title", "value": "安装"}
+    ]},
+    0.3, 3, True
+)
+
+# 获取性能报告
+report = monitor.get_performance_report()
+slow_filters = monitor.identify_slow_filters()
+optimizations = monitor.suggest_optimizations()
+
+print(f"性能报告: {report}")
+print(f"慢速过滤器: {slow_filters}")
+print(f"优化建议: {optimizations}")
+```
+
+## 最佳实践
+
+### 1. 过滤器设计原则
+
+- **简单优先**: 优先使用简单的字典过滤器
+- **索引利用**: 为常用过滤字段创建索引
+- **复杂度控制**: 避免过度复杂的嵌套逻辑
+- **性能监控**: 定期监控过滤器性能
+
+### 2. 性能优化建议
+
+- **字段顺序**: 将选择性高的字段放在前面
+- **索引策略**: 为高频过滤字段建立索引
+- **缓存机制**: 缓存常用过滤器结果
+- **批量操作**: 合并多个过滤操作
+
+### 3. 错误处理
+
+- **验证输入**: 验证过滤器表达式格式
+- **优雅降级**: 过滤器失败时提供备选方案
+- **详细日志**: 记录过滤器执行日志
+- **错误恢复**: 实现过滤器错误恢复机制
+
+## 故障排除
+
+### 常见问题
+
+#### 过滤器语法错误
+
+**问题**: 过滤器表达式格式错误
+**解决方案**:
+1. 检查 JSON 格式是否正确
+2. 验证运算符和参数
+3. 使用过滤器验证工具
+4. 参考正确的示例格式
+
+#### 性能问题
+
+**问题**: 复杂过滤器执行缓慢
+**解决方案**:
+1. 分析过滤器复杂度
+2. 优化字段索引
+3. 简化嵌套逻辑
+4. 考虑分解为多个简单过滤器
+
+#### 结果不准确
+
+**问题**: 过滤结果不符合预期
+**解决方案**:
+1. 检查字段名称和值
+2. 验证逻辑运算符
+3. 测试过滤器表达式
+4. 检查数据类型匹配
+
+## 下一步
+
+- 查看[知识管理](/agent-os/knowledge/manage-knowledge)
+- 了解[AgentOS API](/agent-os/api)
+- 探索[知识库功能](/agent-os/features/knowledge-management)
+- 查看[向量数据库](/basics/knowledge/vectordb)

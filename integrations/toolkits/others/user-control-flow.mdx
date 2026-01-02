@@ -1,0 +1,46 @@
+---
+title: User Control Flow
+description: UserControlFlowTools enable 智能体s to pause execution and request input from users during conversations.
+---
+
+## Example
+
+The 以下 智能体 can request user input during conversations:
+
+```python
+from agno.agent import Agent
+from agno.tools.user_control_flow import UserControlFlowTools
+
+agent = Agent(
+    instructions=[
+        "You are an interactive assistant that can ask users for input when needed",
+        "Use user input requests to gather specific information or clarify requirements",
+        "Always explain why you need the user input and how it will be used",
+        "Provide clear prompts and instructions for user responses",
+    ],
+    tools=[UserControlFlowTools()],
+)
+
+agent.print_response("Help me create a personalized workout plan", stream=True)
+```
+
+## Toolkit 参数
+
+| Parameter             | Type                | Default | Description                                                    |
+| --------------------- | ------------------- | ------- | -------------------------------------------------------------- |
+| `instructions`        | `Optional[str]`     | `None`  | Custom instructions for user interaction behavior.           |
+| `add_instructions`    | `bool`              | `True`  | Whether to add instructions to the 智能体.                    |
+| `enable_get_user_input` | `bool`            | `True`  | Enable user input request functionality.                     |
+
+## Toolkit Functions
+
+| Function         | Description                                                      |
+| ---------------- | ---------------------------------------------------------------- |
+| `get_user_input` | Pause 智能体 execution and request input from the user.          |
+
+
+## 开发者资源
+
+- 查看 [Tools Source](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/tools/user_control_flow.py)
+- [Agno Interactive Agents](https://docs.agno.com/interactive-智能体s)
+- [User Input Patterns](https://docs.agno.com/user-input)

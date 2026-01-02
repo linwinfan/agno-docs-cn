@@ -1,0 +1,43 @@
+---
+title: MySQL
+description: 学习使用 MySQL 作为智能体的数据库
+sidebarTitle: 概览
+---
+
+Agno 支持 using [MySQL](https://www.mysql.com/) as a 数据库 with the `MySQLDb` class.
+
+## 使用方法
+
+```python mysql_for_agent.py
+from agno.agent import Agent
+from agno.db.mysql import MySQLDb
+
+# Setup your Database
+db = MySQLDb(db_url="mysql+pymysql://ai:ai@localhost:3306/ai")
+
+# Setup your Agent with the Database
+agent = Agent(db=db)
+```
+
+### Run MySQL
+
+安装 [docker desktop](https://docs.docker.com/desktop/install/mac-install/) 并运行 **MySQL** 在端口 **3306** 使用：
+
+```bash
+docker run -d \
+  --name mysql \
+  -e MYSQL_ROOT_PASSWORD=ai \
+  -e MYSQL_DATABASE=ai \
+  -e MYSQL_USER=ai \
+  -e MYSQL_PASSWORD=ai \
+  -p 3306:3306 \
+  -d mysql:8
+```
+
+## 参数
+
+<Snippet file="db-mysql-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/mysql/mysql_for_智能体.py)

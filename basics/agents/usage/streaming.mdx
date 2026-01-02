@@ -1,0 +1,77 @@
+---
+title: 流式传输智能体响应
+sidebarTitle: 流式传输智能体
+description: 学习如何流式传输您的智能体响应
+mode: wide
+---
+
+在此示例中，我们将看到如何从智能体流式传输响应。
+
+当您想要实时处理或显示响应时（在生成过程中），这非常有用。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch streaming.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python streaming.py
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.run.agent import RunEvent
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions="您是一个乐于助人的助手。您的所有回复都必须简洁明了。",
+    )
+
+    # 使用 stream=True 运行智能体
+    stream = agent.run("热门产品", stream=True)
+
+    # 消费流式响应
+    for chunk in stream:
+        if chunk.event == RunEvent.run_content:
+            print(chunk.content)
+
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python streaming.py
+    ```
+
+    ```bash Windows
+    python streaming.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

@@ -1,0 +1,39 @@
+---
+title: Redis
+description: 学习使用 Redis 作为您的代理数据库
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [Redis](https://redis.io/) 作为数据库，通过 `RedisDb` 类实现。
+
+## 用法
+
+### 运行 Redis
+
+安装 [docker desktop](https://docs.docker.com/desktop/install/mac-install/) 并使用以下命令在端口 **6379** 上运行 **Redis**：
+
+```bash
+docker run -d \
+  --name my-redis \
+  -p 6379:6379 \
+  redis
+```
+
+```python redis_for_agent.py
+from agno.agent import Agent
+from agno.db.redis import RedisDb
+
+# 初始化 Redis 数据库（为您的设置使用正确的 db_url）
+db = RedisDb(db_url="redis://localhost:6379")
+
+# 使用 Redis 数据库创建代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-redis-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/redis/redis_for_agent.py)

@@ -1,0 +1,564 @@
+---
+title: "覆盖路由"
+sidebarTitle: "覆盖路由"
+description: "了解在发生冲突时如何使用您自己的自定义路由覆盖 AgentOS 路由"
+keywords: [路由冲突, 覆盖路由, 保留路由, fastapi 路由, on_route_conflict, 自定义路由]
+---
+
+当将您的自定义 FastAPI 应用与 AgentOS 集成时，如果您的应用和 AgentOS 都定义了相同的端点路径，就会发生路由冲突。例如，两者都可能定义 `/health` 端点或根 `/` 路由。
+
+AgentOS 提供了 `on_route_conflict` 参数来控制如何解决这些冲突，允许您选择是您的自定义路由还是 AgentOS 路由优先。
+
+## 何时使用
+
+在以下情况下覆盖路由：
+
+- **自定义健康检查**: 用您自己的监控逻辑替换 AgentOS 的 `/health` 端点
+- **品牌落地页**: 在 `/` 处提供自定义主页而不是默认的 AgentOS 界面
+- **自定义身份验证**: 实现与 AgentOS 默认值冲突的您自己的身份验证端点
+- **API 版本控制**: 控制暴露哪个版本的端点
+- **自定义错误处理器**: 为特定路由定义专门的错误处理
+
+## 配置选项
+
+AgentOS 为处理路由冲突的 `on_route_conflict` 参数提供两个值：
+
+| 选项 | 自定义路由 | AgentOS 路由 | 记录警告 |
+|--------|----------|---------------|----------------|
+| `preserve_base_app` |  ✓ 保留 | ✗ 跳过（仅冲突）| 是 |
+| `preserve_agentos` (默认) |  ✗ 覆盖 | ✓ 保留 | 是 |
+
+<Note>
+无论模式如何，来自您的应用和 AgentOS 的非冲突路由总是被包含。
+</Note>
+
+## 示例
+
+此示例演示如何使用 `on_route_conflict="preserve_base_app"` 来保留主页和健康端点的自定义路由。
+
+```python override_routes.py
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.anthropic import Claude
+from agno.os import AgentOS
+from agno.tools.duckduckgo import DuckDuckGoTools
+from fastapi import FastAPI
+
+# 设置数据库
+db = PostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai")
+
+# 创建自定义 FastAPI 应用
+app = FastAPI()
+
+# 自定义主页路由
+@app.get("/")
+async def custom_home():
+    return {
+        "message": "欢迎使用我们的智能体平台",
+        "version": "2.0.0",
+        "features": ["智能对话", "文档分析", "多语言支持"]
+    }
+
+# 自定义健康检查
+@app.get("/health")
+async def custom_health():
+    return {
+        "status": "健康",
+        "timestamp": "2024-01-15T10:30:00Z",
+        "services": {
+            "database": "正常",
+            "cache": "正常",
+            "ai_models": "正常"
+        }
+    }
+
+# 设置智能体
+researcher = Agent(
+    name="研究助手",
+    model=Claude(id="claude-3-sonnet-20240229"),
+    tools=[DuckDuckGoTools()],
+    instructions="您是一个研究助手，帮助用户查找信息。请用中文回答。",
+    db=db,
+)
+
+# 创建 AgentOS，保留自定义路由
+agent_os = AgentOS(
+    agents=[researcher],
+    base_app=app,
+    on_route_conflict="preserve_base_app"  # 保留自定义路由
+)
+
+# 获取组合应用
+combined_app = agent_os.get_app()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(combined_app, host="0.0.0.0", port=8000)
+```
+
+## 路由冲突场景
+
+### 1. 健康检查端点冲突
+
+```python
+# 自定义健康检查
+@app.get("/health")
+async def custom_health():
+    """自定义健康检查逻辑"""
+    # 检查外部服务
+    external_services = await check_external_services()
+    
+    return {
+        "status": "健康" if all(external_services.values()) else "不健康",
+        "services": external_services,
+        "custom_checks": True
+    }
+
+async def check_external_services():
+    """检查外部服务状态"""
+    return {
+        "payment_gateway": await check_payment_service(),
+        "email_service": await check_email_service(),
+        "storage_service": await check_storage_service()
+    }
+```
+
+### 2. 主页路由冲突
+
+```python
+# 自定义主页
+@app.get("/")
+async def custom_landing_page():
+    """自定义品牌落地页"""
+    return {
+        "welcome": "欢迎使用智能体平台",
+        "company": {
+            "name": "智能科技有限公司",
+            "description": "提供企业级 AI 解决方案"
+        },
+        "quick_actions": [
+            {"name": "开始对话", "url": "/chat"},
+            {"name": "查看文档", "url": "/docs"},
+            {"name": "管理面板", "url": "/admin"}
+        ],
+        "stats": {
+            "active_users": 1250,
+            "total_conversations": 45678,
+            "satisfaction_rate": 0.95
+        }
+    }
+```
+
+### 3. API 端点版本控制
+
+```python
+# API v1 版本
+@app.get("/api/v1/agents")
+async def list_agents_v1():
+    """API v1 智能体列表"""
+    return {
+        "version": "v1",
+        "agents": [
+            {"id": "assistant", "name": "助手"},
+            {"id": "translator", "name": "翻译器"}
+        ]
+    }
+
+# API v2 版本（可能与 AgentOS 冲突）
+@app.get("/api/v2/agents")
+async def list_agents_v2():
+    """API v2 智能体列表"""
+    return {
+        "version": "v2",
+        "agents": [
+            {"id": "assistant", "name": "AI 助手", "capabilities": ["对话", "分析"]},
+            {"id": "translator", "name": "翻译助手", "languages": ["中文", "英文", "日文"]},
+            {"id": "researcher", "name": "研究助手", "specialties": ["学术", "技术"]}
+        ]
+    }
+```
+
+## 高级配置
+
+### 条件性路由覆盖
+
+根据环境条件决定路由覆盖策略：
+
+```python
+import os
+
+def get_route_conflict_strategy():
+    """根据环境获取路由冲突策略"""
+    environment = os.getenv("ENVIRONMENT", "development")
+    
+    if environment == "production":
+        # 生产环境保留 AgentOS 路由以确保稳定性
+        return "preserve_agentos"
+    elif environment == "staging":
+        # 测试环境保留自定义路由以进行测试
+        return "preserve_base_app"
+    else:
+        # 开发环境保留自定义路由以便调试
+        return "preserve_base_app"
+
+# 使用动态策略
+route_strategy = get_route_conflict_strategy()
+
+agent_os = AgentOS(
+    agents=[researcher],
+    base_app=app,
+    on_route_conflict=route_strategy
+)
+```
+
+### 选择性路由覆盖
+
+只覆盖特定的 AgentOS 路由：
+
+```python
+from agno.os import AgentOS
+from agno.routing import RouteOverride
+
+# 创建路由覆盖配置
+route_overrides = [
+    RouteOverride(
+        path="/health",
+        preserve="base_app",  # 保留自定义健康检查
+        reason="自定义健康检查包含外部服务状态"
+    ),
+    RouteOverride(
+        path="/",
+        preserve="base_app",  # 保留自定义主页
+        reason="品牌自定义主页"
+    ),
+    RouteOverride(
+        path="/agents",
+        preserve="agentos",  # 保留 AgentOS 智能体端点
+        reason="使用 AgentOS 的智能体管理功能"
+    )
+]
+
+# 应用选择性覆盖
+agent_os = AgentOS(
+    agents=[researcher],
+    base_app=app,
+    route_overrides=route_overrides
+)
+```
+
+## 路由冲突检测
+
+### 自动检测冲突
+
+```python
+from fastapi.routing import APIRoute
+
+def detect_route_conflicts(app: FastAPI, agent_os: AgentOS):
+    """检测路由冲突"""
+    base_app_routes = {route.path: route for route in app.routes}
+    agentos_routes = {route.path: route for route in agent_os.get_app().routes}
+    
+    conflicts = []
+    for path in base_app_routes:
+        if path in agentos_routes:
+            conflicts.append({
+                "path": path,
+                "base_app_route": base_app_routes[path],
+                "agentos_route": agentos_routes[path]
+            })
+    
+    return conflicts
+
+# 使用冲突检测
+conflicts = detect_route_conflicts(app, agent_os)
+
+if conflicts:
+    print("发现路由冲突:")
+    for conflict in conflicts:
+        print(f"  路径: {conflict['path']}")
+        print(f"    自定义路由: {conflict['base_app_route'].endpoint.__name__}")
+        print(f"    AgentOS 路由: {conflict['agentos_route'].endpoint.__name__}")
+```
+
+### 冲突解决建议
+
+```python
+def suggest_conflict_resolution(conflicts):
+    """建议冲突解决方案"""
+    suggestions = []
+    
+    for conflict in conflicts:
+        path = conflict["path"]
+        
+        if path == "/":
+            suggestions.append({
+                "path": path,
+                "suggestion": "使用自定义主页以提供品牌体验",
+                "config": "on_route_conflict='preserve_base_app'"
+            })
+        elif path == "/health":
+            suggestions.append({
+                "path": path,
+                "suggestion": "使用自定义健康检查以监控外部服务",
+                "config": "on_route_conflict='preserve_base_app'"
+            })
+        elif path.startswith("/agents"):
+            suggestions.append({
+                "path": path,
+                "suggestion": "保留 AgentOS 智能体端点以使用内置管理功能",
+                "config": "on_route_conflict='preserve_agentos'"
+            })
+        else:
+            suggestions.append({
+                "path": path,
+                "suggestion": "根据业务需求选择保留的路由",
+                "config": "根据具体情况选择"
+            })
+    
+    return suggestions
+
+# 获取解决建议
+suggestions = suggest_conflict_resolution(conflicts)
+
+for suggestion in suggestions:
+    print(f"路径: {suggestion['path']}")
+    print(f"建议: {suggestion['suggestion']}")
+    print(f"配置: {suggestion['config']}")
+    print()
+```
+
+## 测试路由覆盖
+
+### 单元测试
+
+```python
+import pytest
+from fastapi.testclient import TestClient
+from agno.agent import Agent
+from agno.os import AgentOS
+
+def test_custom_homepage_preserved():
+    """测试自定义主页被保留"""
+    app = FastAPI()
+    
+    @app.get("/")
+    async def custom_home():
+        return {"message": "自定义主页"}
+    
+    agent_os = AgentOS(
+        agents=[Agent(id="test")],
+        base_app=app,
+        on_route_conflict="preserve_base_app"
+    )
+    
+    client = TestClient(agent_os.get_app())
+    response = client.get("/")
+    
+    assert response.status_code == 200
+    assert response.json()["message"] == "自定义主页"
+
+def test_agentos_routes_preserved():
+    """测试 AgentOS 路由被保留"""
+    app = FastAPI()
+    
+    @app.get("/agents")
+    async def custom_agents():
+        return {"agents": []}
+    
+    agent_os = AgentOS(
+        agents=[Agent(id="test")],
+        base_app=app,
+        on_route_conflict="preserve_agentos"
+    )
+    
+    client = TestClient(agent_os.get_app())
+    response = client.get("/agents")
+    
+    assert response.status_code == 200
+    # 应该返回 AgentOS 的智能体列表，而不是自定义的
+    assert len(response.json()) >= 1
+```
+
+### 集成测试
+
+```python
+@pytest.mark.asyncio
+async def test_route_conflict_resolution():
+    """测试路由冲突解决"""
+    app = FastAPI()
+    
+    # 定义可能冲突的路由
+    @app.get("/")
+    async def custom_home():
+        return {"source": "custom"}
+    
+    @app.get("/health")
+    async def custom_health():
+        return {"status": "custom"}
+    
+    # 创建 AgentOS
+    agent_os = AgentOS(
+        agents=[Agent(id="test-agent")],
+        base_app=app,
+        on_route_conflict="preserve_base_app"
+    )
+    
+    client = TestClient(agent_os.get_app())
+    
+    # 测试自定义路由被保留
+    home_response = client.get("/")
+    assert home_response.json()["source"] == "custom"
+    
+    health_response = client.get("/health")
+    assert health_response.json()["status"] == "custom"
+    
+    # 测试非冲突的 AgentOS 路由仍然可用
+    agents_response = client.get("/agents")
+    assert agents_response.status_code == 200
+```
+
+## 最佳实践
+
+### 1. 明确的路由策略
+
+```python
+# 在配置文件中明确定义路由策略
+class RouteConfig:
+    PRESERVE_CUSTOM = "preserve_base_app"
+    PRESERVE_AGENTOS = "preserve_agentos"
+    
+    # 明确定义哪些路由应该被保留
+    CUSTOM_ROUTES = [
+        "/",           # 主页
+        "/health",     # 健康检查
+        "/api/v1/*",   # API v1 版本
+    ]
+    
+    AGENTOS_ROUTES = [
+        "/agents",     # 智能体管理
+        "/teams",      # 团队管理
+        "/workflows",  # 工作流管理
+        "/sessions",   # 会话管理
+    ]
+```
+
+### 2. 环境特定配置
+
+```python
+# 根据环境选择路由策略
+def configure_routes(app: FastAPI, agent_os: AgentOS):
+    environment = os.getenv("ENVIRONMENT", "development")
+    
+    if environment == "production":
+        # 生产环境：优先保证核心功能
+        agent_os.configure_routes(
+            on_route_conflict="preserve_agentos",
+            exceptions=["/health"]  # 例外：自定义健康检查
+        )
+    else:
+        # 开发/测试环境：优先自定义功能
+        agent_os.configure_routes(
+            on_route_conflict="preserve_base_app",
+            exceptions=["/agents"]  # 例外：保留智能体管理
+        )
+```
+
+### 3. 文档化路由决策
+
+```python
+# 记录路由覆盖决策
+class RouteDecisionLogger:
+    def __init__(self):
+        self.decisions = []
+    
+    def log_decision(self, path: str, preserved: str, reason: str):
+        """记录路由决策"""
+        self.decisions.append({
+            "path": path,
+            "preserved": preserved,
+            "reason": reason,
+            "timestamp": datetime.now().isoformat()
+        })
+    
+    def get_decisions(self):
+        """获取所有决策"""
+        return self.decisions
+
+# 使用决策记录器
+decision_logger = RouteDecisionLogger()
+
+# 在配置路由时记录决策
+decision_logger.log_decision(
+    path="/",
+    preserved="custom",
+    reason="品牌自定义主页提供更好的用户体验"
+)
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 1. 路由意外覆盖
+
+```python
+# 调试路由覆盖问题
+def debug_route_coverage(app: FastAPI):
+    """调试路由覆盖情况"""
+    print("当前路由:")
+    for route in app.routes:
+        if hasattr(route, 'endpoint'):
+            print(f"  {route.methods} {route.path} -> {route.endpoint.__name__}")
+        else:
+            print(f"  {route.methods} {route.path} -> {route.__class__.__name__}")
+
+# 在集成后调试
+combined_app = agent_os.get_app()
+debug_route_coverage(combined_app)
+```
+
+#### 2. 中间件冲突
+
+```python
+# 检查中间件冲突
+def check_middleware_conflicts(app: FastAPI):
+    """检查中间件冲突"""
+    middleware_stack = app.user_middleware
+    
+    print("中间件栈:")
+    for i, middleware in enumerate(middleware_stack):
+        print(f"  {i}: {middleware.cls.__name__}")
+    
+    # 检查是否有重复的中间件
+    middleware_types = [type(middleware.cls) for middleware in middleware_stack]
+    if len(middleware_types) != len(set(middleware_types)):
+        print("⚠️ 发现重复的中间件")
+```
+
+#### 3. CORS 配置问题
+
+```python
+# 验证 CORS 配置
+def validate_cors_config(app: FastAPI):
+    """验证 CORS 配置"""
+    cors_middleware = None
+    
+    for middleware in app.user_middleware:
+        if "cors" in middleware.cls.__name__.lower():
+            cors_middleware = middleware
+            break
+    
+    if cors_middleware:
+        print("✅ 找到 CORS 中间件")
+        # 检查 CORS 配置
+        print(f"  允许的源: {cors_middleware.kwargs.get('allow_origins', [])}")
+    else:
+        print("❌ 未找到 CORS 中间件")
+```
+
+## 下一步
+
+- 了解[AgentOS 配置](/agent-os/config)
+- 查看[自定义 FastAPI 概述](/agent-os/custom-fastapi/overview)
+- 探索[中间件](/agent-os/middleware)功能
+- 查看[API 参考](/reference-api/overview)

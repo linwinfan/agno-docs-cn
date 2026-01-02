@@ -1,0 +1,65 @@
+---
+title: AgentSession
+sidebarTitle: Agent 会话
+---
+
+## AgentSession 属性
+
+| 参数 | 类型 | 默认值 | 描述 |
+|-----------|------|---------|-------------|
+| `session_id` | `str` | 必需 | 会话 UUID |
+| `agent_id` | `Optional[str]` | `None` | 与此会话关联的代理的 ID |
+| `team_id` | `Optional[str]` | `None` | 与此会话关联的团队的 ID |
+| `user_id` | `Optional[str]` | `None` | 与此代理交互的用户的 ID |
+| `workflow_id` | `Optional[str]` | `None` | 与此会话关联的工作流的 ID |
+| `session_data` | `Optional[Dict[str, Any]]` | `None` | 会话数据：session_name、session_state、images、videos、audio |
+| `metadata` | `Optional[Dict[str, Any]]` | `None` | 与此代理一起存储的元数据 |
+| `agent_data` | `Optional[Dict[str, Any]]` | `None` | 代理数据：agent_id、name 和 model |
+| `runs` | `Optional[List[RunOutput]]` | `None` | 会话中所有运行的列表 |
+| `summary` | `Optional[SessionSummary]` | `None` | 会话的摘要 |
+| `created_at` | `Optional[int]` | `None` | 创建此会话时的 unix 时间戳 |
+| `updated_at` | `Optional[int]` | `None` | 最后更新此会话时的 unix 时间戳 |
+
+## AgentSession 方法
+
+### `upsert_run(run: RunOutput)`
+
+将 RunOutput 添加到运行列表中。如果具有相同 `run_id` 的运行已存在，则更新现有运行。
+
+### `get_run(run_id: str) -> Optional[RunOutput]`
+
+通过 `run_id` 检索特定的运行。
+
+### `get_messages(...) -> List[Message]`
+
+返回属于会话且符合给定条件的消息。
+
+**参数：**
+
+- `agent_id` (Optional[str]): 要获取消息的代理的 ID
+- `team_id` (Optional[str]): 要获取消息的团队的 ID
+- `last_n_runs` (Optional[int]): 要返回消息的运行数量，从最新的开始计算。默认为所有运行
+- `limit` (Optional[int]): 要返回的消息数量，从最新的开始计算。默认为所有消息
+- `skip_roles` (Optional[List[str]]): 跳过具有这些角色的消息
+- `skip_statuses` (Optional[List[RunStatus]]): 跳过具有这些状态的消息
+- `skip_history_messages` (bool): 跳过在先前运行中被标记为历史记录的消息。默认为 True
+
+**返回：**
+
+- `List[Message]`: 会话的消息
+
+### `get_session_summary() -> Optional[SessionSummary]`
+
+获取会话的会话摘要
+
+### `get_chat_history(...) -> List[Message]`
+
+获取会话的聊天历史（用户和助手消息）。使用 `get_messages()` 获取更多过滤选项。
+
+**参数：**
+
+- `last_n_runs` (Optional[int]): 要包含的最近运行数量。如果为 None，将考虑所有运行
+
+**返回：**
+
+- `List[Message]`: 会话的聊天历史

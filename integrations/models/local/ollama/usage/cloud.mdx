@@ -1,0 +1,54 @@
+---
+title: Ollama Cloud
+---
+
+## Code
+
+```python cookbook/11_models/ollama/ollama_cloud.py
+from agno.agent import Agent
+from agno.models.ollama import Ollama
+
+agent = Agent(
+    model=Ollama(id="gpt-oss:120b-cloud", host="https://ollama.com"),
+)
+
+agent.print_response("How many r's in the word 'strawberry'?", stream=True)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="Set up Ollama Cloud API Key">
+    Sign up at [ollama.com](https://ollama.com) and get your API key, then export it:
+    ```bash
+    export OLLAMA_API_KEY=your_api_key_here
+    ```
+  </Step>
+
+  <Step title="安装 libraries">
+    ```bash
+    pip install -U ollama agno
+    ```
+  </Step>
+
+  <Step title="Run Agent">
+    <CodeGroup>
+    ```bash Mac
+    python cookbook/11_models/ollama/ollama_cloud.py
+    ```
+
+    ```bash Windows
+    python cookbook/11_models/ollama/ollama_cloud.py
+    ```
+    </CodeGroup>
+  </Step>
+</Steps>
+
+## Key Features
+
+- **No 本地 setup required**: Access powerful 模型s instantly without downloading or managing 本地 installations
+- **Production-ready**: Enterprise-grade infrastructure with reliable uptime and performance
+- **Wide 模型 selection**: Access to powerful 模型s including GPT-OSS and other optimized 云 模型s
+- **Automatic configuration**: When `api_key` is provided, the host automatically defaults to `https://ollama.com`

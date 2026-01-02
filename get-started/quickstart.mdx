@@ -1,0 +1,45 @@
+---
+title: 快速入门
+description: 15 分钟内构建您的第一个 Agno 智能体
+---
+
+# 快速入门
+
+本指南将在 15 分钟内帮助您构建和运行第一个 Agno 智能体。
+
+## 安装 Agno
+
+```bash
+pip install agno
+```
+
+## 创建您的第一个智能体
+
+创建一个新文件 `first_agent.py`：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 创建智能体
+agent = Agent(
+    model=OpenAIChat(id="gpt-4"),
+    instructions="您是一个友好的人工智能助手。",
+    markdown=True,
+)
+
+# 运行智能体
+agent.print_response("你好！请介绍一下自己。")
+```
+
+## 运行智能体
+
+```bash
+python first_agent.py
+```
+
+## 下一步
+
+- 了解如何[构建智能体团队](/basics/teams/overview)
+- 探索[工作流](/basics/workflows/overview)
+- 查看[更多示例](/examples/use-cases/overview)

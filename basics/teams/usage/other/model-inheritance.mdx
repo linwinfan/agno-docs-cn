@@ -1,0 +1,138 @@
+---
+title: 模型继承
+sidebarTitle: 成员继承模型
+description: 这个示例演示了智能体如何自动从其父团队继承模型。
+---
+
+**当团队设置了模型时：**
+- 没有设置模型的智能体使用团队的 `model`
+- 设置了自己模型的智能体保持自己的模型
+- 在嵌套团队中，智能体使用其直接父团队的 `model`
+- `reasoning_model`、`parser_model` 和 `output_model` 必须在每个团队成员或团队上显式设置
+
+**当团队没有设置模型时：**
+- 团队和所有智能体默认使用 OpenAI `gpt-4o`
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch model_inheritance.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python model_inheritance.py
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+
+    # 这些智能体没有设置模型
+    researcher = Agent(
+        name="研究员",
+        role="研究和收集信息",
+        instructions=["要全面且详细"],
+    )
+
+    writer = Agent(
+        name="作者",
+        role="根据研究撰写内容",
+        instructions=["清晰简洁地写作"],
+    )
+
+    # 这个智能体设置了模型
+    editor = Agent(
+        name="编辑",
+        role="编辑和优化内容",
+        model=OpenAIChat(id="gpt-4o-mini"),
+        instructions=["确保清晰和正确"],
+    )
+
+    # 嵌套团队设置
+    analyst = Agent(
+        name="分析师",
+        role="分析数据并提供见解",
+    )
+
+    sub_team = Team(
+        name="分析团队",
+        model=OpenAIChat(id="gpt-5-mini"),
+        members=[analyst],
+    )
+
+    team = Team(
+        name="内容生产团队",
+        model=OpenAIChat(id="gpt-4o"),
+        members=[researcher, writer, editor, sub_team],
+        instructions=[
+            "彻底研究主题",
+            "撰写清晰且引人入胜的内容",
+            "为质量和清晰度进行编辑",
+            "协调整个过程",
+        ],
+        show_members_responses=True,
+    )
+
+    team.initialize_team()
+
+    # 研究员和作者从团队继承 gpt-4o
+    print(f"研究员模型: {researcher.model.id}")
+    print(f"作者模型: {writer.model.id}")
+
+    # 编辑保持其显式设置的模型
+    print(f"编辑模型: {editor.model.id}")
+
+    # 分析师从其子团队继承 gpt-5-mini
+    print(f"分析师模型: {analyst.model.id}")
+
+    team.print_response(
+        "Write a brief article about AI", stream=True
+    )
+    ```
+
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="设置您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python model_inheritance.py
+    ```
+    
+    ```bash Windows
+    python model_inheritance.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/basic_flows" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+

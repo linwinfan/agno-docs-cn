@@ -1,0 +1,134 @@
+---
+title: 研究智能体
+---
+
+本示例展示如何通过结合 exa 的搜索能力和学术写作技能来创建高级研究智能体，以提供结构良好、基于事实的报告。
+
+演示的关键功能：
+- 使用 Exa.ai 进行学术和新闻搜索
+- 带引用的结构化报告生成
+- 自定义格式化和文件保存功能
+
+尝试的示例提示：
+- "量子计算的最新发展是什么？"
+- "研究人工意识的当前状态"
+- "分析聚变能源的最新突破"
+- "调查太空旅游的环境影响"
+- "探索长寿研究的最新发现"
+
+## 代码
+
+```python research_agent.py
+from datetime import datetime
+from pathlib import Path
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.exa import ExaTools
+
+cwd = Path(__file__).parent.resolve()
+tmp = cwd.joinpath("tmp")
+if not tmp.exists():
+    tmp.mkdir(exist_ok=True, parents=True)
+
+today = datetime.now().strftime("%Y-%m-%d")
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    tools=[ExaTools(start_published_date=today, type="keyword")],
+    description=dedent("""\
+        您是 X-1000 教授，一位杰出的 AI 研究科学家，在
+        分析和综合复杂信息方面具有专业知识。您的专长在于
+        创建引人入胜、基于事实的报告，结合学术严谨性与引人入胜的叙事。
+
+        您的写作风格是：
+        - 清晰和权威
+        - 引人入胜但专业
+        - 专注于事实并有适当引用
+        - 对受过教育的非专业人士可理解\
+    """),
+    instructions=dedent("""\
+        首先运行 3 个不同的搜索以收集全面信息。
+        分析和交叉参考来源的准确性和相关性。
+        遵循学术标准构建您的报告，但保持可读性。
+        只包含可验证的事实并有适当引用。
+        创建引人入胜的叙事，引导读者理解复杂主题。
+        以可行的要点和未来影响结束。\
+    """),
+    expected_output=dedent("""\
+    以 markdown 格式的专业研究报告：
+
+    # {抓住主题本质的引人注目标题}
+
+    ## 执行摘要
+    {关键发现和重要性的简要概述}
+
+    ## 介绍
+    {主题的背景和重要性}
+    {研究/讨论的当前状态}
+
+    ## 主要发现
+    {重大发现或发展}
+    {支持性证据和分析}
+
+    ## 影响
+    {对领域/社会的影响}
+    {未来方向}
+
+    ## 关键要点
+    - {要点 1}
+    - {要点 2}
+    - {要点 3}
+
+    ## 参考文献
+    - [来源 1](链接) - 关键发现/引用
+    - [来源 2](链接) - 关键发现/引用
+    - [来源 3](链接) - 关键发现/引用
+
+    ---
+    由 X-1000 教授生成报告
+    高级研究系统部
+    日期：{当前日期}\
+    """),
+    markdown=True,
+    add_datetime_to_context=True,
+    save_response_to_file=str(tmp.joinpath("{message}.md")),
+)
+
+# 示例用法
+if __name__ == "__main__":
+    # 生成关于前沿主题的研究报告
+    agent.print_response(
+        "研究脑机接口的最新发展", stream=True
+    )
+
+# 更多示例提示尝试：
+"""
+尝试这些研究主题：
+1. "分析固态电池的当前状态"
+2. "研究 CRISPR 基因编辑的最新突破"
+3. "调查自动驾驶汽车的发展"
+4. "探索量子机器学习的进展"
+5. "研究人工智能对医疗保健的影响"
+"""
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai exa-py agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python research_agent.py
+    ```
+  </Step>
+
+</Steps>

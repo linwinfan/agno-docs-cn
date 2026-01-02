@@ -1,0 +1,86 @@
+---
+title: DashScope
+sidebarTitle: 概览
+description: Learn how to use DashScope 模型s in Agno.
+---
+
+Leverage DashScope's powerful command 模型s and 更多功能.
+
+[DashScope](https://dashscope.aliyun.com/) 支持 a wide range of 模型s
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `qwen-plus` 模型 is good for most use-cases.
+
+## Authentication
+
+Set your `DASHSCOPE_API_KEY` environment variable. Get your key from [here](https://dashscope.aliyun.com/api-keys).
+
+<CodeGroup>
+
+```bash Mac
+export DASHSCOPE_API_KEY=***
+```
+
+```bash Windows
+setx DASHSCOPE_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `DashScope` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.dashscope import DashScope
+
+agent = Agent(
+    model=DashScope(id="qwen-plus"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/dashscope/usage/basic). </Note>
+
+## Parameters
+
+| Parameter           | Type               | Default                                                      | Description                                                           |
+| ------------------- | ------------------ | ------------------------------------------------------------ | --------------------------------------------------------------------- |
+| `id`                | `str`              | `"qwen-plus"`                                                | The id of the Qwen 模型 to use                                      |
+| `name`              | `str`              | `"Qwen"`                                                     | The name of the 模型                                                 |
+| `提供商`          | `str`              | `"Dashscope"`                                                | The 提供商 of the 模型                                             |
+| `api_key`           | `Optional[str]`    | `None`                                                       | The API key for DashScope (defaults to DASHSCOPE_API_KEY env var)    |
+| `base_url`          | `str`              | `"https://dashscope-intl.aliyuncs.com/兼容-mode/v1"`  | The base URL for the DashScope API. For users in Mainland China, you must set the base URL to https://dashscope.aliyuncs.com/兼容-mode/v1 to avoid the “invalid API key” error.                                    |
+| `enable_thinking`   | `bool`             | `False`                                                      | Enable thinking process for reasoning 模型s                          |
+| `include_thoughts`  | `Optional[bool]`   | `None`                                                       | Include thinking process in response (alter原生 parameter)          |
+| `thinking_budget`   | `Optional[int]`    | `None`                                                       | Budget for thinking tokens in reasoning 模型s                        |
+
+`DashScope` extends the OpenAI-兼容 interface and 支持 most parameters from the [OpenAI 模型](/integrations/models/native/openai/completion/overview).
+
+## Thinking Models
+
+DashScope 支持 reasoning 模型s with thinking 功能:
+
+```python
+from agno.agent import Agent
+from agno.models.dashscope import DashScope
+
+agent = Agent(
+    model=DashScope(
+        id="qwen-plus",
+        enable_thinking=True,
+        thinking_budget=5000
+    ),
+    markdown=True
+)
+```

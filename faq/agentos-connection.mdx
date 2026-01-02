@@ -1,0 +1,61 @@
+---
+title: AgentOS 连接问题
+sidebarTitle: AgentOS 连接问题
+---
+
+如果您在使用 AgentOS 时遇到连接问题，特别是在尝试连接到**本地实例**时，本指南将帮助您解决这些问题。
+
+## 浏览器兼容性
+
+某些浏览器由于混合内容安全问题而存在安全限制，会阻止连接到 localhost 域。以下是您需要了解的不同浏览器信息：
+
+### 推荐浏览器
+- **Chrome & Edge**: 这些浏览器默认情况下与本地连接配合良好，是我们的推荐选择
+- **Firefox**: 通常与本地连接配合良好
+
+### 有已知问题的浏览器
+- **Safari**: 可能由于其严格的安全策略而阻止本地连接
+- **Brave**: 由于其防护功能，默认阻止本地连接
+
+## 解决方案
+
+### 对于 Brave 用户
+如果您使用的是 Brave 浏览器，可以尝试以下步骤：
+1. 点击地址栏中的 Brave 防护图标
+2. 为当前站点关闭防护
+3. 刷新端点并重新尝试连接
+
+<video
+  autoPlay
+  muted
+  controls
+  className="w-full aspect-video"
+  src="/videos/agentos-brave-issue.mp4"
+></video>
+
+### 对于其他浏览器
+如果您使用的是 Safari 或在其他浏览器中遇到问题，可以使用以下解决方案之一：
+
+#### 1. 使用 Chrome 或 Edge
+最简单的解决方案是使用对本地连接有更好支持的 Chrome 或 Edge 浏览器。
+
+#### 2. 使用隧道服务
+您可以使用隧道服务将本地端点暴露到互联网：
+
+##### 使用 ngrok
+1. 从 [ngrok.com](https://ngrok.com) 安装 ngrok
+2. 运行您的本地服务器
+3. 使用 ngrok 创建隧道：
+```bash
+ngrok http <your-local-port>
+```
+4. 在 [AgentOS](https://os.agno.com) 上使用提供的 ngrok URL。
+
+##### 使用 Cloudflare Tunnel
+1. 从 [Cloudflare 网站](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/) 安装 Cloudflare Tunnel (cloudflared)
+2. 使用 Cloudflare 进行身份验证
+3. 创建隧道：
+```bash
+cloudflared tunnel --url http://localhost:<your-local-port>
+```
+4. 在 [AgentOS](https://os.agno.com) 上使用提供的 Cloudflare URL。

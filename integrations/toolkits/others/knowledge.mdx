@@ -1,0 +1,58 @@
+---
+title: Knowledge Tools
+description: KnowledgeTools provide intelligent search and analysis 功能 over knowledge bases with reasoning 集成.
+---
+
+## Example
+
+The 以下 智能体 can search and analyze knowledge bases:
+
+```python
+from agno.agent import Agent
+from agno.tools.knowledge import KnowledgeTools
+from agno.knowledge import Knowledge
+
+# Initialize knowledge base
+knowledge = Knowledge()
+knowledge.load_documents("./docs/")
+
+agent = Agent(
+    instructions=[
+        "You are a knowledge assistant that helps find and analyze information",
+        "Search through the knowledge base to answer questions",
+        "Provide detailed analysis and reasoning about the information found",
+        "Always cite your sources and explain your reasoning",
+    ],
+    tools=[KnowledgeTools(knowledge=knowledge)],
+)
+
+agent.print_response("What are the best practices for API design?", stream=True)
+```
+
+## Toolkit 参数
+
+| Parameter           | Type                | Default | Description                                                    |
+| ------------------- | ------------------- | ------- | -------------------------------------------------------------- |
+| `knowledge`         | `Knowledge`         | `None`  | Knowledge base instance (required).                           |
+| `enable_think`      | `bool`              | `True`  | Enable reasoning 功能.                                |
+| `enable_search`     | `bool`              | `True`  | Enable knowledge search functionality.                       |
+| `enable_analyze`    | `bool`              | `True`  | Enable knowledge analysis 功能.                      |
+| `instructions`      | `Optional[str]`     | `None`  | Custom instructions for knowledge operations.                |
+| `add_instructions`  | `bool`              | `True`  | Whether to add instructions to the 智能体.                   |
+| `add_few_shot`      | `bool`              | `False` | Whether to include few-shot examples.                       |
+| `few_shot_examples` | `Optional[str]`     | `None`  | Custom few-shot examples.                                    |
+
+## Toolkit Functions
+
+| Function   | Description                                                      |
+| ---------- | ---------------------------------------------------------------- |
+| `think`    | Apply reasoning to knowledge-based problems and questions.       |
+| `search`   | Search the knowledge base for relevant information.             |
+| `analyze`  | Perform detailed analysis of knowledge base content.            |
+
+
+## 开发者资源
+
+- 查看 [Tools Source](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/tools/knowledge.py)
+- [Agno Knowledge Framework](https://docs.agno.com/knowledge)
+- [Vector Database Integration](https://docs.agno.com/vector-db)

@@ -1,0 +1,107 @@
+---
+title: 更新智能体工具
+sidebarTitle: 更新智能体工具
+description: 学习如何在创建后添加/更新智能体和团队的工具。
+---
+
+工具可以在创建后添加到智能体和团队中。这为您提供了灵活性，可以在初始化后将工具添加到现有的智能体或团队实例中，这对于动态工具管理或需要根据运行时要求有条件地添加工具的情况非常有用。
+智能体或团队可用的整个工具集也可以通过使用 `set_tools` 调用来更新。请注意，这将删除已分配给您的智能体或团队的任何其他工具，并用提供给 `set_tools` 的工具列表覆盖它。
+
+## 智能体示例
+
+创建您自己的工具，例如 `get_weather`。然后调用 `add_tool` 将其附加到您的智能体。
+
+```python add_agent_tool_post_initialization.py
+import random
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools import tool
+
+
+@tool(stop_after_tool_call=True)
+def get_weather(city: str) -> str:
+    """Get the weather for a city."""
+    # In a real implementation, this would call a weather API
+    weather_conditions = ["sunny", "cloudy", "rainy", "snowy", "windy"]
+    random_weather = random.choice(weather_conditions)
+
+    return f"The weather in {city} is {random_weather}."
+
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    markdown=True,
+)
+
+agent.print_response("What can you do?", stream=True)
+
+agent.add_tool(get_weather)
+
+agent.print_response("What is the weather in San Francisco?", stream=True)
+```
+
+# 团队示例
+
+创建工具列表，并使用 `set_tools` 将它们分配给您的团队
+
+```python add_team_tool_post_initialization.py
+import random
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+from agno.tools import tool
+from agno.tools.calculator import CalculatorTools
+
+
+agent1 = Agent(
+    name="Stock Searcher",
+    model=OpenAIChat("gpt-5-mini"),
+)
+
+agent2 = Agent(
+    name="Company Info Searcher",
+    model=OpenAIChat("gpt-5-mini"),
+)
+
+team = Team(
+    name="Stock Research Team",
+    model=OpenAIChat("gpt-5-mini"),
+    members=[agent1, agent2],
+    tools=[CalculatorTools()],
+    markdown=True,
+    show_members_responses=True,
+)
+
+
+@tool
+def get_stock_price(stock_symbol: str) -> str:
+    """Get the current stock price of a stock."""
+    return f"The current stock price of {stock_symbol} is {random.randint(100, 1000)}."
+
+@tool
+def get_stock_availability(stock_symbol: str) -> str:
+    """Get the current availability of a stock."""
+    return f"The current stock available of {stock_symbol} is {random.randint(100, 1000)}."
+
+
+team.set_tools([get_stock_price, get_stock_availability])
+
+team.print_response("What is the current stock price of NVDA?", stream=True)
+team.print_response("How much stock NVDA stock is available?", stream=True)
+
+```
+
+<Tip>
+
+- `add_tool` 方法允许您动态扩展智能体或团队的功能。当您想要基于用户输入或其他运行时条件添加工具时，这特别有用。
+- `set_tool` 方法允许您覆盖智能体或团队的功能。请注意，这将删除之前分配给您的智能体或团队的任何现有工具。
+
+</Tip>
+
+## 开发者资源
+
+- [创建自己的工具](/basics/tools/creating-tools/overview) - 学习如何创建自定义工具
+- [可用工具包](/integrations/toolkits/overview) - 探索预构建的工具包
+- [选择工具](/basics/tools/selecting-tools) - 学习如何在工具包中过滤工具

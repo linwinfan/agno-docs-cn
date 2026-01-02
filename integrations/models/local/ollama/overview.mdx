@@ -1,0 +1,128 @@
+---
+title: Ollama
+sidebarTitle: 概览
+description: Learn how to use Ollama with Agno.
+---
+
+Run large language 模型s with Ollama, either 本地ly or through Ollama Cloud.
+
+[Ollama](https://ollama.com) is a fantastic tool for running 模型s both 本地ly and in the 云.
+
+**Local 使用方法**: Run 模型s on your own hardware using the Ollama client.
+
+**Cloud 使用方法**: Access 云-hosted 模型s via [Ollama Cloud](https://ollama.com) with an API key. 
+
+Ollama 支持 multiple open-source 模型s. See the library [here](https://ollama.com/library).
+
+Experiment with different 模型s to find the best fit for your use case. Here are some general recommendations:
+
+- `gpt-oss:120b-云` is an excellent general-purpose 云 模型 for most tasks.
+- `llama3.3` 模型s are good for most basic use-cases.
+- `qwen` 模型s perform specifically well with tool use.
+- `deepseek-r1` 模型s have strong reasoning 功能.
+- `phi4` 模型s are powerful, while being really small in size.
+
+## Authentication (Ollama Cloud Only)
+
+To use Ollama Cloud, set your `OLLAMA_API_KEY` environment variable. You can get an API key from [Ollama Cloud](https://ollama.com).
+
+<CodeGroup>
+
+```bash Mac
+export OLLAMA_API_KEY=***
+```
+
+```bash Windows
+setx OLLAMA_API_KEY ***
+```
+
+</CodeGroup>
+
+When using Ollama Cloud, the host is automatically set to `https://ollama.com`. For 本地 usage, no API key is required.
+
+## Set up a 模型
+
+### Local 使用方法
+
+安装 [ollama](https://ollama.com) 并运行 a 模型:
+
+```bash run model
+ollama run llama3.1
+```
+
+This starts an interactive session with the 模型.
+
+To download the 模型 for use in an Agno 智能体:
+
+```bash pull model
+ollama pull llama3.1
+```
+
+### Cloud 使用方法
+
+For Ollama Cloud, no 本地 Ollama server installation is required. 安装 the Ollama library, set up your API key as described in the Authentication section above, and access 云-hosted 模型s directly.
+
+## Examples
+
+### Local 使用方法
+
+Once the 模型 is available 本地ly, use the `Ollama` 模型 class to access it:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.ollama import Ollama
+
+agent = Agent(
+    model=Ollama(id="llama3.1"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+### Cloud 使用方法
+
+<Note>When using Ollama Cloud with an API key, the host is automatically set to `https://ollama.com`. You can omit the `host` parameter.</Note>
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.ollama import Ollama
+
+agent = Agent(
+    model=Ollama(id="gpt-oss:120b-cloud"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/local/ollama/usage/basic). </Note>
+
+## 参数
+
+| Parameter           | Type                       | Default                        | Description                                                                                                          |
+| ------------------- | -------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `id`                | `str`                      | `"llama3.2"`                   | The name of the Ollama 模型 to use                                                                                 |
+| `name`              | `str`                      | `"Ollama"`                     | The name of the 模型                                                                                                |
+| `提供商`          | `str`                      | `"Ollama"`                     | The 提供商 of the 模型                                                                                            |
+| `host`              | `str`                      | `"http://本地host:11434"`     | The host URL for the Ollama server                                                                                  |
+| `timeout`           | `Optional[int]`            | `None`                         | Request timeout in seconds                                                                                           |
+| `format`            | `Optional[str]`            | `None`                         | The format to return the response in (e.g., "json")                                                               |
+| `options`           | `Optional[Dict[str, Any]]` | `None`                         | Additional 模型 options (temperature, top_p, etc.)                                                                 |
+| `keep_alive`        | `Optional[Union[float, str]]` | `None`                      | How long to keep the 模型 loaded (e.g., "5m", 3600 seconds)                                                      |
+| `template`          | `Optional[str]`            | `None`                         | The prompt template to use                                                                                           |
+| `system`            | `Optional[str]`            | `None`                         | System message to use                                                                                                |
+| `raw`               | `Optional[bool]`           | `None`                         | Whether to return raw response without formatting                                                                    |
+| `stream`            | `bool`                     | `True`                         | Whether to stream the response                                                                                       |
+
+`Ollama` is a subclass of the [Model](/reference/models/模型) class and has access to the same params.

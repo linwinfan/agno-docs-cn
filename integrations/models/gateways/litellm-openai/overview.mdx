@@ -1,0 +1,63 @@
+---
+title: LiteLLM OpenAI
+sidebarTitle: 概览
+description: Use LiteLLM with Agno with an openai-兼容 proxy server.
+---
+
+## Proxy Server Integration
+
+LiteLLM can also be used as an OpenAI-兼容 proxy server, allowing you to route requests to different 模型s through a 统一 API.
+
+### Starting the Proxy Server
+
+First, install LiteLLM with proxy support:
+
+```shell
+pip install 'litellm[proxy]'
+```
+
+Start the proxy server:
+
+```shell
+litellm --model gpt-5-mini --host 127.0.0.1 --port 4000
+```
+
+### Using the Proxy
+
+The `LiteLLMOpenAI` class connects to the LiteLLM proxy using an OpenAI-兼容 interface:
+
+```python
+from agno.agent import Agent
+from agno.models.litellm import LiteLLMOpenAI
+
+agent = Agent(
+    model=LiteLLMOpenAI(
+        id="gpt-5-mini",  # Model ID to use
+    ),
+    markdown=True,
+)
+
+agent.print_response("Share a 2 sentence horror story")
+```
+
+### Configuration Options
+
+The `LiteLLMOpenAI` class accepts the 以下 parameters:
+
+| Parameter  | Type | Description                                                  | Default               |
+| ---------- | ---- | ------------------------------------------------------------ | --------------------- |
+| `id`       | str  | Model identifier                                             | "gpt-5-mini"              |
+| `name`     | str  | Display name for the 模型                                   | "LiteLLM"             |
+| `提供商` | str  | Provider name                                                | "LiteLLM"             |
+| `api_key`  | str  | API key (falls back to LITELLM_API_KEY environment variable) | None                  |
+| `base_url` | str  | URL of the LiteLLM proxy server                              | "http://0.0.0.0:4000" |
+
+`LiteLLMOpenAI` is a subclass of the [OpenAILike](/integrations/models/openai-like) class and has access to the same params.
+
+## Examples
+
+Check out these examples in the cookbook:
+
+### Proxy Examples
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/litellm-openai/usage/basic-stream). </Note>

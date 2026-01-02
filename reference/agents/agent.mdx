@@ -1,0 +1,262 @@
+---
+title: "智能体 API 参考"
+description: "Agno 智能体的完整 API 文档"
+---
+
+# 智能体 API 参考
+
+## Agent 类
+
+Agno 智能体的核心类。
+
+### 构造函数
+
+```python
+Agent(
+    name: str,
+    model: Optional[Model] = None,
+    instructions: Optional[str] = None,
+    tools: Optional[List[Tool]] = None,
+    memory: Optional[Memory] = None,
+    knowledge: Optional[Knowledge] = None,
+    db: Optional[Db] = None,
+    add_history_to_context: bool = False,
+    markdown: bool = False,
+    debug_mode: bool = False,
+    **kwargs
+)
+```
+
+#### 参数
+
+| 参数 | 类型 | 描述 | 默认值 |
+|------|------|------|--------|
+| `name` | `str` | 智能体名称 | 必需 |
+| `model` | `Optional[Model]` | 使用的语言模型 | `None` |
+| `instructions` | `Optional[str]` | 智能体指令 | `None` |
+| `tools` | `Optional[List[Tool]]` | 智能体工具列表 | `None` |
+| `memory` | `Optional[Memory]` | 内存配置 | `None` |
+| `knowledge` | `Optional[Knowledge]` | 知识库配置 | `None` |
+| `db` | `Optional[Db]` | 数据库配置 | `None` |
+| `add_history_to_context` | `bool` | 是否添加历史到上下文 | `False` |
+| `markdown` | `bool` | 是否启用 Markdown 输出 | `False` |
+| `debug_mode` | `bool` | 是否启用调试模式 | `False` |
+
+### 主要方法
+
+#### run()
+
+执行智能体并获取响应。
+
+```python
+def run(
+    message: str,
+    stream: bool = False,
+    **kwargs
+) -> Union[str, Iterator[str]]
+```
+
+**参数：**
+- `message` (`str`): 输入消息
+- `stream` (`bool`): 是否流式输出
+
+**返回：**
+- `str` 或 `Iterator[str]`: 智能体响应
+
+#### print_response()
+
+打印智能体响应。
+
+```python
+def print_response(
+    message: str,
+    stream: bool = False,
+    **kwargs
+) -> None
+```
+
+#### get_chat_history()
+
+获取聊天历史。
+
+```python
+def get_chat_history() -> List[Dict[str, Any]]
+```
+
+## 使用示例
+
+### 基本智能体
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+agent = Agent(
+    name="基本智能体",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="您是一个友好的 AI 助手。"
+)
+
+response = agent.run("你好！")
+print(response)
+```
+
+### 带工具的智能体
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+agent = Agent(
+    name="搜索智能体",
+    model=OpenAIChat(id="gpt-4"),
+    tools=[DuckDuckGoTools()],
+    instructions="您是一个研究助手。"
+)
+
+response = agent.run("搜索最新的 AI 新闻")
+print(response)
+```
+
+### 带记忆的智能体
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+agent = Agent(
+    name="记忆智能体",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="您是一个有记忆的助手。",
+    db=SqliteDb(db_file="memory.db"),
+    add_history_to_context=True
+)
+
+# 第一次对话
+response1 = agent.run("我叫张三")
+print(response1)
+
+# 第二次对话（会记住之前的信息）
+response2 = agent.run("我的名字是什么？")
+print(response2)
+```
+
+### 带知识库的智能体
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.knowledge.knowledge import Knowledge
+from agno.vectordb.lancedb import LanceDb
+
+knowledge = Knowledge(
+    vector_db=LanceDb(
+        uri="./tmp/lancedb",
+        table_name="knowledge",
+    )
+)
+
+agent = Agent(
+    name="知识智能体",
+    model=OpenAIChat(id="gpt-4"),
+    knowledge=knowledge,
+    instructions="基于知识库回答问题。"
+)
+
+response = agent.run("关于 Agno 的主要特性有哪些？")
+print(response)
+```
+
+## 高级功能
+
+### 自定义工具
+
+```python
+from agno.agent import Agent
+from agno.tools.tool import Tool
+
+def weather_tool(location: str) -> str:
+    # 这里应该是实际的天气查询逻辑
+    return f"{location} 的天气是晴天，温度 25°C"
+
+weather = Tool(
+    name="weather",
+    description="获取指定地点的天气信息",
+    func=weather_tool
+)
+
+agent = Agent(
+    name="天气助手",
+    tools=[weather],
+    instructions="您是一个天气助手，使用天气工具提供准确的天气信息。"
+)
+
+response = agent.run("北京今天的天气怎么样？")
+print(response)
+```
+
+### 流式输出
+
+```python
+agent = Agent(
+    name="流式智能体",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="写一个关于 AI 的故事。"
+)
+
+# 流式输出
+for chunk in agent.run("写一个短故事", stream=True):
+    print(chunk, end="", flush=True)
+```
+
+### 调试模式
+
+```python
+agent = Agent(
+    name="调试智能体",
+    model=OpenAIChat(id="gpt-4"),
+    debug_mode=True,
+    instructions="您是一个调试助手。"
+)
+
+response = agent.run("解释一下调试模式的作用")
+print(response)
+```
+
+## 错误处理
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+try:
+    agent = Agent(
+        name="错误处理示例",
+        model=OpenAIChat(id="gpt-4"),
+        instructions="您是一个助手。"
+    )
+    
+    response = agent.run("你好")
+    print(response)
+    
+except Exception as e:
+    print(f"智能体运行出错: {e}")
+    # 处理错误逻辑
+```
+
+## 最佳实践
+
+1. **命名规范**: 使用描述性的名称
+2. **指令清晰**: 提供明确、具体的指令
+3. **工具选择**: 只添加必要的工具
+4. **内存管理**: 合理使用历史记录
+5. **错误处理**: 始终包含适当的错误处理逻辑
+
+## 更多信息
+
+- [智能体概述](/basics/agents/overview)
+- [构建智能体](/basics/agents/building-agents)
+- [智能体工具](/basics/tools/overview)
+- [智能体记忆](/basics/memory/overview)

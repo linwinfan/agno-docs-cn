@@ -1,0 +1,79 @@
+---
+title: 知识工具
+sidebarTitle: 知识工具
+---
+
+`KnowledgeTools` 工具包使智能体能够搜索、检索和分析来自知识库的信息。该工具包与 `Knowledge` 集成，并在响应用户之前为查找和评估相关信息提供结构化的工作流程。
+
+该工具包实现了"思考 → 搜索 → 分析"循环，使智能体能够：
+1. 思考问题并规划搜索查询
+2. 在知识库中搜索相关信息
+3. 分析结果以确定它们是否足够或是否需要额外搜索
+
+这种方法通过为智能体提供查找、评估和综合知识的工具，显著提高了智能体提供准确信息的能力。
+
+该工具包包括以下工具：
+
+- `think`：用于规划、头脑风暴关键词和完善方法的草稿板。这些想法对智能体保持内部，不向用户显示。
+- `search`：对知识库执行查询以检索相关文档。
+- `analyze`：评估返回的文档是否正确和充分，确定是否需要进一步搜索。
+
+## 示例
+
+以下是如何使用 `KnowledgeTools` 工具包的示例：
+
+```python
+from agno.agent import Agent
+from agno.knowledge.embedder.openai import OpenAIEmbedder
+from agno.knowledge.knowledge import Knowledge
+from agno.models.openai import OpenAIChat
+from agno.tools.knowledge import KnowledgeTools
+from agno.vectordb.lancedb import LanceDb, SearchType
+
+# Create a knowledge base containing information from a URL
+agno_docs = Knowledge(
+    # Use LanceDB as the vector database and store embeddings in the `agno_docs` table
+    vector_db=LanceDb(
+        uri="tmp/lancedb",
+        table_name="agno_docs",
+        search_type=SearchType.hybrid,
+        embedder=OpenAIEmbedder(id="text-embedding-3-small"),
+    ),
+)
+agno_docs.add_content(
+    url="https://docs.agno.com/llms-full.txt"
+)
+
+knowledge_tools = KnowledgeTools(
+    knowledge=agno_docs,
+    think=True,
+    search=True,
+    analyze=True,
+    add_few_shot=True,
+)
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[knowledge_tools],
+    markdown=True,
+)
+
+if __name__ == "__main__":
+    agent.print_response("How do I build multi-agent teams with Agno?", stream=True)
+```
+
+该工具包带有默认指令和少量示例，以帮助智能体有效使用工具。以下是您如何配置它们：
+
+```python
+from agno.tools.knowledge import KnowledgeTools
+
+knowledge_tools = KnowledgeTools(
+    knowledge=my_knowledge_base,
+    think=True,                # Enable the think tool
+    search=True,               # Enable the search tool
+    analyze=True,              # Enable the analyze tool
+    add_instructions=True,     # Add default instructions
+    add_few_shot=True,         # Add few-shot examples
+    few_shot_examples=None,    # Optional custom few-shot examples
+)
+```

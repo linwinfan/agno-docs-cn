@@ -1,0 +1,196 @@
+---
+title: 工作流工具
+sidebarTitle: 工作流工具
+---
+
+`WorkflowTools` 工具包使智能体能够执行、分析和推理工作流操作。该工具包与 `Workflow` 集成，并为运行工作流和评估其结果提供结构化方法。
+
+该工具包实现了"思考 → 运行 → 分析"循环，使智能体能够：
+1. 思考问题并规划工作流输入和执行策略
+2. 使用适当的输入和参数执行工作流
+3. 分析结果以确定它们是否充分或是否需要额外的工作流运行
+
+这种方法通过为智能体提供规划、执行和评估工作流操作的工具，显著提高了智能体成功执行复杂工作流的能力。
+
+该工具包包括以下工具：
+
+- `think`：用于规划工作流执行、头脑风暴输入和完善方法的草稿板。这些想法对智能体保持内部，不向用户显示。
+- `run_workflow`：使用指定的输入和附加参数执行工作流。
+- `analyze`：评估工作流执行结果是否正确和充分，确定是否需要进一步的工作流运行。
+
+<Tip>
+此工具包默认不启用推理。您可以通过设置 `enable_think=True` 和 `enable_analyze=True` 来启用它。
+</Tip>
+
+
+
+## Example
+
+Here's an example of how to use the `WorkflowTools` toolkit:
+
+```python
+import asyncio
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.hackernews import HackerNewsTools
+from agno.tools.workflow import WorkflowTools
+from agno.workflow.types import StepInput, StepOutput
+from agno.workflow.workflow import Workflow
+
+FEW_SHOT_EXAMPLES = dedent("""\
+    You can refer to the examples below as guidance for how to use each tool.
+    ### Examples
+    #### Example: Blog Post Workflow
+    User: Please create a blog post on the topic: AI Trends in 2024
+    Run: input_data="AI trends in 2024", additional_data={"topic": "AI, AI agents, AI workflows", "style": "The blog post should be written in a style that is easy to understand and follow."}
+    Final Answer: I've created a blog post on the topic: AI trends in 2024 through the workflow. The blog post shows...
+    
+    You HAVE TO USE additional_data to pass the topic and style to the workflow.
+""")
+
+
+# Define agents
+web_agent = Agent(
+    name="Web Agent",
+    model=OpenAIChat(id="gpt-4o-mini"),
+    tools=[DuckDuckGoTools()],
+    role="Search the web for the latest news and trends",
+)
+hackernews_agent = Agent(
+    name="Hackernews Agent",
+    model=OpenAIChat(id="gpt-4o-mini"),
+    tools=[HackerNewsTools()],
+    role="Extract key insights and content from Hackernews posts",
+)
+
+writer_agent = Agent(
+    name="Writer Agent",
+    model=OpenAIChat(id="gpt-4o-mini"),
+    instructions="Write a blog post on the topic",
+)
+
+
+def prepare_input_for_web_search(step_input: StepInput) -> StepOutput:
+    title = step_input.input
+    topic = step_input.additional_data.get("topic")
+    return StepOutput(
+        content=dedent(f"""\
+	I'm writing a blog post with the title: {title}
+	<topic>
+	{topic}
+	</topic>
+	Search the web for atleast 10 articles\
+	""")
+    )
+
+
+def prepare_input_for_writer(step_input: StepInput) -> StepOutput:
+    title = step_input.additional_data.get("title")
+    topic = step_input.additional_data.get("topic")
+    style = step_input.additional_data.get("style")
+
+    research_team_output = step_input.previous_step_content
+
+    return StepOutput(
+        content=dedent(f"""\
+	I'm writing a blog post with the title: {title}
+	<required_style>
+	{style}
+	</required_style>
+	<topic>
+	{topic}
+	</topic>
+	Here is information from the web:
+	<research_results>
+	{research_team_output}
+	<research_results>\
+	""")
+    )
+
+
+# Define research team for complex analysis
+research_team = Team(
+    name="Research Team",
+    members=[hackernews_agent, web_agent],
+    instructions="Research tech topics from Hackernews and the web",
+)
+
+
+content_creation_workflow = Workflow(
+    name="Blog Post Workflow",
+    description="Automated blog post creation from Hackernews and the web",
+    db=SqliteDb(
+        session_table="workflow_session",
+        db_file="tmp/workflow.db",
+    ),
+    steps=[
+        prepare_input_for_web_search,
+        research_team,
+        prepare_input_for_writer,
+        writer_agent,
+    ],
+)
+
+workflow_tools = WorkflowTools(
+    workflow=content_creation_workflow,
+    add_few_shot=True,
+    few_shot_examples=FEW_SHOT_EXAMPLES,
+    async_mode=True,
+)
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[workflow_tools],
+    markdown=True,
+)
+
+asyncio.run(agent.aprint_response(
+    "Create a blog post with the following title: Quantum Computing in 2025",
+    instructions="When you run the workflow using the `run_workflow` tool, remember to pass `additional_data` as a dictionary of key-value pairs.",
+    stream=True,
+    debug_mode=True,
+))
+```
+
+Here is how you can configure the toolkit:
+
+```python
+from agno.tools.workflow import WorkflowTools
+
+workflow_tools = WorkflowTools(
+    workflow=my_workflow,
+    enable_think=True,            # Enable the think tool
+    enable_run_workflow=True,     # Enable the run_workflow tool (true by default)
+    enable_analyze=True,          # Enable the analyze tool
+    add_instructions=True,        # Add default instructions
+    instructions=None,            # Optional custom instructions
+    add_few_shot=True,           # Add few-shot examples
+    few_shot_examples=None,      # Optional custom few-shot examples
+    async_mode=False,            # Set to True for async workflow execution
+)
+```
+
+## Async Support
+
+The `WorkflowTools` toolkit supports both synchronous and asynchronous workflow execution:
+
+```python
+# For async workflow execution
+workflow_tools = WorkflowTools(
+    workflow=my_async_workflow,
+    async_mode=True,  # This will use async versions of the tools
+    enable_run_workflow=True,
+)
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[workflow_tools],
+)
+
+await agent.arun(...)
+```

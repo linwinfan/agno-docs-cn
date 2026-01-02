@@ -1,0 +1,130 @@
+---
+title: 推理工具
+sidebarTitle: 推理工具
+---
+
+`ReasoningTools` 工具包允许智能体在执行期间的任何时间点像使用任何其他工具一样使用推理。与传统的在开始时推理一次以创建固定计划的方法不同，这使智能体能够在每一步之后反思，调整其思维，并即时更新其行动。
+
+我们发现这种方法显著提高了智能体解决复杂问题的能力，否则它将无法处理这些问题。通过给智能体"思考"其行动的空间，它可以更深入地检查自己的响应，质疑其假设，并从不同角度处理问题。
+
+该工具包包括以下工具：
+
+- `think`：此工具被智能体用作草稿板，以推理问题并逐步解决它。它有助于将复杂问题分解为更小、可管理的块并跟踪推理过程。
+- `analyze`：此工具用于分析推理步骤的结果并确定下一步行动。
+
+## 示例
+
+以下是如何使用 `ReasoningTools` 工具包的示例：
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.reasoning import ReasoningTools
+from agno.tools.yfinance import YFinanceTools
+
+thinking_agent = Agent(
+    model=Claude(id="claude-3-7-sonnet-latest"),
+    tools=[
+        ReasoningTools(add_instructions=True),
+        YFinanceTools(
+            stock_price=True,
+            analyst_recommendations=True,
+            company_info=True,
+            company_news=True,
+        ),
+    ],
+    instructions="Use tables where possible",
+    markdown=True,
+)
+
+thinking_agent.print_response("Write a report comparing NVDA to TSLA", stream=True)
+```
+
+该工具包带有默认指令和少量示例，以帮助智能体有效使用工具。以下是您如何启用它们：
+
+```python
+reasoning_agent = Agent(
+    model=Claude(id="claude-3-7-sonnet-latest"),
+    tools=[
+        ReasoningTools(
+            think=True,
+            analyze=True,
+            add_instructions=True,
+            add_few_shot=True,
+        ),
+    ],
+)
+```
+
+`ReasoningTools` 可以与任何支持函数调用的模型提供商一起使用。以下是使用 `OpenAIChat` 的推理智能体示例：
+
+```python
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.reasoning import ReasoningTools
+
+reasoning_agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[ReasoningTools(add_instructions=True)],
+    instructions=dedent("""\
+        You are an expert problem-solving assistant with strong analytical skills! 🧠
+
+        Your approach to problems:
+        1. First, break down complex questions into component parts
+        2. Clearly state your assumptions
+        3. Develop a structured reasoning path
+        4. Consider multiple perspectives
+        5. Evaluate evidence and counter-arguments
+        6. Draw well-justified conclusions
+
+        When solving problems:
+        - Use explicit step-by-step reasoning
+        - Identify key variables and constraints
+        - Explore alternative scenarios
+        - Highlight areas of uncertainty
+        - Explain your thought process clearly
+        - Consider both short and long-term implications
+        - Evaluate trade-offs explicitly
+
+        For quantitative problems:
+        - Show your calculations
+        - Explain the significance of numbers
+        - Consider confidence intervals when appropriate
+        - Identify source data reliability
+
+        For qualitative reasoning:
+        - Assess how different factors interact
+        - Consider psychological and social dynamics
+        - Evaluate practical constraints
+        - Address value considerations
+        \
+    """),
+    add_datetime_to_context=True,
+    stream_events=True,
+    markdown=True,
+)
+```
+
+此智能体可用于提出引发深思熟虑分析的问题，例如：
+
+```python
+reasoning_agent.print_response(
+    "A startup has $500,000 in funding and needs to decide between spending it on marketing or "
+    "product development. They want to maximize growth and user acquisition within 12 months. "
+    "What factors should they consider and how should they analyze this decision?",
+    stream=True
+)
+```
+
+或者，
+
+```python
+reasoning_agent.print_response(
+    "Solve this logic puzzle: A man has to take a fox, a chicken, and a sack of grain across a river. "
+    "The boat is only big enough for the man and one item. If left unattended together, the fox will "
+    "eat the chicken, and the chicken will eat the grain. How can the man get everything across safely?",
+    stream=True,
+)
+```

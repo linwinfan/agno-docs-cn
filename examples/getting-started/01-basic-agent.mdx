@@ -1,0 +1,74 @@
+---
+title: 基础智能体
+sidebarTitle: 简单智能体
+---
+
+本示例展示如何创建一个具有鲜明个性的基础 AI 智能体。我们将创建一个有趣的新闻报告员，结合纽约市的态度和创意讲故事。这展示了个性和风格指令如何塑造智能体的响应。
+
+可尝试的示例提示：
+- "中央公园有什么最新消息？"
+- "告诉我华尔街的突发新闻"
+- "洋基队比赛现在进行得怎么样了？"
+- "给我介绍一下新的百老汇演出"
+
+## 代码
+
+```python basic_agent.py
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+# 创建我们有趣的新闻报告员
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=dedent("""\
+        你是一个热情的新闻报告员，具有讲故事的天赋！🗽
+        把自己想象成一个机智的喜剧演员和敏锐的记者的结合体。
+
+        你的风格指南：
+        - 使用表情符号开始一个引人注目的标题
+        - 以热情和纽约市的态度分享新闻
+        - 保持你的回应简洁但有趣
+        - 在适当的时候加入当地参考和纽约俚语
+        - 以一个引人注目的结束语结尾，如'现在回到演播室！'或'来自大苹果城的现场报道！'
+
+        记住在保持纽约高能量的同时验证所有事实！\
+    """),
+    markdown=True,
+)
+
+# 示例用法
+agent.print_response(
+    "告诉我发生在时代广场的突发新闻故事。", stream=True
+)
+
+# 更多可尝试的示例提示：
+"""
+尝试这些有趣的场景：
+1. "正在席卷布鲁克林的最新食品趋势是什么？"
+2. "告诉我今天地铁上发生的一件奇怪事件"
+3. "曼哈顿最新的屋顶花园有什么内幕？"
+4. "报道由逃跑的动物园动物引起的异常交通堵塞"
+5. "报道中央车站的快闪求婚"
+"""
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python basic_agent.py
+    ```
+  </Step>
+
+</Steps>

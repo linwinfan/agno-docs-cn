@@ -1,0 +1,61 @@
+---
+title: 远程执行使用
+description: AgentOS 远程执行使用指南
+sidebarTitle: 远程执行
+keywords: [远程执行, 分布式, 微服务, agentos]
+---
+
+AgentOS 支持远程执行智能体、团队和工作流。
+
+## 远程智能体
+
+```python
+from agno.agent import RemoteAgent
+
+agent = RemoteAgent(
+    base_url="http://remote-server:7778",
+    agent_id="remote-agent"
+)
+
+response = agent.run("执行任务")
+```
+
+## 远程团队
+
+```python
+from agno.team import RemoteTeam
+
+team = RemoteTeam(
+    base_url="http://remote-server:7778",
+    team_id="remote-team"
+)
+
+response = team.run("团队协作任务")
+```
+
+## 远程工作流
+
+```python
+from agno.workflow import RemoteWorkflow
+
+workflow = RemoteWorkflow(
+    base_url="http://remote-server:7778",
+    workflow_id="remote-workflow"
+)
+
+response = workflow.run("执行工作流")
+```
+
+## 网关模式
+
+```python
+from agno.agent import RemoteAgent
+from agno.os import AgentOS
+
+gateway = AgentOS(
+    agents=[
+        RemoteAgent(base_url="http://server1:7778", agent_id="agent1"),
+        RemoteAgent(base_url="http://server2:7778", agent_id="agent2")
+    ]
+)
+```

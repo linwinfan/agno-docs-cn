@@ -1,0 +1,69 @@
+---
+title: Groq
+sidebarTitle: 概览
+description: Learn how to use Groq with Agno.
+---
+
+Groq offers blazing-fast API endpoints for large language 模型s.
+
+See all the Groq supported 模型s [here](https://console.groq.com/docs/模型s).
+
+- We recommend using `llama-3.3-70b-versatile` for general use
+- We recommend `llama-3.1-8b-instant` for a faster result.
+- We recommend using `llama-3.2-90b-vision-preview` for image understanding.
+
+#### Multimodal Support
+
+With Groq we support `Image` as input
+
+## Authentication
+
+Set your `GROQ_API_KEY` environment variable. Get your key from [here](https://console.groq.com/keys).
+
+<CodeGroup>
+
+```bash Mac
+export GROQ_API_KEY=***
+```
+
+```bash Windows
+setx GROQ_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Groq` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.groq import Groq
+
+agent = Agent(
+    model=Groq(id="llama-3.3-70b-versatile"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/groq/usage/basic-stream). </Note>
+
+## Parameters
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"llama-3.3-70b-versatile"`    | The id of the Groq 模型 to use                                      |
+| `name`       | `str`              | `"Groq"`                       | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Groq"`                       | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for Groq (defaults to GROQ_API_KEY env var)              |
+| `base_url`   | `str`              | `"https://api.groq.com/openai/v1"` | The base URL for the Groq API                                    |
+
+`Groq` extends the OpenAI-兼容 interface and 支持 most parameters from the [OpenAI 模型](/integrations/models/native/openai/completion/overview).

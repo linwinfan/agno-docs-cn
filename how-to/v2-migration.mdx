@@ -1,0 +1,343 @@
+---
+title: 迁移到 Agno v2.0
+sidebarTitle: Agno v2.0 迁移指南
+description: 将你的 Agno 应用程序从 v1 迁移到 v2 的指南。
+---
+
+如果在迁移过程中有任何问题，我们可以帮助你！在 [Discord](https://discord.gg/4MtYHHrgA8) 或 [Discourse](https://community.agno.com/) 上找到我们。
+
+<Tip>
+  参考 [v2.0 更新日志](/how-to/v2-changelog) 获取完整的变更列表。
+</Tip>
+
+## 安装 Agno v2
+
+如果你已经在使用 Agno，可以通过运行以下命令升级到 v2：
+```bash
+pip install -U agno
+```
+
+否则，可以通过运行以下命令安装最新版本的 Agno v2：
+```bash
+pip install agno
+```
+
+## 迁移你的 Agno 数据库
+
+如果你使用了我们的 `Storage` 或 `Memory` 功能来在数据库中存储 Agent 会话和记忆，你可以从迁移表开始。
+
+使用我们的迁移脚本：[`libs/agno/migrations/v1_to_v2/migrate_to_v2.py`](https://github.com/agno-agi/agno/blob/main/libs/agno/migrations/v1_to_v2/migrate_to_v2.py)
+
+该脚本支持 PostgreSQL、MySQL、SQLite 和 MongoDB。在脚本中更新数据库连接设置、批量大小（如果你正在迁移大表，这很有用）并运行它。
+
+注意：
+
+- 该脚本不会清理旧表，以防你仍然需要它们。
+- 该脚本是幂等的。如果出现错误或者你在运行中途停止，可以再次运行它。
+- 指标会自动从 v1 格式转换为 v2 格式。
+
+## 迁移你的 Agno 代码
+
+这里的每个部分涵盖特定的框架领域，提供前后示例和详细解释（在需要时）。
+
+### 1. Agent 和 Team
+
+[Agent](/basics/agents/overview) 和 [Team](/basics/teams/overview) 是 Agno 框架的主要构建块。
+
+以下是我们对 `Agent` 和 `Team` 类进行的一些 v2 更新：
+
+1.1. 使用 `arun` 流式传输响应现在返回 `AsyncIterator`，而不是协程。这是你现在在流式传输运行时消费结果事件的方式：
+
+```python v2_arun.py
+async for event in agent.arun(...):
+    ...
+```
+
+1.2. `RunResponse` 类现在是 `RunOutput`。这是运行 Agent 时获得的结果类型：
+
+```python v2_run_output.py
+from agno.run.agent import RunOutput
+
+run_output: RunOutput = agent.run(...)
+```
+
+1.3. 流式传输 Agent 结果时获得的事件已重命名：
+- `RunOutputStartedEvent` → `RunStartedEvent`
+- `RunOutputCompletedEvent` → `RunCompletedEvent`
+- `RunOutputErrorEvent` → `RunErrorEvent`
+- `RunOutputCancelledEvent` → `RunCancelledEvent`
+- `RunOutputContinuedEvent` → `RunContinuedEvent`
+- `RunOutputPausedEvent` → `RunPausedEvent`
+- `RunOutputContentEvent` → `RunContentEvent`
+
+1.4. 类似地，对于 Team 输出事件：
+- `TeamRunOutputStartedEvent` → `TeamRunStartedEvent`
+- `TeamRunOutputCompletedEvent` → `TeamRunCompletedEvent`
+- `TeamRunOutputErrorEvent` → `TeamRunErrorEvent`
+- `TeamRunOutputCancelledEvent` → `TeamRunCancelledEvent`
+- `TeamRunOutputContentEvent` → `TeamRunContentEvent`
+
+1.5. `add_state_in_messages` 参数已被弃用。指令中的变量现在默认自动解析。
+1.6. `context` 参数已重命名为 `dependencies`。
+
+这是在 v1 时的样子：
+```python v1_context.py
+from agno.agent import Agent
+
+agent = Agent(
+    context={"top_stories": get_top_hackernews_stories},
+    instructions="Here are the top stories: {top_stories}",
+    add_state_in_messages=True,
+)
+```
+
+这是现在在 v2 时的样子：
+
+```python v2_dependencies.py
+from agno.agent import Agent
+
+agent = Agent(
+    dependencies={"top_stories": get_top_hackernews_stories},
+    instructions="Here are the top stories: {top_stories}",
+    # resolve_in_context=True by default - no need to set add_state_in_messages
+)
+```
+
+<Tip>
+  在更新日志的 [Agent
+  更新](/how-to/v2-changelog#agent-updates) 部分查看完整的变更列表。
+</Tip>
+
+### 2. 存储
+
+存储用于在数据库中持久化 Agent 会话、状态和记忆。
+
+这是存储在 v1 时的样子：
+
+```python v1_storage.py
+from agno.agent import Agent
+from agno.storage.sqlite import SqliteStorage
+
+storage = SqliteStorage(table_name="agent_sessions", db_file="agno.db", mode="agent")
+
+agent = Agent(storage=storage)
+```
+
+这些是我们为 v2 所做的更改：
+
+2.1. `Storage` 类已从 `agno/storage` 移至 `agno/db`。我们现在将它们称为我们的 `Db` 类。
+2.2. `mode` 参数已被弃用。同一个实例现在可以被 Agent、Team 和 Workflow 使用。
+
+```python v2_storage.py
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+
+db = SqliteDb(db_file="agno.db")
+
+agent = Agent(db=db)
+```
+
+2.3. `table_name` 参数已被弃用。一个实例现在处理多个表，你可以单独定义它们的名称。
+
+```python v2_storage_table_names.py
+db = SqliteDb(db_file="agno.db", sessions_table="your_sessions_table_name", ...)
+```
+
+这些是所有支持的表，每个用于持久化与特定领域相关的数据：
+
+```python v2_storage_all_tables.py
+db = SqliteDb(
+    db_file="agno.db",
+    # Table to store your Agent, Team and Workflow sessions and runs
+    session_table="your_session_table_name",
+    # Table to store all user memories
+    memory_table="your_memory_table_name",
+    # Table to store all metrics aggregations
+    metrics_table="your_metrics_table_name",
+    # Table to store all your evaluation data
+    eval_table="your_evals_table_name",
+    # Table to store all your knowledge content
+    knowledge_table="your_knowledge_table_name",
+)
+```
+
+2.4. 以前运行 `Team` 会创建团队会话和参与运行的每个团队成员的会话。现在，只创建 `Team` 会话。团队领导者和所有成员的运行可以在 `Team` 会话中找到。
+
+```python v2_storage_team_sessions.py
+team.run(...)
+
+team_session = team.get_latest_session()
+
+# The runs for the team leader and all team members are here
+team_session.runs
+```
+
+<Tip>
+  在更新日志的 [存储更新](/how-to/v2-changelog#storage)
+  部分查看更多更改。
+</Tip>
+
+### 3. 内存
+
+内存使 Agent 能够回忆相关信息。
+
+这是内存在 V1 时的样子：
+
+```python v1_memory.py
+from agno.agent import Agent
+from agno.memory.v2.db.sqlite import SqliteMemoryDb
+from agno.memory.v2.memory import Memory
+
+memory_db = SqliteMemoryDb(table_name="memory", db_file="agno.db")
+memory = Memory(db=memory_db)
+
+agent = Agent(memory=memory)
+```
+
+这些是我们为 v2 所做的更改：
+
+3.1. `MemoryDb` 类已被弃用。应该使用主要的 `Db` 类。
+3.2. `Memory` 类已被弃用。你现在只需要在带有 `db` 的 Agent 上设置 `enable_user_memories=True` 来使内存工作。
+
+```python v2_memory.py
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+
+db = SqliteDb(db_file="agno.db")
+
+agent = Agent(db=db, enable_user_memories=True)
+```
+
+3.3. 生成的记忆将存储在 `memories_table` 中。默认情况下，将使用 `agno_memories`。如果需要，它将被创建。你也可以这样设置内存表：
+
+```python v2_memory_set_table.py
+db = SqliteDb(db_file="agno.db", memory_table="your_memory_table_name")
+```
+
+3.4. 你以前通过 Memory 类访问的方法现在直接在相关的 `db` 对象上可用。例如：
+
+```python v2_memory_db_methods.py
+agent.get_user_memories(user_id="123")
+```
+
+你可以在 [示例](/examples/basics/memory) 部分找到其他所有数据库和高级场景的示例。
+
+<Tip>
+  在更新日志的 [内存更新](/how-to/v2-changelog#memory)
+  部分查看更多更改。
+</Tip>
+
+### 4. 知识
+
+知识使 Agent 能够从知识库搜索和检索相关的领域特定信息。
+
+这些是我们为 v2 所做的更改：
+
+4.1. `AgentKnowledge` 已被弃用，取而代之的是新的 `Knowledge` 类。
+与此一起，所有使用 `AgentKnowledge` 作为基础的子类都已被移除。它们的功能现在在 `Knowledge` 中默认支持。
+这也意味着现在会自动选择你添加内容的正确读取器，并可以随时覆盖它。
+
+4.2. `load()` 方法及其变体已被 `add_content()` 取代。内容是源自任何来源的任何知识片段的构建块。
+有关使用的完整示例，请参见 [内容类型](/basics/knowledge/content-types) 页面。
+
+4.3. `Knowledge` 现在支持 `contents_db`。这允许存储和管理添加到你的知识中的每一段内容。
+此外，我们现在支持使用 `remove_vectors_by_id()`、`remove_vectors_by_name()` 和 `remove_vectors_by_metadata()` 方法删除单个向量。
+你也可以使用 `remove_content_by_id()` 删除由特定内容片段创建的所有向量。
+
+4.4 为了支持上述删除功能，VectorDB 表已更新。添加了两个新列：`content_hash` 和 `content_id`。
+
+4.5. `retriever` 字段已重命名为 `knowledge_retriever`。
+
+4.6. `add_references` 方法已重命名为 `add_knowledge_to_context`。
+
+**重命名**
+
+- `retriever` -> `knowledge_retriever`
+- `add_references` -> `add_knowledge_to_context`
+
+<Tip>
+  在更新日志的 [知识更新](/how-to/v2-changelog#knowledge) 部分查看更多更改。
+</Tip>
+
+### 5. 指标
+
+指标用于了解与会话、运行或消息相关的使用和消耗情况。
+
+这些是我们为 v2 所做的更改：
+
+5.1. **字段名称更改**：
+   - `time` → `duration`
+   - `audio_tokens` → `audio_total_tokens`
+   - `input_audio_tokens` → `audio_input_tokens`
+   - `output_audio_tokens` → `audio_output_tokens`
+   - `cached_tokens` → `cache_read_tokens`
+
+5.2. **已弃用字段**（在 v2 中移除）：
+   - `prompt_tokens` 和 `completion_tokens` - 被 `input_tokens` 和 `output_tokens` 取代
+   - `prompt_tokens_details` 和 `completion_tokens_details` - 详细信息移至 `provider_metrics`
+
+5.3. **新结构**：
+   - 提供程序特定的指标字段现在在 `provider_metrics` 字段内
+   - 添加了新的 `additional_metrics` 字段用于自定义指标
+
+<Tip>
+  迁移脚本自动将所有指标从 v1 格式转换为 v2 格式，包括会话数据中的嵌套指标。
+</Tip>
+
+### 6. Teams
+
+我们重构了 `Team` 类，使其更加灵活和强大。
+
+最大的变化是 `mode` 参数已被弃用。相反，有可用于控制团队行为的属性：
+    - `respond_directly` -> 如果为 True，团队领导者不会处理成员的响应，而是直接返回它们
+    - `delegate_to_all_members` -> 如果为 True，团队领导者将同时向所有成员委派任务，而不是一个接一个。在异步运行时（使用 `arun`），成员将并发运行。
+    - `determine_input_for_members` -> 默认为 `True`。如果你想将运行输入直接发送给成员 agent，而不让团队领导者综合自己的输入，请设置为 False。如果你想将 pydantic 模型输入直接发送给成员 agent，这很有用。
+
+这是一个快速迁移指南：
+- 如果你以前使用 `mode=coordinate`，这现在是默认行为，你可以使用 `Team` 而无需任何修改。
+- 如果你以前使用 `mode=route`，你现在可以使用 `respond_directly=True` 和 `determine_input_for_members=False` 来实现相同的行为。
+- 如果你以前使用 `mode=collaborate`，你可以设置 `delegate_to_all_members=True` 来实现相同的行为。
+
+查看更新日志的 [Team 更新](/how-to/v2-changelog#team-updates) 部分了解更多详情。
+
+### 7. Workflows
+
+我们大幅更新了我们的 Workflows，旨在提供构建智能体系统的顶级工具。
+
+<Tip>
+  确保查看我们的 [Workflows 综合迁移指南](/how-to/workflows-migration)。
+</Tip>
+
+### 7. Apps -> Interfaces
+
+旧的"apps"系统（`AGUIApp`、`SlackApi`、`WhatsappApi`）已被 AgentOS 中的统一接口系统取代。
+
+#### 之前 - 独立 Apps
+```python
+from agno.app.agui.app import AGUIApp
+
+agui_app = AGUIApp(agent=agent)
+app = agui_app.get_app()
+agui_app.serve(port=8000)
+```
+
+#### 之后 - 统一接口
+```python
+from agno.os import AgentOS
+from agno.os.interfaces.agui import AGUI
+
+agent_os = AgentOS(agents=[agent], interfaces=[AGUI(agent=agent)])
+app = agent_os.get_app()
+agent_os.serve(port=8000)
+```
+
+#### 迁移步骤
+1. **更新导入**：用接口导入替换应用导入
+2. **使用 AgentOS**：用 `AgentOS` 包装 agent 并指定接口
+3. **更新服务**：使用 `agent_os.serve()` 而不是 `app.serve()`
+
+### 8. Playground -> AgentOS
+
+我们的 `Playground` 已被弃用。我们新的 [AgentOS](/agent-os/introduction) 产品将替代所有用例。
+
+查看 [AgentOS](/agent-os/introduction) 了解更多详情！

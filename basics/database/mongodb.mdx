@@ -1,0 +1,47 @@
+---
+title: MongoDB 数据库
+description: 学习使用 MongoDB 作为您的代理数据库
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [MongoDB](https://www.mongodb.com/) 作为数据库，通过 `MongoDb` 类实现。
+
+<Tip>
+  **v2 迁移支持**：如果您正在从 Agno v1 升级，MongoDB 在 v2 迁移脚本中完全受支持。请参阅[迁移指南](/how-to/v2-migration)了解详细信息。
+</Tip>
+
+## 用法
+
+```python mongodb_for_agent.py
+from agno.agent import Agent
+from agno.db.mongo import MongoDb
+
+# MongoDB 连接设置
+db_url = "mongodb://localhost:27017"
+
+db = MongoDb(db_url=db_url)
+
+# 使用数据库设置您的代理
+agent = Agent(db=db)
+```
+
+### 运行 MongoDB
+
+安装 [docker desktop](https://docs.docker.com/desktop/install/mac-install/) 并使用以下命令在端口 **27017** 上运行 **MongoDB**：
+```bash
+docker run -d \
+  --name local-mongo \
+  -p 27017:27017 \
+  -e MONGO_INITDB_ROOT_USERNAME=mongoadmin \
+  -e MONGO_INITDB_ROOT_PASSWORD=secret \
+  mongo
+```
+
+
+## 参数
+
+<Snippet file="db-mongo-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/mongo/mongodb_for_agent.py)

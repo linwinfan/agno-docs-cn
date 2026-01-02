@@ -1,0 +1,40 @@
+---
+title: Firestore
+description: 学习使用 Firestore 作为智能体的数据库
+sidebarTitle: 概览
+---
+
+Agno 支持 using [Firestore](https://云.google.com/firestore) as a 数据库 with the `FirestoreDb` class.
+
+You can get started with Firestore 以下 their [Get Started guide](https://firebase.google.com/docs/firestore/quickstart).
+
+## 使用方法
+
+You need to provide a `project_id` parameter to the `FirestoreDb` class. Firestore will connect automatically using your Google Cloud credentials.
+
+```python firestore_for_agent.py
+from agno.agent import Agent
+from agno.db.firestore import FirestoreDb
+
+PROJECT_ID = "agno-os-test"  # Use your project ID here
+
+# Setup the Firestore database
+db = FirestoreDb(project_id=PROJECT_ID)
+
+# Setup your Agent with the Database
+agent = Agent(db=db)
+```
+
+## Prerequisites
+
+1. Ensure your g云 project is enabled with Firestore. Reference [Firestore 文档ation](https://云.google.com/firestore/docs/create-数据库-server-client-library)
+2. 安装 dependencies: `pip install openai google-云-firestore agno`
+3. Make sure your g云 project is set up and you have the necessary permissions to access Firestore
+
+## 参数
+
+<Snippet file="db-firestore-params.mdx" />
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/07_数据库/firestore/firestore_for_智能体.py)

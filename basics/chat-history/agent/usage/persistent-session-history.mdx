@@ -1,0 +1,68 @@
+---
+title: "带历史上下文的持久会话"
+---
+
+本示例展示了如何使用会话历史来存储对话历史，并将其添加到上下文中，同时可配置历史记录限制。
+
+## 代码
+
+```python persistent_session_history.py
+"""
+本示例展示了如何使用会话历史来存储对话历史。
+add_history_to_context 标志用于将历史记录添加到消息中。
+num_history_runs 用于设置要添加到消息中的历史运行次数。
+"""
+
+from agno.agent.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+
+db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
+
+db = PostgresDb(db_url=db_url, session_table="sessions")
+
+agent = Agent(model=OpenAIChat(id="gpt-5-mini"))
+
+team = Team(
+    model=OpenAIChat(id="gpt-5-mini"),
+    members=[agent],
+    db=db,
+    add_history_to_context=True,
+    num_history_runs=2,
+)
+
+team.print_response("告诉我一个关于太空的有趣新事实")
+```
+
+## 使用方法
+
+<Steps>
+
+    <Snippet file="create-venv-step.mdx" />
+
+    <Step title="安装所需库">
+        ```bash
+        pip install agno psycopg2-binary
+        ```
+    </Step>
+
+    <Step title="设置环境变量">
+        ```bash
+        export OPENAI_API_KEY=****
+        ```
+    </Step>
+
+    <Step title="启动 PostgreSQL 数据库">
+        ```bash
+        cookbook/run_pgvector.sh
+        ```
+    </Step>
+
+    <Step title="运行智能体">
+        ```bash
+        python persistent_session_history.py
+        ```
+    </Step>
+
+</Steps>

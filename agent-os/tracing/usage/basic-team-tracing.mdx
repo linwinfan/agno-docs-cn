@@ -1,0 +1,78 @@
+---
+title: 基本团队追踪
+description: 学习如何在 AgentOS 中追踪团队协作
+sidebarTitle: 基本团队追踪
+keywords: [追踪, 可观察性, 团队, 智能体协作, agno, opentelemetry]
+mode: wide
+---
+
+此示例展示如何在 AgentOS 中追踪团队协作过程。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch basic_team_tracing.py
+    ```
+  </Step>
+
+  <Step title="添加团队代码">
+    ```python basic_team_tracing.py
+    from agno.agent import Agent
+    from agno.team import Team
+    from agno.db.sqlite import SqliteDb
+    from agno.models.openai import OpenAIChat
+    from agno.os import AgentOS
+
+    # 设置数据库
+    db = SqliteDb(db_file="tmp/traces.db")
+
+    # 创建团队成员
+    researcher = Agent(
+        name="研究员",
+        model=OpenAIChat(id="gpt-4"),
+        instructions="你是一个研究员，负责收集和分析信息。",
+        db=db
+    )
+
+    writer = Agent(
+        name="写作者",
+        model=OpenAIChat(id="gpt-4"),
+        instructions="你是一个写作者，负责整理和撰写内容。",
+        db=db
+    )
+
+    # 创建团队
+    team = Team(
+        name="研究团队",
+        instructions="协同完成研究任务。",
+        agents=[researcher, writer],
+        db=db
+    )
+
+    # 设置启用了追踪的 AgentOS
+    agent_os = AgentOS(
+        description="团队追踪示例",
+        teams=[team],
+        tracing=True,
+    )
+    app = agent_os.get_app()
+
+    if __name__ == "__main__":
+        agent_os.serve(app="basic_team_tracing:app", reload=True)
+    ```
+  </Step>
+
+  <Step title="运行并查看追踪">
+    在 [AgentOS UI](https://os.agno.com/traces) 中查看团队协作追踪。
+  </Step>
+
+</Steps>
+
+## 团队追踪数据
+
+团队追踪包括：
+- 团队执行追踪
+- 成员间协作追踪
+- 任务分配追踪
+- 结果聚合追踪

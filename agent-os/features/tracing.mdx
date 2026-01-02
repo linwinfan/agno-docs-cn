@@ -1,0 +1,621 @@
+---
+title: "链路追踪"
+sidebarTitle: "链路追踪"
+description: "在 AgentOS 中查看和分析智能体及团队的执行链路"
+tag: beta
+---
+
+## 概述
+
+AgentOS 中的链路追踪功能为您的智能体和团队执行提供了深度可观测性。每次运行都会生成一个链路，包含关于发生了什么、花了多长时间以及使用了什么资源的详细信息。
+
+- 链路捕获智能体和团队的完整执行流程
+- 每个链路包含代表单个操作的 span（LLM 调用、工具执行等）
+- 每个 span 包含令牌使用情况（如相关）、延迟和错误信息一览
+- 您可以过滤和搜索链路以调试问题或分析性能
+
+<Note>
+  <strong>前提条件</strong>: 您的 AgentOS 必须已连接并处于活动状态，且启用了链路追踪。如果您看到"已断开连接"或"未活动"，请查看您的<a href="/agent-os/connecting-your-os">连接设置</a>。
+</Note>
+
+## 访问链路追踪
+
+- 在侧边栏中打开`链路追踪`部分
+- 点击`刷新`按钮同步最新的链路
+
+## 过滤链路
+
+使用过滤选项快速找到您需要的链路：
+
+### 查看模式
+
+- **按会话** - 按对话会话分组链路，查看会话内的所有活动
+- **按运行** - 查看单个执行运行，分析特定交互
+
+### 时间范围
+
+- **快速过滤器** - 从预设范围中选择：最近一小时、最近 24 小时或最近 7 天
+- **自定义范围** - 选择特定的开始和结束日期，进行精确的基于时间的过滤
+
+<Frame>
+  <img
+    src="/images/traces-date-filter.png"
+    alt="链路日期过滤器选项"
+    style={{ borderRadius: "0.5rem" }}
+  />
+</Frame>
+
+## 链路视图
+
+### 链路列表
+
+链路列表提供了所有执行链路的概览：
+
+| 列 | 描述 |
+|------|------|
+| **链路 ID** | 唯一标识符，用于引用特定链路 |
+| **智能体/团队** | 执行的智能体或团队名称 |
+| **开始时间** | 链路开始的时间戳 |
+| **持续时间** | 链路执行的总时间 |
+| **状态** | 执行状态（成功、失败、超时） |
+| **Span 数量** | 链路中包含的 span 数量 |
+| **令牌使用** | 总令牌消耗量 |
+
+### 链路详情
+
+点击任何链路可查看详细信息：
+
+#### Span 时间线
+
+```mermaid
+gantt
+    title 智能体执行时间线
+    dateFormat  HH:mm:ss
+    axisFormat %H:%M:%S
+    
+    section 初始化
+    接收用户输入     :active, init1, 00:00:01, 00:00:02
+    解析请求内容     :init1, init2, 00:00:02, 00:00:03
+    
+    section LLM 调用
+    生成响应       :active, llm1, 00:00:03, 00:00:05
+    处理响应       :llm1, llm2, 00:00:05, 00:00:06
+    
+    section 工具执行
+    调用搜索工具     :active, tool1, 00:00:06, 00:00:08
+    解析搜索结果     :tool1, tool2, 00:00:08, 00:00:09
+    
+    section 响应生成
+    格式化输出       :active, fmt1, 00:00:09, 00:00:10
+    返回最终响应     :fmt1, done, 00:00:10, 00:00:11
+```
+
+#### Span 详细信息
+
+每个 span 包含以下信息：
+
+```json
+{
+  "span_id": "span_123",
+  "parent_span_id": "span_122",
+  "operation_name": "llm_call",
+  "start_time": "2024-01-15T10:30:00Z",
+  "end_time": "2024-01-15T10:30:05Z",
+  "duration_ms": 5000,
+  "status": "success",
+  "attributes": {
+    "model": "gpt-4",
+    "temperature": 0.7,
+    "max_tokens": 1000,
+    "input_tokens": 150,
+    "output_tokens": 200,
+    "total_tokens": 350
+  },
+  "events": [
+    {
+      "timestamp": "2024-01-15T10:30:02Z",
+      "name": "model_loaded",
+      "attributes": {
+        "model_name": "gpt-4",
+        "provider": "openai"
+      }
+    }
+  ],
+  "logs": [
+    {
+      "timestamp": "2024-01-15T10:30:03Z",
+      "level": "info",
+      "message": "开始处理用户请求"
+    },
+    {
+      "timestamp": "2024-01-15T10:30:04Z",
+      "level": "debug",
+      "message": "发送请求到 LLM API"
+    }
+  ]
+}
+```
+
+## 高级链路功能
+
+### 性能分析
+
+#### 执行时间分析
+
+```python
+# 链路性能分析器
+class TracePerformanceAnalyzer:
+    def __init__(self):
+        self.performance_metrics = [
+            "total_duration",
+            "span_durations",
+            "bottlenecks",
+            "resource_usage"
+        ]
+    
+    def analyze_trace(self, trace_id):
+        """分析链路性能"""
+        trace = self.get_trace(trace_id)
+        
+        analysis = {
+            "trace_id": trace_id,
+            "total_duration": trace.total_duration,
+            "span_analysis": self.analyze_spans(trace.spans),
+            "bottlenecks": self.identify_bottlenecks(trace.spans),
+            "recommendations": self.generate_performance_recommendations(trace)
+        }
+        
+        return analysis
+    
+    def analyze_spans(self, spans):
+        """分析各个 span"""
+        span_analysis = []
+        
+        for span in spans:
+            span_analysis.append({
+                "span_id": span.id,
+                "operation": span.operation_name,
+                "duration": span.duration_ms,
+                "percentage_of_total": (span.duration_ms / self.total_duration) * 100,
+                "status": span.status
+            })
+        
+        return sorted(span_analysis, key=lambda x: x["duration"], reverse=True)
+    
+    def identify_bottlenecks(self, spans):
+        """识别性能瓶颈"""
+        bottlenecks = []
+        
+        for span in spans:
+            if span.duration_ms > 1000:  # 超过 1 秒的操作
+                bottlenecks.append({
+                    "span_id": span.id,
+                    "operation": span.operation_name,
+                    "duration": span.duration_ms,
+                    "severity": "high" if span.duration_ms > 5000 else "medium"
+                })
+        
+        return bottlenecks
+```
+
+#### 资源使用分析
+
+```python
+# 资源使用分析
+def analyze_resource_usage(trace):
+    """分析资源使用情况"""
+    resource_metrics = {
+        "token_usage": {
+            "total_tokens": 0,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cost_estimate": 0.0
+        },
+        "tool_usage": {},
+        "memory_usage": {},
+        "network_usage": {}
+    }
+    
+    for span in trace.spans:
+        if span.operation_name == "llm_call":
+            # 统计令牌使用
+            attrs = span.attributes
+            resource_metrics["token_usage"]["total_tokens"] += attrs.get("total_tokens", 0)
+            resource_metrics["token_usage"]["input_tokens"] += attrs.get("input_tokens", 0)
+            resource_metrics["token_usage"]["output_tokens"] += attrs.get("output_tokens", 0)
+        
+        elif span.operation_name.startswith("tool_"):
+            # 统计工具使用
+            tool_name = span.operation_name.replace("tool_", "")
+            if tool_name not in resource_metrics["tool_usage"]:
+                resource_metrics["tool_usage"][tool_name] = {
+                    "call_count": 0,
+                    "total_duration": 0,
+                    "success_rate": 0
+                }
+            
+            resource_metrics["tool_usage"][tool_name]["call_count"] += 1
+            resource_metrics["tool_usage"][tool_name]["total_duration"] += span.duration_ms
+            if span.status == "success":
+                resource_metrics["tool_usage"][tool_name]["success_rate"] += 1
+    
+    # 计算成本估算
+    total_tokens = resource_metrics["token_usage"]["total_tokens"]
+    resource_metrics["token_usage"]["cost_estimate"] = calculate_llm_cost(total_tokens)
+    
+    return resource_metrics
+```
+
+### 错误分析
+
+#### 错误检测和分类
+
+```python
+# 错误分析器
+class TraceErrorAnalyzer:
+    def __init__(self):
+        self.error_categories = {
+            "network_errors": ["timeout", "connection_failed", "rate_limited"],
+            "api_errors": ["invalid_request", "authentication_failed", "quota_exceeded"],
+            "tool_errors": ["tool_not_found", "tool_execution_failed", "invalid_parameters"],
+            "system_errors": ["memory_exhausted", "disk_full", "permission_denied"]
+        }
+    
+    def analyze_errors(self, trace):
+        """分析链路中的错误"""
+        errors = []
+        
+        for span in trace.spans:
+            if span.status == "error":
+                error_info = {
+                    "span_id": span.id,
+                    "operation": span.operation_name,
+                    "error_type": self.categorize_error(span),
+                    "error_message": self.extract_error_message(span),
+                    "timestamp": span.end_time,
+                    "retry_count": span.attributes.get("retry_count", 0)
+                }
+                errors.append(error_info)
+        
+        # 统计错误类型
+        error_summary = self.summarize_errors(errors)
+        
+        return {
+            "trace_id": trace.id,
+            "total_errors": len(errors),
+            "error_details": errors,
+            "error_summary": error_summary,
+            "error_rate": len(errors) / len(trace.spans) if trace.spans else 0
+        }
+    
+    def categorize_error(self, span):
+        """分类错误类型"""
+        error_message = self.extract_error_message(span)
+        
+        for category, error_types in self.error_categories.items():
+            for error_type in error_types:
+                if error_type.lower() in error_message.lower():
+                    return category
+        
+        return "unknown_error"
+```
+
+### 链路比较
+
+#### 执行对比
+
+```python
+# 链路比较器
+class TraceComparator:
+    def compare_traces(self, trace_ids):
+        """比较多个链路的执行情况"""
+        traces = [self.get_trace(trace_id) for trace_id in trace_ids]
+        
+        comparison = {
+            "traces": [
+                {
+                    "trace_id": trace.id,
+                    "duration": trace.total_duration,
+                    "success_rate": self.calculate_success_rate(trace),
+                    "token_usage": self.calculate_token_usage(trace),
+                    "tool_calls": self.count_tool_calls(trace)
+                }
+                for trace in traces
+            ],
+            "performance_comparison": self.compare_performance(traces),
+            "resource_comparison": self.compare_resources(traces),
+            "recommendations": self.generate_comparison_recommendations(traces)
+        }
+        
+        return comparison
+    
+    def compare_performance(self, traces):
+        """比较性能指标"""
+        durations = [trace.total_duration for trace in traces]
+        
+        return {
+            "fastest": min(durations),
+            "slowest": max(durations),
+            "average": sum(durations) / len(durations),
+            "median": sorted(durations)[len(durations) // 2],
+            "std_deviation": self.calculate_std_deviation(durations)
+        }
+```
+
+## 链路配置
+
+### 追踪配置
+
+```python
+# 链路追踪配置
+tracing_config = {
+    "enabled": True,
+    "sampling_rate": 1.0,  # 100% 采样率，生产环境可能需要降低
+    "service_name": "agentos",
+    "exporters": [
+        {
+            "type": "jaeger",
+            "endpoint": "http://jaeger:14268/api/traces",
+            "timeout": "5s"
+        },
+        {
+            "type": "prometheus",
+            "endpoint": "http://prometheus:9090/metrics"
+        }
+    ],
+    "spans": {
+        "include_system_spans": True,
+        "include_tool_spans": True,
+        "include_llm_spans": True,
+        "max_spans_per_trace": 1000
+    },
+    "storage": {
+        "retention_days": 30,
+        "max_traces_per_user": 10000,
+        "compression": True
+    }
+}
+```
+
+### 智能体追踪配置
+
+```python
+# 智能体追踪配置
+agent_tracing_config = {
+    "auto_instrument": True,
+    "trace_llm_calls": True,
+    "trace_tool_usage": True,
+    "trace_memory_operations": True,
+    "trace_knowledge_search": True,
+    "custom_attributes": {
+        "agent_version": "1.0.0",
+        "environment": "production",
+        "team_id": "ai_research"
+    }
+}
+```
+
+## 链路 API
+
+### 获取链路
+
+```python
+# 获取链路 API
+async def get_trace(trace_id):
+    """获取特定链路的详细信息"""
+    trace = await trace_store.get_trace(trace_id)
+    
+    if not trace:
+        return {"error": "链路不存在"}
+    
+    return {
+        "trace_id": trace.id,
+        "trace_state": trace.state,
+        "duration_ms": trace.duration_ms,
+        "start_time": trace.start_time.isoformat(),
+        "end_time": trace.end_time.isoformat(),
+        "spans": [
+            {
+                "span_id": span.id,
+                "parent_span_id": span.parent_span_id,
+                "operation_name": span.operation_name,
+                "start_time": span.start_time.isoformat(),
+                "end_time": span.end_time.isoformat(),
+                "duration_ms": span.duration_ms,
+                "status": span.status,
+                "attributes": span.attributes,
+                "events": span.events,
+                "logs": span.logs
+            }
+            for span in trace.spans
+        ],
+        "metrics": trace.metrics
+    }
+```
+
+### 搜索链路
+
+```python
+# 搜索链路 API
+async def search_traces(filters=None):
+    """搜索符合条件的链路"""
+    search_params = {
+        "filters": filters or {},
+        "limit": 100,
+        "sort_by": "start_time",
+        "order": "desc"
+    }
+    
+    traces = await trace_store.search_traces(search_params)
+    
+    return {
+        "traces": [
+            {
+                "trace_id": trace.id,
+                "duration_ms": trace.duration_ms,
+                "span_count": len(trace.spans),
+                "status": trace.state,
+                "start_time": trace.start_time.isoformat(),
+                "agent_id": trace.agent_id,
+                "user_id": trace.user_id
+            }
+            for trace in traces
+        ],
+        "total_count": len(traces),
+        "filters_applied": filters
+    }
+```
+
+## 监控和告警
+
+### 实时监控
+
+```python
+# 链路监控器
+class TraceMonitor:
+    def __init__(self):
+        self.alert_thresholds = {
+            "max_duration": 30000,  # 30 秒
+            "max_error_rate": 0.1,   # 10% 错误率
+            "max_span_duration": 5000  # 5 秒单个 span
+        }
+    
+    async def monitor_trace(self, trace_id):
+        """监控链路执行"""
+        trace = await trace_store.get_trace(trace_id)
+        
+        if not trace:
+            return
+        
+        alerts = []
+        
+        # 检查执行时间
+        if trace.duration_ms > self.alert_thresholds["max_duration"]:
+            alerts.append({
+                "type": "performance",
+                "message": f"链路执行时间过长: {trace.duration_ms}ms",
+                "severity": "warning"
+            })
+        
+        # 检查错误率
+        error_rate = self.calculate_error_rate(trace)
+        if error_rate > self.alert_thresholds["max_error_rate"]:
+            alerts.append({
+                "type": "error_rate",
+                "message": f"错误率过高: {error_rate:.2%}",
+                "severity": "critical"
+            })
+        
+        # 检查 span 持续时间
+        for span in trace.spans:
+            if span.duration_ms > self.alert_thresholds["max_span_duration"]:
+                alerts.append({
+                    "type": "span_duration",
+                    "message": f"Span 执行时间过长: {span.operation_name} - {span.duration_ms}ms",
+                    "severity": "warning",
+                    "span_id": span.id
+                })
+        
+        if alerts:
+            await self.send_alerts(trace_id, alerts)
+    
+    async def send_alerts(self, trace_id, alerts):
+        """发送告警通知"""
+        for alert in alerts:
+            await self.notification_service.send({
+                "trace_id": trace_id,
+                "alert_type": alert["type"],
+                "message": alert["message"],
+                "severity": alert["severity"],
+                "timestamp": datetime.now().isoformat()
+            })
+```
+
+## 最佳实践
+
+### 1. 链路设计
+
+- **合理的 span 粒度**: 每个 span 应该代表一个逻辑操作
+- **有意义的命名**: 使用清晰的 operation 名称
+- **适当的属性**: 添加相关上下文信息
+- **错误处理**: 正确记录错误信息和状态
+
+### 2. 性能优化
+
+- **采样策略**: 在高负载环境中使用采样
+- **异步处理**: 避免阻塞主要执行流程
+- **批量导出**: 批量处理链路数据
+- **压缩存储**: 压缩历史链路数据
+
+### 3. 错误处理
+
+- **结构化错误**: 使用标准的错误格式
+- **重试机制**: 记录重试次数和结果
+- **上下文保留**: 保留足够的错误上下文
+- **恢复策略**: 实现自动恢复机制
+
+### 4. 数据分析
+
+- **趋势分析**: 分析性能趋势和模式
+- **异常检测**: 识别异常行为模式
+- **容量规划**: 基于链路数据进行容量规划
+- **成本优化**: 优化资源使用和成本
+
+## 故障排除
+
+### 常见问题
+
+#### 链路数据缺失
+
+**问题**: 链路数据不完整或丢失
+**解决方案**:
+1. 检查追踪配置是否正确
+2. 验证导出器连接状态
+3. 查看存储空间是否充足
+4. 检查网络连接稳定性
+
+#### 性能影响
+
+**问题**: 链路追踪影响系统性能
+**解决方案**:
+1. 降低采样率
+2. 优化 span 数量
+3. 使用异步处理
+4. 实施本地缓存
+
+#### 搜索结果不准确
+
+**问题**: 链路搜索结果不相关
+**解决方案**:
+1. 优化搜索索引
+2. 改进过滤条件
+3. 调整排序权重
+4. 检查数据一致性
+
+### 调试工具
+
+```python
+# 链路调试工具
+async def debug_tracing_system():
+    """调试链路追踪系统"""
+    # 检查追踪配置
+    config = await get_tracing_config()
+    print(f"追踪配置: {config}")
+    
+    # 检查导出器状态
+    exporter_status = await check_exporter_health()
+    print(f"导出器状态: {exporter_status}")
+    
+    # 测试链路创建
+    test_trace = await create_test_trace()
+    print(f"测试链路: {test_trace}")
+
+asyncio.run(debug_tracing_system())
+```
+
+## 下一步
+
+- 了解[记忆功能](/agent-os/features/memories)
+- 查看[会话跟踪](/agent-os/features/session-tracking)
+- 探索[聊天界面](/agent-os/features/chat-interface)
+- 了解[知识管理](/agent-os/features/knowledge-management)

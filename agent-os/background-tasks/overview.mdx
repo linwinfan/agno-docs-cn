@@ -1,0 +1,627 @@
+---
+title: 后台钩子
+sidebarTitle: 后台钩子
+description: 在 AgentOS 中将智能体钩子作为非阻塞后台任务运行
+keywords: [后台任务, 钩子, 前置钩子, 后置钩子, 异步, 非阻塞, AgentOS, 团队, 工作流]
+---
+
+通过 AgentOS 提供智能体或团队时，您可以配置前置钩子和后置钩子作为后台任务运行。这意味着 API 响应会立即返回给用户，而钩子继续在后台执行。
+
+## 为什么使用后台钩子？
+
+默认情况下，AgentOS 中智能体和团队使用的钩子在执行路径中并阻塞响应：
+
+<img 
+  className="block dark:hidden" 
+  src="/images/background-tasks-notenabled-light.png" 
+  alt="未启用后台任务"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/background-tasks-notenabled-dark.png" 
+  alt="未启用后台任务"
+/>
+
+启用后台钩子后，您的钩子不会阻塞响应，提高响应速度：
+
+<img 
+  className="block dark:hidden" 
+  src="/images/background-tasks-enabled-light.png" 
+  alt="已启用后台任务"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/background-tasks-enabled-dark.png" 
+  alt="已启用后台任务"
+/>
+
+这对于以下场景很有用：
+
+- **智能体评估**: 评估智能体的响应而不影响响应本身
+- **分析和日志记录**: 跟踪使用模式而不影响响应时间
+- **通知**: 发送电子邮件、Slack 消息或 Webhook 调用
+- **外部 API 调用**: 与第三方服务同步数据
+- **非关键数据处理**: 不影响响应的任务
+
+## 启用后台任务
+
+### 在 AgentOS 配置中启用
+
+```python
+from agno.os import AgentOS, AgentOSConfig
+
+# 启用后台任务的配置
+config = AgentOSConfig(
+    background_tasks={
+        "enabled": True,
+        "max_workers": 10,  # 最大工作线程数
+        "queue_size": 100   # 队列大小
+    }
+)
+
+agent_os = AgentOS(config=config)
+```
+
+### 为智能体启用后台钩子
+
+```python
+from agno.agent import Agent
+from agno.hooks import Hook
+
+# 创建后台钩子
+class AnalyticsHook(Hook):
+    async def post_run(self, agent, response):
+        """后置钩子：记录分析数据"""
+        await self.log_analytics(agent, response)
+    
+    async def log_analytics(self, agent, response):
+        """记录分析数据到数据库"""
+        # 这里可以记录到数据库、发送到分析服务等
+        print(f"记录智能体 {agent.name} 的响应分析")
+
+# 创建带后台钩子的智能体
+agent = Agent(
+    name="分析助手",
+    instructions="帮助用户进行数据分析",
+    hooks=[AnalyticsHook()],
+    background_hooks=True  # 启用后台钩子
+)
+```
+
+### 为团队启用后台钩子
+
+```python
+from agno.team import Team
+
+# 创建团队后台钩子
+class TeamAnalyticsHook(Hook):
+    async def post_run(self, team, response):
+        """团队后置钩子"""
+        await self.log_team_performance(team, response)
+    
+    async def log_team_performance(self, team, response):
+        """记录团队性能数据"""
+        print(f"记录团队 {team.name} 的性能指标")
+
+# 创建带后台钩子的团队
+team = Team(
+    name="客服团队",
+    agents=[agent1, agent2],
+    hooks=[TeamAnalyticsHook()],
+    background_hooks=True
+)
+```
+
+## 钩子类型
+
+### 前置钩子 (Pre-hooks)
+
+在智能体执行之前运行的钩子：
+
+```python
+class PreProcessingHook(Hook):
+    async def pre_run(self, agent, input_data):
+        """前置处理钩子"""
+        # 验证输入
+        await self.validate_input(input_data)
+        
+        # 记录请求
+        await self.log_request(agent, input_data)
+    
+    async def validate_input(self, input_data):
+        """验证输入数据"""
+        # 实现输入验证逻辑
+        pass
+    
+    async def log_request(self, agent, input_data):
+        """记录请求日志"""
+        print(f"记录智能体 {agent.name} 的请求")
+
+# 使用前置钩子
+agent = Agent(
+    name="验证助手",
+    instructions="处理用户请求",
+    hooks=[PreProcessingHook()],
+    background_hooks=True
+)
+```
+
+### 后置钩子 (Post-hooks)
+
+在智能体执行之后运行的钩子：
+
+```python
+class PostProcessingHook(Hook):
+    async def post_run(self, agent, response):
+        """后置处理钩子"""
+        # 保存响应
+        await self.save_response(agent, response)
+        
+        # 发送通知
+        await self.send_notification(agent, response)
+        
+        # 更新统计
+        await self.update_metrics(agent, response)
+    
+    async def save_response(self, agent, response):
+        """保存响应到数据库"""
+        print(f"保存智能体 {agent.name} 的响应")
+    
+    async def send_notification(self, agent, response):
+        """发送通知"""
+        # 发送邮件、Slack 消息等
+        print(f"发送智能体 {agent.name} 的通知")
+    
+    async def update_metrics(self, agent, response):
+        """更新性能指标"""
+        print(f"更新智能体 {agent.name} 的指标")
+
+# 使用后置钩子
+agent = Agent(
+    name="通知助手",
+    instructions="处理用户请求并发送通知",
+    hooks=[PostProcessingHook()],
+    background_hooks=True
+)
+```
+
+## 高级用法
+
+### 条件性后台执行
+
+根据条件决定是否在后台执行：
+
+```python
+class ConditionalHook(Hook):
+    async def post_run(self, agent, response):
+        """条件性后置钩子"""
+        if self.should_run_in_background(response):
+            await self.background_task(agent, response)
+        else:
+            await self.sync_task(agent, response)
+    
+    def should_run_in_background(self, response):
+        """判断是否应该在后台运行"""
+        # 根据响应内容、大小或其他条件决定
+        return len(response.content) > 1000
+    
+    async def background_task(self, agent, response):
+        """后台任务"""
+        print("执行后台任务")
+    
+    async def sync_task(self, agent, response):
+        """同步任务"""
+        print("执行同步任务")
+
+agent = Agent(
+    name="条件助手",
+    instructions="根据条件处理任务",
+    hooks=[ConditionalHook()],
+    background_hooks=True
+)
+```
+
+### 错误处理
+
+处理后台钩子中的错误：
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+class RobustHook(Hook):
+    async def post_run(self, agent, response):
+        """健壮的后置钩子"""
+        try:
+            await self.process_response(agent, response)
+        except Exception as e:
+            await self.handle_error(agent, response, e)
+    
+    async def process_response(self, agent, response):
+        """处理响应"""
+        # 可能出错的处理逻辑
+        raise ValueError("模拟错误")
+    
+    async def handle_error(self, agent, response, error):
+        """处理错误"""
+        logger.error(f"钩子执行失败: {error}")
+        
+        # 发送错误通知
+        await self.send_error_notification(agent, error)
+        
+        # 记录错误到监控系统
+        await self.log_error_to_monitoring(agent, error)
+    
+    async def send_error_notification(self, agent, error):
+        """发送错误通知"""
+        print(f"发送错误通知: {error}")
+    
+    async def log_error_to_monitoring(self, agent, error):
+        """记录错误到监控系统"""
+        print(f"记录错误到监控: {error}")
+
+agent = Agent(
+    name="健壮助手",
+    instructions="处理错误情况",
+    hooks=[RobustHook()],
+    background_hooks=True
+)
+```
+
+### 批量处理
+
+批量处理多个任务：
+
+```python
+import asyncio
+from typing import List
+
+class BatchProcessingHook(Hook):
+    def __init__(self, batch_size=10, flush_interval=30):
+        super().__init__()
+        self.batch_size = batch_size
+        self.flush_interval = flush_interval
+        self.batch_queue = []
+        self.last_flush = asyncio.get_event_loop().time()
+    
+    async def post_run(self, agent, response):
+        """批量处理钩子"""
+        # 添加到批处理队列
+        self.batch_queue.append({
+            "agent": agent.name,
+            "response": response.content,
+            "timestamp": asyncio.get_event_loop().time()
+        })
+        
+        # 检查是否需要刷新
+        await self.check_and_flush()
+    
+    async def check_and_flush(self):
+        """检查并刷新批处理"""
+        current_time = asyncio.get_event_loop().time()
+        
+        should_flush = (
+            len(self.batch_queue) >= self.batch_size or
+            current_time - self.last_flush >= self.flush_interval
+        )
+        
+        if should_flush:
+            await self.flush_batch()
+    
+    async def flush_batch(self):
+        """刷新批处理"""
+        if not self.batch_queue:
+            return
+        
+        # 复制并清空队列
+        batch = self.batch_queue.copy()
+        self.batch_queue.clear()
+        self.last_flush = asyncio.get_event_loop().time()
+        
+        # 处理批次
+        await self.process_batch(batch)
+    
+    async def process_batch(self, batch: List[dict]):
+        """处理批次数据"""
+        print(f"处理批次: {len(batch)} 个项目")
+        
+        # 批量插入数据库
+        await self.batch_insert_to_database(batch)
+        
+        # 批量发送分析
+        await self.batch_send_analytics(batch)
+    
+    async def batch_insert_to_database(self, batch: List[dict]):
+        """批量插入数据库"""
+        print(f"批量插入 {len(batch)} 条记录到数据库")
+    
+    async def batch_send_analytics(self, batch: List[dict]):
+        """批量发送分析数据"""
+        print(f"批量发送 {len(batch)} 条分析数据")
+
+agent = Agent(
+    name="批处理助手",
+    instructions="批量处理数据",
+    hooks=[BatchProcessingHook()],
+    background_hooks=True
+)
+```
+
+## 监控和调试
+
+### 后台任务监控
+
+监控后台任务的执行状态：
+
+```python
+import asyncio
+from datetime import datetime
+
+class TaskMonitor:
+    def __init__(self):
+        self.active_tasks = set()
+        self.completed_tasks = []
+        self.failed_tasks = []
+    
+    def track_task(self, task_id: str):
+        """跟踪任务"""
+        self.active_tasks.add(task_id)
+    
+    def complete_task(self, task_id: str):
+        """完成任务"""
+        self.active_tasks.discard(task_id)
+        self.completed_tasks.append({
+            "task_id": task_id,
+            "completed_at": datetime.now()
+        })
+    
+    def fail_task(self, task_id: str, error: Exception):
+        """任务失败"""
+        self.active_tasks.discard(task_id)
+        self.failed_tasks.append({
+            "task_id": task_id,
+            "failed_at": datetime.now(),
+            "error": str(error)
+        })
+    
+    def get_stats(self):
+        """获取统计信息"""
+        return {
+            "active_tasks": len(self.active_tasks),
+            "completed_tasks": len(self.completed_tasks),
+            "failed_tasks": len(self.failed_tasks)
+        }
+
+# 全局任务监控器
+task_monitor = TaskMonitor()
+
+class MonitoredHook(Hook):
+    async def post_run(self, agent, response):
+        """带监控的后置钩子"""
+        task_id = f"{agent.name}_{datetime.now().timestamp()}"
+        task_monitor.track_task(task_id)
+        
+        try:
+            await self.process_with_monitoring(agent, response)
+            task_monitor.complete_task(task_id)
+        except Exception as e:
+            task_monitor.fail_task(task_id, e)
+            raise
+    
+    async def process_with_monitoring(self, agent, response):
+        """带监控的处理"""
+        print(f"处理智能体 {agent.name} 的响应")
+
+agent = Agent(
+    name="监控助手",
+    instructions="带监控的处理",
+    hooks=[MonitoredHook()],
+    background_hooks=True
+)
+```
+
+### 调试后台任务
+
+调试后台任务的执行：
+
+```python
+import logging
+
+# 配置详细日志
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+logger = logging.getLogger(__name__)
+
+class DebugHook(Hook):
+    async def post_run(self, agent, response):
+        """调试钩子"""
+        logger.debug(f"开始执行后台钩子: {agent.name}")
+        
+        start_time = asyncio.get_event_loop().time()
+        
+        try:
+            await self.debug_process(agent, response)
+            
+            duration = asyncio.get_event_loop().time() - start_time
+            logger.debug(f"后台钩子执行完成: {agent.name}, 耗时: {duration:.2f}s")
+            
+        except Exception as e:
+            duration = asyncio.get_event_loop().time() - start_time
+            logger.error(f"后台钩子执行失败: {agent.name}, 耗时: {duration:.2f}s, 错误: {e}")
+            raise
+    
+    async def debug_process(self, agent, response):
+        """调试处理"""
+        logger.debug(f"处理响应内容: {response.content[:100]}...")
+        
+        # 模拟处理时间
+        await asyncio.sleep(1)
+        
+        logger.debug("处理完成")
+
+agent = Agent(
+    name="调试助手",
+    instructions="调试后台任务",
+    hooks=[DebugHook()],
+    background_hooks=True
+)
+```
+
+## 最佳实践
+
+### 1. 合理设置队列大小
+
+根据系统资源设置合适的队列大小：
+
+```python
+# 根据系统资源调整配置
+import psutil
+
+def get_optimal_config():
+    cpu_count = psutil.cpu_count()
+    memory_gb = psutil.virtual_memory().total / (1024**3)
+    
+    # 基于系统资源计算最优配置
+    max_workers = min(cpu_count * 2, 20)
+    queue_size = int(memory_gb * 100)  # 每 GB 内存 100 个队列项
+    
+    return {
+        "max_workers": max_workers,
+        "queue_size": queue_size
+    }
+
+config = AgentOSConfig(
+    background_tasks=get_optimal_config()
+)
+```
+
+### 2. 优雅关闭
+
+确保后台任务在应用关闭时正确完成：
+
+```python
+import signal
+import asyncio
+
+class GracefulShutdown:
+    def __init__(self):
+        self.shutdown_event = asyncio.Event()
+        
+    async def wait_for_shutdown(self):
+        """等待关闭信号"""
+        await self.shutdown_event.wait()
+        
+        # 等待后台任务完成
+        print("等待后台任务完成...")
+        await asyncio.sleep(5)  # 给后台任务时间完成
+        
+        print("优雅关闭完成")
+
+graceful_shutdown = GracefulShutdown()
+
+def signal_handler(signum, frame):
+    """信号处理器"""
+    print(f"收到信号 {signum}，开始优雅关闭...")
+    graceful_shutdown.shutdown_event.set()
+
+# 注册信号处理器
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+```
+
+### 3. 资源限制
+
+限制后台任务的资源使用：
+
+```python
+import asyncio
+import resource
+
+class ResourceLimitedHook(Hook):
+    def __init__(self, max_memory_mb=100, max_cpu_time=10):
+        super().__init__()
+        self.max_memory_mb = max_memory_mb
+        self.max_cpu_time = max_cpu_time
+    
+    async def post_run(self, agent, response):
+        """资源限制的后置钩子"""
+        # 设置内存限制
+        resource.setrlimit(
+            resource.RLIMIT_AS,
+            (self.max_memory_mb * 1024 * 1024, -1)
+        )
+        
+        # 设置 CPU 时间限制
+        try:
+            await asyncio.wait_for(
+                self.process_with_limits(agent, response),
+                timeout=self.max_cpu_time
+            )
+        except asyncio.TimeoutError:
+            logger.warning(f"后台任务超时: {agent.name}")
+    
+    async def process_with_limits(self, agent, response):
+        """带限制的处理"""
+        # 实际的处理逻辑
+        await asyncio.sleep(2)  # 模拟处理
+
+agent = Agent(
+    name="资源限制助手",
+    instructions="资源限制的处理",
+    hooks=[ResourceLimitedHook()],
+    background_hooks=True
+)
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 1. 后台任务积压
+
+```python
+# 监控队列积压
+def check_queue_backlog(agent_os):
+    """检查队列积压"""
+    queue_size = agent_os.background_queue.qsize()
+    max_size = agent_os.config.background_tasks["queue_size"]
+    
+    if queue_size > max_size * 0.8:  # 80% 阈值
+        logger.warning(f"后台任务队列积压: {queue_size}/{max_size}")
+        
+        # 增加工作线程
+        agent_os.increase_background_workers()
+```
+
+#### 2. 内存泄漏
+
+```python
+import gc
+import tracemalloc
+
+class MemoryMonitorHook(Hook):
+    async def post_run(self, agent, response):
+        """内存监控钩子"""
+        # 检查内存使用
+        if tracemalloc.is_tracing():
+            current, peak = tracemalloc.get_traced_memory()
+            logger.debug(f"内存使用: 当前={current/1024/1024:.2f}MB, 峰值={peak/1024/1024:.2f}MB")
+            
+            # 如果内存使用过高，强制垃圾回收
+            if peak > 100 * 1024 * 1024:  # 100MB
+                gc.collect()
+                logger.info("执行垃圾回收")
+```
+
+## 下一步
+
+- 了解[AgentOS 配置](/agent-os/config)
+- 查看[中间件](/agent-os/middleware)功能
+- 探索[安全功能](/agent-os/security)
+- 查看[API 参考](/reference-api/overview)

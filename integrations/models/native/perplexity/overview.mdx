@@ -1,0 +1,58 @@
+---
+title: Perplexity
+sidebarTitle: 概览
+description: Learn how to use Perplexity with Agno.
+---
+
+Perplexity offers powerful language 模型s with built-in web search 功能, enabling advanced research and Q&A functionality.
+
+Explore Perplexity’s 模型s [here](https://docs.perplexity.ai/guides/模型-cards).
+
+## Authentication
+
+Set your `PERPLEXITY_API_KEY` environment variable. Get your key [from Perplexity here](https://www.perplexity.ai/settings/api).
+
+<CodeGroup>
+
+```bash Mac
+export PERPLEXITY_API_KEY=***
+```
+
+```bash Windows
+setx PERPLEXITY_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Perplexity` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.perplexity import Perplexity
+
+agent = Agent(model=Perplexity(id="sonar-pro"), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/perplexity/usage/basic). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"llama-3.1-sonar-small-128k-online"` | The id of the Perplexity 模型 to use                          |
+| `name`       | `str`              | `"Perplexity"`                | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Perplexity"`                | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for Perplexity (defaults to PERPLEXITY_API_KEY env var)  |
+| `base_url`   | `str`              | `"https://api.perplexity.ai"` | The base URL for the Perplexity API                                   |
+
+`Perplexity` also 支持 the params of [OpenAI](/reference/models/openai).

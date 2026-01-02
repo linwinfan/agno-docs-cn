@@ -1,0 +1,171 @@
+---
+title: 团队事件监控
+sidebarTitle: 事件流式传输
+description: 这个示例演示了如何在团队执行过程中监控和处理不同类型的事件，包括工具调用、运行状态和内容生成事件。
+---
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch stream_events.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python stream_events.py
+    import asyncio
+    from uuid import uuid4
+
+    from agno.agent import RunEvent
+    from agno.agent.agent import Agent
+    from agno.models.anthropic.claude import Claude
+
+    from agno.models.openai import OpenAIChat
+    from agno.team import Team, TeamRunEvent
+    from agno.tools.duckduckgo import DuckDuckGoTools
+    from agno.tools.hackernews import HackerNewsTools
+
+    hacker_news_agent = Agent(
+        id="hacker-news-agent",
+        name="Hacker News 智能体",
+        role="在 Hacker News 中搜索信息",
+        tools=[HackerNewsTools()],
+        instructions=[
+            "在 Hacker News 中查找关于公司的文章",
+        ],
+    )
+
+    website_agent = Agent(
+        id="website-agent",
+        name="网站智能体",
+        role="在网站上搜索信息",
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[DuckDuckGoTools()],
+        instructions=[
+            "在网站上搜索信息",
+        ],
+    )
+
+    user_id = str(uuid4())
+    id = str(uuid4())
+
+    company_info_team = Team(
+        name="公司信息团队",
+        id=id,
+        user_id=user_id,
+        model=Claude(id="claude-3-7-sonnet-latest"),
+        members=[
+            wikipedia_agent,
+            website_agent,
+        ],
+        markdown=True,
+        instructions=[
+            "您是一个查找公司信息的团队.",
+            "首先在网上和维基百科搜索关于公司的信息.",
+            "如果您能找到公司的网站 URL，则抓取主页和关于页面.",
+        ],
+        show_members_responses=True,
+    )
+
+
+    async def run_team_with_events(prompt: str):
+        content_started = False
+        async for run_output_event in company_info_team.arun(
+            prompt,
+            stream=True,
+            stream_events=True,
+        ):
+            if run_output_event.event in [
+                TeamRunEvent.run_started,
+                TeamRunEvent.run_completed,
+            ]:
+                print(f"\n🎯 团队事件： {run_output_event.event}")
+
+            if run_output_event.event in [TeamRunEvent.tool_call_started]:
+                print(f"\n🔧 团队工具调用开始： {run_output_event.tool.tool_name}")
+                print(f"   参数： {run_output_event.tool.tool_args}")
+
+            if run_output_event.event in [TeamRunEvent.tool_call_completed]:
+                print(f"\n✅ 团队工具调用完成： {run_output_event.tool.tool_name}")
+                print(f"   结果： {run_output_event.tool.result}")
+
+            # 成员事件
+            if run_output_event.event in [RunEvent.tool_call_started]:
+                print(f"\n🤖 成员工具调用开始： {run_output_event.agent_id}")
+                print(f"   工具： {run_output_event.tool.tool_name}")
+                print(f"   参数： {run_output_event.tool.tool_args}")
+
+            if run_output_event.event in [RunEvent.tool_call_completed]:
+                print(f"\n✅ 成员工具调用完成： {run_output_event.agent_id}")
+                print(f"   工具： {run_output_event.tool.tool_name}")
+                print(f"   结果： {run_output_event.tool.result[:100]}...")  # 为可读性截断
+
+            if run_output_event.event in [TeamRunEvent.run_content]:
+                if not content_started:
+                    print("\n📝 内容：")
+                    content_started = True
+                else:
+                    print(run_output_event.content, end="")
+
+
+    if __name__ == "__main__":
+        asyncio.run(
+            run_team_with_events(
+                "请撰写一份关于 Agno 的完整报告，该公司正在构建 AI 智能体基础设施.",
+            )
+        )
+    ```
+
+
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno anthropic openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置您的 API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+$Env:ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python stream_events.py
+    ```
+    
+    ```bash Windows
+    python stream_events.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/streaming" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+
+
+
+

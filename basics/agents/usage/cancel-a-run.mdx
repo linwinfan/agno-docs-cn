@@ -1,0 +1,244 @@
+---
+title: 取消智能体运行
+---
+
+此示例演示如何使用多线程取消正在运行的智能体执行，展示如何启动一个长时间运行的任务并从另一个线程取消它。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch cancel_a_run.py
+    ```
+  </Step>
+
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+    ```python cancel_a_run.py
+    """
+    演示如何取消正在运行的智能体执行的示例。
+
+    此示例展示了如何：
+    1. 在单独的线程中启动智能体运行
+    2. 从另一个线程取消运行
+    3. 处理已取消的响应
+    """
+
+    import threading
+    import time
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.run.agent import RunEvent
+    from agno.run.base import RunStatus
+
+
+    def long_running_task(agent: Agent, run_id_container: dict):
+        """
+        模拟一个可以被取消的长时间运行的智能体任务。
+
+        参数：
+            agent: 要运行的智能体
+            run_id_container: 用于存储run_id以进行取消操作的字典
+
+        返回：
+            包含运行结果和状态的字典
+        """
+        try:
+            # 启动智能体运行 - 这模拟了一个长时间任务
+            final_response = None
+            content_pieces = []
+
+            for chunk in agent.run(
+                "写一个关于龙学习编程的很长的故事。"
+                "至少2000字，包含详细的描述和对话。"
+                "慢慢来，要非常详尽。",
+                stream=True,
+            ):
+                if "run_id" not in run_id_container and chunk.run_id:
+                    run_id_container["run_id"] = chunk.run_id
+
+                if chunk.event == RunEvent.run_content:
+                    print(chunk.content, end="", flush=True)
+                    content_pieces.append(chunk.content)
+                # When the run is cancelled, a `RunEvent.run_cancelled` event is emitted
+                elif chunk.event == RunEvent.run_cancelled:
+                    print(f"\n🚫 Run was cancelled: {chunk.run_id}")
+                    run_id_container["result"] = {
+                        "status": "cancelled",
+                        "run_id": chunk.run_id,
+                        "cancelled": True,
+                        "content": "".join(content_pieces)[:200] + "..."
+                        if content_pieces
+                        else "No content before cancellation",
+                    }
+                    return
+                elif hasattr(chunk, "status") and chunk.status == RunStatus.completed:
+                    final_response = chunk
+
+            # If we get here, the run completed successfully
+            if final_response:
+                run_id_container["result"] = {
+                    "status": final_response.status.value
+                    if final_response.status
+                    else "completed",
+                    "run_id": final_response.run_id,
+                    "cancelled": final_response.status == RunStatus.cancelled,
+                    "content": ("".join(content_pieces)[:200] + "...")
+                    if content_pieces
+                    else "No content",
+                }
+            else:
+                run_id_container["result"] = {
+                    "status": "unknown",
+                    "run_id": run_id_container.get("run_id"),
+                    "cancelled": False,
+                    "content": ("".join(content_pieces)[:200] + "...")
+                    if content_pieces
+                    else "No content",
+                }
+
+        except Exception as e:
+            print(f"\n❌ Exception in run: {str(e)}")
+            run_id_container["result"] = {
+                "status": "error",
+                "error": str(e),
+                "run_id": run_id_container.get("run_id"),
+                "cancelled": True,
+                "content": "Error occurred",
+            }
+
+
+    def cancel_after_delay(agent: Agent, run_id_container: dict, delay_seconds: int = 3):
+        """
+        在指定延迟后取消智能体运行。
+
+        参数：
+            agent: 应该被取消运行的智能体
+            run_id_container: 包含要取消的run_id的字典
+            delay_seconds: 取消前等待的时间（秒）
+        """
+        print(f"⏰ 将在 {delay_seconds} 秒后取消运行...")
+        time.sleep(delay_seconds)
+
+        run_id = run_id_container.get("run_id")
+        if run_id:
+            print(f"🚫 正在取消运行：{run_id}")
+            success = agent.cancel_run(run_id)
+            if success:
+                print(f"✅ 运行 {run_id} 已标记为取消")
+            else:
+                print(
+                    f"❌ 取消运行 {run_id} 失败（可能不存在或已完成）"
+                )
+        else:
+            print("⚠️  未找到要取消的 run_id")
+
+
+    def main():
+        """演示运行取消的主函数。"""
+
+        # 使用模型初始化智能体
+        agent = Agent(
+            name="StorytellerAgent",
+            model=OpenAIChat(id="gpt-5-mini"),  # 使用能够生成长响应的模型
+            description="一个编写详细故事的智能体",
+        )
+
+        print("🚀 开始智能体运行取消示例...")
+        print("=" * 50)
+
+        # 用于在线程间共享run_id的容器
+        run_id_container = {}
+
+        # 在单独的线程中启动智能体运行
+        agent_thread = threading.Thread(
+            target=lambda: long_running_task(agent, run_id_container), name="AgentRunThread"
+        )
+
+        # 启动取消线程
+        cancel_thread = threading.Thread(
+            target=cancel_after_delay,
+            args=(agent, run_id_container, 8),  # 8秒后取消
+            name="CancelThread",
+        )
+
+        # 启动两个线程
+        print("🏃 启动智能体运行线程...")
+        agent_thread.start()
+
+        print("🏃 启动取消线程...")
+        cancel_thread.start()
+
+        # 等待两个线程完成
+        print("⌛ 等待线程完成...")
+        agent_thread.join()
+        cancel_thread.join()
+
+        # 打印结果
+        print("\n" + "=" * 50)
+        print("📊 结果：")
+        print("=" * 50)
+
+        result = run_id_container.get("result")
+        if result:
+            print(f"状态: {result['status']}")
+            print(f"运行ID: {result['run_id']}")
+            print(f"是否已取消: {result['cancelled']}")
+
+            if result.get("error"):
+                print(f"错误: {result['error']}")
+            else:
+                print(f"内容预览: {result['content']}")
+
+            if result["cancelled"]:
+                print("\n✅ 成功：运行已成功取消！")
+            else:
+                print("\n⚠️  警告：运行在取消前已完成")
+        else:
+            print("❌ 未获得结果 - 检查取消是否在流式传输期间发生")
+
+        print("\n🏁 示例完成！")
+
+
+    if __name__ == "__main__":
+        # 运行主示例
+        main()
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="导出您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python cancel_a_run.py
+    ```
+
+    ```bash Windows
+    python cancel_a_run.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

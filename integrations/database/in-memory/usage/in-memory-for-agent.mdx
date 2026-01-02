@@ -1,0 +1,27 @@
+---
+title: In-Memory Storage for Agents
+sidebarTitle: Agent
+---
+
+Example using `InMemoryDb` with 智能体.
+
+## 使用方法
+
+```python
+from agno.agent import Agent
+from agno.db.in_memory import InMemoryDb
+
+# Setup in-memory database
+db = InMemoryDb()
+
+# Create agent with database
+agent = Agent(db=db)
+
+# Agent sessions stored in memory
+agent.print_response("Give me an easy dinner recipe")
+```
+
+
+## 开发者资源
+
+- 查看 [Cookbook](https://github.com/agno-agi/agno/blob/main/cookbook/07_数据库/in_记忆/in_记忆_存储_for_智能体.py)

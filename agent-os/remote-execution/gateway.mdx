@@ -1,0 +1,713 @@
+---
+title: "AgentOS 网关"
+sidebarTitle: "网关模式"
+description: "为多个 AgentOS 实例创建统一的 API 网关"
+---
+
+网关模式允许您创建一个单一的 AgentOS 实例，该实例聚合来自多个远程 AgentOS 实例的智能体、团队和工作流。这为您的分布式智能体基础设施提供了统一的 API 端点。
+
+## 使用场景
+
+- **统一 API**: 为跨不同服务器的所有智能体提供单一端点
+- **负载分布**: 将专门的智能体分布到多个服务器
+- **微服务架构**: 每个服务托管自己的智能体
+- **混合部署**: 在一个界面中结合本地和远程智能体
+
+## 基本网关设置
+
+创建一个聚合来自多个服务器的远程智能体的网关：
+
+```python
+from agno.agent import RemoteAgent
+from agno.team import RemoteTeam
+from agno.workflow import RemoteWorkflow
+from agno.os import AgentOS
+
+# 创建网关 AgentOS
+gateway = AgentOS(
+    id="api-gateway",
+    description="分布式智能体的统一 API 网关",
+    agents=[
+        RemoteAgent(base_url="http://server-1:7778", agent_id="assistant-agent"),
+        RemoteAgent(base_url="http://server-2:7778", agent_id="researcher-agent"),
+    ],
+    teams=[
+        RemoteTeam(base_url="http://server-3:7778", team_id="research-team"),
+    ],
+    workflows=[
+        RemoteWorkflow(base_url="http://server-4:7778", workflow_id="qa-workflow"),
+    ],
+)
+
+app = gateway.get_app()
+if __name__ == "__main__":
+    gateway.serve(app="gateway:app", port=7777)
+```
+
+## 结合本地和远程
+
+在同一网关中混合本地智能体和远程智能体：
+
+```python
+from agno.agent import Agent, RemoteAgent
+from agno.models.openai import OpenAIChat
+from agno.os import AgentOS
+
+# 本地智能体
+local_agent = Agent(
+    name="本地助手",
+    id="local-assistant",
+    model=OpenAIChat(id="gpt-4"),
+    instructions="你是一个本地运行的助手智能体。",
+)
+
+# 远程智能体
+remote_agents = [
+    RemoteAgent(base_url="http://research-server:7778", agent_id="research-agent"),
+    RemoteAgent(base_url="http://analytics-server:7778", agent_id="analytics-agent"),
+]
+
+# 创建混合网关
+gateway = AgentOS(
+    id="hybrid-gateway",
+    description="混合本地和远程智能体的网关",
+    agents=[local_agent] + remote_agents,
+)
+
+app = gateway.get_app()
+if __name__ == "__main__":
+    gateway.serve(app="gateway:app", port=7777)
+```
+
+## 高级网关配置
+
+### 1. 负载均衡和故障转移
+
+```python
+from agno.agent import RemoteAgent
+from agno.os import AgentOS
+from agno.os.gateway import LoadBalancer, FailoverStrategy
+
+# 配置负载均衡器
+load_balancer = LoadBalancer(
+    strategy="round_robin",  # 轮询策略
+    health_check_interval=30,  # 健康检查间隔（秒）
+    max_retries=3,  # 最大重试次数
+)
+
+# 配置故障转移策略
+failover = FailoverStrategy(
+    primary_servers=["http://primary-1:7778", "http://primary-2:7778"],
+    backup_servers=["http://backup-1:7778", "http://backup-2:7778"],
+    failover_timeout=5,  # 故障转移超时（秒）
+)
+
+# 创建高可用网关
+gateway = AgentOS(
+    id="ha-gateway",
+    agents=[
+        RemoteAgent(
+            base_url="http://agent-cluster:7778",
+            agent_id="cluster-agent",
+            load_balancer=load_balancer,
+            failover_strategy=failover
+        )
+    ],
+)
+```
+
+### 2. 认证和授权
+
+```python
+from agno.os.middleware import JWTMiddleware, RateLimitMiddleware
+from agno.os import AgentOS
+
+# 网关认证配置
+gateway = AgentOS(
+    id="secure-gateway",
+    agents=[...],  # 远程智能体列表
+    middleware=[
+        JWTMiddleware(
+            secret_key="gateway-secret-key",
+            algorithm="HS256",
+            user_id_header="X-User-ID",
+            exclude_paths=["/health", "/metrics"]
+        ),
+        RateLimitMiddleware(
+            requests_per_minute=100,
+            key_func=lambda request: request.headers.get("X-API-Key")
+        )
+    ],
+)
+```
+
+### 3. 缓存和性能优化
+
+```python
+from agno.os.middleware import CacheMiddleware
+from agno.os.cache import RedisCache
+from agno.os import AgentOS
+
+# Redis 缓存配置
+redis_cache = RedisCache(
+    host="redis-server",
+    port=6379,
+    db=0,
+    ttl=300,  # 缓存过期时间（秒）
+)
+
+# 创建带缓存的网关
+gateway = AgentOS(
+    id="cached-gateway",
+    agents=[...],
+    middleware=[
+        CacheMiddleware(
+            cache=redis_cache,
+            cache_key_func=lambda request: f"{request.method}:{request.url.path}",
+            exclude_methods=["POST", "PUT", "DELETE"]
+        )
+    ],
+)
+```
+
+## 路由和代理
+
+### 1. 智能路由
+
+```python
+from agno.os.gateway import SmartRouter
+from agno.agent import RemoteAgent
+
+class SmartRouter:
+    def __init__(self):
+        self.routes = {}
+        self.agent_capabilities = {}
+    
+    def register_agent(self, agent_id: str, agent: RemoteAgent, capabilities: list):
+        """注册智能体及其能力"""
+        self.routes[agent_id] = agent
+        self.agent_capabilities[agent_id] = capabilities
+    
+    def route_request(self, message: str, user_preferences: dict = None) -> str:
+        """根据消息内容和用户偏好路由请求"""
+        # 分析消息内容
+        message_type = self._analyze_message(message)
+        
+        # 根据能力匹配智能体
+        suitable_agents = [
+            agent_id for agent_id, capabilities in self.agent_capabilities.items()
+            if message_type in capabilities
+        ]
+        
+        if not suitable_agents:
+            return "default-agent"  # 默认智能体
+        
+        # 根据用户偏好选择最佳智能体
+        if user_preferences:
+            preferred_agent = self._select_by_preferences(
+                suitable_agents, 
+                user_preferences
+            )
+            if preferred_agent:
+                return preferred_agent
+        
+        # 负载均衡选择
+        return self._load_balance_select(suitable_agents)
+    
+    def _analyze_message(self, message: str) -> str:
+        """分析消息类型"""
+        message_lower = message.lower()
+        
+        if any(word in message_lower for word in ["研究", "分析", "调查"]):
+            return "research"
+        elif any(word in message_lower for word in ["计算", "数学", "统计"]):
+            return "analytics"
+        elif any(word in message_lower for word in ["创作", "写作", "故事"]):
+            return "creative"
+        else:
+            return "general"
+    
+    def _select_by_preferences(self, agents: list, preferences: dict) -> str:
+        """根据用户偏好选择智能体"""
+        # 实现偏好选择逻辑
+        pass
+    
+    def _load_balance_select(self, agents: list) -> str:
+        """负载均衡选择"""
+        import random
+        return random.choice(agents)
+
+# 使用智能路由器
+router = SmartRouter()
+
+# 注册智能体
+router.register_agent(
+    "research-agent",
+    RemoteAgent(base_url="http://research-server:7778", agent_id="research-agent"),
+    ["research", "analysis"]
+)
+
+router.register_agent(
+    "analytics-agent", 
+    RemoteAgent(base_url="http://analytics-server:7778", agent_id="analytics-agent"),
+    ["analytics", "computation"]
+)
+
+# 创建带智能路由的网关
+gateway = AgentOS(
+    id="smart-gateway",
+    agents=list(router.routes.values()),
+    router=router
+)
+```
+
+### 2. API 版本控制
+
+```python
+from agno.os.gateway import VersionRouter
+from agno.agent import RemoteAgent
+
+class VersionRouter:
+    def __init__(self):
+        self.versions = {}
+    
+    def register_version(self, version: str, agents: list):
+        """注册特定版本的智能体"""
+        self.versions[version] = agents
+    
+    def get_agents_for_version(self, version: str) -> list:
+        """获取特定版本的智能体"""
+        return self.versions.get(version, [])
+    
+    def route_by_version(self, request, version_header="X-API-Version"):
+        """根据版本路由请求"""
+        version = request.headers.get(version_header, "v1")
+        return self.get_agents_for_version(version)
+
+# 版本路由配置
+version_router = VersionRouter()
+
+# 注册不同版本的智能体
+version_router.register_version("v1", [
+    RemoteAgent(base_url="http://v1-server:7778", agent_id="legacy-agent"),
+])
+
+version_router.register_version("v2", [
+    RemoteAgent(base_url="http://v2-server:7778", agent_id="modern-agent"),
+])
+
+# 创建带版本控制的网关
+gateway = AgentOS(
+    id="versioned-gateway",
+    agents=version_router.get_agents_for_version("v2"),  # 默认版本
+    version_router=version_router
+)
+```
+
+## 监控和观察性
+
+### 1. 性能监控
+
+```python
+import time
+import asyncio
+from collections import defaultdict
+from agno.os import AgentOS
+
+class GatewayMonitor:
+    def __init__(self):
+        self.metrics = defaultdict(lambda: {
+            "request_count": 0,
+            "response_time_total": 0,
+            "error_count": 0,
+            "last_request_time": 0
+        })
+        self.agent_health = {}
+    
+    async def track_request(self, agent_id: str, response_time: float, success: bool):
+        """跟踪请求指标"""
+        metrics = self.metrics[agent_id]
+        metrics["request_count"] += 1
+        metrics["response_time_total"] += response_time
+        metrics["last_request_time"] = time.time()
+        
+        if not success:
+            metrics["error_count"] += 1
+    
+    def get_agent_metrics(self, agent_id: str) -> dict:
+        """获取智能体指标"""
+        metrics = self.metrics[agent_id]
+        if metrics["request_count"] > 0:
+            avg_response_time = metrics["response_time_total"] / metrics["request_count"]
+            error_rate = metrics["error_count"] / metrics["request_count"]
+            
+            return {
+                "agent_id": agent_id,
+                "total_requests": metrics["request_count"],
+                "avg_response_time": avg_response_time,
+                "error_rate": error_rate,
+                "last_request": metrics["last_request_time"]
+            }
+        
+        return {}
+    
+    def get_health_status(self) -> dict:
+        """获取健康状态"""
+        current_time = time.time()
+        health_status = {}
+        
+        for agent_id, metrics in self.metrics.items():
+            last_request = metrics["last_request_time"]
+            time_since_last = current_time - last_request
+            
+            # 判断健康状态
+            if time_since_last > 300:  # 5 分钟无请求
+                status = "unknown"
+            elif metrics["error_count"] / max(metrics["request_count"], 1) > 0.1:  # 错误率 > 10%
+                status = "unhealthy"
+            else:
+                status = "healthy"
+            
+            health_status[agent_id] = status
+        
+        return health_status
+
+# 创建带监控的网关
+monitor = GatewayMonitor()
+
+class MonitoredGateway(AgentOS):
+    async def handle_request(self, request, agent_id):
+        start_time = time.time()
+        success = False
+        
+        try:
+            response = await super().handle_request(request, agent_id)
+            success = True
+            return response
+            
+        finally:
+            response_time = time.time() - start_time
+            await monitor.track_request(agent_id, response_time, success)
+
+gateway = MonitoredGateway(id="monitored-gateway", agents=[...])
+```
+
+### 2. 日志聚合
+
+```python
+import logging
+import json
+from datetime import datetime
+from agno.os import AgentOS
+
+class GatewayLogger:
+    def __init__(self, log_level="INFO"):
+        self.logger = logging.getLogger("gateway")
+        self.logger.setLevel(getattr(logging, log_level))
+        
+        # 配置日志处理器
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+    
+    def log_request(self, request, agent_id, response_time, status_code):
+        """记录请求日志"""
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "type": "request",
+            "method": request.method,
+            "path": request.url.path,
+            "agent_id": agent_id,
+            "response_time": response_time,
+            "status_code": status_code,
+            "user_agent": request.headers.get("User-Agent"),
+            "client_ip": request.client.host if request.client else "unknown"
+        }
+        
+        self.logger.info(json.dumps(log_entry, ensure_ascii=False))
+    
+    def log_error(self, request, agent_id, error):
+        """记录错误日志"""
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "type": "error",
+            "method": request.method,
+            "path": request.url.path,
+            "agent_id": agent_id,
+            "error_type": type(error).__name__,
+            "error_message": str(error),
+            "client_ip": request.client.host if request.client else "unknown"
+        }
+        
+        self.logger.error(json.dumps(log_entry, ensure_ascii=False))
+
+# 使用网关日志记录器
+gateway_logger = GatewayLogger()
+
+class LoggingGateway(AgentOS):
+    async def handle_request(self, request, agent_id):
+        start_time = time.time()
+        status_code = 500
+        error = None
+        
+        try:
+            response = await super().handle_request(request, agent_id)
+            status_code = response.status_code
+            return response
+            
+        except Exception as e:
+            error = e
+            gateway_logger.log_error(request, agent_id, e)
+            raise
+            
+        finally:
+            response_time = time.time() - start_time
+            gateway_logger.log_request(request, agent_id, response_time, status_code)
+
+gateway = LoggingGateway(id="logging-gateway", agents=[...])
+```
+
+## 安全最佳实践
+
+### 1. 认证和授权
+
+```python
+from agno.os.middleware import JWTMiddleware, RBACMiddleware
+from agno.os.security import PermissionManager
+
+# 权限管理器
+permission_manager = PermissionManager()
+
+# 定义权限
+permission_manager.define_permission("agent:read", "读取智能体信息")
+permission_manager.define_permission("agent:execute", "执行智能体")
+permission_manager.define_permission("admin:manage", "管理网关配置")
+
+# 角色权限映射
+permission_manager.assign_role_permissions("user", ["agent:read", "agent:execute"])
+permission_manager.assign_role_permissions("admin", ["agent:read", "agent:execute", "admin:manage"])
+
+# 创建安全网关
+gateway = AgentOS(
+    id="secure-gateway",
+    agents=[...],
+    middleware=[
+        JWTMiddleware(
+            secret_key="your-secret-key",
+            algorithm="HS256"
+        ),
+        RBACMiddleware(
+            permission_manager=permission_manager,
+            default_permissions=["agent:read", "agent:execute"]
+        )
+    ],
+)
+```
+
+### 2. 速率限制
+
+```python
+from agno.os.middleware import RateLimitMiddleware
+from agno.os.limiter import RedisRateLimiter
+
+# Redis 速率限制器
+rate_limiter = RedisRateLimiter(
+    host="redis-server",
+    port=6379,
+    limits={
+        "default": "100/hour",  # 默认限制
+        "premium": "1000/hour",  # 高级用户限制
+        "admin": "10000/hour"    # 管理员限制
+    }
+)
+
+# 基于用户角色的速率限制
+class RoleBasedRateLimitMiddleware(RateLimitMiddleware):
+    def get_limit_key(self, request):
+        user_role = request.state.user_role if hasattr(request.state, 'user_role') else "default"
+        user_id = request.state.user_id if hasattr(request.state, 'user_id') else "anonymous"
+        return f"{user_role}:{user_id}"
+    
+    def get_limit(self, request):
+        user_role = request.state.user_role if hasattr(request.state, 'user_role') else "default"
+        return rate_limiter.get_limit(user_role)
+
+# 创建带速率限制的网关
+gateway = AgentOS(
+    id="rate-limited-gateway",
+    agents=[...],
+    middleware=[
+        JWTMiddleware(secret_key="your-secret-key"),
+        RoleBasedRateLimitMiddleware()
+    ],
+)
+```
+
+## 部署和扩展
+
+### 1. 容器化部署
+
+```dockerfile
+# Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+EXPOSE 7777
+
+CMD ["python", "gateway.py"]
+```
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  gateway:
+    build: .
+    ports:
+      - "7777:7777"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET_KEY=your-secret-key
+    depends_on:
+      - redis
+      - agent-server-1
+      - agent-server-2
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  agent-server-1:
+    image: agno-agent-server:latest
+    ports:
+      - "8001:7778"
+
+  agent-server-2:
+    image: agno-agent-server:latest
+    ports:
+      - "8002:7778"
+```
+
+### 2. Kubernetes 部署
+
+```yaml
+# gateway-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentos-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: agentos-gateway
+  template:
+    metadata:
+      labels:
+        app: agentos-gateway
+    spec:
+      containers:
+      - name: gateway
+        image: agentos-gateway:latest
+        ports:
+        - containerPort: 7777
+        env:
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gateway-secrets
+              key: jwt-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+spec:
+  selector:
+    app: agentos-gateway
+  ports:
+  - port: 80
+    targetPort: 7777
+  type: LoadBalancer
+```
+
+## 最佳实践
+
+### 1. 架构设计
+
+- **单一职责**: 每个网关专注于特定的路由和代理功能
+- **无状态设计**: 网关应该是无状态的，便于水平扩展
+- **配置外部化**: 将配置信息存储在外部系统中
+- **优雅降级**: 在后端服务不可用时提供合理的降级响应
+
+### 2. 性能优化
+
+- **连接复用**: 使用连接池减少连接开销
+- **请求缓存**: 缓存频繁请求的结果
+- **异步处理**: 使用异步操作提高并发性能
+- **负载均衡**: 在多个后端实例间分配负载
+
+### 3. 监控和运维
+
+- **全面监控**: 监控请求量、响应时间、错误率等关键指标
+- **结构化日志**: 使用结构化日志便于分析和告警
+- **健康检查**: 定期检查后端服务的健康状态
+- **告警机制**: 设置智能告警规则及时发现问题
+
+### 4. 安全考虑
+
+- **多层认证**: 实施网关级和服务级的认证
+- **最小权限**: 只授予必要的权限
+- **传输加密**: 使用 HTTPS 保护数据传输
+- **审计日志**: 记录所有访问和操作用于审计
+
+## 故障排除
+
+### 常见问题
+
+#### 后端服务不可用
+
+**问题**: 网关无法连接到后端 AgentOS 实例
+**解决方案**:
+1. 检查后端服务状态
+2. 验证网络连接和防火墙配置
+3. 实施健康检查和自动故障转移
+4. 配置适当的超时和重试策略
+
+#### 性能瓶颈
+
+**问题**: 网关响应缓慢或出现性能瓶颈
+**解决方案**:
+1. 分析性能指标识别瓶颈
+2. 优化路由和负载均衡策略
+3. 增加缓存层减少后端请求
+4. 水平扩展网关实例
+
+#### 认证失败
+
+**问题**: 客户端认证失败或权限不足
+**解决方案**:
+1. 检查认证配置和令牌有效性
+2. 验证权限设置和角色映射
+3. 确认认证中间件的配置顺序
+4. 检查用户角色和权限分配
+
+## 下一步
+
+- 查看[RemoteAgent](/agent-os/remote-execution/remote-agent)
+- 了解[RemoteTeam](/agent-os/remote-execution/remote-team)
+- 探索[RemoteWorkflow](/agent-os/remote-execution/remote-workflow)
+- 查看[AgentOSClient](/reference/agent-os/client)

@@ -1,0 +1,122 @@
+---
+title: 图像智能体
+---
+
+本示例展示如何创建能够分析图像并使用网络搜索将它们与当前事件联系起来的 AI 智能体。完美适用于：
+1. 新闻报道和新闻业
+2. 旅游内容
+3. 社交媒体分析
+4. 教育演示
+5. 活动报道
+
+尝试的示例图像：
+- 著名地标（埃菲尔铁塔、泰姬陵等）
+- 城市天际线
+- 文化活动和节日
+- 突发新闻场景
+- 历史地点
+
+## 代码
+
+```python image_agent.py
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.media import Image
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    description=dedent("""\
+        您是世界级的视觉记者和文化通讯员，具有通过
+        故事叙述让图像栩栩如生的天赋！📸✨ 拥有侦探的观察技能
+        和畅销书作者的叙事才华，您将视觉
+        分析转化为引人入胜的故事，既信息丰富又引人入胜。\
+    """),
+    instructions=dedent("""\
+        分析图像和报道新闻时，请遵循以下原则：
+
+        1. 视觉分析：
+           - 使用相关表情符号开始引人注目的标题
+           - 以专家精度分解关键视觉元素
+           - 注意他人可能忽略的细微细节
+           - 将视觉元素与更广泛的背景联系起来
+
+        2. 新闻整合：
+           - 研究和验证与图像相关的当前事件
+           - 将历史背景与当代意义联系起来
+           - 在保持吸引力的同时优先考虑准确性
+           - 在可用时包含相关统计数据或数据
+
+        3. 故事叙述风格：
+           - 保持专业但引人入胜的语气
+           - 使用生动、描述性的语言
+           - 在相关时包含文化和历史参考
+           - 以适合故事的难忘署名结束
+
+        4. 报道指南：
+           - 保持回复简洁但信息丰富（2-3 段）
+           - 平衡事实与人文关怀
+           - 维护新闻诚信
+           - 引用特定信息时注明来源
+
+        将每张图像转化为引人入胜的新闻故事，既信息丰富又鼓舞人心！\
+    """),
+    tools=[DuckDuckGoTools()],
+    markdown=True,
+)
+
+# 与著名地标的示例用法
+agent.print_response(
+    "告诉我关于这张图片的信息并分享最新的相关新闻。",
+    images=[
+        Image(
+            url="https://upload.wikimedia.org/wikipedia/commons/0/0c/GoldenGateBridge-001.jpg"
+        )
+    ],
+    stream=True,
+)
+
+# 更多示例尝试：
+"""
+探索示例提示：
+1. "这个地方的历史意义是什么？"
+2. "这个地方随时间发生了什么变化？"
+3. "这里发生什么文化活动？"
+4. "建筑风格和影响是什么？"
+5. "哪些最新发展影响这个地区？"
+
+要分析的示例图像 URL：
+1. 埃菲尔铁塔："https://upload.wikimedia.org/wikipedia/commons/8/85/Tour_Eiffel_Wikimedia_Commons_%28cropped%29.jpg"
+2. 泰姬陵："https://upload.wikimedia.org/wikipedia/commons/b/bd/Taj_Mahal%2C_Agra%2C_India_edit3.jpg"
+3. 金门大桥："https://upload.wikimedia.org/wikipedia/commons/0/0c/GoldenGateBridge-001.jpg"
+"""
+
+# 在变量中获取响应：
+# from rich.pretty import pprint
+# response = agent.run(
+#     "分析这个地标的建筑和最新新闻。",
+#     images=[Image(url="YOUR_IMAGE_URL")],
+# )
+# pprint(response.content)
+```
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai ddgs agno
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python image_agent.py
+    ```
+  </Step>
+
+</Steps>

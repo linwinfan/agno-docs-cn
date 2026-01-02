@@ -1,0 +1,135 @@
+---
+title: 共享成员交互
+sidebarTitle: 共享成员交互
+---
+
+本示例演示了一个团队，其中通过 `share_member_interactions=True` 在当前运行期间将成员交互共享给其他成员。
+
+这使成员能够看到其他成员在同一运行中所做的工作，从而实现更好的协调并避免重复工作。
+
+## 工作原理
+
+当 `share_member_interactions=True` 时，交互详细信息会附加到发送给成员的任务中：
+
+```
+<member_interaction_context>
+- Member: User Profile Agent
+- Task: Get the user's profile information
+- Response: {"name": "John Doe", "email": "john.doe@example.com", ...}
+
+- Member: Technical Support Agent
+- Task: Answer technical support questions
+- Response: Here's how to change your billing address...
+</member_interaction_context>
+```
+
+这使计费智能体能够看到用户资料智能体已经检索了用户信息，从而避免重复的工具调用。
+
+## 使用场景
+
+在以下情况下使用 `share_member_interactions=True`：
+- 多个成员可能需要相同的信息
+- 您希望避免重复的 API 调用或工具执行
+- 成员需要在单次运行期间协调他们的行动
+- 一个成员的工作在同一请求中基于另一个成员的工作
+
+## 代码
+
+```python share_member_interactions.py
+from uuid import uuid4
+
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+
+
+def get_user_profile() -> dict:
+    """获取用户资料。"""
+    return {
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "phone": "1234567890",
+        "billing_address": "123 Main St, Anytown, USA",
+        "login_type": "email",
+        "mfa_enabled": True,
+    }
+
+
+user_profile_agent = Agent(
+    name="User Profile Agent",
+    role="您是一个用户资料智能体，可以检索有关用户和用户账户的信息。",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[get_user_profile],
+)
+
+technical_support_agent = Agent(
+    name="Technical Support Agent",
+    role="您是一个技术支持智能体，可以回答有关技术支持的问题。",
+    model=OpenAIChat(id="gpt-5-mini"),
+)
+
+billing_agent = Agent(
+    name="Billing Agent",
+    role="您是一个计费智能体，可以回答有关计费的问题。",
+    model=OpenAIChat(id="gpt-5-mini"),
+)
+
+
+support_team = Team(
+    name="技术支持团队",
+    model=OpenAIChat("o3-mini"),
+    members=[user_profile_agent, technical_support_agent, billing_agent],
+    instructions=[
+        "您是 Facebook 账户的技术支持团队，可以回答有关 Facebook 技术支持和计费的问题。",
+        "如果问题涉及用户资料或账户，请先获取用户的资料信息。",
+    ],
+    db=SqliteDb(
+        db_file="tmp/technical_support_team.db"
+    ),  # 添加数据库以存储对话历史。这是历史功能正常工作的必要条件。
+    share_member_interactions=True,  # 在当前运行期间将成员交互发送给其他成员。
+    show_members_responses=True,
+)
+
+
+session_id = f"conversation_{uuid4()}"
+
+## 询问技术支持问题
+support_team.print_response(
+    "我的账单地址是什么？如何更改它？",
+    stream=True,
+    session_id=session_id,
+)
+
+support_team.print_response(
+    "我启用了多因素认证吗？如何禁用它？",
+    stream=True,
+    session_id=session_id,
+)
+```
+
+## 使用方法
+
+<Steps>
+
+    <Snippet file="create-venv-step.mdx" />
+
+    <Step title="安装所需库">
+        ```bash
+        pip install agno openai
+        ```
+    </Step>
+
+    <Step title="设置环境变量">
+        ```bash
+        export OPENAI_API_KEY=****
+        ```
+    </Step>
+
+    <Step title="运行智能体">
+        ```bash
+        python share_member_interactions.py
+        ```
+    </Step>
+
+</Steps>

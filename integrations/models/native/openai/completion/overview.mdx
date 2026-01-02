@@ -1,0 +1,107 @@
+---
+title: OpenAI
+sidebarTitle: 概览
+description: Learn how to use OpenAI 模型s in Agno.
+---
+
+The GPT 模型s are the best in class LLMs and used as the default LLM by **Agents**. OpenAI 支持 a variety of world-class 模型s. See their 模型s [here](https://平台.openai.com/docs/模型s).
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `gpt-5-mini` is good for most general use-cases.
+- `gpt-5-nano` 模型 is good for smaller tasks and faster 推理.
+- `o1` 模型s are good for complex reasoning and multi-step tasks.
+- `gpt-5-mini` is a strong reasoning 模型 with support for tool-calling and structured outputs, but at a much lower cost.
+
+OpenAI have tier based rate limits. See the [docs](https://平台.openai.com/docs/guides/rate-limits/usage-tiers) for 更多功能 information.
+
+## Authentication
+
+Set your `OPENAI_API_KEY` environment variable. You can get one [from OpenAI here](https://平台.openai.com/account/api-keys).
+
+<CodeGroup>
+
+```bash Mac
+export OPENAI_API_KEY=sk-***
+```
+
+```bash Windows
+setx OPENAI_API_KEY sk-***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `OpenAIChat` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+## Prompt caching
+
+Prompt caching will happen automatically using our `OpenAIChat` 模型. You can read 更多功能 about how OpenAI handle caching in [their docs](https://平台.openai.com/docs/guides/prompt-caching).
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/openai/completion/usage/basic-stream). </Note>
+
+## Parameters
+
+For 更多功能 information, please refer to the [OpenAI docs](https://平台.openai.com/docs/api-reference/chat/create) as well.
+
+| Parameter                    | Type                           | Default                | Description                                                                                              |
+| ---------------------------- | ------------------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `id`                         | `str`                          | `"gpt-4o"`             | The id of the OpenAI 模型 to use                                                                       |
+| `name`                       | `str`                          | `"OpenAIChat"`         | The name of the 模型                                                                                    |
+| `提供商`                   | `str`                          | `"OpenAI"`             | The 提供商 of the 模型                                                                                |
+| `store`                      | `Optional[bool]`               | `None`                 | Whether to store the conversation for training purposes                                                  |
+| `reasoning_effort`           | `Optional[str]`                | `None`                 | The reasoning effort level for o1 模型s ("low", "medium", "high")                                      |
+| `verbosity`                  | `Optional[Literal["low", "medium", "high"]]` | `None`     | Controls verbosity level of reasoning 模型s                                                             |
+| `meta数据`                   | `Optional[Dict[str, Any]]`     | `None`                 | Developer-defined meta数据 to associate with the completion                                              |
+| `frequency_penalty`          | `Optional[float]`              | `None`                 | Penalizes new tokens based on their frequency in the text so far (-2.0 to 2.0)                         |
+| `logit_bias`                 | `Optional[Any]`                | `None`                 | Modifies the likelihood of specified tokens appearing in the completion                                  |
+| `logprobs`                   | `Optional[bool]`               | `None`                 | Whether to return log probabilities of the output tokens                                                 |
+| `top_logprobs`               | `Optional[int]`                | `None`                 | Number of most likely tokens to return log probabilities for (0 to 20)                                  |
+| `max_tokens`                 | `Optional[int]`                | `None`                 | Maximum number of tokens to generate (deprecated, use max_completion_tokens)                            |
+| `max_completion_tokens`      | `Optional[int]`                | `None`                 | Maximum number of completion tokens to generate                                                          |
+| `modalities`                 | `Optional[List[str]]`          | `None`                 | List of modalities to use ("text" and/or "audio")                                                       |
+| `audio`                      | `Optional[Dict[str, Any]]`     | `None`                 | Audio configuration (e.g., `{"voice": "alloy", "format": "wav"}`)                                         |
+| `presence_penalty`           | `Optional[float]`              | `None`                 | Penalizes new tokens based on whether they appear in the text so far (-2.0 to 2.0)                     |
+| `seed`                       | `Optional[int]`                | `None`                 | Random seed for deterministic sampling                                                                   |
+| `stop`                       | `Optional[Union[str, List[str]]]` | `None`              | Up to 4 sequences where the API will stop generating further tokens                                     |
+| `temperature`                | `Optional[float]`              | `None`                 | Controls randomness in the 模型's output (0.0 to 2.0)                                                  |
+| `user`                       | `Optional[str]`                | `None`                 | A unique identifier representing your end-user                                                           |
+| `top_p`                      | `Optional[float]`              | `None`                 | Controls diversity via nucleus sampling (0.0 to 1.0)                                                    |
+| `服务_tier`               | `Optional[str]`                | `None`                 | Service tier to use ("auto", "default", "flex", "priority")                                             |
+| `strict_output`              | `bool`                         | `True`                 | Controls schema adherence for structured outputs                                                         |
+| `extra_headers`              | `Optional[Any]`                | `None`                 | Additional headers to include in requests                                                                |
+| `extra_query`                | `Optional[Any]`                | `None`                 | Additional query parameters to include in requests                                                       |
+| `extra_body`                 | `Optional[Any]`                | `None`                 | Additional body parameters to include in requests                                                        |
+| `request_params`             | `Optional[Dict[str, Any]]`     | `None`                 | Additional parameters to include in the request                                                          |
+| `role_map`                   | `Optional[Dict[str, str]]`     | `None`                 | Mapping of message roles to OpenAI roles                                                                |
+| `api_key`                    | `Optional[str]`                | `None`                 | The API key for authenticating with OpenAI (defaults to OPENAI_API_KEY env var)                        |
+| `organization`               | `Optional[str]`                | `None`                 | The organization ID to use for requests                                                                  |
+| `base_url`                   | `Optional[Union[str, httpx.URL]]` | `None`              | The base URL for the OpenAI API                                                                         |
+| `timeout`                    | `Optional[float]`              | `None`                 | Request timeout in seconds                                                                               |
+| `max_retries`                | `Optional[int]`                | `None`                 | Maximum number of retries for failed requests                                                           |
+| `default_headers`            | `Optional[Any]`                | `None`                 | Default headers to include in all requests                                                               |
+| `default_query`              | `Optional[Any]`                | `None`                 | Default query parameters to include in all requests                                                     |
+| `http_client`                | `Optional[Union[httpx.Client, httpx.AsyncClient]]` | `None` | HTTP client instance for making requests                                                  |
+| `client_params`              | `Optional[Dict[str, Any]]`     | `None`                 | Additional parameters for client configuration                                                           |
+
+`OpenAIChat` is a subclass of the [Model](/reference/models/模型) class and has access to the same params.

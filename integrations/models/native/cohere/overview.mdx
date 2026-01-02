@@ -1,0 +1,85 @@
+---
+title: Cohere
+sidebarTitle: 概览
+description: Learn how to use Cohere 模型s in Agno.
+---
+
+Leverage Cohere's powerful command 模型s and 更多功能.
+
+[Cohere](https://cohere.com) has a wide range of 模型s and is really good for fine-tuning. See their library of 模型s [here](https://docs.cohere.com/v2/docs/模型s).
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `command` 模型 is good for most basic use-cases.
+- `command-light` 模型 is good for smaller tasks and faster 推理.
+- `command-r7b-12-2024` 模型 is good with RAG tasks, complex reasoning and multi-step tasks.
+
+Cohere also 支持 fine-tuning 模型s. Here is a [guide](https://docs.cohere.com/v2/docs/fine-tuning) on how to do it.
+
+Cohere has tier-based rate limits. See the [docs](https://docs.cohere.com/v2/docs/rate-limits) for 更多功能 information.
+
+## Authentication
+
+Set your `CO_API_KEY` environment variable. Get your key from [here](https://dashboard.cohere.com/api-keys).
+
+<CodeGroup>
+
+```bash Mac
+export CO_API_KEY=***
+```
+
+```bash Windows
+setx CO_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Cohere` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.cohere import Cohere
+
+agent = Agent(
+    model=Cohere(id="command-r-08-2024"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/cohere/usage/basic). </Note>
+
+## 参数
+
+| Parameter                       | Type                       | Default               | Description                                                                                                                                                                                |
+| ------------------------------ | -------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`                           | `str`                      | `"command-r-plus"`    | The specific 模型 ID used for generating responses.                                                                                                                                       |
+| `name`                         | `str`                      | `"cohere"`            | The name identifier for the 智能体.                                                                                                                                                         |
+| `提供商`                     | `str`                      | `"Cohere"`            | The 提供商 of the 模型.                                                                                                                                                                 |
+| `temperature`                  | `Optional[float]`          | `None`                | The sampling temperature to use, between 0 and 2. Higher values like 0.8 make the output 更多功能 random, while lower values like 0.2 make it 更多功能 focused and deterministic.                  |
+| `max_tokens`                   | `Optional[int]`            | `None`                | The maximum number of tokens to generate in the response.                                                                                                                                  |
+| `top_k`                        | `Optional[int]`            | `None`                | The number of highest probability vocabulary tokens to keep for top-k-filtering.                                                                                                           |
+| `top_p`                        | `Optional[float]`          | `None`                | Nucleus sampling parameter. The 模型 considers the results of the tokens with top_p probability mass.                                                                                     |
+| `frequency_penalty`            | `Optional[float]`          | `None`                | Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the 模型's likelihood to repeat the same line verbatim. |
+| `presence_penalty`             | `Optional[float]`          | `None`                | Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the 模型's likelihood to talk about new topics.              |
+| `seed`                         | `Optional[int]`            | `None`                | Random seed for deterministic text generation.                                                                                                                                            |
+| `logprobs`                     | `Optional[bool]`           | `None`                | Whether to return log probabilities of the output tokens.                                                                                                                                  |
+| `request_params`               | `Optional[Dict[str, Any]]` | `None`                | Additional parameters to include in the request.                                                                                                                                           |
+| `strict_tools`                 | `bool`                     | `False`               | Whether to use strict mode for tools (enforce strict parameter requirements).                                                                                                              |
+| `add_chat_history`             | `bool`                     | `False`               | Whether to add chat history to the Cohere messages instead of using the conversation_id.                                                                                                   |
+| `api_key`                      | `Optional[str]`            | `None`                | The API key for authenticating requests to the Cohere 服务.                                                                                                                             |
+| `client_params`                | `Optional[Dict[str, Any]]` | `None`                | Additional parameters for client configuration.                                                                                                                                            |
+| `client`                       | `Optional[CohereClient]`   | `None`                | A pre-configured instance of the Cohere client.                                                                                                                                            |
+| `async_client`                 | `Optional[CohereAsyncClient]` | `None`             | A pre-configured instance of the async Cohere client.                                                                                                                                      |
+
+
+`Cohere` is a subclass of the [Model](/reference/models/模型) class and has access to the same params.

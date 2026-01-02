@@ -1,0 +1,41 @@
+---
+title: Supabase
+description: 学习使用 Supabase 作为您的代理数据库提供商
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [Supabase](https://supabase.com/)，通过 `PostgresDb` 类实现。
+
+您可以按照他们的[入门指南](https://supabase.com/docs/guides/getting-started)开始使用 Supabase。
+
+您可以在其部分中阅读更多关于 [`PostgresDb` 类](/integrations/database/postgres/overview)的信息。
+
+## 用法
+
+```python supabase_for_agent.py
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+from os import getenv
+
+# 获取您的 Supabase 项目和密码
+SUPABASE_PROJECT = getenv("SUPABASE_PROJECT")
+SUPABASE_PASSWORD = getenv("SUPABASE_PASSWORD")
+
+SUPABASE_DB_URL = (
+    f"postgresql://postgres:{SUPABASE_PASSWORD}@db.{SUPABASE_PROJECT}:5432/postgres"
+)
+
+# 设置 Supabase 数据库
+db = PostgresDb(db_url=SUPABASE_DB_URL)
+
+# 使用数据库设置您的代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-postgres-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/postgres/postgres_for_agent.py)

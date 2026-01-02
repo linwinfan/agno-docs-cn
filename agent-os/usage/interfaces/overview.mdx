@@ -1,0 +1,67 @@
+---
+title: 接口使用
+description: AgentOS 接口使用指南
+sidebarTitle: 接口
+keywords: [接口, api, rest, webhooks, agentos]
+---
+
+AgentOS 提供了丰富的接口来与外部系统集成。
+
+## REST API
+
+### 基本用法
+
+```python
+import requests
+
+# 获取智能体列表
+response = requests.get(
+    "http://localhost:7777/api/agents",
+    headers={"Authorization": "Bearer your-token"}
+)
+
+agents = response.json()
+```
+
+### 运行智能体
+
+```python
+# 运行智能体
+response = requests.post(
+    "http://localhost:7777/api/agents/agent-id/run",
+    json={"message": "你好！"},
+    headers={"Authorization": "Bearer your-token"}
+)
+
+result = response.json()
+```
+
+## WebSocket 连接
+
+```python
+import asyncio
+import websockets
+
+async def connect_agent():
+    uri = "ws://localhost:7777/ws/agents/agent-id"
+    async with websockets.connect(uri) as websocket:
+        await websocket.send(json.dumps({"message": "你好！"}))
+        response = await websocket.recv()
+        print(f"响应: {response}")
+
+asyncio.run(connect_agent())
+```
+
+## Webhook 配置
+
+```python
+from agno.os import AgentOS
+
+agent_os = AgentOS(
+    agents=[agent],
+    webhooks={
+        "agent.completed": "https://your-app.com/webhook",
+        "error.occurred": "https://your-app.com/error-webhook"
+    }
+)
+```

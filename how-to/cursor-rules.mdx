@@ -1,0 +1,84 @@
+---
+title: 构建 Agent 的 Cursor 规则
+sidebarTitle: Cursor 规则
+description: 使用 .cursorrules 来改进在使用 Agno 构建 agent 时 AI 编程助手的建议
+---
+
+[`.cursorrules`](https://docs.cursor.com/context/rules-for-ai) 文件教授 AI 编程助手（如 Cursor、Windsurf）如何使用 Agno 更好地构建 agent。
+
+## 什么是 .cursorrules？
+
+`.cursorrules` 是一个配置文件，为你的 AI 编程助手提供关于如何生成特定代码的指令。
+Agno 推荐的 `.cursorrules` 文件包含：
+- Agno 特定的模式和最佳实践
+- 正确的参数名称和语法
+- 要避免的常见错误
+- 何时使用 Agent vs Team vs Workflow
+
+可以将其视为一个参考指南，帮助你的 AI 助手正确地使用 Agno 构建 agent。
+
+## 为什么要使用它？
+
+没有 `.cursorrules`，AI 助手可能会建议：
+- 错误的参数名称（比如 Teams 使用 `agents=` 而不是 `members=`）
+- 过时的模式或不正确的语法
+- 性能反模式（在循环中创建 agent）
+- 不存在的方法或功能
+
+有了 `.cursorrules`，你的 AI 将：
+- 自动建议正确的 Agno 模式
+- 遵循性能最佳实践
+- 为你的用例使用正确的方法
+- 在你犯错误之前捕获常见错误
+
+## 如何使用 .cursorrules
+
+将 Agno 的 `.cursorrules` 文件复制到你的项目根目录：
+
+```bash
+# 下载 .cursorrules 文件
+curl -o .cursorrules https://raw.githubusercontent.com/agno-agi/agno/main/.cursorrules
+
+# 或者克隆并复制
+git clone https://github.com/agno-agi/agno.git
+cp agno/.cursorrules /path/to/your/project/
+```
+
+你的 AI 助手（Cursor、Windsurf 等）将自动检测并使用它。
+
+<Card title="在 GitHub 上查看 .cursorrules" icon="github" href="https://github.com/agno-agi/agno/blob/main/.cursorrules">
+  查看使用 Agno 构建 agent 的完整 .cursorrules 文件
+</Card>
+
+## IDE 支持
+
+`.cursorrules` 适用于：
+- **Cursor** - 自动检测
+- **Windsurf** - 原生支持
+- **其他 AI 助手** - 支持可能因集成而异
+
+## 了解更多
+
+有关详细示例和模式：
+
+<CardGroup cols={3}>
+  <Card title="Agent 示例" icon="code" href="/examples/basics/agent">
+    查看完整的 agent 示例
+  </Card>
+  
+  <Card title="Agent 概念" icon="book" href="/basics/agents/overview">
+    学习 agent 基础知识
+  </Card>
+  
+  <Card title="Teams" icon="users" href="/basics/teams/overview">
+    多 agent 协调
+  </Card>
+  
+  <Card title="Workflows" icon="workflow" href="/basics/workflows/overview">
+    确定性 agent 编排
+  </Card>
+</CardGroup>
+
+<Note>
+`.cursorrules` 文件专注于**使用 Agno 构建 agent**。如果你要为 Agno 框架本身做贡献，那将有单独的说明。
+</Note>

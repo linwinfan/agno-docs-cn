@@ -1,0 +1,420 @@
+---
+title: "控制平面"
+sidebarTitle: "概述"
+description: "与您的 AgentOS 实例交互和管理的主要 Web 界面"
+---
+
+AgentOS 控制平面是您访问和管理所有 AgentOS 功能的主要 Web 界面。这个直观的仪表板作为中央枢纽，您可以在其中与智能体交互、管理知识库、跟踪会话、监控性能和控制用户访问。
+
+<Frame>
+  <img
+    src="/images/agentos-full-screenshot.png"
+    alt="AgentOS 控制平面仪表板"
+    style={{ borderRadius: "0.5rem" }}
+  />
+</Frame>
+
+## OS 管理
+
+从单一界面连接和检查您的 OS 运行时。在本地开发和实时生产实例之间切换，监控连接健康状态，并为不同环境配置端点。
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/agentos-select-os.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## 用户管理
+
+管理组织成员及其对 AgentOS 功能的访问。配置组织名称、邀请团队成员，并从集中界面控制权限。
+
+### 邀请成员
+
+通过输入他们的电子邮件地址将新团队成员添加到您的组织。您可以通过用逗号分隔电子邮件地址或在地址之间按 Enter/Tab 键来一次邀请多个用户。
+
+### 成员角色
+
+控制每个成员可以访问的内容：
+
+- **所有者**: 完全管理访问权限，包括计费和成员管理
+- **成员**: 访问 AgentOS 功能和协作能力
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/agentos-user-management.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## 功能概览
+
+### 智能体管理
+
+- **创建和配置**: 设置智能体参数、模型和工具
+- **监控状态**: 实时查看智能体运行状态
+- **性能分析**: 分析智能体响应时间和准确性
+
+### 知识库管理
+
+- **文档上传**: 添加和管理知识文档
+- **向量存储**: 配置和优化向量数据库
+- **搜索优化**: 改进知识检索准确性
+
+### 会话跟踪
+
+- **实时监控**: 查看活跃会话和对话历史
+- **用户分析**: 分析用户行为和偏好
+- **质量控制**: 评估对话质量和满意度
+
+### 性能监控
+
+- **系统指标**: 监控 CPU、内存和网络使用情况
+- **API 调用**: 跟踪 API 使用量和成本
+- **错误追踪**: 识别和解决系统问题
+
+## 导航界面
+
+### 侧边栏导航
+
+控制平面提供直观的侧边栏导航：
+
+- **仪表板**: 系统概览和关键指标
+- **智能体**: 智能体管理和配置
+- **团队**: 团队成员和权限管理
+- **工作流**: 自动化工作流管理
+- **知识库**: 知识管理和搜索
+- **会话**: 对话历史和用户交互
+- **指标**: 性能指标和分析
+- **监控**: 系统监控和警报
+
+### 顶部导航栏
+
+顶部导航栏提供快速访问：
+
+- **团队切换**: 在不同组织间切换
+- **用户设置**: 个人账户和偏好设置
+- **通知**: 系统通知和警报
+- **帮助**: 文档和支持资源
+
+## 仪表板功能
+
+### 概览统计
+
+仪表板提供关键统计信息：
+
+```yaml
+# 仪表板指标
+metrics:
+  total_agents: 25
+  active_sessions: 142
+  daily_queries: 3,847
+  avg_response_time: 1.2s
+  success_rate: 98.5%
+```
+
+### 实时图表
+
+- **使用趋势**: 显示查询量随时间变化
+- **性能指标**: 响应时间趋势图
+- **错误率**: 系统错误和异常统计
+- **用户活跃度**: 用户参与度分析
+
+### 快速操作
+
+仪表板提供快速访问常用功能：
+
+- **创建智能体**: 快速启动新智能体
+- **上传文档**: 添加知识库内容
+- **查看会话**: 访问最近的对话
+- **系统状态**: 检查系统健康状况
+
+## 高级功能
+
+### 自定义仪表板
+
+创建个性化的仪表板视图：
+
+```python
+# 自定义仪表板配置
+dashboard_config = {
+    "widgets": [
+        {
+            "type": "chart",
+            "title": "查询量趋势",
+            "data_source": "metrics",
+            "time_range": "7d"
+        },
+        {
+            "type": "table",
+            "title": "活跃智能体",
+            "data_source": "agents",
+            "columns": ["name", "status", "last_active"]
+        }
+    ]
+}
+```
+
+### 警报系统
+
+配置智能警报：
+
+```yaml
+# 警报配置
+alerts:
+  - name: "高响应时间"
+    condition: "response_time > 5s"
+    action: "send_email"
+    recipients: ["admin@company.com"]
+  
+  - name: "错误率过高"
+    condition: "error_rate > 5%"
+    action: "slack_notification"
+    channel: "#alerts"
+```
+
+### 数据导出
+
+导出各种格式的数据：
+
+- **CSV 导出**: 用于数据分析
+- **JSON 导出**: 用于集成其他系统
+- **PDF 报告**: 用于分享和演示
+
+## 安全功能
+
+### 访问控制
+
+实施细粒度权限控制：
+
+```yaml
+# 权限配置
+permissions:
+  roles:
+    admin:
+      - "manage_users"
+      - "view_all_data"
+      - "system_configuration"
+    
+    analyst:
+      - "view_metrics"
+      - "export_reports"
+      - "manage_dashboards"
+    
+    user:
+      - "chat_with_agents"
+      - "view_own_sessions"
+```
+
+### 审计日志
+
+跟踪所有用户操作：
+
+```python
+# 审计日志示例
+audit_logs = [
+    {
+        "timestamp": "2024-01-15T10:30:00Z",
+        "user": "john.doe@company.com",
+        "action": "created_agent",
+        "details": {"agent_name": "客服助手"}
+    },
+    {
+        "timestamp": "2024-01-15T10:35:00Z",
+        "user": "jane.smith@company.com",
+        "action": "uploaded_document",
+        "details": {"document": "产品手册.pdf", "size": "2.3MB"}
+    }
+]
+```
+
+### 数据加密
+
+保护敏感数据：
+
+```yaml
+# 加密配置
+encryption:
+  data_at_rest:
+    algorithm: "AES-256"
+    key_rotation: "90d"
+  
+  data_in_transit:
+    protocol: "TLS 1.3"
+    cipher_suites: ["ECDHE-RSA-AES256-GCM-SHA384"]
+```
+
+## 集成能力
+
+### API 集成
+
+控制平面提供丰富的 API：
+
+```python
+# API 使用示例
+import requests
+
+# 获取智能体列表
+response = requests.get(
+    "https://api.agno.com/v1/agents",
+    headers={"Authorization": "Bearer your-api-key"}
+)
+agents = response.json()
+
+# 创建新智能体
+new_agent = {
+    "name": "销售助手",
+    "model": "gpt-4",
+    "tools": ["knowledge_search", "data_analysis"]
+}
+
+response = requests.post(
+    "https://api.agno.com/v1/agents",
+    json=new_agent,
+    headers={"Authorization": "Bearer your-api-key"}
+)
+```
+
+### Webhook 支持
+
+配置 Webhook 以接收实时通知：
+
+```yaml
+# Webhook 配置
+webhooks:
+  - url: "https://your-app.com/webhooks/agentos"
+    events:
+      - "agent.created"
+      - "session.started"
+      - "error.occurred"
+    secret: "your-webhook-secret"
+```
+
+### 第三方集成
+
+与流行工具和服务集成：
+
+- **Slack**: 在 Slack 中接收通知
+- **Microsoft Teams**: 团队协作集成
+- **Zapier**: 自动化工作流集成
+- **Custom Apps**: 通过 API 构建自定义应用
+
+## 最佳实践
+
+### 1. 组织结构
+
+为大型组织设置层次结构：
+
+```yaml
+# 组织结构示例
+organization:
+  name: "Acme Corporation"
+  departments:
+    - name: "技术部"
+      teams:
+        - "AI 研发"
+        - "系统运维"
+    
+    - name: "业务部"
+      teams:
+        - "市场营销"
+        - "客户服务"
+```
+
+### 2. 权限管理
+
+实施最小权限原则：
+
+```python
+# 权限分配示例
+def assign_permissions(user_role, department):
+    base_permissions = {
+        "developer": ["code_access", "debug_tools"],
+        "manager": ["team_management", "reports"],
+        "analyst": ["data_access", "analytics"]
+    }
+    
+    # 添加部门特定权限
+    dept_permissions = {
+        "技术部": ["system_config", "deployment"],
+        "业务部": ["customer_data", "sales_reports"]
+    }
+    
+    return base_permissions.get(user_role, []) + \
+           dept_permissions.get(department, [])
+```
+
+### 3. 监控策略
+
+建立全面的监控策略：
+
+```python
+# 监控配置
+monitoring_config = {
+    "metrics_collection": {
+        "interval": "60s",
+        "retention": "30d"
+    },
+    "alert_thresholds": {
+        "response_time": 3.0,  # 秒
+        "error_rate": 0.05,    # 5%
+        "cpu_usage": 0.80      # 80%
+    },
+    "dashboard_refresh": "30s"
+}
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 连接问题
+
+```python
+# 连接诊断
+def diagnose_connection():
+    checks = [
+        check_network_connectivity,
+        check_api_credentials,
+        check_service_availability,
+        check_firewall_settings
+    ]
+    
+    results = {}
+    for check in checks:
+        try:
+            results[check.__name__] = check()
+        except Exception as e:
+            results[check.__name__] = f"错误: {e}"
+    
+    return results
+```
+
+#### 性能问题
+
+```python
+# 性能优化建议
+performance_tips = [
+    "增加缓存配置以提高响应速度",
+    "优化数据库查询以减少延迟",
+    "实施负载均衡以分散请求",
+    "启用压缩以减少网络传输"
+]
+```
+
+## 下一步
+
+- 了解[AgentOS 功能](/agent-os/features)
+- 查看[AgentOS 配置](/agent-os/config)
+- 探索[AgentOS 参考](/reference/agent-os/configuration)
+- 查看[部署指南](/deploy/overview)

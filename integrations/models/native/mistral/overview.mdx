@@ -1,0 +1,76 @@
+---
+title: Mistral
+sidebarTitle: 概览
+description: Learn how to use Mistral 模型s in Agno.
+---
+
+Mistral is a 平台 for providing endpoints for Large Language 模型s.
+See their library of 模型s [here](https://docs.mistral.ai/getting-started/models/模型s_overview/).
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `codestral` 模型 is good for code generation and editing.
+- `mistral-large-latest` 模型 is good for most use-cases.
+- `open-mistral-nemo` is a free 模型 that is good for most use-cases.
+- `pixtral-12b-2409` is a vision 模型 that is good for OCR, transcribing 文档s, and image comparison. It is not always capable at tool calling.
+
+Mistral has tier-based rate limits. See the [docs](https://docs.mistral.ai/deployment/laplateforme/tier/) for 更多功能 information.
+
+## Authentication
+
+Set your `MISTRAL_API_KEY` environment variable. Get your key from [here](https://console.mistral.ai/api-keys/).
+
+<CodeGroup>
+
+```bash Mac
+export MISTRAL_API_KEY=***
+```
+
+```bash Windows
+setx MISTRAL_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `Mistral` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+import os
+
+from agno.agent import Agent, RunOutput
+from agno.models.mistral import MistralChat
+
+mistral_api_key = os.getenv("MISTRAL_API_KEY")
+
+agent = Agent(
+    model=MistralChat(
+        id="mistral-large-latest",
+        api_key=mistral_api_key,
+    ),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/native/mistral/usage/basic). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                        | Description                                                           |
+| ------------ | ------------------ | ------------------------------ | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"mistral-large-latest"`       | The id of the Mistral 模型 to use                                   |
+| `name`       | `str`              | `"Mistral"`                    | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"Mistral"`                    | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                         | The API key for Mistral (defaults to MISTRAL_API_KEY env var)        |
+| `base_url`   | `str`              | `"https://api.mistral.ai/v1"` | The base URL for the Mistral API                                     |
+
+`MistralChat` is a subclass of the [Model](/reference/models/模型) class and has access to the same params.

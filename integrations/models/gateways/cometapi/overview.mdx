@@ -1,0 +1,74 @@
+---
+title: CometAPI
+sidebarTitle: 概览
+description: Learn how to use CometAPI 模型s in Agno.
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.0.8" cta="查看 release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.0.8">v2.0.8</Tooltip>
+</Badge>
+
+
+CometAPI is a 平台 for providing endpoints for Large Language 模型s.
+
+See all CometAPI supported 模型s and pricing [here](https://api.cometapi.com/pricing).
+
+## Authentication
+
+Set your `COMETAPI_KEY` environment variable. Get your API key from [here](https://api.cometapi.com/console/token).
+
+<CodeGroup>
+
+```bash Mac
+export COMETAPI_KEY=***
+```
+
+```bash Windows
+setx COMETAPI_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `CometAPI` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.cometapi import CometAPI
+
+agent = Agent(model=CometAPI(), markdown=True)
+
+# Print the response in the terminal
+agent.print_response("Explain quantum computing in simple terms")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/cometapi/usage/basic-stream). </Note>
+
+## Parameters
+
+| Parameter    | Type               | Default                                        | Description                                                           |
+| ------------ | ------------------ | ---------------------------------------------- | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"gpt-5-mini"`                                 | The id of the 模型 to use                                            |
+| `name`       | `str`              | `"CometAPI"`                                   | The name of the 模型                                                 |
+| `api_key`    | `Optional[str]`    | `None`                                         | The API key for CometAPI (defaults to COMETAPI_KEY env var)          |
+| `base_url`   | `str`              | `"https://api.cometapi.com/v1"`                | The base URL for the CometAPI                                         |
+
+`CometAPI` extends the OpenAI-兼容 interface and 支持 most parameters from the [OpenAI 模型](/integrations/models/native/openai/completion/overview).
+
+## Available Models
+
+CometAPI provides access to 300+ AI 模型s. You can fetch the available 模型s programmatically:
+
+```python
+from agno.models.cometapi import CometAPI
+
+model = CometAPI()
+available_models = model.get_available_models()
+print(available_models)
+```

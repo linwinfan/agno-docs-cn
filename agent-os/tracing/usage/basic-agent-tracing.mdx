@@ -1,0 +1,273 @@
+---
+title: 基本智能体追踪
+description: 学习如何在 AgentOS 中使用 Agno 追踪智能体
+sidebarTitle: 基本智能体追踪
+keywords: [追踪, 可观察性, 智能体, agno, opentelemetry]
+mode: wide
+---
+
+此示例展示如何在 AgentOS 中为智能体启用追踪。只需设置 `tracing=True`，所有智能体运行、模型调用和工具执行都会被自动捕获。
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch basic_agent_tracing.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件">
+    ```python basic_agent_tracing.py
+    from agno.agent import Agent
+    from agno.db.sqlite import SqliteDb
+    from agno.models.openai import OpenAIChat
+    from agno.os import AgentOS
+    from agno.tools.hackernews import HackerNewsTools
+
+    # 设置数据库
+    db = SqliteDb(db_file="tmp/traces.db")
+
+    agent = Agent(
+        name="HackerNews 智能体",
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[HackerNewsTools()],
+        instructions="你是一个 Hacker News 智能体。请简洁地回答问题。",
+        markdown=True,
+        db=db,
+    )
+
+    # 设置启用了追踪的 AgentOS
+    agent_os = AgentOS(
+        description="用于追踪 HackerNews 的示例应用",
+        agents=[agent],
+        tracing=True,  # 为所有智能体启用追踪
+    )
+    app = agent_os.get_app()
+
+    if __name__ == "__main__":
+        agent_os.serve(app="basic_agent_tracing:app", reload=True)
+    ```
+  </Step>
+
+  <Step title="运行应用程序">
+    ```bash
+    python basic_agent_tracing.py
+    ```
+  </Step>
+
+  <Step title="在浏览器中打开应用程序">
+    在浏览器中打开 [http://localhost:7777](http://localhost:7777) 并与智能体交互。
+  </Step>
+
+  <Step title="查看追踪">
+    在 [AgentOS UI](https://os.agno.com/traces) 中查看追踪记录。您将看到：
+    
+    - 智能体运行的完整追踪
+    - 模型调用详情
+    - 工具执行记录
+    - 性能指标和时间信息
+  </Step>
+
+</Steps>
+
+## 追踪数据说明
+
+当您运行此示例时，以下数据将被捕获：
+
+### 1. 智能体执行追踪
+
+```json
+{
+  "trace_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b",
+  "span_name": "agent.run",
+  "attributes": {
+    "agent.name": "HackerNews 智能体",
+    "agent.model": "gpt-5-mini",
+    "agent.instructions": "你是一个 Hacker News 智能体。请简洁地回答问题。",
+    "agent.markdown": true
+  },
+  "events": [
+    {
+      "name": "agent.start",
+      "timestamp": "2024-01-01T12:00:00Z"
+    },
+    {
+      "name": "agent.end", 
+      "timestamp": "2024-01-01T12:00:05Z"
+    }
+  ]
+}
+```
+
+### 2. 模型调用追踪
+
+```json
+{
+  "trace_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b",
+  "span_name": "model.call",
+  "parent_span_id": "agent.run",
+  "attributes": {
+    "model.name": "gpt-5-mini",
+    "model.provider": "openai",
+    "model.temperature": 0.7,
+    "model.max_tokens": 1000
+  },
+  "events": [
+    {
+      "name": "model.request.start",
+      "attributes": {
+        "prompt_length": 150,
+        "response_format": "text"
+      }
+    },
+    {
+      "name": "model.response.received",
+      "attributes": {
+        "response_length": 200,
+        "finish_reason": "stop"
+      }
+    }
+  ]
+}
+```
+
+### 3. 工具执行追踪
+
+```json
+{
+  "trace_id": "0192d4b4-4c8e-7b8b-8b8b-8b8b8b8b8b8b",
+  "span_name": "tool.execute",
+  "parent_span_id": "agent.run",
+  "attributes": {
+    "tool.name": "hackernews_top_stories",
+    "tool.type": "api_call",
+    "tool.parameters": {
+      "limit": 10
+    }
+  },
+  "events": [
+    {
+      "name": "tool.start",
+      "timestamp": "2024-01-01T12:00:02Z"
+    },
+    {
+      "name": "tool.success",
+      "timestamp": "2024-01-01T12:00:03Z",
+      "attributes": {
+        "result_count": 10,
+        "response_time_ms": 1000
+      }
+    }
+  ]
+}
+```
+
+## 性能指标
+
+追踪系统会自动收集以下性能指标：
+
+| 指标 | 描述 | 示例值 |
+|------|------|--------|
+| `duration_ms` | 总执行时间 | 5000 |
+| `model_calls_count` | 模型调用次数 | 3 |
+| `tool_calls_count` | 工具调用次数 | 2 |
+| `tokens_used` | 使用的令牌数量 | 450 |
+| `error_count` | 错误次数 | 0 |
+
+## 分析追踪数据
+
+### 1. 在 AgentOS UI 中查看
+
+1. 访问 [AgentOS UI](https://os.agno.com/traces)
+2. 按时间范围、智能体名称或状态过滤追踪
+3. 点击追踪查看详细信息
+4. 分析性能指标和错误
+
+### 2. 使用 API 查询
+
+```python
+from agno.os.tracing import TraceQuery
+
+# 查询最近的追踪
+query = TraceQuery()
+traces = query.get_recent_traces(limit=10)
+
+# 按智能体名称过滤
+hackernews_traces = query.filter_by_agent("HackerNews 智能体")
+
+# 获取性能统计
+stats = query.get_performance_stats(time_range="1h")
+```
+
+### 3. 导出追踪数据
+
+```python
+# 导出追踪数据到 JSON
+import json
+
+traces = query.get_traces_by_time_range("2024-01-01", "2024-01-02")
+
+with open("traces_export.json", "w") as f:
+    json.dump(traces, f, indent=2)
+```
+
+## 故障排除
+
+### 常见问题
+
+#### 追踪数据未显示
+
+**问题**: 在 UI 中看不到追踪数据
+**解决方案**:
+1. 确认 `tracing=True` 已设置
+2. 检查数据库连接
+3. 验证 OpenTelemetry 包已安装
+4. 查看应用程序日志中的错误
+
+#### 性能影响
+
+**问题**: 追踪影响应用程序性能
+**解决方案**:
+1. 调整采样率
+2. 排除不必要的跨度
+3. 使用异步追踪处理
+4. 考虑使用专用的追踪数据库
+
+#### 数据存储问题
+
+**问题**: 追踪数据存储失败
+**解决方案**:
+1. 检查数据库权限
+2. 验证存储空间
+3. 确认数据库表结构
+4. 检查网络连接
+
+## 最佳实践
+
+### 1. 追踪配置
+
+- 为生产环境设置适当的采样率
+- 使用专用的追踪数据库
+- 定期清理旧的追踪数据
+- 监控追踪系统的性能
+
+### 2. 数据分析
+
+- 设置关键性能指标的告警
+- 定期分析追踪模式
+- 识别性能瓶颈
+- 优化智能体配置
+
+### 3. 隐私保护
+
+- 避免在追踪中记录敏感信息
+- 使用数据脱敏技术
+- 实施访问控制
+- 定期审查追踪数据
+
+## 下一步
+
+- 查看[带知识库的智能体追踪](/agent-os/tracing/usage/agent-with-knowledge-tracing)
+- 了解[带推理工具的智能体追踪](/agent-os/tracing/usage/agent-with-reasoning-tools-tracing)
+- 探索[团队追踪](/agent-os/tracing/usage/basic-team-tracing)
+- 查看[工作流追踪](/agent-os/tracing/usage/basic-workflow-tracing)

@@ -1,0 +1,80 @@
+---
+title: Azure OpenAI
+sidebarTitle: 概览
+description: Learn how to use Azure OpenAI 模型s in Agno.
+---
+
+Use OpenAI 模型s through Azure's infrastructure. Learn 更多功能 [here](https://learn.microsoft.com/azure/ai-服务s/openai/overview).
+
+Azure OpenAI provides access to OpenAI's 模型s like `GPT-4o`, `gpt-5-mini`, and 更多功能.
+
+## Authentication
+
+Navigate to Azure OpenAI on the [Azure Portal](https://portal.azure.com/) and create a 服务. Then, using the Azure AI Studio portal, create a deployment and set your environment variables:
+
+<CodeGroup>
+
+```bash Mac
+export AZURE_OPENAI_API_KEY=***
+export AZURE_OPENAI_ENDPOINT=***  # Of the form https://<your-resource-name>.openai.azure.com/openai/deployments/<your-deployment-name>
+# Optional:
+# export AZURE_OPENAI_DEPLOYMENT=***
+```
+
+```bash Windows
+setx AZURE_OPENAI_API_KEY ***  # Of the form https://<your-resource-name>.openai.azure.com/openai/deployments/<your-deployment-name>
+setx AZURE_OPENAI_ENDPOINT ***
+# Optional:
+# setx AZURE_OPENAI_DEPLOYMENT ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `AzureOpenAI` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.azure import AzureOpenAI
+from os import getenv
+
+agent = Agent(
+    model=AzureOpenAI(id="gpt-5-mini"),
+    markdown=True
+)
+
+# Print the response on the terminal
+agent.print_response("Share a 2 sentence horror story.")
+```
+
+</CodeGroup>
+
+## Prompt caching
+
+Prompt caching will happen automatically using our `AzureOpenAI` 模型. You can read 更多功能 about how OpenAI handle caching in [their docs](https://平台.openai.com/docs/guides/prompt-caching).
+
+## Advanced Examples
+
+查看 更多功能 examples [here](/integrations/models/cloud/azure-openai/usage/basic-stream).
+
+## Parameters
+
+| Parameter                | Type                                       | Default                        | Description                                                                    |
+| ------------------------ | ------------------------------------------ | ------------------------------ | ------------------------------------------------------------------------------ |
+| `id`                     | `str`                                      | (required)                     | The deployment name or 模型 name to use                                      |
+| `name`                   | `str`                                      | `"AzureOpenAI"`                | The name of the 模型                                                          |
+| `提供商`               | `str`                                      | `"Azure"`                      | The 提供商 of the 模型                                                      |
+| `api_key`                | `Optional[str]`                            | `None`                         | The API key for Azure OpenAI (defaults to AZURE_OPENAI_API_KEY env var)      |
+| `api_version`            | `Optional[str]`                            | `"2024-10-21"`                | The API version to use                                                         |
+| `azure_endpoint`         | `Optional[str]`                            | `None`                         | The Azure endpoint URL (defaults to AZURE_OPENAI_ENDPOINT env var)           |
+| `azure_deployment`       | `Optional[str]`                            | `None`                         | The deployment name (defaults to AZURE_OPENAI_DEPLOYMENT env var)             |
+| `base_url`               | `Optional[str]`                            | `None`                         | Alter原生 base URL for the 服务                                           |
+| `azure_ad_token`         | `Optional[str]`                            | `None`                         | Azure AD token for authentication                                              |
+| `azure_ad_token_提供商`| `Optional[Any]`                            | `None`                         | Azure AD token 提供商 for authentication                                     |
+| `default_headers`        | `Optional[Dict[str, str]]`                 | `None`                         | Default headers to include in all requests                                     |
+| `default_query`          | `Optional[Dict[str, Any]]`                 | `None`                         | Default query parameters to include in all requests                           |
+
+`AzureOpenAI` also 支持 the parameters of [OpenAI](/reference/models/openai).

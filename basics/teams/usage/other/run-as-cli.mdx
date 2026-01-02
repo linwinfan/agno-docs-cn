@@ -1,0 +1,211 @@
+---
+title: "交互式 CLI 写作团队"
+sidebarTitle: 交互式 CLI
+description: 这个示例演示了如何创建一个具有协作写作团队的交互式 CLI 应用程序。
+---
+
+
+<Steps>
+
+  <Step title="创建 Python 文件">
+    ```bash
+    touch run_as_cli.py
+    ```
+  </Step>
+
+  <Step title="将以下代码添加到您的 Python 文件中">
+
+    ```python run_as_cli.py
+    """✍️ 交互式写作团队 - CLI 应用示例
+
+    这个示例展示了如何创建一个具有协作写作团队的交互式 CLI 应用。
+
+    运行 `pip install openai agno ddgs` 来安装依赖。
+    """
+
+    from textwrap import dedent
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team import Team
+    from agno.tools.duckduckgo import DuckDuckGoTools
+
+    research_agent = Agent(
+        name="研究专家",
+        role="信息研究和事实验证",
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[DuckDuckGoTools()],
+        instructions=dedent("""\
+            您是一位专业的研究专家！
+
+            您的专业领域：
+            - **深度研究**：查找任何主题的全面、最新信息
+            - **事实验证**：交叉引用声明并验证准确性
+            - **来源分析**：评估来源的可信度和相关性
+            - **数据综合**：将研究整理成清晰、可用的见解
+
+            始终提供：
+            - 多个可靠的来源
+            - 关键统计数据和最新进展
+            - 不同的主题视角
+            - 可信的引用和链接
+            """),
+    )
+
+    brainstorm_agent = Agent(
+        name="创意头脑风暴专家",
+        role="创意生成和概念设计",
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions=dedent("""\
+            您是一位创意头脑风暴专家！
+
+            您的专长：
+            - **创意生成**：创建独特、引人入胜的内容概念
+            - **创意角度**：为熟悉的话题找到新颖的视角
+            - **内容格式**：建议多种信息呈现方式
+            - **受众定位**：根据特定受众定制创意
+
+            生成：
+            - 多种创意方法
+            - 引人注目的标题和钩子
+            - 吸引人的故事结构
+            - 互动内容创意
+            """),
+    )
+
+    writer_agent = Agent(
+        name="内容作者",
+        role="内容创作和故事叙述",
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions=dedent("""\
+            您是一位技艺娴熟的内容作者！
+
+            您的专长包括：
+            - **结构化写作**：创建清晰、逻辑性强的内容流
+            - **吸引人的风格**：撰写引人入胜、易于阅读的内容
+            - **受众意识**：根据目标读者调整语调和风格
+            - **SEO 知识**：优化搜索和参与度
+
+            创作：
+            - 结构良好的文章和帖子
+            - 引人入胜的开头和结尾
+            - 流畅的观点过渡
+            - 以行动为导向的内容
+            """),
+    )
+
+    editor_agent = Agent(
+        name="编辑",
+        role="内容编辑和质量保证",
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions=dedent("""\
+            您是一位一丝不苟的编辑！
+
+            您的专业领域：
+            - **语法与风格**：完善语言机制和流畅度
+            - **清晰度**：确保观点清晰且表达得当
+            - **一致性**：保持一致的语调和格式
+            - **质量保证**：最终审核以确保发布就绪
+
+            重点关注：
+            - 无错误的语法和标点
+            - 清晰、简洁的表达
+            - 逻辑结构和流畅度
+            - 专业的呈现效果
+            """),
+    )
+
+    writing_team = Team(
+        name="写作团队",
+        members=[research_agent, brainstorm_agent, writer_agent, editor_agent],
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions=dedent("""\
+            您是一个协作写作团队，擅长创建高质量内容！
+
+            团队流程：
+            1. **研究阶段**：收集全面、最新的信息
+            2. **创意阶段**：头脑风暴独特的角度和方法
+            3. **写作阶段**：创建结构化、引人入胜的内容
+            4. **编辑阶段**：润色和完善最终作品
+
+            协作风格：
+            - 每个成员贡献其专业技能
+            - 在彼此的贡献基础上构建
+            - 确保连贯、高质量的最终输出
+            - 提供多样化的视角和创意
+
+            始终交付经过充分研究、富有创意、
+            专业撰写和精心编辑的内容！
+            """),
+        show_members_responses=True,
+        markdown=True,
+    )
+
+    if __name__ == "__main__":
+        print("💡 告诉我们您的写作项目，观看团队协作！")
+        print("✏️ 输入 'exit'、'quit' 或 'bye' 结束会话。\n")
+
+        writing_team.cli_app(
+            input="您好！我们很期待为您处理写作项目。今天您希望我们帮您创建什么内容？我们的团队可以处理研究、头脑风暴、写作和编辑 - 只需告诉我们您的需求！",
+            user="客户",
+            emoji="👥",
+            stream=True,
+        )
+
+        ###########################################################################
+        # ASYNC CLI APP
+        ###########################################################################
+        # import asyncio
+
+        # asyncio.run(writing_team.acli_app(
+        #     input="Hello! We're excited to work on your writing project. What would you like us to help you create today? Our team can handle research, brainstorming, writing, and editing - just tell us what you need!",
+        #     user="Client",
+        #     emoji="👥",
+        #     stream=True,
+        # ))
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖库">
+    ```bash
+    pip install -U agno openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置您的 OpenAI API 密钥">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python run_as_cli.py
+    ```
+    
+    ```bash Windows
+    python run_as_cli.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查看所有示例">
+  探索 Agno 仓库中所有可用的示例。点击下面的链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/other" target="_blank">
+    GitHub 上的 Agno 示例代码
+  </Link>
+</Step>
+</Steps>
+
+

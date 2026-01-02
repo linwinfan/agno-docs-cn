@@ -1,0 +1,125 @@
+---
+title: Agno 助手智能体
+mode: wide
+---
+
+构建一个使用您自己的文档回答问题的 AI 助手。此示例使用检索增强生成（RAG）来确保准确、基于文档的响应，而不是产生幻觉。
+
+## 您将学到什么
+
+通过构建这个智能体，您将了解：
+- 如何创建向量数据库来存储和搜索文档
+- 为什么混合搜索（结合语义和关键词匹配）能提高检索准确性
+- 如何在多次交互中维护对话历史
+- 如何确保智能体搜索知识库而不是仅依赖训练数据
+
+## 使用场景
+
+构建文档助手、客户支持智能体、帮助台系统或需要引用特定知识库的教育导师。
+
+## 工作原理
+
+智能体使用检索增强生成（RAG）来回答问题：
+
+1. **搜索**：使用混合搜索（语义 + 关键词匹配）查询向量数据库
+2. **检索**：从 LanceDB 获取相关文档片段
+3. **上下文**：将检索到的文档与来自 SQLite 的对话历史结合起来
+4. **生成**：LLM 创建基于文档的答案
+
+这确保响应基于您的实际文档，而不仅仅是模型的训练数据。
+
+## 代码
+
+```python agno_assist.py
+import asyncio
+
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.knowledge.embedder.openai import OpenAIEmbedder
+from agno.knowledge.knowledge import Knowledge
+from agno.models.openai import OpenAIChat
+from agno.vectordb.lancedb import LanceDb, SearchType
+
+# 创建具有混合搜索的知识库
+knowledge = Knowledge(
+    vector_db=LanceDb(
+        uri="tmp/lancedb",
+        table_name="agno_assist_knowledge",
+        search_type=SearchType.hybrid,  # 语义 + 关键词搜索
+        embedder=OpenAIEmbedder(id="text-embedding-3-small"),
+    ),
+)
+
+# 异步加载文档
+asyncio.run(
+    knowledge.add_content_async(
+        name="Agno Docs", 
+        url="https://docs.agno.com/llms-full.txt"
+    )
+)
+
+# 创建具有知识和会话持久性的智能体
+agno_assist = Agent(
+    name="Agno Assist",
+    model=OpenAIChat(id="gpt-4o"),
+    description="您帮助回答有关 Agno 框架的问题。",
+    instructions="在回答问题之前搜索您的知识。",  # 强制知识搜索
+    knowledge=knowledge,
+    db=SqliteDb(  # 存储对话历史
+        session_table="agno_assist_sessions", 
+        db_file="tmp/agents.db"
+    ),
+    add_history_to_context=True,
+    add_datetime_to_context=True,
+    markdown=True,
+)
+
+if __name__ == "__main__":
+    agno_assist.print_response("什么是 Agno？")
+    agno_assist.print_response("如何创建带有工具的智能体？")
+    agno_assist.print_response("Agno 支持哪些向量数据库？")
+
+```
+
+## 预期效果
+
+智能体将通过搜索 Agno 文档来回答问题。首次运行时，它会将文档索引到本地向量数据库（存储在 `tmp/` 目录中）。后续运行会重用现有数据库以获得更快的响应。
+
+每个答案都基于实际的文档内容，智能体维护对话历史，因此您可以提出后续问题。
+
+## 使用方法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="设置您的 API 密钥">
+    ```bash
+    export OPENAI_API_KEY=xxx
+    ```
+  </Step>
+
+  <Step title="安装库">
+    ```bash
+    pip install -U agno openai lancedb tantivy sqlalchemy pandas
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python agno_assist.py
+    ```
+
+    ```bash Windows
+    python agno_assist.py
+    ```
+    </CodeGroup>
+  </Step>
+</Steps>
+
+## 下一步
+
+- 将 `add_content_async()` 中的 URL 替换为您自己的文档
+- 删除 `tmp/` 目录以重新加载新内容
+- 修改 `instructions` 来自定义智能体的行为
+- 探索[知识库](/basics/knowledge/knowledge-bases)进行高级配置

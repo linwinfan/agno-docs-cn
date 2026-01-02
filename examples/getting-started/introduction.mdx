@@ -1,0 +1,110 @@
+---
+title: 介绍
+---
+
+本指南介绍了使用 Agno 构建智能体的基础知识。
+
+这些示例相互递进，逐步介绍新概念和功能。每个示例都包含详细注释、示例提示和所需依赖项。
+
+## 设置
+
+创建虚拟环境：
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+安装所需的依赖项：
+
+```bash
+pip install openai ddgs lancedb tantivy pypdf requests exa-py newspaper4k lxml_html_clean sqlalchemy agno
+```
+
+导出您的 OpenAI API 密钥：
+
+```bash
+export OPENAI_API_KEY=your_api_key
+```
+
+## 示例
+
+<CardGroup cols={3}>
+  <Card title="基础智能体" icon="robot" iconType="duotone" href="./01-basic-agent">
+    构建一个具有鲜明个性的新闻报告员。这个智能体仅展示基本的 LLM 推理。
+  </Card>
+
+  <Card title="带工具的智能体" icon="toolbox" iconType="duotone" href="./02-agent-with-tools">
+    使用 DuckDuckGo 添加网络搜索功能，用于实时信息收集。
+  </Card>
+
+  <Card title="带知识的智能体" icon="brain" iconType="duotone" href="./03-agent-with-knowledge">
+    为您的智能体添加向量数据库，用于存储和搜索知识。
+  </Card>
+
+  <Card title="带存储的智能体" icon="database" iconType="duotone" href="./06-agent-with-storage">
+    为您的智能体添加持久性，包括会话管理和历史记录功能。
+  </Card>
+
+  <Card title="智能体团队" icon="users" iconType="duotone" href="./17-agent-team">
+    创建一个专门从事市场研究和财务分析的智能体团队。
+  </Card>
+
+  <Card title="结构化输出" icon="code" iconType="duotone" href="./05-structured-output">
+    使用 Pydantic 模型生成结构化输出。
+  </Card>
+
+  <Card title="自定义工具" icon="wrench" iconType="duotone" href="./04-write-your-own-tool">
+    创建并集成自定义工具到您的智能体。
+  </Card>
+
+  <Card title="研究智能体" icon="magnifying-glass" iconType="duotone" href="./18-research-agent-exa">
+    使用 Exa 构建 AI 研究智能体，具有可控的输出导向。
+  </Card>
+
+  <Card title="研究工作流" icon="diagram-project" iconType="duotone" href="./19-blog-generator-workflow">
+    创建一个结合网络搜索和内容抓取的研究工作流。
+  </Card>
+
+  <Card title="图像智能体" icon="image" iconType="duotone" href="./13-image-agent">
+    创建一个能够理解图像的智能体。
+  </Card>
+
+  <Card title="图像生成" icon="paintbrush" iconType="duotone" href="./14-image-generation">
+    创建一个能够使用 DALL-E 生成图像的智能体。
+  </Card>
+
+  <Card title="视频生成" icon="video" iconType="duotone" href="./15-video-generation">
+    创建一个能够使用 ModelsLabs 生成视频的智能体。
+  </Card>
+
+  <Card title="音频智能体" icon="microphone" iconType="duotone" href="./16-audio-agent">
+    创建一个能够处理音频输入并生成响应的智能体。
+  </Card>
+
+  <Card title="带状态的智能体" icon="database" iconType="duotone" href="./07-agent-state">
+    创建一个具有会话状态管理的智能体。
+  </Card>
+
+  <Card title="智能体上下文" icon="sitemap" iconType="duotone" href="./08-agent-context">
+    在 agent.run 时评估依赖项并将其注入到指令中。
+  </Card>
+
+  <Card title="智能体会话" icon="clock-rotate-left" iconType="duotone" href="./09-agent-session">
+    创建一个在对话间具有持久会话记忆的智能体。
+  </Card>
+
+  <Card title="用户记忆" icon="memory" iconType="duotone" href="./10-user-memories-and-summaries">
+    创建一个存储用户记忆和摘要的智能体。
+  </Card>
+
+  <Card title="函数重试" icon="rotate" iconType="duotone" href="./11-retry-function-call">
+    处理失败或不满意输出的函数重试。
+  </Card>
+
+  <Card title="人在回路" icon="user-check" iconType="duotone" href="./12-human-in-the-loop">
+    添加用户确认和安全检查，实现交互式智能体控制。
+  </Card>
+</CardGroup>
+
+每个示例都包含可运行代码和详细说明。我们建议按顺序学习，因为概念是建立在先前示例之上的。

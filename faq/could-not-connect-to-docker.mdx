@@ -1,0 +1,59 @@
+---
+title: 无法连接到 Docker
+sidebarTitle: Docker 连接错误
+---
+
+如果您已经启动并运行了 Docker，但收到以下错误，请继续阅读：
+
+```bash
+ERROR    Could not connect to docker. Please confirm docker is installed and running
+ERROR    Error while fetching server API version: ('Connection aborted.', FileNotFoundError(2, 'No such file or directory'))
+```
+
+## 快速修复
+
+使用以下命令创建 `/var/run/docker.sock` 符号链接：
+
+```shell
+sudo ln -s "$HOME/.docker/run/docker.sock" /var/run/docker.sock
+```
+
+在 99% 的情况下，这应该可以解决问题。如果不行，请尝试：
+
+```shell
+sudo chown $USER /var/run/docker.sock
+```
+
+## 详细信息
+
+Agno 使用 [docker-py](https://github.com/docker/docker-py) 来运行容器，如果 `/var/run/docker.sock` 缺失或权限不正确，它就无法连接到 docker。
+
+**要修复此问题，请使用以下命令创建 `/var/run/docker.sock` 文件：**
+
+```shell
+sudo ln -s "$HOME/.docker/run/docker.sock" /var/run/docker.sock
+```
+
+如果这不起作用，请使用 `ls -l /var/run/docker.sock` 检查权限。
+
+如果 `/var/run/docker.sock` 不存在，请检查 `$HOME/.docker/run/docker.sock` 文件是否缺失。如果缺失，请重新安装 Docker。
+
+**如果以上方法都不起作用且 `/var/run/docker.sock` 存在：**
+
+- 为您的用户授予 `/var/run/docker.sock` 文件权限：
+
+```shell
+sudo chown $USER /var/run/docker.sock
+```
+
+- 为您的用户授予 docker 组权限：
+
+```shell
+sudo usermod -a -G docker $USER
+```
+
+## 更多信息
+
+- [Docker-py Issue](https://github.com/docker/docker-py/issues/3059#issuecomment-1294369344)
+- [Stackoverflow answer](https://stackoverflow.com/questions/48568172/docker-sock-permission-denied/56592277#56592277)
+

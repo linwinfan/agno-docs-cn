@@ -1,0 +1,69 @@
+---
+title: DeepInfra
+sidebarTitle: 概览
+description: Learn how to use DeepInfra 模型s in Agno.
+---
+
+Leverage DeepInfra's powerful command 模型s and 更多功能.
+
+[DeepInfra](https://deepinfra.com) 支持 a wide range of 模型s. See their library of 模型s [here](https://deepinfra.com/模型s).
+
+We recommend experimenting to find the best-suited 模型 for your use-case. Here are some general recommendations:
+
+- `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` 模型 is good for reasoning.
+- `meta-llama/Llama-2-70b-chat-hf` 模型 is good for basic use-cases.
+- `meta-llama/Llama-3.3-70B-Instruct` 模型 is good for multi-step tasks.
+
+DeepInfra has rate limits. See the [docs](https://deepinfra.com/docs/advanced/rate-limits) for 更多功能 information.
+
+## Authentication
+
+Set your `DEEPINFRA_API_KEY` environment variable. Get your key from [here](https://deepinfra.com/dash/api_keys).
+
+<CodeGroup>
+
+```bash Mac
+export DEEPINFRA_API_KEY=***
+```
+
+```bash Windows
+setx DEEPINFRA_API_KEY ***
+```
+
+</CodeGroup>
+
+## Example
+
+Use `DeepInfra` with your `Agent`:
+
+<CodeGroup>
+
+```python agent.py
+from agno.agent import Agent
+from agno.models.deepinfra import DeepInfra
+
+agent = Agent(
+    model=DeepInfra(id="meta-llama/Llama-2-70b-chat-hf"),
+    markdown=True
+)
+
+# Print the response in the terminal
+agent.print_response("Share a 2 sentence horror story.")
+
+```
+
+</CodeGroup>
+
+<Note> 查看 更多功能 examples [here](/integrations/models/gateways/deepinfra/usage/basic). </Note>
+
+## 参数
+
+| Parameter    | Type               | Default                                       | Description                                                           |
+| ------------ | ------------------ | --------------------------------------------- | --------------------------------------------------------------------- |
+| `id`         | `str`              | `"meta-llama/Llama-2-70b-chat-hf"`           | The id of the DeepInfra 模型 to use                                 |
+| `name`       | `str`              | `"DeepInfra"`                                | The name of the 模型                                                 |
+| `提供商`   | `str`              | `"DeepInfra"`                                | The 提供商 of the 模型                                             |
+| `api_key`    | `Optional[str]`    | `None`                                        | The API key for DeepInfra (defaults to DEEPINFRA_API_KEY env var)    |
+| `base_url`   | `str`              | `"https://api.deepinfra.com/v1/openai"`      | The base URL for the DeepInfra API                                    |
+
+`DeepInfra` also 支持 the parameters of [OpenAI](/reference/models/openai).

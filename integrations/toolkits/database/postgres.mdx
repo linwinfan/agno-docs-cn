@@ -1,0 +1,87 @@
+---
+title: Postgres
+description: The PostgresTools toolkit enables an Agent to interact with a PostgreSQL 数据库.
+sidebarTitle: Postgres
+keywords: [postgres, database]
+---
+
+**PostgresTools** enable an Agent to interact with a PostgreSQL 数据库.
+
+## Prerequisites
+
+The 以下 example requires the `psycopg2` library.
+
+```shell
+pip install -U psycopg2
+```
+
+You will also need a 数据库. The 以下 example uses a Postgres 数据库 running in a Docker container.
+
+```shell
+docker run -d \
+  -e POSTGRES_DB=ai \
+  -e POSTGRES_USER=ai \
+  -e POSTGRES_PASSWORD=ai \
+  -e PGDATA=/var/lib/postgresql/data/pgdata \
+  -v pgvolume:/var/lib/postgresql/data \
+  -p 5532:5432 \
+  --name pgvector \
+  agno/pgvector:16
+```
+
+## Example
+
+The 以下 智能体 will list all tables in the 数据库.
+
+```python cookbook/14_tools/postgres.py
+from agno.agent import Agent
+from agno.tools.postgres import PostgresTools
+
+# Initialize PostgresTools with connection details
+postgres_tools = PostgresTools(
+    host="localhost",
+    port=5532,
+    db_name="ai",
+    user="ai",
+    password="ai"
+)
+
+# Create an agent with the PostgresTools
+agent = Agent(tools=[postgres_tools])
+
+# Example: Ask the agent to run a SQL query
+agent.print_response("""
+Please run a SQL query to get all users from the users table
+who signed up in the last 30 days
+""")
+```
+
+## Toolkit 参数
+
+| Name           | Type                              | Default  | Description                                    |
+| -------------- | --------------------------------- | -------- | ---------------------------------------------- |
+| `connection`   | `Optional[PgConnection[DictRow]]` | `None`   | Optional existing psycopg connection object.   |
+| `db_name`      | `Optional[str]`                   | `None`   | Optional name of the 数据库 to connect to.   |
+| `user`         | `Optional[str]`                   | `None`   | Optional username for 数据库 authentication. |
+| `password`     | `Optional[str]`                   | `None`   | Optional password for 数据库 authentication. |
+| `host`         | `Optional[str]`                   | `None`   | Optional host for the 数据库 connection.     |
+| `port`         | `Optional[int]`                   | `None`   | Optional port for the 数据库 connection.     |
+| `table_schema` | `str`                             | `public` | Schema name to search for tables.              |
+
+## Toolkit Functions
+
+| Function               | Description                                                                                                                                                                                                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `show_tables`          | Retrieves and displays a list of tables in the 数据库. Returns the list of tables.                                                                                                                                                                                                   |
+| `describe_table`       | Describes the structure of a specified table by returning its columns, 数据 types, and nullability. Parameters include `table` (str) to specify the table name. Returns the table description.                                                                                         |
+| `summarize_table`      | Summarizes a table by computing aggregates such as min, max, average, standard deviation, and non-null counts for numeric columns, or unique values and average length for text columns. Parameters include `table` (str) to specify the table name. Returns the summary of the table. |
+| `inspect_query`        | Inspects an SQL query by returning the query plan using EXPLAIN. Parameters include `query` (str) to specify the SQL query. Returns the query plan.                                                                                                                                    |
+| `export_table_to_path` | Exports a specified table in CSV format to a given path. Parameters include `table` (str) to specify the table name and `path` (str) to specify where to save the file. Returns the result of the export operation.                                                                    |
+| `run_query`            | Executes a read-only SQL query and returns the result. Parameters include `query` (str) to specify the SQL query. Returns the result of the query execution.                                                                                                                           |
+
+You can use `include_tools` or `exclude_tools` to modify the list of tools the 智能体 has access to. Learn 更多功能 about [selecting tools](/basics/tools/selecting-tools).
+
+## 开发者资源
+
+- 查看 [Tools](https://github.com/agno-agi/agno/blob/main/libs/agno/agno/tools/postgres.py)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/14_tools/postgres_tools.py)

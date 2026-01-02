@@ -1,0 +1,68 @@
+---
+title: 授权失败 - JWT 验证
+sidebarTitle: 授权失败 - JWT 验证
+---
+
+如果您的 AgentOS 中同时启用了安全密钥和授权时遇到授权失败，本指南将帮助您解决此问题。
+
+## 问题所在
+
+当同时启用安全密钥身份验证和授权时，您可能会遇到授权失败错误：
+
+![Authorization Failed Error](/images/auth-failed.png)
+
+发生这种情况是因为授权优先于安全密钥。了解更多关于[安全密钥](https://docs.agno.com/agent-os/security/overview#security-key-authentication)的信息。
+
+## 解决方案
+
+解决方案取决于您的 AgentOS 版本：
+
+### 对于较旧版本（v2.3.13 之前）
+
+如果您运行的 AgentOS 版本早于 **v2.3.13**，该平台仅支持安全密钥身份验证。
+
+<Accordion title="关闭授权" defaultOpen={true}>
+  1. 在 AgentOS 控制平面上**禁用授权**
+  2. 继续仅使用安全密钥身份验证
+</Accordion>
+
+### 对于较新版本 <Badge icon="code-branch" color="orange"><Tooltip tip="Introduced in v2.3.13" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.3.13">v2.3.13</Tooltip></Badge> 及更高版本
+
+如果您运行的 AgentOS 版本是 **v2.3.13** 或更新版本，您有两个选项来解决此冲突：
+
+<Note>
+授权（JWT 验证）优先于安全密钥身份验证，因为它提供了 RBAC 的细粒度权限。
+</Note>
+
+<AccordionGroup>
+  <Accordion title="选项 1：关闭授权">
+    如果您想继续使用安全密钥身份验证：
+
+    1. 从 AgentOS 控制平面**禁用授权**
+    2. 继续仅使用安全密钥身份验证
+  </Accordion>
+
+  <Accordion title="选项 2：切换到授权（推荐）" defaultOpen={true}>
+    如果您想使用 JWT 验证的授权：
+
+    1. 从 AgentOS 控制平面**禁用安全密钥身份验证**
+    2. 从您的环境中**取消设置安全密钥**：
+
+    ```bash
+    # 移除旧的安全密钥
+    unset OS_SECURITY_KEY
+    ```
+
+    3. **确保授权已启用**在 AgentOS 控制平面上并设置验证密钥。[更多信息](https://docs.agno.com/agent-os/security/overview#switching-to-rbac)
+
+    ```bash
+    # 设置新的 JWT 验证密钥
+    export JWT_VERIFICATION_KEY="your-public-key"
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 后续步骤
+
+- [JWT 授权配置](https://docs.agno.com/agent-os/security/overview)
+- [迁移到 RBAC](https://docs.agno.com/agent-os/security/overview#switching-to-rbac)

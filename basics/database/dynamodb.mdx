@@ -1,0 +1,33 @@
+---
+title: DynamoDB
+description: 学习使用 DynamoDB 作为您的代理数据库
+sidebarTitle: 概述
+---
+
+Agno 支持使用 [DynamoDB](https://aws.amazon.com/dynamodb/) 作为数据库，通过 `DynamoDb` 类实现。
+
+## 用法
+
+要连接到 DynamoDB，您需要有效的 AWS 凭证。您可以将它们设置为环境变量：
+
+- `AWS_REGION`: 要连接的 AWS 区域。
+- `AWS_ACCESS_KEY_ID`: 您的 AWS 访问密钥 ID。
+- `AWS_SECRET_ACCESS_KEY`: 您的 AWS 秘密访问密钥。
+
+```python dynamo_for_agent.py
+from agno.db.dynamo import DynamoDb
+
+# 设置您的数据库
+db = DynamoDb()
+
+# 使用数据库设置您的代理
+agent = Agent(db=db)
+```
+
+## 参数
+
+<Snippet file="db-dynamodb-params.mdx" />
+
+## 开发者资源
+
+- 查看[示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/07_database/dynamodb/dynamo_for_agent.py)

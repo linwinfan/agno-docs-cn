@@ -1,0 +1,91 @@
+---
+title: 智能体状态
+sidebarTitle: 智能体状态
+mode: wide
+---
+
+本示例展示如何创建在交互间维护状态的智能体。它演示了一个简单的计数器机制，但此模式可以扩展到更复杂的状态管理，如维护对话上下文、用户偏好或跟踪多步骤过程。
+
+尝试的示例提示：
+- "将计数器增加 3 次并告诉我最终计数"
+- "我们当前的计数是多少？再加 2"
+- "让我们将计数器增加 5 次，但告诉我每一步"
+- "给我们的计数加 4 并提醒我从哪里开始"
+- "将计数器增加两次并总结我们的历程"
+
+<Steps>
+  <Step title="创建 Python 文件">
+    创建文件 `agent_state.py`
+  </Step>
+
+  <Step title="向文件添加代码">
+    ```python agent_state.py
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.run import RunContext
+
+
+def increment_counter(run_context: RunContext) -> str:
+    """增加会话状态中的计数器。"""
+    # 如果计数器不存在则初始化
+    if not run_context.session_state:
+        run_context.session_state = {}
+
+    if "count" not in run_context.session_state:
+        run_context.session_state["count"] = 0
+
+    # 增加计数器
+    run_context.session_state["count"] += 1
+
+    return f"计数器已增加！当前计数：{run_context.session_state['count']}"
+
+
+def get_counter(run_context: RunContext) -> str:
+    """获取当前计数器值。"""
+    if not run_context.session_state:
+        run_context.session_state = {}
+
+    count = run_context.session_state.get("count", 0)
+    return f"当前计数：{count}"
+
+
+# 创建维护状态的智能体
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    # 初始化会话状态，计数器从 0 开始
+    session_state={"count": 0},
+    tools=[increment_counter, get_counter],
+    # 在指令中使用会话状态中的变量
+    instructions="您可以增加和检查计数器。当前计数是：{count}",
+    # 重要：在消息中解析状态，以便智能体可以看到状态变化
+    resolve_in_context=True,
+    markdown=True,
+)
+
+# 测试计数器功能
+print("测试计数器功能...")
+agent.print_response(
+    "让我们将计数器增加 3 次并观察状态变化！", stream=True
+)
+print(f"最终会话状态：{agent.get_session_state()}")
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装库">
+    ```bash
+    pip install openai agno
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI 密钥">
+    <Snippet file="set-openai-key.mdx" />
+  </Step>
+
+  <Step title="运行智能体">
+    ```bash
+    python agent_state.py
+    ```
+  </Step>
+</Steps>

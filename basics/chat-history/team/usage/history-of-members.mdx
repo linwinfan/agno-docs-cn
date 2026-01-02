@@ -1,0 +1,107 @@
+---
+title: 成员级别历史
+sidebarTitle: 成员级别历史
+---
+
+本示例演示了一个团队，其中每个成员通过在单个智能体上设置 `add_history_to_context=True` 来访问自己的历史记录。
+
+与团队级别历史不同，每个成员只能访问自己的对话历史，而不能访问其他成员或团队的历史。
+
+在以下情况下使用成员级别历史：
+- 每个成员处理不同的、独立的任务
+- 不需要跨成员的上下文共享
+- 成员应维护独立的对话线程
+- 您希望最小化每个成员的上下文大小
+
+
+```python history_of_members.py
+from uuid import uuid4
+
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+
+german_agent = Agent(
+    name="German Agent",
+    role="您回答德语问题。",
+    model=OpenAIChat(id="gpt-5-mini"),
+    add_history_to_context=True,  # 成员将能够访问自己的历史记录。无需在成员上设置数据库。
+)
+
+spanish_agent = Agent(
+    name="Spanish Agent",
+    role="您回答西班牙语问题。",
+    model=OpenAIChat(id="gpt-5-mini"),
+    add_history_to_context=True,  # 成员将能够访问自己的历史记录。无需在成员上设置数据库。
+)
+
+
+multi_lingual_q_and_a_team = Team(
+    name="多语言问答团队",
+    model=OpenAIChat("gpt-5-mini"),
+    members=[german_agent, spanish_agent],
+    instructions=[
+        "您是一个多语言问答团队，可以用英语和西班牙语回答问题。您必须根据问题的语言将任务委派给适当的成员。",
+        "如果问题是德语，请委派给德语智能体。如果是西班牙语，请委派给西班牙语智能体。",
+    ],
+    db=SqliteDb(
+        db_file="tmp/multi_lingual_q_and_a_team.db"
+    ),  # 添加数据库以存储对话历史。这是历史功能正常工作的必要条件。
+    determine_input_for_members=False,  # 直接将输入发送给成员智能体，而不需要团队领导者合成自己的输入。
+    respond_directly=True,  # 团队领导者不会处理来自成员的响应，而是直接返回它们。
+)
+
+
+session_id = f"conversation_{uuid4()}"
+
+## 用德语提问
+multi_lingual_q_and_a_team.print_response(
+    "Hallo, wie heißt du? Mein Name ist John.", stream=True, session_id=session_id
+)
+
+## 用德语跟进
+multi_lingual_q_and_a_team.print_response(
+    "Erzähl mir eine Geschichte mit zwei Sätzen und verwende dabei meinen richtigen Namen.",
+    stream=True,
+    session_id=session_id,
+)
+
+## 用西班牙语提问
+multi_lingual_q_and_a_team.print_response(
+    "Hola, ¿cómo se llama? Mi nombre es Juan.", stream=True, session_id=session_id
+)
+
+## 用西班牙语跟进
+multi_lingual_q_and_a_team.print_response(
+    "Cuenta una historia de dos oraciones y utiliza mi nombre real.",
+    stream=True,
+    session_id=session_id,
+)
+```
+
+## 使用方法
+
+<Steps>
+
+    <Snippet file="create-venv-step.mdx" />
+
+    <Step title="安装所需库">
+        ```bash
+        pip install agno openai
+        ```
+    </Step>
+
+    <Step title="设置环境变量">
+        ```bash
+        export OPENAI_API_KEY=****
+        ```
+    </Step>
+
+    <Step title="运行智能体">
+        ```bash
+        python history_of_members.py
+        ```
+    </Step>
+
+</Steps>

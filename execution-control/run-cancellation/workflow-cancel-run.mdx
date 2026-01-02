@@ -1,0 +1,262 @@
+---
+title: "工作流运行取消"
+sidebarTitle: 取消工作流运行
+description: 学习如何通过在单独线程中启动工作流运行并从另一个线程取消它来取消正在运行的工作流执行。
+keywords: [工作流运行取消, 取消工作流运行, 取消工作流运行示例]
+---
+
+此示例演示如何通过在单独线程中启动工作流运行并从另一个线程取消它来取消正在运行的工作流执行。它展示了正确处理已取消响应和线程管理。
+
+## 示例
+
+```python workflow_cancel_run.py
+"""
+演示如何取消正在运行的工作流执行的示例。
+
+此示例展示如何：
+1. 在单独线程中启动工作流运行
+2. 从另一个线程取消运行
+3. 处理已取消的响应
+"""
+
+import threading
+import time
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.run.agent import RunEvent
+from agno.run.base import RunStatus
+from agno.run.workflow import WorkflowRunEvent
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.workflow.step import Step
+from agno.workflow.workflow import Workflow
+
+
+def long_running_task(workflow: Workflow, run_id_container: dict):
+    """
+    模拟可以取消的长时间运行的工作流任务。
+
+    Args:
+        workflow: 要运行的工作流
+        run_id_container: 用于存储 run_id 以便取消的字典
+
+    Returns:
+        包含运行结果和状态的字典
+    """
+    try:
+        # 启动工作流运行 - 这模拟一个长任务
+        final_response = None
+        content_pieces = []
+
+        for chunk in workflow.run(
+            "写一个关于学习编程的龙的非常长的故事。"
+            "使其至少 2000 字，包含详细描述和对话。"
+            "慢慢来，要非常详尽。",
+            stream=True,
+        ):
+            if "run_id" not in run_id_container and chunk.run_id:
+                print(f"工作流运行已启动: {chunk.run_id}")
+                run_id_container["run_id"] = chunk.run_id
+
+            if chunk.event in [RunEvent.run_content]:
+                print(chunk.content, end="", flush=True)
+                content_pieces.append(chunk.content)
+            elif chunk.event == RunEvent.run_cancelled:
+                print(f"\n工作流运行被取消: {chunk.run_id}")
+                run_id_container["result"] = {
+                    "status": "cancelled",
+                    "run_id": chunk.run_id,
+                    "cancelled": True,
+                    "content": "".join(content_pieces)[:200] + "..."
+                    if content_pieces
+                    else "取消前无内容",
+                }
+                return
+            elif chunk.event == WorkflowRunEvent.workflow_cancelled:
+                print(f"\n工作流运行被取消: {chunk.run_id}")
+                run_id_container["result"] = {
+                    "status": "cancelled",
+                    "run_id": chunk.run_id,
+                    "cancelled": True,
+                    "content": "".join(content_pieces)[:200] + "..."
+                    if content_pieces
+                    else "取消前无内容",
+                }
+                return
+            elif hasattr(chunk, "status") and chunk.status == RunStatus.completed:
+                final_response = chunk
+
+        # 如果我们到达这里，运行已成功完成
+        if final_response:
+            run_id_container["result"] = {
+                "status": final_response.status.value
+                if final_response.status
+                else "completed",
+                "run_id": final_response.run_id,
+                "cancelled": final_response.status == RunStatus.cancelled,
+                "content": ("".join(content_pieces)[:200] + "...")
+                if content_pieces
+                else "无内容",
+            }
+        else:
+            run_id_container["result"] = {
+                "status": "unknown",
+                "run_id": run_id_container.get("run_id"),
+                "cancelled": False,
+                "content": ("".join(content_pieces)[:200] + "...")
+                if content_pieces
+                else "无内容",
+            }
+
+    except Exception as e:
+        print(f"\n运行中的异常: {str(e)}")
+        run_id_container["result"] = {
+            "status": "error",
+            "error": str(e),
+            "run_id": run_id_container.get("run_id"),
+            "cancelled": True,
+            "content": "发生错误",
+        }
+
+
+def cancel_after_delay(
+    workflow: Workflow, run_id_container: dict, delay_seconds: int = 3
+):
+    """
+    在指定延迟后取消工作流运行。
+
+    Args:
+        workflow: 应该取消其运行的工作流
+        run_id_container: 包含要取消的 run_id 的字典
+        delay_seconds: 取消前等待多长时间
+    """
+    print(f"将在 {delay_seconds} 秒后取消工作流运行...")
+    time.sleep(delay_seconds)
+
+    run_id = run_id_container.get("run_id")
+    if run_id:
+        print(f"正在取消工作流运行: {run_id}")
+        success = workflow.cancel_run(run_id)
+        if success:
+            print(f"工作流运行 {run_id} 已标记为取消")
+        else:
+            print(
+                f"取消工作流运行 {run_id} 失败（可能不存在或已完成）"
+            )
+    else:
+        print("未找到要取消的 run_id")
+
+
+def main():
+    """演示工作流运行取消的主函数。"""
+
+    # 创建工作流智能体
+    researcher = Agent(
+        name="Research Agent",
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[DuckDuckGoTools()],
+        instructions="研究给定主题并提供关键事实和见解。",
+    )
+
+    writer = Agent(
+        name="Writing Agent",
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions="基于提供的研究写一篇全面的文章。使其引人入胜且结构良好。",
+    )
+    research_step = Step(
+        name="research",
+        agent=researcher,
+        description="研究主题并收集信息",
+    )
+
+    writing_step = Step(
+        name="writing",
+        agent=writer,
+        description="基于研究写文章",
+    )
+
+    # 创建一个将上述步骤链接在一起的步骤序列
+    article_workflow = Workflow(
+        description="从研究到写作的自动化文章创建",
+        steps=[research_step, writing_step],
+        debug_mode=True,
+    )
+
+    print("启动工作流运行取消示例...")
+    print("=" * 50)
+
+    # 在线程间共享 run_id 的容器
+    run_id_container = {}
+
+    # 在单独线程中启动工作流运行
+    workflow_thread = threading.Thread(
+        target=lambda: long_running_task(article_workflow, run_id_container),
+        name="WorkflowRunThread",
+    )
+
+    # 启动取消线程
+    cancel_thread = threading.Thread(
+        target=cancel_after_delay,
+        args=(article_workflow, run_id_container, 8),  # 8 秒后取消
+        name="CancelThread",
+    )
+
+    # 启动两个线程
+    print("启动工作流运行线程...")
+    workflow_thread.start()
+
+    print("启动取消线程...")
+    cancel_thread.start()
+
+    # 等待两个线程完成
+    print("等待线程完成...")
+    workflow_thread.join()
+    cancel_thread.join()
+
+    # 打印结果
+    print("\n" + "=" * 50)
+    print("结果:")
+    print("=" * 50)
+
+    result = run_id_container.get("result")
+    if result:
+        print(f"状态: {result['status']}")
+        print(f"运行 ID: {result['run_id']}")
+        print(f"是否被取消: {result['cancelled']}")
+
+        if result.get("error"):
+            print(f"错误: {result['error']}")
+        else:
+            print(f"内容预览: {result['content']}")
+
+        if result["cancelled"]:
+            print("\n成功: 工作流运行已成功取消！")
+        else:
+            print("\n警告: 工作流运行在取消前已完成")
+    else:
+        print("未获得结果 - 检查取消是否在流式传输期间发生")
+
+    print("\n工作流取消示例完成！")
+
+
+if __name__ == "__main__":
+    # 运行主示例
+    main()
+```
+
+## API 端点
+
+可以通过 AgentOS API 取消工作流运行：
+
+```bash
+POST /workflows/{workflow_id}/runs/{run_id}/cancel
+```
+
+**示例：**
+```bash
+curl --location 'http://localhost:7777/workflows/analysis-workflow/runs/789/cancel' \
+  --request POST
+```
+
+**参考：**[取消工作流运行 API](/reference-api/schema/workflows/cancel-workflow-run)
+
