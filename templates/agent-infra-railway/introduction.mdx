@@ -1,40 +1,40 @@
 ---
-title: "Agent Infra Railway"
-sidebarTitle: Introduction
+title: "智能体基础设施 Railway 模板"
+sidebarTitle: 介绍
 ---
 
-The Agent Infra Railway template provides a simple Railway project for running AgentOS.
+Agent Infra Railway 模板为运行 AgentOS 提供了一个简单的 Railway 项目。
 
-### Local environment
+### 本地环境
 
-Runs both AgentOS and PostgreSQL using Docker Desktop.
+使用 Docker Desktop 运行 AgentOS 和 PostgreSQL。
 
-Ideal for development, testing, and verifying your setup before deploying to the cloud.
+适用于在部署到云端之前进行开发、测试和验证您的设置。
 
-### Production environment
+### 生产环境
 
-AgentOS is deployed on Railway using the Dockerfile and a PgVector template is used as the database
+使用 Dockerfile 在 Railway 上部署 AgentOS，并使用 PgVector 模板作为数据库
 
-The template automates infrastructure creation and deployment steps using a single script.
+该模板使用单个脚本自动化基础设施创建和部署步骤。
 
-### How to get started
+### 如何开始
 
-- Clone the template repository and install the dependencies
-- Start with the local setup to ensure everything works end-to-end.
-- Move to Railway deployment using the provided guides once your local environment is ready.
+- 克隆模板仓库并安装依赖项
+- 从本地设置开始，确保端到端的所有功能都能正常工作。
+- 一旦本地环境准备就绪，使用提供的指南迁移到 Railway 部署。
 
 <Snippet file="setup.mdx" />
 
 <Snippet file="create-agent-infra-railway-codebase.mdx" />
 
-You can also clone the template directory and follow the instructions in the template documentation.
+您也可以克隆模板目录并按照模板文档中的说明进行操作。
 
 <CodeGroup>
   ```bash terminal
-  git clone https://github.com/agno-agi/agent-infra-railway.git 
-  cd agent-infra-railway 
+  git clone https://github.com/agno-agi/agent-infra-railway.git
+  cd agent-infra-railway
   ```
 
 </CodeGroup>
 
-After creating your codebase, the next step is to get it up and running locally using docker
+创建代码库后，下一步是使用 docker 在本地启动并运行

@@ -3,32 +3,33 @@ title: Speech-to-Text Agent
 mode: wide
 ---
 
-Build an Agent that transcribes audio files into structured data with speaker identification and conversation metadata. This Agent uses multimodal capabilities to convert audio content into structured transcription data.
 
-## What You'll Learn
+Build an Agent that transcribes audio 文件s into structured data with speaker identification and conversation metadata. This Agent uses multimodal capabilities to convert audio content into structured tran脚本ion data.
 
-By building this agent, you'll understand:
+## What You'll 学习
 
-- How to use Pydantic schemas for structured transcription output
-- How to configure multimodal Agent for audio processing
+By building this 代理, you'll 理解:
+
+- How 使用 Pydantic schemas for structured tran脚本ion output
+- How 配置 multimodal Agent for audio processing
 - How to identify speakers in audio conversations
 
-## Use Cases
+## 使用 Cases
 
-Transcribe meeting recordings with speaker identification, convert podcast episodes into searchable text, create subtitles for video content, or build voice note analyzers with structured transcription data.
+Transcribe meeting recordings with speaker identification, convert podcast episodes into 搜索able text, create subtitles for video content, or build voice note analyzers with structured tran脚本ion data.
 
 ## How It Works
 
-The Agent uses multimodal capabilities to process audio directly and output structured transcription data:
+The Agent uses multimodal capabilities to process audio directly and output structured tran脚本ion data:
 
-1. **Input**: Accepts audio files WAV format from URLs (or local files)
-2. **Process**: Multimodal model analyzes audio content and identifies speakers
+1. **Input**: Accepts audio 文件s WAV format from URLs (or local 文件s)
+2. **Process**: Multimodal 模型 analyzes audio content and identifies speakers
 3. **Structure**: Output is validated against a Pydantic schema
-4. **Output**: Returns typed data with transcript, description, and speaker list
+4. **Output**: Returns typed data with tran脚本, de脚本ion, and speaker list
 
-The structured output makes transcriptions immediately usable in downstream applications without additional parsing.
+The structured output makes tran脚本ions immediately usable in downstream 应用程序s without additional parsing.
 
-## STT example using Gemini flash 3 preview
+## STT 示例 using Gemini flash 3 pre查看
 
 ```python speech_to_text_agent.py
 import httpx
@@ -91,7 +92,7 @@ agent.print_response(
 )
 ```
 
-## STT example using OpenAI gpt-audio
+## STT 示例 using OpenAI gpt-audio
 
 ```python speech_to_text_agent.py
 import httpx
@@ -158,9 +159,9 @@ agent.print_response(
 
 ## What to Expect
 
-The agent processes audio files and returns a structured `Transcription` object containing:
+The 代理 processes audio 文件s and returns a structured `Transcription` object containing:
 
-- **description**: A summary describing what the audio is about
+- **de脚本ion**: A summary describing what the audio is 关于
 - **utterances**: List of identified speakers (names if mentioned, otherwise "Speaker 1", "Speaker 2", etc.)
 
 The utterances are in the order of the audio conversation and they contain:
@@ -168,9 +169,9 @@ The utterances are in the order of the audio conversation and they contain:
 - **speaker**: Name or identifier of the speaker
 - **text**: What was said by the speaker
 
-Processing time depends on audio length, typically 10-30 seconds for files under 5 minutes.
+Processing time depends on audio length, typic所有y 10-30 seconds for 文件s under 5 minutes.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -200,4 +201,4 @@ Processing time depends on audio length, typically 10-30 seconds for files under
 - Remove the structured output and use the text output instead if your use case does not require structured outputs
 - Extend the `Transcription` schema with additional fields like `sentiment` or `topics`
 - Try processing different audio formats (MP3, WAV, M4A)
-- Combine with other tools for enhanced analysis
+- Combine with other 工具s for enhanced analysis

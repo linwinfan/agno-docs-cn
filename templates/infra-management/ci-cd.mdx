@@ -2,46 +2,46 @@
 title: CI/CD
 ---
 
-Agno templates come pre-configured with [Github Actions](https://docs.github.com/en/actions) for CI/CD. We can
+Agno 模板预配置了 [Github Actions](https://docs.github.com/en/actions) 用于 CI/CD。我们可以：
 
-1. [Test and Validate on every PR](#test-and-validate-on-every-pr)
-2. [Build Docker Images with Github Releases](#build-docker-images-with-github-releases)
-3. [Build ECR Images with Github Releases](#build-ecr-images-with-github-releases)
+1. [在每个 PR 上测试和验证](#在每个-pr上测试和验证)
+2. [使用 Github Releases 构建 Docker 镜像](#使用-github-releases构建-docker-镜像)
+3. [使用 Github Releases 构建 ECR 镜像](#使用-github-releases构建-ecr-镜像)
 
-## Test and Validate on every PR
+## 在每个 PR 上测试和验证
 
-Whenever a PR is opened against the `main` branch, a validate script runs that ensures
+每当针对 `main` 分支打开 PR 时，会运行一个验证脚本，确保：
 
-1. The changes are formatted using ruff
-2. All unit-tests pass
-3. The changes don't have any typing or linting errors.
+1. 更改已使用 ruff 格式化
+2. 所有单元测试通过
+3. 更改没有任何类型或 lint 错误。
 
-Checkout the `.github/workflows/validate.yml` file for more information.
+查看 `.github/workflows/validate.yml` 文件以获取更多信息。
 
 <img src="/images/validate-cicd.png" alt="validate-cicd" />
 
-## Build Docker Images with Github Releases
+## 使用 Github Releases 构建 Docker 镜像
 
-If you're using [Dockerhub](https://hub.docker.com/) for images, you can buld and push the images throug a Github Release. This action is defined in the `.github/workflows/docker-images.yml` file.
+如果您使用 [Dockerhub](https://hub.docker.com/) 存储镜像，可以通过 Github Release 构建并推送镜像。此操作在 `.github/workflows/docker-images.yml` 文件中定义。
 
-1. Create a [Docker Access Token](https://hub.docker.com/settings/security) for Github Actions
+1. 为 Github Actions 创建一个 [Docker 访问令牌](https://hub.docker.com/settings/security)
 
 <img src="/images/docker-access-token.png" alt="docker-access-token" />
 
-2. Create secret variables `DOCKERHUB_REPO`, `DOCKERHUB_TOKEN` and `DOCKERHUB_USERNAME` in your github repo. These variables are used by the action in `.github/workflows/docker-images.yml`
+2. 在您的 github 仓库中创建密钥变量 `DOCKERHUB_REPO`、`DOCKERHUB_TOKEN` 和 `DOCKERHUB_USERNAME`。这些变量由 `.github/workflows/docker-images.yml` 中的操作使用
 
 <img
   src="/images/github-actions-docker-secrets.png"
   alt="github-actions-docker-secrets"
 />
 
-3. Run workflow using a Github Release
+3. 使用 Github Release 运行工作流
 
-This workflow is configured to run when a release is created. Create a new release using:
+此工作流配置为在创建发布时运行。使用以下命令创建新发布：
 
 <Note>
 
-Confirm the image name in the `.github/workflows/docker-images.yml` file before running
+在运行前确认 `.github/workflows/docker-images.yml` 文件中的镜像名称
 
 </Note>
 
@@ -64,91 +64,91 @@ gh release create v0.1.0 --title "v0.1.0" -n ""
 
 <Note>
 
-You can also run the workflow using `gh workflow run`
+您也可以使用 `gh workflow run` 运行工作流
 
 </Note>
 
-## Build ECR Images with Github Releases
+## 使用 Github Releases 构建 ECR 镜像
 
-If you're using ECR for images, you can buld and push the images through a Github Release. This action is defined in the `.github/workflows/ecr-images.yml` file and uses the new OpenID Connect (OIDC) approach to request the access token, without using IAM access keys.
+如果您使用 ECR 存储镜像，可以通过 Github Release 构建并推送镜像。此操作在 `.github/workflows/ecr-images.yml` 文件中定义，并使用新的 OpenID Connect (OIDC) 方法请求访问令牌，而无需使用 IAM 访问密钥。
 
-We will follow this [guide](https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/) to create an IAM role which will be used by the github action.
+我们将按照此[指南](https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/) 创建一个 IAM 角色，该角色将被 github 操作使用。
 
-1. Open the IAM console.
-2. In the left navigation menu, choose Identity providers.
-3. In the Identity providers pane, choose Add provider.
-4. For Provider type, choose OpenID Connect.
-5. For Provider URL, enter the URL of the GitHub OIDC IdP: https://token.actions.githubusercontent.com
-6. Get thumbprint to verify the server certificate
-7. For Audience, enter sts.amazonaws.com.
+1. 打开 IAM 控制台。
+2. 在左侧导航菜单中，选择身份提供商。
+3. 在身份提供商窗格中，选择添加提供商。
+4. 对于提供商类型，选择 OpenID Connect。
+5. 对于提供商 URL，输入 GitHub OIDC IdP 的 URL：https://token.actions.githubusercontent.com
+6. 获取指纹以验证服务器证书
+7. 对于受众，输入 sts.amazonaws.com。
 
-Verify the information matches the screenshot below and Add provider
+验证信息与下面的截图匹配并添加提供商
 
 <img src="/images/github-oidc-provider.png" alt="github-oidc-provider" />
 
-8. Assign a Role to the provider.
+8. 为提供商分配角色。
 
 <img
   src="/images/github-oidc-provider-assign-role.png"
   alt="github-oidc-provider-assign-role"
 />
 
-9. Create a new role.
+9. 创建新角色。
 
 <img
   src="/images/github-oidc-provider-create-new-role.png"
   alt="github-oidc-provider-create-new-role"
 />
 
-10. Confirm that Web identity is already selected as the trusted entity and the Identity provider field is populated with the IdP. In the Audience list, select sts.amazonaws.com, and then select Next.
+10. 确认 Web 身份已作为受信任实体被选中，并且身份提供商字段已填充 IdP。在受众列表中，选择 sts.amazonaws.com，然后选择下一步。
 
 <img
   src="/images/github-oidc-provider-trusted-entity.png"
   alt="github-oidc-provider-trusted-entity"
 />
 
-11. Add the `AmazonEC2ContainerRegistryPowerUser` permission to this role.
+11. 为此角色添加 `AmazonEC2ContainerRegistryPowerUser` 权限。
 
-12. Create the role with the name `GithubActionsRole`.
+12. 使用名称 `GithubActionsRole` 创建角色。
 
-13. Find the role `GithubActionsRole` and copy the ARN.
+13. 找到角色 `GithubActionsRole` 并复制 ARN。
 
 <img src="/images/github-oidc-role.png" alt="github-oidc-role" />
 
-14. Create the ECR Repositories: `llm` and `jupyter-llm` which are built by the workflow.
+14. 创建由工作流构建的 ECR 仓库：`llm` 和 `jupyter-llm`。
 
 <img src="/images/create-ecr-image.png" alt="create-ecr-image" />
 
-15. Update the workflow with the `GithubActionsRole` ARN and ECR Repository.
+15. 使用 `GithubActionsRole` ARN 和 ECR 仓库更新工作流。
 
 ```yaml .github/workflows/ecr-images.yml
-name: Build ECR Images
+name: 构建 ECR 镜像
 
 on:
   release:
     types: [published]
 
 permissions:
-  # For AWS OIDC Token access as per https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services#updating-your-github-actions-workflow
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
+  # 用于 AWS OIDC 令牌访问，根据 https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services#updating-your-github-actions-workflow
+  id-token: write # 请求 JWT 所需
+  contents: read # actions/checkout 所需
 
 env:
   ECR_REPO: [YOUR_ECR_REPO]
-  # Create role using https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/
+  # 使用 https://aws.amazon.com/blogs/security/use-iam-roles-to-connect-github-actions-to-actions-in-aws/ 创建角色
   AWS_ROLE: [GITHUB_ACTIONS_ROLE_ARN]
   AWS_REGION: us-east-1
 ```
 
-16. Update the `docker-images` workflow to **NOT** run on a release
+16. 更新 `docker-images` 工作流以**不**在发布时运行
 
 ```yaml .github/workflows/docker-images.yml
-name: Build Docker Images
+name: 构建 Docker 镜像
 
 on: workflow_dispatch
 ```
 
-17. Run workflow using a Github Release
+17. 使用 Github Release 运行工作流
 
 <CodeGroup>
 
@@ -169,6 +169,6 @@ gh release create v0.2.0 --title "v0.2.0" -n ""
 
 <Note>
 
-You can also run the workflow using `gh workflow run`
+您也可以使用 `gh workflow run` 运行工作流
 
 </Note>

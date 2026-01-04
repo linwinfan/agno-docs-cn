@@ -1,34 +1,35 @@
 ---
-title: Startup Idea Validator
+title: 初创企业创意验证器
 ---
 
-Build a startup validation workflow that helps entrepreneurs evaluate their business ideas through clarification, originality assessment, mission definition, and comprehensive market research. This multi-agent system provides objective feedback before resource investment.
 
-## What You'll Learn
+构建一个初创企业验证工作流，帮助创业者通过概念澄清、原创性评估、使命定义和全面的市场调研来评估他们的商业创意。这个多智能体系统在资源投入前提供客观反馈。
 
-By building this workflow, you'll understand:
-- How to structure multi-phase validation workflows for complex analysis
-- How to coordinate specialized agents for different evaluation aspects
-- How to integrate market research with competitive analysis
-- How to generate comprehensive validation reports with actionable insights
+## 您将学到的内容
 
-## Use Cases
+通过构建此工作流，您将理解：
+- 如何为复杂分析构建多阶段验证工作流
+- 如何协调专业智能体进行不同方面的评估
+- 如何将市场调研与竞争分析相结合
+- 如何生成包含可操作见解的全面验证报告
 
-Build startup validation platforms, business idea analyzers, market opportunity assessment tools, or entrepreneurship advisory systems.
+## 使用场景
 
-## How It Works
+构建初创企业验证平台、商业创意分析器、市场机会评估工具或创业咨询服务系统。
 
-The workflow validates startup ideas through four specialized phases:
+## 工作原理
 
-1. **Clarify**: Idea clarifier agent refines and structures the core business concept
-2. **Evaluate**: Originality evaluator assesses uniqueness compared to existing solutions
-3. **Define**: Mission definer establishes clear objectives and vision
-4. **Research**: Market researcher conducts comprehensive analysis using Google Search
-5. **Synthesize**: Combines all insights into a validation report with recommendations
+该工作流通过四个专业阶段验证初创企业创意：
 
-Each agent specializes in a specific validation aspect, ensuring thorough analysis.
+1. **澄清**：创意澄清智能体提炼并结构化核心商业概念
+2. **评估**：原创性评估器评估与现有解决方案相比的独特性
+3. **定义**：使命定义器建立清晰的目标和愿景
+4. **调研**：市场调研员使用Google搜索进行全面分析
+5. **综合**：将所有见解综合成包含建议的验证报告
 
-## Code
+每个智能体专注于特定的验证方面，确保全面分析。
+
+## 代码
 
 ```python startup_idea_validator.py
 """
@@ -430,30 +431,30 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## What to Expect
+## 预期效果
 
-The workflow will guide you through four validation phases: concept clarification, originality evaluation, mission definition, and market research. You'll receive objective feedback on your startup idea with detailed analysis of market opportunity, competition, and target segments.
+该工作流将引导您完成四个验证阶段：概念澄清、原创性评估、使命定义和市场调研。您将收到关于初创企业创意的客观反馈，包括对市场机会、竞争格局和目标细分市场的详细分析。
 
-The final output is a comprehensive validation report with insights on total addressable market, competitive landscape, and actionable recommendations to refine your business concept before investing resources.
+最终输出是一份全面的验证报告，包含关于总可寻址市场、竞争格局的见解，以及在投入资源前完善商业概念的可操作建议。
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai fastapi ddgs pycountry
     ```
   </Step>
 
-  <Step title="Run Workflow">
+  <Step title="运行工作流">
     <CodeGroup>
     ```bash Mac
     python startup_idea_validator.py
@@ -466,9 +467,9 @@ The final output is a comprehensive validation report with insights on total add
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Modify the startup idea input to validate different business concepts
-- Customize agent instructions to focus on specific validation criteria
-- Adjust market research parameters to target different industries
-- Explore [Workflows](/basics/workflows/overview) for advanced workflow patterns
+- 修改初创企业创意输入以验证不同的商业概念
+- 自定义智能体说明以专注于特定的验证标准
+- 调整市场调研参数以针对不同行业
+- 探索 [工作流](/basics/工作流s/overview) 以了解高级工作流模式

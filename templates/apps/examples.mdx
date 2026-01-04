@@ -1,12 +1,12 @@
 ---
-title: Examples
+title: 示例
 ---
 
 <Snippet file="run-pgvector-docker.mdx" />
 
-## Run Jupyter on Docker
+## 在 Docker 上运行 Jupyter
 
-A jupyter notebook is a must have for AI development. Update the `resources.py` file to:
+Jupyter notebook 是 AI 开发的必备工具。更新 `resources.py` 文件为：
 
 ```python resources.py
 from os import getenv
@@ -15,7 +15,7 @@ from agno.docker.app.jupyter import Jupyter
 from agno.docker.app.postgres import PgVectorDb
 from agno.docker.resources import DockerResources
 
-# -*- PgVector running on port 5432:5432
+# -*- PgVector 在端口 5432:5432 上运行
 vector_db = PgVectorDb(
     pg_user="ai",
     pg_password="ai",
@@ -23,7 +23,7 @@ vector_db = PgVectorDb(
     debug_mode=True,
 )
 
-# -*- Jupyter running on port 8888:8888
+# -*- Jupyter 在端口 8888:8888 上运行
 jupyter = Jupyter(
     mount_workspace=True,
     env_vars={"OPENAI_API_KEY": getenv("OPENAI_API_KEY")},
@@ -35,7 +35,7 @@ dev_docker_resources = DockerResources(
 )
 ```
 
-Start resources using:
+使用以下命令启动资源：
 
 <CodeGroup>
 
@@ -49,12 +49,12 @@ ag start resources.py
 
 </CodeGroup>
 
-### View Jupyterlab UI
+### 查看 Jupyterlab UI
 
-- Open localhost:8888 to view the Jupyterlab UI. Password: **admin**
-- The directory is automatically mounted in the notebook.
+- 打开 localhost:8888 查看 Jupyterlab UI。密码：**admin**
+- 目录在笔记本中自动挂载。
 
-## Stop resources
+## 停止资源
 
 <CodeGroup>
 

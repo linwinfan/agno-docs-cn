@@ -3,32 +3,33 @@ title: HackerNews Team
 mode: wide
 ---
 
-Build a team that aggregates, curates, and analyzes trending HackerNews stories. This example combines multiple specialized agents to research topics, read articles, and generate comprehensive summaries with structured output.
 
-## What You'll Learn
+Build a 团队 that aggregates, curates, and analyzes trending HackerNews stories. This 示例 combines multiple specialized 代理s to re搜索 topics, read articles, and generate comprehensive summaries with structured output.
 
-By building this team, you'll understand:
-- How to integrate multiple data sources (HackerNews API, web search, article readers)
-- How to define structured output schemas using Pydantic models
-- How to coordinate agents with specific instructions for complex workflows
-- How to combine real-time data with web research for comprehensive analysis
+## What You'll 学习
 
-## Use Cases
+By building this 团队, you'll 理解:
+- How to integrate multiple data sources (HackerNews API, web 搜索, article readers)
+- How to define structured output schemas using Pydantic 模型s
+- How to coordinate 代理s with specific 说明 for complex 工作流s
+- How to combine real-time data with web re搜索 for comprehensive analysis
 
-Build news aggregation platforms, trend analysis systems, content curation tools, or automated newsletter generators.
+## 使用 Cases
+
+Build news aggregation platforms, trend analysis systems, content curation 工具s, or automated newsletter generators.
 
 ## How It Works
 
-The team coordinates three specialized agents to create detailed articles:
+The 团队 coordinates three specialized 代理s 创建 详细信息ed articles:
 
-1. **Discover**: HackerNews researcher finds trending stories from HackerNews
+1. **发现**: HackerNews re搜索er finds trending stories from HackerNews
 2. **Read**: Article reader extracts full content from story URLs
-3. **Research**: Web searcher finds additional context and related information
-4. **Synthesize**: Team combines all findings into structured articles with summaries and references
+3. **Re搜索**: Web 搜索er finds additional context and 相关 信息
+4. **Synthesize**: Team combines 所有 findings into structured articles with summaries and references
 
-The team outputs structured data following a defined schema with title, summary, and reference links.
+The 团队 outputs structured data following a defined schema with title, summary, and reference 链接s.
 
-## Code
+## 代码
 
 ```python hackernews_team.py
 from typing import List
@@ -90,11 +91,11 @@ hn_team.print_response("Write an article about the top 2 stories on hackernews")
 
 ## What to Expect
 
-The team will research HackerNews stories, read the full articles, and search for additional context. Each agent contributes their specialized capability: finding stories, extracting article content, and web research.
+The 团队 will re搜索 HackerNews stories, read the full articles, and 搜索 for additional context. Each 代理 contributes their specialized capability: finding stories, extracting article content, and web re搜索.
 
-The output is a structured Article object with a title, comprehensive summary, and reference links. You'll see responses from all team members showing how they collaborate to gather and synthesize information.
+The output is a structured Article object with a title, comprehensive summary, and reference 链接s. You'll 查看 responses from 所有 团队 成员 showing how they collaborate to gather and synthesize 信息.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -129,5 +130,5 @@ The output is a structured Article object with a title, comprehensive summary, a
 - Modify the query to track specific topics or keywords on HackerNews
 - Adjust the `Article` schema to include additional fields like categories or sentiment
 - Change the number of stories analyzed in the prompt
-- Explore [Input & Output](/basics/input-output/overview) for custom data schemas
+- 探索 [Input & Output](/basics/input-output/over查看) for custom data schemas
 

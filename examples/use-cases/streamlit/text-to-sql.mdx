@@ -2,47 +2,48 @@
 title: SQL Agent
 ---
 
-This example shows how to build a text-to-SQL system that:
-1. Uses Agentic RAG to search for table metadata, sample queries and rules for writing better SQL queries.
-2. Uses dynamic few-shot examples and rules to improve query construction.
-3. Provides an interactive Streamlit UI for users to query the database.
 
-We'll use the F1 dataset as an example, but you can easily extend it to other datasets.
+此示例展示 how 构建 a text-to-SQL system that:
+1. 使用s Agentic RAG to 搜索 for table metadata, sample queries and rules for writing better SQL queries.
+2. 使用s dynamic few-shot 示例 and rules to improve query construction.
+3. Provides an interactive Streamlit UI for users to query the 数据库.
 
-### Key capabilities
+We'll use the F1 dataset as an 示例, but you can easily extend it to other datasets.
+
+### 密钥 capabilities
 - Natural language to SQL conversion
 - Retrieve table metadata, sample queries and rules using Agentic RAG
-- Better query construction with the help of dynamic few-shot examples and rules
+- Better query construction with the help of dynamic few-shot 示例 and rules
 - Interactive Streamlit UI
 
 <video
   autoPlay
   muted
   controls
-  className="w-full aspect-video"
-  src="/videos/sql_agent.mp4"
+  类Name="w-full aspect-video"
+  src="/videos/sql_代理.mp4"
 ></video>
 
-### Simple queries to try
+### 简单 queries to try
 - "Who are the top 5 drivers with the most race wins?"
 - "Compare Mercedes vs Ferrari performance in constructors championships"
 - "Show me the progression of fastest lap times at Monza"
-- "Which drivers have won championships with multiple teams?"
+- "Which drivers have won championships with multiple 团队s?"
 - "What tracks have hosted the most races?"
 - "Show me Lewis Hamilton's win percentage by season"
 
-### Advanced queries with table joins
+### 高级 queries with table joins
 - "How many races did the championship winners win each year?"
 - "Compare the number of race wins vs championship positions for constructors in 2019"
 - "Show me Lewis Hamilton's race wins and championship positions by year"
 - "Which drivers have both won races and set fastest laps at Monaco?"
 - "Show me Ferrari's race wins and constructor championship positions from 2015-2020"
 
-## Code
+## 代码
 
-The complete code is available in the [Agno repository](https://github.com/agno-agi/agno).
+The complete code is 可用的 in the [Agno 存储库](https://github.com/agno-agi/agno).
 
-## Usage
+## 用法
 
 <Steps>
   <Step title="Clone the repository">

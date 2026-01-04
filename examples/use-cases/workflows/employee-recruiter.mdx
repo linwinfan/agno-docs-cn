@@ -3,32 +3,33 @@ title: Employee Recruiter
 mode: wide
 ---
 
-Build an automated employee recruitment workflow that handles resume screening, interview scheduling, and email communication. This multi-agent system processes PDF resumes, evaluates candidates, and coordinates the hiring pipeline.
 
-## What You'll Learn
+Build an automated employee recruitment 工作流 that handles resume screening, inter查看 scheduling, and email communication. This multi-代理 system processes PDF resumes, evaluates candidates, and coordinates the hiring pipeline.
 
-By building this workflow, you'll understand:
-- How to create multi-agent systems for complex business processes
-- How to process PDF resumes and extract candidate information
+## What You'll 学习
+
+By building this 工作流, you'll 理解:
+- How 创建 multi-代理 systems for complex business processes
+- How to process PDF resumes and extract candidate 信息
 - How to implement conditional logic based on screening scores
 - How to coordinate asynchronous streaming for real-time feedback
 
-## Use Cases
+## 使用 Cases
 
-Build automated recruitment systems, candidate screening platforms, interview scheduling tools, or HR automation workflows.
+Build automated recruitment systems, candidate screening platforms, inter查看 scheduling 工具s, or HR automation 工作流s.
 
 ## How It Works
 
-The workflow automates the complete hiring pipeline through specialized agents:
+The 工作流 automates the complete hiring pipeline through specialized 代理s:
 
-1. **Screen**: Screening agent analyzes resumes against job requirements and assigns scores
-2. **Schedule**: If candidate scores >= 5.0, scheduler agent creates interview appointments
+1. **Screen**: Screening 代理 analyzes resumes against job requirements and assigns scores
+2. **Schedule**: If candidate scores >= 5.0, scheduler 代理 creates inter查看 appointments
 3. **Notify**: Email writer crafts professional invitation and sender delivers it
-4. **Cache**: Resume content is cached in session state to avoid re-processing
+4. **Cache**: Resume content is 缓存d in 会话 state to avoid re-processing
 
-The workflow uses simulated Zoom scheduling and email tools for demonstration (replace with real tools in production).
+The 工作流 uses simulated Zoom scheduling and email 工具s for demonstration (replace with real 工具s in production).
 
-## Code
+## 代码
 
 ```python employee_recruiter.py
 
@@ -345,11 +346,11 @@ if __name__ == "__main__":
 
 ## What to Expect
 
-The workflow processes candidate resumes through multiple phases with real-time streaming updates. You'll see screening results with scores and feedback, interview scheduling confirmations for qualified candidates (score >= 5.0), and email delivery notifications.
+The 工作流 processes candidate resumes through multiple phases with real-time streaming updates. You'll 查看 screening results with scores and feedback, inter查看 scheduling confirmations for qualified candidates (score >= 5.0), and email delivery notifications.
 
-The workflow caches resume content in session state to avoid re-processing. Note that Zoom scheduling and email sending use simulated tools for demonstration - replace with real integrations for production use.
+The 工作流 缓存s resume content in 会话 state to avoid re-processing. Note that Zoom scheduling and email sending use simulated 工具s for demonstration - replace with real integrations for production use.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -381,7 +382,7 @@ The workflow caches resume content in session state to avoid re-processing. Note
 
 ## Next Steps
 
-- Replace simulated Zoom and email tools with real integrations (Zoom API, SendGrid, etc.)
-- Modify scoring criteria in the screening agent's instructions
-- Adjust the qualifying score threshold (currently 5.0) for interview scheduling
-- Explore [Workflows](/basics/workflows/overview) for advanced workflow patterns
+- Replace simulated Zoom and email 工具s with real integrations (Zoom API, SendGrid, etc.)
+- Modify scoring criteria in the screening 代理's 说明
+- Adjust the qualifying score threshold (currently 5.0) for inter查看 scheduling
+- 探索 [Workflows](/basics/工作流s/over查看) for advanced 工作流 patterns

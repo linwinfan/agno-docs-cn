@@ -1,49 +1,49 @@
 ---
-title: Introduction
+title: 介绍
 ---
 
-Apps are tools like `FastAPI`, `PgVector`, `Streamlit`, `Jupyter`, `Django` that we define as python classes and run using `ag start` or `ag infra up`.
+Apps 是像 `FastAPI`、`PgVector`、`Streamlit`、`Jupyter`、`Django` 这样的工具，我们将它们定义为 Python 类并使用 `ag start` 或 `ag infra up` 运行。
 
-When running Apps using agno, think of them as infrastructure as code but at a higher level of abstraction. Instead of defining containers, volumes etc. we define the application we want to run. We run **Applications as Code** instead of Infrastructure as Code.
+使用 agno 运行 Apps 时，将它们视为基础设施即代码，但具有更高层次的抽象。我们不定义容器、卷等，而是定义要运行的应用程序。我们运行**代码化应用程序**而不是基础设施即代码。
 
-The same `App` can run on docker, AWS (ECS) or Kubernetes (EKS). The App creates the underlying resources like LoadBalancers, Services, Deployments. As the underlying resources become more complex, the concept of Apps become more appealing.
+同一个 `App` 可以在 docker、AWS（ECS）或 Kubernetes（EKS）上运行。App 创建底层资源，如负载均衡器、服务、部署。随着底层资源变得更加复杂，Apps 的概念变得更加有吸引力。
 
-## Example
+## 示例
 
-Lets run a Jupyter notebook and PgVector on docker.
+让我们在 docker 上运行 Jupyter notebook 和 PgVector。
 
-Copy the following contents to a file `resources.py` and run `ag start resources.py`
+将以下内容复制到文件 `resources.py` 并运行 `ag start resources.py`
 
 ```python resources.py
 from agno.docker.app.jupyter import Jupyter
 from agno.docker.app.postgres import PgVectorDb
 from agno.docker.resources import DockerResources
 
-# -*- PgVector running on port 5432:5432
+# -*- PgVector 在端口 5432:5432 上运行
 vector_db = PgVectorDb(pg_user="ai", pg_password="ai", pg_database="ai")
 
-# -*- Jupyter running on port 8888:8888
+# -*- Jupyter 在端口 8888:8888 上运行
 jupyter = Jupyter(mount_workspace=True)
 
 # -*- DockerResources
 dev_docker_resources = DockerResources(apps=[vector_db, jupyter])
 ```
 
-- Each App is a pydantic object providing input and type validation.
-- Note how the `mount_workspace` automatically mounts the directory
-- Note how `PgVectorDb` sets the required settings and creates the volume.
+- 每个 App 都是一个 pydantic 对象，提供输入和类型验证。
+- 注意 `mount_workspace` 如何自动挂载目录
+- 注意 `PgVectorDb` 如何设置所需的设置并创建卷。
 
-While this is a simple example, these concepts become very powerful for complex applications.
+虽然这是一个简单的示例，但对于复杂应用程序，这些概念变得非常强大。
 
-## Motivation
+## 动机
 
-Apps provide the **"Application Layer"** for our AI products.
+Apps 为我们的 AI 产品提供**"应用层"**。
 
-The software we write needs to be served by an Application, and this Application needs to **run the same** locally for development and in the cloud for production. By defining **Applications as Code**, we bring the benefits of **Infrastructure as Code** to the software layer.
+我们编写的软件需要由应用程序提供服务，并且该应用程序需要在本地进行开发时和在云端进行生产时**以相同方式运行**。通过定义**代码化应用程序**，我们将**基础设施即代码**的优势带到软件层。
 
-Defining **Applications as Code** also allows us to package "software systems" into templates. Meaning every agno template can run locally using docker or on AWS with 1 command.
+定义**代码化应用程序**还允许我们将"软件系统"打包到模板中。这意味着每个 agno 模板都可以使用 docker 在本地运行，或使用 1 个命令在 AWS 上运行。
 
-Finally, defining **Applications as python objects** means we can import them in our code like regular objects making the following code possible:
+最后，将**应用程序定义为 Python 对象**意味着我们可以像常规对象一样在代码中导入它们，使以下代码成为可能：
 
 ```python
 from resources import vector_db
@@ -51,10 +51,10 @@ from resources import vector_db
 db_url=vector_db.get_db_connection_local()
 ```
 
-Checkout some example apps you can run on docker:
+查看一些您可以在 docker 上运行的示例应用程序：
 
 - [PgVector](/integrations/database/postgres/overview)
 
-Defining **Applications as Code** offers many benefits, such as:
+定义**代码化应用程序**提供许多好处，例如：
 
-- [Install requirements on startup](/templates/infra-management/install)
+- [在启动时安装需求](/templates/infra-management/install)

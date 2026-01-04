@@ -1,14 +1,14 @@
 ---
-title: Features
+title: 功能
 ---
 
-## Install requirements on startup
+## 在启动时安装需求
 
-Apps can install requirements on container startup. Update the `Jupyter` app to:
+应用程序可以在容器启动时安装需求。更新 `Jupyter` 应用程序为：
 
 ```python resources.py
 ...
-# -*- Jupyter running on port 8888:8888
+# -*- Jupyter 在端口 8888:8888 上运行
 jupyter = Jupyter(
     mount_workspace=True,
     install_requirements=True,
@@ -18,13 +18,13 @@ jupyter = Jupyter(
 ...
 ```
 
-Create a `requirements.txt` file in the same directory
+在同一目录中创建 `requirements.txt` 文件
 
 ```python requirements.txt
 openai
 ```
 
-## Patch resources
+## 修补资源
 
 <CodeGroup>
 

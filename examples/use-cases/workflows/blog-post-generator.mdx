@@ -3,32 +3,33 @@ title: Blog Post Generator
 mode: wide
 ---
 
-Build a sophisticated blog post generator that combines web research with professional writing expertise. This workflow uses a multi-stage approach to create high-quality, well-researched blog content with proper citations.
 
-## What You'll Learn
+Build a sophisticated blog post generator that combines web re搜索 with professional writing expertise. This 工作流 uses a multi-stage approach 创建 high-quality, well-re搜索ed blog content with proper citations.
 
-By building this workflow, you'll understand:
-- How to structure multi-phase workflows with research, extraction, and writing stages
+## What You'll 学习
+
+By building this 工作流, you'll 理解:
+- How to structure multi-phase 工作流s with re搜索, extraction, and writing stages
 - How to implement caching strategies for expensive operations like web scraping
-- How to coordinate multiple specialized agents for complex content creation
-- How to integrate web search and content extraction tools effectively
+- How to coordinate multiple specialized 代理s for complex content creation
+- How to integrate web 搜索 and content extraction 工具s effectively
 
-## Use Cases
+## 使用 Cases
 
-Build content creation platforms, automated journalism systems, SEO content generators, or research-based article writers.
+Build content creation platforms, automated journalism systems, SEO content generators, or re搜索-based article writers.
 
 ## How It Works
 
-The workflow follows a three-phase content creation process:
+The 工作流 follows a three-phase content creation process:
 
-1. **Research**: Research agent searches the web and evaluates 10-15 sources to find the 5-7 best articles
-2. **Extract**: Content scraper agent extracts and processes full article content in markdown format
-3. **Write**: Writer agent crafts an engaging blog post with proper citations and SEO optimization
-4. **Cache**: All intermediate results are cached in session state for efficiency
+1. **Re搜索**: Re搜索 代理 搜索es the web and evaluates 10-15 sources to find the 5-7 best articles
+2. **Extract**: Content scraper 代理 extracts and processes full article content in markdown format
+3. **Write**: Writer 代理 crafts an engaging blog post with proper citations and SEO optimization
+4. **Cache**: All intermediate results are 缓存d in 会话 state for efficiency
 
-The workflow uses SQLite for session persistence and caches search results, scraped articles, and final blog posts.
+The 工作流 uses SQLite for 会话 persistence and 缓存s 搜索 results, scraped articles, and final blog posts.
 
-## Code
+## 代码
 
 ```python blog_post_generator.py
 """Blog Post Generator v2.0 - Your AI Content Creation Studio!
@@ -517,11 +518,11 @@ if __name__ == "__main__":
 
 ## What to Expect
 
-The workflow will generate a comprehensive blog post through three phases: research, content extraction, and writing. You'll see progress indicators for each phase showing which articles are being found and scraped.
+The 工作流 will generate a comprehensive blog post through three phases: re搜索, content extraction, and writing. You'll 查看 progress indicators for each phase showing which articles are being found and scraped.
 
-The workflow caches all intermediate results (search results, scraped articles, final blog posts) in SQLite for efficiency. Subsequent runs with the same topic will use cached data. The final output is a professionally formatted blog post with proper citations, SEO optimization, and engaging structure.
+The 工作流 缓存s 所有 intermediate results (搜索 results, scraped articles, final blog posts) in SQLite for efficiency. Subsequent runs with the same topic will use 缓存d data. The final output is a profession所有y formatted blog post with proper citations, SEO optimization, and engaging structure.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -553,7 +554,7 @@ The workflow caches all intermediate results (search results, scraped articles, 
 
 ## Next Steps
 
-- Modify the example topics in the code to generate content about your specific interests
+- Modify the 示例 topics in the code to generate content 关于 your specific interests
 - Adjust caching behavior by changing `use_search_cache`, `use_scrape_cache`, or `use_blog_cache` parameters
-- Customize agent instructions to match your writing style or SEO requirements
-- Explore [Workflows](/basics/workflows/overview) for advanced workflow patterns
+- Customize 代理 说明 to match your writing style or SEO requirements
+- 探索 [Workflows](/basics/工作流s/over查看) for advanced 工作流 patterns

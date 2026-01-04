@@ -1,60 +1,60 @@
 ---
-title: Use Custom Domain and HTTPS
-sidebarTitle: Custom Domain & HTTPS
+title: 使用自定义域名和 HTTPS
+sidebarTitle: 自定义域名和 HTTPS
 ---
 
-## Overview
+## 概述
 
-To add a live AgentOS instance to os.agno.com, the endpoint must be HTTPS. Here is how you can add a custom domain and HTTPS to your AWS loadbalancer.
+要将实时的 AgentOS 实例添加到 os.agno.com，端点必须是 HTTPS。以下是为您的 AWS 负载均衡器添加自定义域名和 HTTPS 的方法。
 
-## Use a custom domain
+## 使用自定义域名
 
-1. Register your domain with [Route 53](https://us-east-1.console.aws.amazon.com/route53/).
-2. Point the domain to the loadbalancer DNS.
+1. 在 [Route 53](https://us-east-1.console.aws.amazon.com/route53/) 中注册您的域名。
+2. 将域名指向负载均衡器 DNS。
 
-### Custom domain for your AgentOS App
+### 为您的 AgentOS 应用程序设置自定义域名
 
-Create a record in the Route53 console to point `app.[YOUR_DOMAIN]` to the AgentOS endpoint.
+在 Route53 控制台中创建记录，将 `app.[YOUR_DOMAIN]` 指向 AgentOS 端点。
 
 <img src="/images/llm-app-aidev-run.png" alt="llm-app-aidev-run" />
 
-You can visit the app at `[http://app.[YOUR_DOMAIN]`
+您可以在 `[http://app.[YOUR_DOMAIN]` 访问应用程序
 
-<Note>Note the `http` in the domain name.</Note>
+<Note>注意域名中的 `http`。</Note>
 
-## Add HTTPS
+## 添加 HTTPS
 
-To add HTTPS:
+要添加 HTTPS：
 
-1. Create a certificate using [AWS ACM](https://us-east-1.console.aws.amazon.com/acm). Request a certificat for `*.[YOUR_DOMAIN]`
+1. 使用 [AWS ACM](https://us-east-1.console.aws.amazon.com/acm) 创建证书。为 `*.[YOUR_DOMAIN]` 请求证书
 
 <img src="/images/llm-app-request-cert.png" alt="llm-app-request-cert" />
 
-2. Creating records in Route 53.
+2. 在 Route 53 中创建记录。
 
 <img src="/images/llm-app-validate-cert.png" alt="llm-app-validate-cert" />
 
-3. Add the certificate ARN to Apps
+3. 将证书 ARN 添加到应用程序
 
-<Note>Make sure the certificate is `Issued` before adding it to your Apps</Note>
+<Note>在将其添加到您的应用程序之前，请确保证书状态为 `已颁发`</Note>
 
-Update the `infra/prd_resources.py` file and add the `load_balancer_certificate_arn` to the `FastAPI` app.
+更新 `infra/prd_resources.py` 文件，并将 `load_balancer_certificate_arn` 添加到 `FastAPI` 应用程序。
 
 ```python infra/prd_resources.py
 
-# -*- FastAPI running on ECS
+# -*- 在 ECS 上运行的 FastAPI
 prd_fastapi = FastApi(
     ...
-    # To enable HTTPS, create an ACM certificate and add the ARN below:
+    # 要启用 HTTPS，请创建 ACM 证书并在下方添加 ARN：
     load_balancer_enable_https=True,
     load_balancer_certificate_arn="arn:aws:acm:us-east-1:497891874516:certificate/6598c24a-d4fc-4f17-8ee0-0d3906eb705f",
     ...
 )
 ```
 
-4. Create new Loadbalancer Listeners
+4. 创建新的负载均衡器监听器
 
-Create new listeners for the loadbalancer to pickup the HTTPs configuration.
+为负载均衡器创建新的监听器以获取 HTTPS 配置。
 
 <CodeGroup>
 
@@ -68,11 +68,11 @@ ag infra up -e prd -i aws -n listener
 
 </CodeGroup>
 
-<Note>The certificate should be `Issued` before applying it.</Note>
+<Note>在应用之前，证书应处于 `已颁发` 状态。</Note>
 
-After this, `https` should be working on your custom domain.
+此后，`https` 应该可以在您的自定义域名上正常工作。
 
-5. Update existing listeners to redirect HTTP to HTTPS
+5. 更新现有监听器以将 HTTP 重定向到 HTTPS
 
 <CodeGroup>
 
@@ -86,4 +86,4 @@ ag infra patch -e prd -i aws -n listener
 
 </CodeGroup>
 
-After this, all HTTP requests should redirect to HTTPS automatically.
+此后，所有 HTTP 请求应自动重定向到 HTTPS。

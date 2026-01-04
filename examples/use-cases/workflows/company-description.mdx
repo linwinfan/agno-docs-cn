@@ -3,50 +3,51 @@ title: Company Description Workflow
 mode: wide
 ---
 
-Build a comprehensive supplier profile generator that combines web crawling, search engines, Wikipedia, and competitor analysis. This workflow processes company information through specialized agents and delivers detailed markdown reports via email.
 
-## What You'll Learn
+Build a comprehensive supplier pro文件 generator that combines web crawling, 搜索 engines, Wikipedia, and competitor analysis. This 工作流 processes company 信息 through specialized 代理s and delivers 详细信息ed markdown reports via email.
 
-By building this workflow, you'll understand:
-- How to coordinate multiple agents running in parallel for data gathering
-- How to integrate diverse data sources (web crawling, search, Wikipedia)
-- How to implement workflow session state caching for expensive operations
+## What You'll 学习
+
+By building this 工作流, you'll 理解:
+- How to coordinate multiple 代理s running in par所有el for data gathering
+- How to integrate diverse data sources (web crawling, 搜索, Wikipedia)
+- How to implement 工作流 会话 state caching for expensive operations
 - How to automate report generation and email delivery with Resend
 
-## Use Cases
+## 使用 Cases
 
-Build supplier research platforms, company intelligence systems, vendor evaluation tools, or automated due diligence reports.
+Build supplier re搜索 platforms, company intelligence systems, vendor evaluation 工具s, or automated due diligence reports.
 
 ## How It Works
 
-The workflow coordinates four specialized agents running in parallel:
+The 工作流 coordinates four specialized 代理s running in par所有el:
 
-1. **Crawl**: Crawler agent uses Firecrawl to extract information from the company website
-2. **Search**: Search agent uses DuckDuckGo to find recent news and articles
-3. **Research**: Wikipedia agent gathers background and historical information
-4. **Analyze**: Competitor agent identifies and analyzes market competitors
-5. **Synthesize**: Profile agent combines all findings into a structured markdown report
-6. **Deliver**: Report is automatically sent via email using Resend
+1. **Crawl**: Crawler 代理 uses Firecrawl to extract 信息 from the company website
+2. **Search**: Search 代理 uses DuckDuckGo to find recent news and articles
+3. **Re搜索**: Wikipedia 代理 gathers background and historical 信息
+4. **Analyze**: Competitor 代理 identifies and analyzes market competitors
+5. **Synthesize**: Pro文件 代理 combines 所有 findings into a structured markdown report
+6. **Deliver**: Report is automatic所有y sent via email using Resend
 
-The workflow caches analysis results in session state - subsequent requests for the same supplier return cached data.
+The 工作流 缓存s analysis results in 会话 state - subsequent requests for the same supplier return 缓存d data.
 ```
 export OPENAI_API_KEY="your-openai-key"
 export RESEND_API_KEY="your-resend-key"
 export FIRECRAWL_API_KEY="your-firecrawl-key"
 ```
 
-Install dependencies
+Inst所有 依赖项
 ```
 pip install agno openai firecrawl-py resend
 ```
 
-## Code Structure
+## 代码 Structure
 
-This company description workflow consists of three main files:
+This company de脚本ion 工作流 consists of three main 文件s:
 
 ### 1. Agents (`agents.py`)
 
-Specialized agents for gathering information from multiple sources:
+Specialized 代理s for gathering 信息 from multiple sources:
 
 ```python agents.py
 from agno.agent import Agent
@@ -102,7 +103,7 @@ profile_agent: Agent = Agent(
 
 ### 2. Prompts (`prompts.py`)
 
-Detailed instructions for each specialized agent:
+Detailed 说明 for each specialized 代理:
 
 ```python prompts.py
 CRAWLER_INSTRUCTIONS = """
@@ -247,7 +248,7 @@ Credit Ratings: [If available, include credit ratings or financial stability ind
 
 ### 3. Workflow Implementation (`run_workflow.py`)
 
-Complete workflow with parallel information gathering and email delivery:
+Complete 工作流 with par所有el 信息 gathering and email delivery:
 
 ```python run_workflow.py
 import markdown
@@ -407,17 +408,17 @@ if __name__ == "__main__":
     )
 ```
 
-## Key Features
+## 密钥 Features
 
-- **Parallel Processing**: Four agents gather information simultaneously for maximum efficiency
-- **Multi-Source Data**: Combines web crawling, search engines, Wikipedia, and competitor analysis
-- **Email Integration**: Automatically sends formatted reports via email using Resend
+- **Par所有el Processing**: Four 代理s gather 信息 simultaneously for maximum efficiency
+- **Multi-Source Data**: Combines web crawling, 搜索 engines, Wikipedia, and competitor analysis
+- **Email Integration**: Automatic所有y sends formatted reports via email using Resend
 - **Markdown Formatting**: Generates structured, readable reports in HTML format
-- **Modular Design**: Clean separation of agents, prompts, and workflow logic
-- **Efficient Execution**: Uses parallel steps to minimize execution time
-- **Type Safety**: Pydantic models for structured data validation
+- **Modular Design**: Clean separation of 代理s, prompts, and 工作流 logic
+- **Efficient Execution**: 使用s par所有el steps to minimize execution time
+- **Type Safety**: Pydantic 模型s for structured data validation
 
-## Usage Example
+## 用法 示例
 
 ```python
 # Create supplier profile request
@@ -435,11 +436,11 @@ company_description_workflow.print_response(
 
 ## What to Expect
 
-The workflow will simultaneously gather information from multiple sources (website crawling, web search, Wikipedia, competitor analysis) then generate a comprehensive supplier profile. You'll see progress indicators for each agent's data collection.
+The 工作流 will simultaneously gather 信息 from multiple sources (website crawling, web 搜索, Wikipedia, competitor analysis) then generate a comprehensive supplier pro文件. You'll 查看 progress indicators for each 代理's data collection.
 
-The final output is a structured markdown report delivered via email. The workflow caches all analysis results - if you request the same supplier again, it returns the cached profile instantly instead of re-running the expensive analysis pipeline.
+The final output is a structured markdown report delivered via email. The 工作流 缓存s 所有 analysis results - if you request the same supplier again, it returns the 缓存d pro文件 instantly instead of re-running the expensive analysis pipeline.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -474,6 +475,6 @@ The final output is a structured markdown report delivered via email. The workfl
 ## Next Steps
 
 - Modify `supplier_request` to analyze different companies
-- Customize agent instructions in `prompts.py` to focus on specific analysis areas
-- Adjust the profile template in `SUPPLIER_PROFILE_INSTRUCTIONS_GENERAL` for different report formats
-- Explore [Workflows](/basics/workflows/overview) for advanced workflow patterns
+- Customize 代理 说明 in `prompts.py` to focus on specific analysis areas
+- Adjust the pro文件 template in `SUPPLIER_PROFILE_INSTRUCTIONS_GENERAL` for different report formats
+- 探索 [Workflows](/basics/工作流s/over查看) for advanced 工作流 patterns

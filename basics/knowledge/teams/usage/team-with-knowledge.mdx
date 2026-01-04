@@ -1,8 +1,8 @@
 ---
-title: "Team with Knowledge Base"
+title: "使用知识库的团队"
 ---
 
-This example demonstrates how to create a team with knowledge base integration. The team has access to a knowledge base with Agno documentation and can combine this knowledge with web search capabilities.
+此示例演示了如何创建具有知识库集成的团队。该团队可以访问包含Agno文档的知识库，并能将这些知识与网络搜索功能相结合。
 
 ## Code
 
@@ -65,25 +65,25 @@ if __name__ == "__main__":
     team_with_knowledge.print_response("Tell me about the Agno framework", stream=True)
 ```
 
-## Usage
+## 使用方法
 
 <Steps>
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno ddgs lancedb
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行智能体">
         ```bash
         python cookbook/02_examples/teams/knowledge/01_team_with_knowledge.py
         ```

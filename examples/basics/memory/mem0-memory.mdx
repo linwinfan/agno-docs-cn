@@ -1,7 +1,8 @@
 ---
 title: Mem0 Memory
 ---
-## Code
+
+## 代码
 
 ```python cookbook/13_integrations/memory/mem0_integration.py
 from agno.agent import Agent, RunOutput
@@ -33,7 +34,7 @@ messages = [{"role": i.role, "content": str(i.content)} for i in (run.messages o
 client.add(messages, user_id=user_id)
 ```
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />

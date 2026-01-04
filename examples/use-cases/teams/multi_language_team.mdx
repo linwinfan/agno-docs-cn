@@ -3,32 +3,33 @@ title: Multi Language Team
 mode: wide
 ---
 
-Build a language routing team that automatically detects user language and responds with native speakers. This example demonstrates intelligent routing across multiple AI models specialized for different languages.
 
-## What You'll Learn
+Build a language routing 团队 that automatic所有y detects user language and responds with native speakers. 此示例演示 intelligent routing across multiple AI 模型s specialized for different languages.
 
-By building this team, you'll understand:
-- How to create language-specific agents using different AI models
+## What You'll 学习
+
+By building this 团队, you'll 理解:
+- How 创建 language-specific 代理s using different AI 模型s
 - How to implement intelligent routing based on user input language
-- How to use multiple AI providers (OpenAI, Claude, Mistral, DeepSeek) in one team
-- How to handle unsupported languages with graceful fallback responses
+- How 使用 multiple AI providers (OpenAI, Claude, Mistral, DeepSeek) in one 团队
+- How to handle unsupported languages with graceful f所有back responses
 
-## Use Cases
+## 使用 Cases
 
 Build multilingual customer support, international chatbots, translation services, or global help desk systems.
 
 ## How It Works
 
-The team uses route mode to direct queries to language-specific agents:
+The 团队 uses route mode to direct queries to language-specific 代理s:
 
 1. **Detect**: Team leader analyzes the language of the user's question
-2. **Route**: Directs the query to the appropriate language-specialized agent
-3. **Respond**: Language agent answers in the user's native language
-4. **Fallback**: Handles unsupported languages with English response
+2. **Route**: Directs the query to the appropriate language-specialized 代理
+3. **Respond**: Language 代理 answers in the user's native language
+4. **F所有back**: Handles unsupported languages with English response
 
-Each language agent uses a different AI model optimized for that language's characteristics.
+Each language 代理 uses a different AI 模型 optimized for that language's characteristics.
 
-## Code
+## 代码
 
 ```python multi_language_team.py
 from agno.agent import Agent
@@ -102,11 +103,11 @@ if __name__ == "__main__":
 
 ## What to Expect
 
-The team will automatically detect the language of your input and route it to the appropriate language-specific agent. Each agent responds fluently in their designated language using models optimized for that language.
+The 团队 will automatic所有y detect the language of your input and route it to the appropriate language-specific 代理. Each 代理 responds fluently in their designated language using 模型s optimized for that language.
 
-The output shows which agent handled each request. For unsupported languages, you'll receive a polite message in English listing available languages.
+The output 展示 which 代理 handled each request. For unsupported languages, you'll receive a polite message in English listing 可用的 languages.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -141,8 +142,8 @@ The output shows which agent handled each request. For unsupported languages, yo
 
 ## Next Steps
 
-- Add more language agents for additional language support
+- Add more language 代理s for additional language support
 - Modify the routing logic in `instructions` to handle dialects or regional variations
-- Experiment with different AI models for each language to optimize quality
-- Explore [Teams](/basics/teams/overview) for advanced request distribution
+- Experiment with different AI 模型s for each language to optimize quality
+- 探索 [Teams](/basics/团队s/over查看) for advanced request distribution
 

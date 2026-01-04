@@ -2,9 +2,10 @@
 title: Recipe RAG Image Agent
 ---
 
-This example demonstrates a multi-modal RAG agent that uses Groq and OpenAITools to search a PDF recipe knowledge base and generate a step-by-step visual guide for recipes.
 
-## Code
+此示例演示 a multi-modal RAG 代理 that uses Groq and OpenAITools to 搜索 a PDF recipe 知识库 and generate a step-by-step visual guide for recipes.
+
+## 代码
 
 ```python ref/recipe_rag_image.py
 """Example: Multi-Modal RAG & Image Agent
@@ -62,7 +63,7 @@ if response.images:
     download_image(response.images[0].url, Path("tmp/recipe_image.png"))
 ```
 
-## Usage
+## 用法
 
 <Steps>
   <Step title="Install dependencies">

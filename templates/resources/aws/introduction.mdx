@@ -1,32 +1,32 @@
 ---
-title: AWS Resources
+title: AWS 资源
 sidebarTitle: AWS
 ---
 
-AWS Resources enable us to create AWS services as pydantic objects, completing our vision of writing software, application and infrastructure code entirely in python.
+AWS 资源使我们能够将 AWS 服务创建为 pydantic 对象，从而实现完全使用 Python 编写软件、应用程序和基础设施代码的愿景。
 
-## Examples
+## 示例
 
-### S3 Bucket
+### S3 存储桶
 
-Copy the following code to a file `resources.py` and run `ag start resources.py` to create a bucket called `my-bucket-885`.
+将以下代码复制到文件 `resources.py` 中，并运行 `ag start resources.py` 以创建名为 `my-bucket-885` 的存储桶。
 
 <CodeGroup>
 
 ```python resources.py
 from agno.aws.resource.s3 import S3Bucket
 
-# -*- S3 bucket called my-bucket-885
+# -*- 名为 my-bucket-885 的 S3 存储桶
 prd_bucket = S3Bucket(name="my-bucket-885")
 ```
 
 </CodeGroup>
 
-Make sure to delete the bucket using `ag stop resources.py`
+请务必使用 `ag stop resources.py` 删除存储桶
 
-### Secret Manager
+### 密钥管理器
 
-Copy the following code to a file `resources.py` and run `ag start resources.py` to create a secret called `my-secret`.
+将以下代码复制到文件 `resources.py` 中，并运行 `ag start resources.py` 以创建名为 `my-secret` 的密钥。
 
 <CodeGroup>
 
@@ -34,18 +34,18 @@ Copy the following code to a file `resources.py` and run `ag start resources.py`
 import json
 from agno.aws.resource.secret import SecretsManager
 
-# -*- Secret called my-secret
+# -*- 名为 my-secret 的密钥
 prd_secret = SecretsManager(
     name="my-secret",
     secret_string=json.dumps({"mysecretkey": "mysecretvalue"}),
-    # Read secret variables from my_secrets.yml
+    # 从 my_secrets.yml 读取密钥变量
     # secret_files=[Path('my_secrets.yml')],
 )
 ```
 
 </CodeGroup>
 
-Read the secret in another file called `read_my_secret.py`
+在另一个名为 `read_my_secret.py` 的文件中读取密钥
 
 <CodeGroup>
 
@@ -57,6 +57,6 @@ print(my_secret.get_secret_value("mysecretkey"))
 
 </CodeGroup>
 
-Run this file using `python read_my_secret.py`.
+使用 `python read_my_secret.py` 运行此文件。
 
-Delete the secret using `ag stop resources.py`
+使用 `ag stop resources.py` 删除密钥

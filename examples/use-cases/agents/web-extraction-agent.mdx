@@ -3,32 +3,33 @@ title: Web Extraction Agent
 mode: wide
 ---
 
-Build an AI agent that transforms unstructured web content into organized, structured data by combining Firecrawl's web scraping with Pydantic's structured output validation.
 
-## What You'll Learn
+Build an AI 代理 that transforms unstructured web content into organized, structured data by combining Firecrawl's web scraping with Pydantic's structured output validation.
 
-By building this agent, you'll understand:
+## What You'll 学习
+
+By building this 代理, you'll 理解:
 - How to integrate Firecrawl for reliable web scraping and content extraction
-- How to define structured output schemas using Pydantic models
-- How to create nested data structures for complex web content
+- How to define structured output schemas using Pydantic 模型s
+- How 创建 nested data structures for complex web content
 - How to handle optional fields and varied page structures
 
-## Use Cases
+## 使用 Cases
 
-Build competitive intelligence tools, content aggregation systems, knowledge base constructors, or automated documentation generators.
+Build competitive intelligence 工具s, content aggregation systems, 知识库 constructors, or automated documentation generators.
 
 ## How It Works
 
-The agent extracts structured data from web pages in a systematic process:
+The 代理 extracts structured data from web pages in a systematic process:
 
-1. **Fetch**: Uses Firecrawl to retrieve and parse the target webpage
+1. **Fetch**: 使用s Firecrawl to retrieve and parse the target webpage
 2. **Analyze**: Identifies key sections, elements, and hierarchical structure
-3. **Extract**: Pulls information according to the Pydantic output schema
-4. **Structure**: Organizes content into nested models (sections, metadata, links, contact info)
+3. **Extract**: Pulls 信息 according to the Pydantic output schema
+4. **Structure**: Organizes content into nested 模型s (sections, metadata, 链接s, contact 信息)
 
 The Pydantic schema ensures consistent output format regardless of the source website's structure, with optional fields handling varied page layouts gracefully.
 
-## Code
+## 代码
 
 ```python web_extraction_agent.py
 from textwrap import dedent
@@ -96,11 +97,11 @@ pprint(result.content)
 
 ## What to Expect
 
-The agent will scrape the target URL using Firecrawl and extract all information into a structured PageInformation object. The output includes the page title, description, features, organized content sections with headings, important links, contact information, and additional metadata.
+The 代理 will scrape the target URL using Firecrawl and extract 所有 信息 into a structured PageInformation object. The output includes the page title, de脚本ion, features, organized content sections with headings, important 链接s, contact 信息, and additional metadata.
 
-The structured output ensures consistency and makes the extracted data easy to process, store, or display programmatically. Optional fields handle pages with varying structures gracefully.
+The structured output ensures consistency and makes the extracted data easy to process, store, or display programmatic所有y. Optional fields handle pages with varying structures gracefully.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -134,6 +135,6 @@ The structured output ensures consistency and makes the extracted data easy to p
 ## Next Steps
 
 - Change the target URL to extract data from different websites
-- Modify the `PageInformation` Pydantic model to capture additional fields
-- Adjust the agent's instructions to focus on specific content types
-- Explore [Firecrawl Tools](/integrations/toolkits/web-scrape/firecrawl) for advanced scraping options
+- Modify the `PageInformation` Pydantic 模型 to capture additional fields
+- Adjust the 代理's 说明 to focus on specific content types
+- 探索 [Firecrawl Tools](/integrations/工具kits/web-scrape/firecrawl) for advanced scraping options

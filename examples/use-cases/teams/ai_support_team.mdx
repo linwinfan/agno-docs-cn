@@ -3,33 +3,34 @@ title: AI Support Team
 mode: wide
 ---
 
-Build an intelligent customer support team that routes inquiries to specialized agents for documentation search, issue escalation, and feedback collection. This example demonstrates advanced routing with knowledge bases and external integrations.
 
-## What You'll Learn
+Build an intelligent customer support 团队 that routes inquiries to specialized 代理s for documentation 搜索, issue escalation, and feedback collection. 此示例演示 advanced routing with 知识库s and external integrations.
 
-By building this team, you'll understand:
-- How to create a routing system that classifies and directs customer inquiries
-- How to integrate knowledge bases with vector search for documentation assistance
-- How to connect external tools like Slack for escalation and feedback workflows
-- How to combine multiple specialized agents with distinct responsibilities
+## What You'll 学习
 
-## Use Cases
+By building this 团队, you'll 理解:
+- How 创建 a routing system that 类ifies and directs customer inquiries
+- How to integrate 知识库s with vector 搜索 for documentation assistance
+- How to connect external 工具s like Slack for escalation and feedback 工作流s
+- How to combine multiple specialized 代理s with distinct responsibilities
+
+## 使用 Cases
 
 Build customer support platforms, help desk systems, technical documentation assistants, or automated ticketing systems.
 
 ## How It Works
 
-The team uses intelligent routing to direct inquiries to specialized agents:
+The 团队 uses intelligent routing to direct inquiries to specialized 代理s:
 
 1. **Classify**: Team leader analyzes the inquiry type (question, bug, feedback)
-2. **Route**: Directs to appropriate agent based on classification
-3. **Process**: Specialized agent handles the inquiry with their tools
-4. **Integrate**: Connects with external systems (Slack, knowledge base)
+2. **Route**: Directs to appropriate 代理 based on 类ification
+3. **Process**: Specialized 代理 handles the inquiry with their 工具s
+4. **Integrate**: Connects with external systems (Slack, 知识库)
 5. **Respond**: Provides professional response back to the user
 
-Each agent has specific tools and instructions for their domain of responsibility.
+Each 代理 has specific 工具s and 说明 for their domain of responsibility.
 
-## Code
+## 代码
 
 ```python ai_support_team.py
 from agno.agent import Agent
@@ -155,11 +156,11 @@ customer_support_team.print_response(
 ```
 ## What to Expect
 
-The team will analyze your inquiry and route it to the most appropriate agent. Documentation questions get answered by searching the knowledge base, bugs get escalated to Slack, and feedback gets collected and logged.
+The 团队 will analyze your inquiry and route it to the most appropriate 代理. Documentation questions get answered by 搜索ing the 知识库, bugs get escalated to Slack, and feedback gets collected and logged.
 
-You'll see the team's classification decision and responses from the specific agents handling your request. The knowledge base integration enables accurate answers grounded in actual documentation, while Slack integration provides seamless escalation workflows.
+You'll 查看 the 团队's 类ification decision and responses from the specific 代理s handling your request. The 知识库 integration enables accurate answers grounded in actual documentation, while Slack integration provides seamless escalation 工作流s.
 
-## Usage
+## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
@@ -201,6 +202,6 @@ You'll see the team's classification decision and responses from the specific ag
 
 - Modify the documentation URL in `knowledge.add_content()` to index your own docs
 - Adjust Slack channel names in `support_channel` and `feedback_channel` variables
-- Add more specialized agents for different inquiry types
-- Explore [Knowledge Bases](/basics/knowledge/knowledge-bases) for advanced configurations
+- Add more specialized 代理s for different inquiry types
+- 探索 [Knowledge Bases](/basics/knowledge/knowledge-bases) for advanced 配置s
 

@@ -1,49 +1,50 @@
 ---
-title: "Sage: Answer Engine"
+title: Sage: Answer Engine
 ---
 
-This example shows how to build Sage, a Perplexity-like Answer Engine that intelligently determines whether to perform a web search or conduct a deep analysis using ExaTools based on the user's query.
+
+此示例展示 how 构建 Sage, a Perplexity-like Answer Engine that intelligently determines whether to perform a web 搜索 or conduct a deep analysis using ExaTools based on the user's query.
 
 Sage:
-1. Uses real-time web search (DuckDuckGo) and deep contextual analysis (ExaTools) to provide comprehensive answers
-2. Intelligently selects tools based on query complexity
-3. Provides an interactive Streamlit UI with session management and chat history export
+1. 使用s real-time web 搜索 (DuckDuckGo) and deep contextual analysis (ExaTools) to provide comprehensive answers
+2. Intelligently selects 工具s based on query complexity
+3. Provides an interactive Streamlit UI with 会话 management and chat history 导出
 4. Supports multiple LLM providers (OpenAI, Anthropic, Google, Groq)
 
-## Key capabilities
-- Natural language query understanding and processing
-- Real-time web search integration with DuckDuckGo
+## 密钥 capabilities
+- Natural language query 理解ing and processing
+- Real-time web 搜索 integration with DuckDuckGo
 - Deep contextual analysis using ExaTools
 - Multiple LLM provider support
 - Session management using SQLite
-- Chat history export
+- Chat history 导出
 - Interactive Streamlit UI
 
 <video
   autoPlay
   muted
   controls
-  className="w-full aspect-video"
+  类Name="w-full aspect-video"
   src="/videos/answer-engine.mp4"
 ></video>
 
-## Simple queries to try
-- "Tell me about the tariffs the US is imposing in 2025"
-- "Which is a better reasoning model: o3-mini or DeepSeek R1?"
-- "Tell me about Agno"
+## 简单 queries to try
+- "Tell me 关于 the tariffs the US is imposing in 2025"
+- "Which is a better reasoning 模型: o3-mini or DeepSeek R1?"
+- "Tell me 关于 Agno"
 - "What are the latest trends in renewable energy?"
 
-## Advanced analysis queries
+## 高级 analysis queries
 - "Evaluate how emerging AI regulations could influence innovation"
-- "Compare the environmental impact of electric vs hydrogen vehicles"
-- "Analyze the global semiconductor supply chain challenges"
+- "Compare the 环境al impact of electric vs hydrogen vehicles"
+- "Analyze the global semiconductor supply chain ch所有enges"
 - "Explain the implications of quantum computing on cryptography"
 
-## Code
+## 代码
 
-The complete code is available in the [Agno repository](https://github.com/agno-agi/agno).
+The complete code is 可用的 in the [Agno 存储库](https://github.com/agno-agi/agno).
 
-## Usage
+## 用法
 
 <Steps>
   <Step title="Clone the repository">
@@ -89,16 +90,16 @@ The complete code is available in the [Agno repository](https://github.com/agno-
 </Steps>
 
 ## Model Selection
-The application supports multiple model providers:
+The 应用程序 supports multiple 模型 providers:
 - OpenAI (o3-mini, gpt-5-mini)
 - Anthropic (claude-3-5-sonnet)
 - Google (gemini-2.0-flash-exp)
 - Groq (llama-3.3-70b-versatile)
 
 ## Agent Configuration
-The agent configuration is in `agents.py` and the prompts are in `prompts.py`:
-- To modify prompts, update the `prompts.py` file
-- To add new tools or models, update the `agents.py` file
+The 代理 配置 is in `agents.py` and the prompts are in `prompts.py`:
+- To modify prompts, update the `prompts.py` 文件
+- To add new 工具s or 模型s, update the `agents.py` 文件
 
 ## Support
 

@@ -2,43 +2,43 @@
 title: ag infra patch
 ---
 
-Update resources for active infra
+更新活动基础设施的资源
 
-## Params
+## 参数
 
 <ResponseField name="resources_filter" type="str">
-  Resource filter. Format - ENV:INFRA:GROUP:NAME:TYPE
+  资源筛选器。格式 - ENV:INFRA:GROUP:NAME:TYPE
 </ResponseField>
 <ResponseField name="env_filter" type="str">
-  Filter the environment to deploy `--env` `-e`
+  筛选要部署的环境 `--env` `-e`
 </ResponseField>
 <ResponseField name="infra_filter" type="str">
-  Filter the infra to deploy. `--infra` `-i`
+  筛选要部署的基础设施。`--infra` `-i`
 </ResponseField>
 <ResponseField name="config_filter" type="str">
-  Filter the config to deploy. `--config` `-c`
+  筛选要部署的配置。`--config` `-c`
 </ResponseField>
 <ResponseField name="group_filter" type="str">
-  Filter resources using group name. `--group` `-g`
+  使用组名筛选资源。`--group` `-g`
 </ResponseField>
 <ResponseField name="name_filter" type="str">
-  Filter resource using name. `--name` `-n`
+  使用名称筛选资源。`--name` `-n`
 </ResponseField>
 <ResponseField name="type_filter" type="str">
-  Filter resource using type `--type` `-t`
+  使用类型筛选资源 `--type` `-t`
 </ResponseField>
 <ResponseField name="dry_run" type="bool">
-  Print resources and exit. `--dry-run` `-dr`
+  打印资源并退出。`--dry-run` `-dr`
 </ResponseField>
 <ResponseField name="auto_confirm" type="bool">
-  Skip the confirmation before deploying resources. `--yes` `-y`
+  跳过部署资源前的确认。`--yes` `-y`
 </ResponseField>
 <ResponseField name="print_debug_log" type="bool">
-  Print debug logs. `--debug` `-d`
+  打印调试日志。`--debug` `-d`
 </ResponseField>
 <ResponseField name="force" type="bool">
-  Force `--force` `-f`
+  强制 `--force` `-f`
 </ResponseField>
 <ResponseField name="pull" type="bool">
-  Pull `--pull` `-p`
+  拉取 `--pull` `-p`
 </ResponseField>

@@ -1,15 +1,15 @@
 ---
-title: Infra Settings
-sidebarTitle: Settings
+title: 基础设施设置
+sidebarTitle: 设置
 ---
 
-The `InfraSettings` object, usually defined in the `infra/settings.py` file is used to defines common settings used by your apps and resources.
+`InfraSettings` 对象通常在 `infra/settings.py` 文件中定义，用于定义应用程序和资源使用的通用设置。
 
-Its not mandatory and doesn't serve any other purpose except to hold configuration used by workspace apps and resources. The values in the `InfraSettings` object can also be set using Environment variables or a `.env` file.
+它不是强制性的，除了保存工作区应用程序和资源使用的配置外，没有其他用途。`InfraSettings` 对象中的值也可以使用环境变量或 `.env` 文件进行设置。
 
-## Example
+## 示例
 
-An example `InfraSettings` used by the `agent-infra-aws` template. View this file on [github](https://github.com/agno-agi/agent-infra-aws/blob/main/infra/settings.py)
+`agent-infra-aws` 模板使用的 `InfraSettings` 示例。在 [github](https://github.com/agno-agi/agent-infra-aws/blob/main/infra/settings.py) 上查看此文件
 
 ```python infra/settings.py
 from pathlib import Path
@@ -17,74 +17,74 @@ from pathlib import Path
 from agno.infra.settings import InfraSettings
 
 #
-# -*- Define infra settings using a InfraSettings object
-# these values can also be set using environment variables or a .env file
+# -*- 使用 InfraSettings 对象定义基础设施设置
+# 这些值也可以使用环境变量或 .env 文件进行设置
 #
 infra_settings = InfraSettings(
-    # Infra name: used for naming resources
+    # 基础设施名称：用于命名资源
     infra_name="ai",
-    # Path to the infra root
+    # 基础设施根目录路径
     infra_root=Path(__file__).parent.parent.resolve(),
-    # -*- Dev settings
+    # -*- 开发设置
     dev_env="dev",
-    # -*- Dev Apps
+    # -*- 开发应用程序
     dev_app_enabled=True,
     dev_api_enabled=True,
     dev_db_enabled=True,
     # dev_jupyter_enabled=True,
-    # -*- Production settings
+    # -*- 生产设置
     prd_env="prd",
-    # -*- Production Apps
+    # -*- 生产应用程序
     prd_app_enabled=True,
     prd_api_enabled=True,
     prd_db_enabled=True,
-    # -*- AWS settings
-    # Region for AWS resources
+    # -*- AWS 设置
+    # AWS 资源的区域
     aws_region="us-east-1",
-    # Availability Zones for AWS resources
+    # AWS 资源的可用区
     aws_az1="us-east-1a",
     aws_az2="us-east-1b",
-    # Subnet IDs in the aws_region
+    # aws_region 中的子网 ID
     # subnet_ids=["subnet-xyz", "subnet-xyz"],
     #
-    # -*- Image Settings
+    # -*- 镜像设置
     #
-    # Default repository for images
+    # 镜像的默认仓库
     image_repo="agno"
-    # Build images locally
+    # 在本地构建镜像
     build_images=False
-    # Push images after building
+    # 构建后推送镜像
     push_images=False
-    # Skip cache when building images
+    # 构建镜像时跳过缓存
     skip_image_cache=False
-    # Force pull images in FROM
+    # 强制拉取 FROM 中的镜像
     force_pull_images=False
 )
 ```
 
-## Usage
+## 用法
 
-Use the infra settings to
+使用基础设施设置来
 
-- Name resources
-- Get the infra root path using `infra_settings.infra_root`
+- 命名资源
+- 使用 `infra_settings.infra_root` 获取基础设施根目录路径
 
 ```python dev_resources.py
 ...
-# -*- Streamlit running on port 8501:8501
+# -*- 在端口 8501:8501 上运行的 Streamlit
 dev_streamlit = Streamlit(
     name=f"{infra_settings.dev_key}-app",
     enabled=infra_settings.dev_app_enabled,
     ...
-    # Read secrets from secrets/dev_app_secrets.yml
+    # 从 secrets/dev_app_secrets.yml 读取密钥
     secrets_file=infra_settings.infra_root.joinpath("infra/secrets/dev_app_secrets.yml")
 )
 ```
 
-- Hold AWS constants like `availability zone` and `subnets`
+- 保存 AWS 常量，如 `可用区` 和 `子网`
 
 ```python prd_resources.py
-# -*- FastAPI running on ECS
+# -*- 在 ECS 上运行的 FastAPI
 prd_fastapi = FastApi(
     name=f"{infra_settings.prd_key}-api",
     enabled=infra_settings.prd_api_enabled,
@@ -93,7 +93,7 @@ prd_fastapi = FastApi(
     ...
 )
 
-# -*- RDS Database Instance
+# -*- RDS 数据库实例
 prd_db = DbInstance(
     name=f"{infra_settings.prd_key}-db",
     enabled=infra_settings.prd_db_enabled,
