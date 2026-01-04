@@ -49,8 +49,8 @@ async def run_agent(message: str) -> None:
 
 if __name__ == "__main__":
     task = dedent("""\
-    I'm traveling to San Francisco from April 20th - May 8th. Can you find me the best deals for a 1 bedroom apartment?
-    I'd like a dedicated workspace and close proximity to public transport.\
+    我计划在 4 月 20 日到 5 月 8 日之间前往旧金山。你能帮我找到一间一室公寓的最佳优惠吗？
+    我希望有一个独立的工作空间，并且靠近公共交通。\
     """)
     asyncio.run(run_agent(task))
 

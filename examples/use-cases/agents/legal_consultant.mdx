@@ -47,15 +47,15 @@ legal_agent = Agent(
     model=OpenAIChat(id="gpt-5-mini"),
     markdown=True,
     instructions=[
-        "Provide legal information and advice based on the knowledge base.",
-        "Include relevant legal citations and sources when answering questions.",
-        "Always clarify that you're providing general legal information, not professional legal advice.",
-        "Recommend consulting with a licensed attorney for specific legal situations.",
+        "基于知识库提供法律信息和建议。",
+        "回答问题时包含相关的法律引用和来源。",
+        "始终明确说明您提供的是通用法律信息，而非专业法律建议。",
+        "建议针对特定法律情况咨询持证律师。",
     ],
 )
 
 legal_agent.print_response(
-    "What are the legal consequences and criminal penalties for spoofing Email Address?",
+    "伪造电子邮件地址的法律后果和刑事处罚是什么？",
     stream=True,
 )
 
@@ -66,7 +66,7 @@ legal_agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```

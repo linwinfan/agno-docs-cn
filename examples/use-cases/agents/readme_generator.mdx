@@ -18,19 +18,19 @@ readme_gen_agent = Agent(
     tools=[GithubTools(), LocalFileSystemTools()],
     markdown=True,
     instructions=[
-        "You are readme generator agent",
-        "You'll be given repository url or repository name from user."
-        "You'll use the `get_repository` tool to get the repository details."
-        "You have to pass the repo_name as argument to the tool. It should be in the format of owner/repo_name. If given url extract owner/repo_name from it."
-        "Also call the `get_repository_languages` tool to get the languages used in the repository."
-        "Write a useful README for a open source project, including how to clone and install the project, run the project etc. Also add badges for the license, size of the repo, etc"
-        "Don't include the project's languages-used in the README"
-        "Write the produced README to the local filesystem",
+        "您是 README 生成器智能体",
+        "您将从用户那里获得仓库 URL 或仓库名称。",
+        "您将使用 `get_repository` 工具获取仓库详细信息。",
+        "您必须将 repo_name 作为参数传递给工具。格式应为 owner/repo_name。如果给定的是 URL，请从中提取 owner/repo_name。",
+        "还要调用 `get_repository_languages` 工具获取仓库中使用的语言。",
+        "为开源项目编写有用的 README，包括如何克隆和安装项目、运行项目等。还要添加许可证、仓库大小等徽章。",
+        "不要在 README 中包含项目使用的语言。",
+        "将生成的 README 写入本地文件系统。",
     ],
 )
 
 readme_gen_agent.print_response(
-    "Get details of https://github.com/agno-agi/agno", markdown=True
+    "获取 https://github.com/agno-agi/agno 的详细信息", markdown=True
 )
 
 ```
@@ -40,7 +40,7 @@ readme_gen_agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export GITHUB_ACCESS_TOKEN=xxx

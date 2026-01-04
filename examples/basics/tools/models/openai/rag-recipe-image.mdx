@@ -1,9 +1,9 @@
 ---
-title: Recipe RAG Image Agent
+title: 食谱 RAG 图像智能体
 ---
 
 
-此示例演示 a multi-modal RAG 代理 that uses Groq and OpenAITools to 搜索 a PDF recipe 知识库 and generate a step-by-step visual guide for recipes.
+此示例演示一个多模态 RAG 智能体，该智能体使用 Groq 和 OpenAITools 来搜索 PDF 食谱知识库并为食谱生成逐步可视化指南。
 
 ## 代码
 
@@ -66,17 +66,17 @@ if response.images:
 ## 用法
 
 <Steps>
-  <Step title="Install dependencies">
+  <Step title="安装依赖">
     ```bash
     pip install openai agno groq cohere
     ```
   </Step>
 
-  <Step title="Run the example">
+  <Step title="运行示例">
     ```bash
     python ref/recipe_rag_image.py
     ```
   </Step>
 </Steps>
 
-By default, the generated image will be saved to `tmp/recipe_image.png`.
+默认情况下，生成的图像将保存到 `tmp/recipe_image.png`。

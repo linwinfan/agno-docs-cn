@@ -1,8 +1,8 @@
 ---
-title: Recipe Rag Image
+title: "食谱多模态RAG图像生成器"
 ---
 
-An 代理 that uses Llama 4 for multi-modal RAG and OpenAITools 创建 a visual, step-by-step image manual for a recipe.
+一个使用 Llama 4 进行多模态 RAG 并结合 OpenAITools 创建食谱可视化分步图像手册的智能体。
 
 ## 代码
 
@@ -66,19 +66,19 @@ if response.images:
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置 API 密钥">
     ```bash
     export GROQ_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai groq cohere
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/02_examples/agents/recipe_rag_image.py

@@ -1,26 +1,23 @@
 ---
-title: Research Agent using Exa
+title: 使用 Exa 的研究智能体
 ---
 
 
-此示例展示 how 创建 a sophisticated re搜索 代理 that combines
-academic 搜索 capabilities with scholarly writing expertise. The 代理 performs
-thorough re搜索 using Exa's academic 搜索, analyzes recent publications, and delivers
-well-structured, academic-style reports on any topic.
+此示例展示如何创建一个复杂的研究智能体，该智能体结合了学术搜索能力和学术写作专长。该智能体使用 Exa 的学术搜索进行彻底研究，分析近期出版物，并提供结构良好的学术风格报告。
 
-密钥 capabilities:
-- 高级 academic literature 搜索
-- Recent publication analysis
-- Cross-disciplinary synthesis
-- Academic writing expertise
-- Citation management
+关键功能：
+- 高级学术文献搜索
+- 近期出版物分析
+- 跨学科综合
+- 学术写作专长
+- 引文管理
 
-示例 prompts to try:
-- "探索 recent advances in quantum machine learning"
-- "Analyze the current state of fusion energy re搜索"
-- "Investigate the latest developments in CRISPR gene editing"
-- "Re搜索 the intersection of blockchain and sustainable energy"
-- "Examine recent breakthroughs in brain-computer interfaces"
+可尝试的示例提示：
+- "探索量子机器学习的最新进展"
+- "分析聚变能源研究的当前状态"
+- "调查 CRISPR 基因编辑的最新发展"
+- "研究区块链与可持续能源的交叉领域"
+- "检查脑机接口的最新突破"
 
 ## 代码
 
@@ -41,124 +38,124 @@ research_scholar = Agent(
         )
     ],
     description=dedent("""\
-        You are a distinguished research scholar with expertise in multiple disciplines.
-        Your academic credentials include: 📚
+        您是一位在多个学科领域具有专长的杰出研究学者。
+        您的学术资历包括：📚
 
-        - Advanced research methodology
-        - Cross-disciplinary synthesis
-        - Academic literature analysis
-        - Scientific writing excellence
-        - Peer review experience
-        - Citation management
-        - Data interpretation
-        - Technical communication
-        - Research ethics
-        - Emerging trends analysis\
+        - 先进的研究方法论
+        - 跨学科综合能力
+        - 学术文献分析
+        - 科学写作卓越能力
+        - 同行评审经验
+        - 引文管理
+        - 数据解释
+        - 技术沟通
+        - 研究伦理
+        - 新兴趋势分析\
     """),
     instructions=dedent("""\
-        1. Research Methodology 🔍
-           - Conduct 3 distinct academic searches
-           - Focus on peer-reviewed publications
-           - Prioritize recent breakthrough findings
-           - Identify key researchers and institutions
+        1. 研究方法论 🔍
+           - 进行 3 次不同的学术搜索
+           - 专注于同行评审的出版物
+           - 优先考虑近期的突破性发现
+           - 识别关键研究人员和机构
 
-        2. Analysis Framework 📊
-           - Synthesize findings across sources
-           - Evaluate research methodologies
-           - Identify consensus and controversies
-           - Assess practical implications
+        2. 分析框架 📊
+           - 综合多个来源的发现
+           - 评估研究方法论
+           - 识别共识和争议
+           - 评估实际影响
 
-        3. Report Structure 📝
-           - Create an engaging academic title
-           - Write a compelling abstract
-           - Present methodology clearly
-           - Discuss findings systematically
-           - Draw evidence-based conclusions
+        3. 报告结构 📝
+           - 创建引人入胜的学术标题
+           - 撰写有说服力的摘要
+           - 清晰地展示方法论
+           - 系统地讨论发现
+           - 得出基于证据的结论
 
-        4. Quality Standards ✓
-           - Ensure accurate citations
-           - Maintain academic rigor
-           - Present balanced perspectives
-           - Highlight future research directions\
+        4. 质量标准 ✓
+           - 确保引文准确
+           - 保持学术严谨性
+           - 呈现平衡的观点
+           - 强调未来研究方向\
     """),
     expected_output=dedent("""\
-        # {Engaging Title} 📚
+        # {引人入胜的标题} 📚
 
-        ## Abstract
-        {Concise overview of the research and key findings}
+        ## 摘要
+        {研究和关键发现的简洁概述}
 
-        ## Introduction
-        {Context and significance}
-        {Research objectives}
+        ## 引言
+        {背景和意义}
+        {研究目标}
 
-        ## Methodology
-        {Search strategy}
-        {Selection criteria}
+        ## 方法论
+        {搜索策略}
+        {选择标准}
 
-        ## Literature Review
-        {Current state of research}
-        {Key findings and breakthroughs}
-        {Emerging trends}
+        ## 文献综述
+        {研究现状}
+        {关键发现和突破}
+        {新兴趋势}
 
-        ## Analysis
-        {Critical evaluation}
-        {Cross-study comparisons}
-        {Research gaps}
+        ## 分析
+        {批判性评估}
+        {跨研究比较}
+        {研究空白}
 
-        ## Future Directions
-        {Emerging research opportunities}
-        {Potential applications}
-        {Open questions}
+        ## 未来方向
+        {新兴研究机会}
+        {潜在应用}
+        {开放性问题}
 
-        ## Conclusions
-        {Summary of key findings}
-        {Implications for the field}
+        ## 结论
+        {关键发现总结}
+        {对领域的启示}
 
-        ## References
-        {Properly formatted academic citations}
+        ## 参考文献
+        {格式正确的学术引文}
 
         ---
-        Research conducted by AI Academic Scholar
-        Published: {current_date}
-        Last Updated: {current_time}\
+        由 AI 学术研究员进行的研究
+        发布日期：{current_date}
+        最后更新：{current_time}\
     """),
     markdown=True,
     add_datetime_to_context=True,
     save_response_to_file="tmp/{message}.md",
 )
 
-# Example usage with academic research request
+# 学术研究请求的使用示例
 if __name__ == "__main__":
     research_scholar.print_response(
-        "Analyze recent developments in quantum computing architectures",
+        "分析量子计算架构的最新发展",
         stream=True,
     )
 
-# Advanced research topics to explore:
+# 可探索的高级研究主题：
 """
-Quantum Science & Computing:
-1. "Investigate recent breakthroughs in quantum error correction"
-2. "Analyze the development of topological quantum computing"
-3. "Research quantum machine learning algorithms and applications"
-4. "Explore advances in quantum sensing technologies"
+量子科学与计算：
+1. "调查量子纠错的最新突破"
+2. "分析拓扑量子计算的发展"
+3. "研究量子机器学习算法和应用"
+4. "探索量子传感技术的进展"
 
-Biotechnology & Medicine:
-1. "Examine recent developments in mRNA vaccine technology"
-2. "Analyze breakthroughs in organoid research"
-3. "Investigate advances in precision medicine"
-4. "Research developments in neurotechnology"
+生物技术与医学：
+1. "检查 mRNA 疫苗技术的最新发展"
+2. "分析类器官研究的突破"
+3. "调查精准医学的进展"
+4. "研究神经技术的发展"
 
-Materials Science:
-1. "Explore recent advances in metamaterials"
-2. "Analyze developments in 2D materials beyond graphene"
-3. "Research progress in self-healing materials"
-4. "Investigate new battery technologies"
+材料科学：
+1. "探索超材料的最新进展"
+2. "分析石墨烯以外的二维材料发展"
+3. "研究自修复材料的进展"
+4. "调查新型电池技术"
 
-Artificial Intelligence:
-1. "Examine recent advances in foundation models"
-2. "Analyze developments in AI safety research"
-3. "Research progress in neuromorphic computing"
-4. "Investigate advances in explainable AI"
+人工智能：
+1. "检查基础模型的最新进展"
+2. "分析 AI 安全研究的发展"
+3. "研究神经形态计算的进展"
+4. "调查可解释 AI 的进展"
 """
 ```
 ## 用法
@@ -166,20 +163,20 @@ Artificial Intelligence:
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install openai exa_py agno
     ```
   </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         export EXA_API_KEY=****
         ```
     </Step>
 
-  <Step title="Run the agent">
+  <Step title="运行智能体">
     ```bash
     python research_agent_exa.py
     ```

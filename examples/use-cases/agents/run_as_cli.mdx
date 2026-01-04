@@ -1,8 +1,8 @@
 ---
-title: Run As Cli
+title: 作为 CLI 运行
 ---
 
-此示例展示 how 创建 an interactive CLI app with an 代理.
+此示例展示如何创建一个带有智能体的交互式 CLI 应用程序。
 
 ## 代码
 
@@ -18,33 +18,33 @@ writing_assistant = Agent(
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[DuckDuckGoTools()],
     instructions=dedent("""\
-        You are a friendly and professional writing assistant!
+        您是一位友好且专业的写作助手！
 
-        Your capabilities include:
-        - **Brainstorming**: Help generate ideas, topics, and creative concepts
-        - **Research**: Find current information and facts to support writing
-        - **Editing**: Improve grammar, style, clarity, and flow
-        - **Feedback**: Provide constructive suggestions for improvement
-        - **Content Creation**: Help write articles, emails, stories, and more
+        您的功能包括：
+        - **头脑风暴**：帮助生成想法、主题和创意概念
+        - **研究**：查找当前信息和事实以支持写作
+        - **编辑**：改进语法、风格、清晰度和流畅度
+        - **反馈**：提供建设性的改进建议
+        - **内容创作**：帮助撰写文章、邮件、故事等
 
-        Always:
-        - Ask clarifying questions to better understand the user's needs
-        - Provide specific, actionable suggestions
-        - Maintain an encouraging and supportive tone
-        - Use web search when current information is needed
-        - Format your responses clearly with headings and lists when helpful
+        始终：
+        - 询问澄清问题以更好地理解用户需求
+        - 提供具体、可操作的建议
+        - 保持鼓励和支持的语调
+        - 在需要当前信息时使用网络搜索
+        - 在有帮助时使用标题和列表清晰地格式化您的回复
 
-        Start conversations by asking what writing project they're working on!
+        通过询问他们正在从事什么写作项目来开始对话！
         """),
     markdown=True,
 )
 
 if __name__ == "__main__":
-    print("🔍 I can research topics, help brainstorm, edit text, and more!")
-    print("✏️ Type 'exit', 'quit', or 'bye' to end our session.\n")
+    print("🔍 我可以研究主题、帮助头脑风暴、编辑文本等！")
+    print("✏️ 输入 'exit'、'quit' 或 'bye' 结束我们的会话。\n")
 
     writing_assistant.cli_app(
-        input="Hello! What writing project are you working on today? I'm here to help with brainstorming, research, editing, or any other writing needs you have!",
+        input="你好！你今天在做什么写作项目？我可以帮助你进行头脑风暴、研究、编辑，或满足你的任何其他写作需求！",
         user="Writer",
         emoji="✍️",
         stream=True,
@@ -69,19 +69,19 @@ if __name__ == "__main__":
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno ddgs
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/02_examples/agents/run_as_cli.py

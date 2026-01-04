@@ -1,35 +1,35 @@
 ---
-title: Speech-to-Text Agent
+title: 语音转文本智能体
 mode: wide
 ---
 
 
-Build an Agent that transcribes audio 文件s into structured data with speaker identification and conversation metadata. This Agent uses multimodal capabilities to convert audio content into structured tran脚本ion data.
+构建一个将音频文件转录为结构化数据的智能体，包含说话人识别和对话元数据。该智能体利用多模态能力将音频内容转换为结构化的转录数据。
 
-## What You'll 学习
+## 您将学到的内容
 
-By building this 代理, you'll 理解:
+通过构建此智能体，您将理解：
 
-- How 使用 Pydantic schemas for structured tran脚本ion output
-- How 配置 multimodal Agent for audio processing
-- How to identify speakers in audio conversations
+- 如何使用 Pydantic 模式进行结构化转录输出
+- 如何配置多模态智能体进行音频处理
+- 如何在音频对话中识别说话人
 
-## 使用 Cases
+## 使用场景
 
-Transcribe meeting recordings with speaker identification, convert podcast episodes into 搜索able text, create subtitles for video content, or build voice note analyzers with structured tran脚本ion data.
+转录带有说话人识别的会议录音，将播客节目转换为可搜索的文本，为视频内容创建字幕，或构建具有结构化转录数据的语音笔记分析器。
 
-## How It Works
+## 工作原理
 
-The Agent uses multimodal capabilities to process audio directly and output structured tran脚本ion data:
+该智能体利用多模态能力直接处理音频并输出结构化的转录数据：
 
-1. **Input**: Accepts audio 文件s WAV format from URLs (or local 文件s)
-2. **Process**: Multimodal 模型 analyzes audio content and identifies speakers
-3. **Structure**: Output is validated against a Pydantic schema
-4. **Output**: Returns typed data with tran脚本, de脚本ion, and speaker list
+1. **输入**：接受来自 URL（或本地文件）的 WAV 格式音频文件
+2. **处理**：多模态模型分析音频内容并识别说话人
+3. **结构化**：输出根据 Pydantic 模式进行验证
+4. **输出**：返回包含转录、描述和说话人列表的类型化数据
 
-The structured output makes tran脚本ions immediately usable in downstream 应用程序s without additional parsing.
+结构化输出使转录内容可立即在下游应用程序中使用，无需额外解析。
 
-## STT 示例 using Gemini flash 3 pre查看
+## 使用 Gemini flash 3 预览版的 STT 示例
 
 ```python speech_to_text_agent.py
 import httpx
@@ -92,7 +92,7 @@ agent.print_response(
 )
 ```
 
-## STT 示例 using OpenAI gpt-audio
+## 使用 OpenAI gpt-audio 的 STT 示例
 
 ```python speech_to_text_agent.py
 import httpx
@@ -157,32 +157,32 @@ agent.print_response(
 )
 ```
 
-## What to Expect
+## 预期效果
 
-The 代理 processes audio 文件s and returns a structured `Transcription` object containing:
+该智能体处理音频文件并返回包含以下内容的结构化 `Transcription` 对象：
 
-- **de脚本ion**: A summary describing what the audio is 关于
-- **utterances**: List of identified speakers (names if mentioned, otherwise "Speaker 1", "Speaker 2", etc.)
+- **描述**：描述音频内容的摘要
+- **话语列表**：已识别的说话人列表（如果提到名字则使用名字，否则使用"说话人 1"、"说话人 2"等）
 
-The utterances are in the order of the audio conversation and they contain:
+话语按音频对话的顺序排列，包含：
 
-- **speaker**: Name or identifier of the speaker
-- **text**: What was said by the speaker
+- **说话人**：说话人的姓名或标识符
+- **文本**：说话人所说的内容
 
-Processing time depends on audio length, typic所有y 10-30 seconds for 文件s under 5 minutes.
+处理时间取决于音频长度，通常 5 分钟以内的文件需要 10-30 秒。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-<Step title="Set your API key">```bash export GOOGLE_API_KEY=xxx ```</Step>
+<Step title="设置您的 API 密钥">```bash export GOOGLE_API_KEY=xxx ```</Step>
 
-<Step title="Install libraries">
+<Step title="安装库">
   ```bash pip install -U agno google-genai httpx ```
 </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python speech_to_text_agent.py
@@ -196,9 +196,9 @@ Processing time depends on audio length, typic所有y 10-30 seconds for 文件s 
   </Step>
 </Steps>
 
-## Next Steps
+## 下一步
 
-- Remove the structured output and use the text output instead if your use case does not require structured outputs
-- Extend the `Transcription` schema with additional fields like `sentiment` or `topics`
-- Try processing different audio formats (MP3, WAV, M4A)
-- Combine with other 工具s for enhanced analysis
+- 如果您的用例不需要结构化输出，请移除结构化输出并改用文本输出
+- 使用额外字段（如 `sentiment` 或 `topics`）扩展 `Transcription` 模式
+- 尝试处理不同的音频格式（MP3、WAV、M4A）
+- 与其他工具结合以增强分析能力

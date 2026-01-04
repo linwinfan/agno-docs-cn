@@ -9,12 +9,12 @@ title: 会议总结智能体
 ## 代码
 
 ```python cookbook/02_examples/agents/meeting_summarizer_agent.py
-"""Example: Meeting Summarizer & Visualizer Agent
+"""示例：会议总结与可视化智能体
 
-This script uses OpenAITools (transcribe_audio, generate_image, generate_speech)
-to process a meeting recording, summarize it, visualize it, and create an audio summary.
+此脚本使用 OpenAITools（transcribe_audio、generate_image、generate_speech）
+来处理会议录音、总结、可视化并创建音频摘要。
 
-Requires: pip install openai agno
+需要：pip install openai agno
 """
 
 import base64
@@ -39,17 +39,17 @@ meeting_agent: Agent = Agent(
     model=Gemini(id="gemini-2.0-flash"),
     tools=[OpenAITools(), ReasoningTools()],
     description=dedent("""\
-        You are an efficient Meeting Assistant AI.
-        Your purpose is to process audio recordings of meetings, extract key information,
-        create a visual representation, and provide an audio summary.
+        您是一个高效的会议助理 AI。
+        您的目的是处理会议录音，提取关键信息，
+        创建可视化表示，并提供音频摘要。
     """),
     instructions=dedent("""\
-        Follow these steps precisely:
-        1. Receive the path to an audio file.
-        2. Use the `transcribe_audio` tool to get the text transcription.
-        3. Analyze the transcription and write a concise summary highlighting key discussion points, decisions, and action items.
-        4. Based *only* on the summary created in step 3, generating important meeting points. This should be a essentially an overview of the summary's content properly ordered and formatted in the form of meeting minutes.
-        5. Convert the meeting minutes into an audio summary using the `generate_speech` tool.
+        请精确遵循以下步骤：
+        1. 接收音频文件的路径。
+        2. 使用 `transcribe_audio` 工具获取文本转录。
+        3. 分析转录内容并撰写简洁的摘要，突出关键讨论点、决策和行动项。
+        4. 仅基于第 3 步创建的摘要，生成重要的会议要点。这应该是摘要内容的概览，按照正确的顺序和格式整理成会议纪要的形式。
+        5. 使用 `generate_speech` 工具将会议纪要转换为音频摘要。
     """),
     markdown=True,
 )
@@ -68,7 +68,7 @@ if response.audio:
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export GOOGLE_API_KEY=xxx

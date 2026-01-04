@@ -1,17 +1,16 @@
 ---
-title: 食谱创建器
+title: "食谱创建器"
 ---
-
 
 此示例展示如何创建一个智能食谱推荐系统，根据您的食材、饮食偏好和时间限制提供详细、个性化的食谱。
 该智能体结合烹饪知识、营养数据和烹饪技术来提供全面的烹饪指导。
 
 可尝试的示例提示：
-- "I have chicken, rice, and vegetables. What can I make in 30 minutes?"
-- "Create a vegetarian pasta recipe with mushrooms and spinach"
-- "Suggest healthy breakfast options with oats and fruits"
-- "What can I make with leftover turkey and potatoes?"
-- "Need a quick dessert recipe using chocolate and bananas"
+- "我有鸡肉、米饭和蔬菜。30分钟内能做什么？"
+- "用蘑菇和菠菜创建一个素食意大利面食谱"
+- "推荐使用燕麦和水果的健康早餐选择"
+- "用剩下的火鸡和土豆能做什么？"
+- "需要一个使用巧克力和香蕉的快速甜点食谱"
 
 ## 代码
 
@@ -138,20 +137,20 @@ Batch Cooking:
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno openai exa_py
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         export EXA_API_KEY=****
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行智能体">
         ```bash
         python recipe_creator.py
         ```

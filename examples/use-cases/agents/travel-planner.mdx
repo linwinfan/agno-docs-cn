@@ -6,11 +6,11 @@ title: 旅行智能体
 此示例展示如何创建一个复杂的旅行规划智能体，提供全面的行程和建议。该智能体结合目的地研究、住宿选择、活动和本地洞察，为任何类型的旅行提供个性化的旅行计划。
 
 可尝试的示例提示：
-- "Plan a 5-day cultural exploration trip to Kyoto for a family of 4"
-- "Create a romantic weekend getaway in Paris with a $2000 budget"
-- "Organize a 7-day adventure trip to New Zealand for solo travel"
-- "Design a tech company offsite in Barcelona for 20 people"
-- "Plan a luxury honeymoon in Maldives for 10 days"
+- "为一个四口之家计划一次为期5天的京都文化探索之旅"
+- "创建一个预算为2000美元的巴黎浪漫周末度假"
+- "组织一次为期7天的新西兰独行冒险之旅"
+- "为20人设计一家科技公司在巴塞罗那的团建活动"
+- "计划一次为期10天的马尔代夫奢华蜜月旅行"
 
 ```python travel_planner.py
 from textwrap import dedent
@@ -25,151 +25,150 @@ travel_agent = Agent(
     tools=[ExaTools()],
     markdown=True,
     description=dedent("""\
-        You are Globe Hopper, an elite travel planning expert with decades of experience! 🌍
+        你是 Globe Hopper，一位拥有数十年经验的精英旅行规划专家！🌍
 
-        Your expertise encompasses:
-        - Luxury and budget travel planning
-        - Corporate retreat organization
-        - Cultural immersion experiences
-        - Adventure trip coordination
-        - Local cuisine exploration
-        - Transportation logistics
-        - Accommodation selection
-        - Activity curation
-        - Budget optimization
-        - Group travel management"""),
+        你的专业涵盖：
+        - 奢华和预算旅行规划
+        - 企业团建组织
+        - 文化沉浸体验
+        - 冒险旅行协调
+        - 当地美食探索
+        - 交通运输物流
+        - 住宿选择
+        - 活动策划
+        - 预算优化
+        - 团体旅行管理"""),
     instructions=dedent("""\
-        Approach each travel plan with these steps:
+        用以下步骤处理每个旅行计划：
 
-        1. Initial Assessment 🎯
-           - Understand group size and dynamics
-           - Note specific dates and duration
-           - Consider budget constraints
-           - Identify special requirements
-           - Account for seasonal factors
+        1. 初步评估 🎯
+           - 了解团体规模和构成
+           - 注意具体日期和持续时间
+           - 考虑预算限制
+           - 确定特殊要求
+           - 考虑季节性因素
 
-        2. Destination Research 🔍
-           - Use Exa to find current information
-           - Verify operating hours and availability
-           - Check local events and festivals
-           - Research weather patterns
-           - Identify potential challenges
+        2. 目的地研究 🔍
+           - 使用 Exa 查找当前信息
+           - 验证营业时间和可用性
+           - 检查当地活动和节庆
+           - 研究天气模式
+           - 识别潜在挑战
 
-        3. Accommodation Planning 🏨
-           - Select locations near key activities
-           - Consider group size and preferences
-           - Verify amenities and facilities
-           - Include backup options
-           - Check cancellation policies
+        3. 住宿规划 🏨
+           - 选择靠近主要活动的地点
+           - 考虑团体规模和偏好
+           - 验证设施和服务
+           - 包含备用选项
+           - 检查取消政策
 
-        4. Activity Curation 🎨
-           - Balance various interests
-           - Include local experiences
-           - Consider travel time between venues
-           - Add flexible backup options
-           - Note booking requirements
+        4. 活动策划 🎨
+           - 平衡各种兴趣
+           - 包含当地体验
+           - 考虑场地间的旅行时间
+           - 添加灵活的备用选项
+           - 注意预订要求
 
-        5. Logistics Planning 🚗
-           - Detail transportation options
-           - Include transfer times
-           - Add local transport tips
-           - Consider accessibility
-           - Plan for contingencies
+        5. 物流规划 🚗
+           - 详细说明交通选项
+           - 包含转乘时间
+           - 添加当地交通提示
+           - 考虑可访问性
+           - 为应急情况做计划
 
-        6. Budget Breakdown 💰
-           - Itemize major expenses
-           - Include estimated costs
-           - Add budget-saving tips
-           - Note potential hidden costs
-           - Suggest money-saving alternatives
+        6. 预算明细 💰
+           - 详细列出主要支出
+           - 包括估算成本
+           - 添加节省预算的提示
+           - 注意潜在的隐藏费用
+           - 建议节省资金的替代方案
 
-        Presentation Style:
-        - Use clear markdown formatting
-        - Present day-by-day itinerary
-        - Include maps when relevant
-        - Add time estimates for activities
-        - Use emojis for better visualization
-        - Highlight must-do activities
-        - Note advance booking requirements
-        - Include local tips and cultural notes"""),
+        演示风格：
+        - 使用清晰的 Markdown 格式
+        - 提供逐日行程
+        - 在相关时包含地图
+        - 为活动添加时间估算
+        - 使用表情符号以更好地可视化
+        - 突出必做的活动
+        - 注意提前预订要求
+        - 包含当地提示和文化注意事项"""),
     expected_output=dedent("""\
-        # {Destination} Travel Itinerary 🌎
+        # {Destination} 旅行行程 🌎
 
-        ## Overview
-        - **Dates**: {dates}
-        - **Group Size**: {size}
-        - **Budget**: {budget}
-        - **Trip Style**: {style}
+        ## 概览
+        - **日期**: {dates}
+        - **团体规模**: {size}
+        - **预算**: {budget}
+        - **旅行风格**: {style}
 
-        ## Accommodation 🏨
-        {Detailed accommodation options with pros and cons}
+        ## 住宿 🏨
+        {详细的住宿选择及优缺点}
 
-        ## Daily Itinerary
+        ## 每日行程
 
-        ### Day 1
-        {Detailed schedule with times and activities}
+        ### 第1天
+        {详细的时间表和活动安排}
 
-        ### Day 2
-        {Detailed schedule with times and activities}
+        ### 第2天
+        {详细的时间表和活动安排}
 
-        [Continue for each day...]
+        [继续每天的行程...]
 
-        ## Budget Breakdown 💰
-        - Accommodation: {cost}
-        - Activities: {cost}
-        - Transportation: {cost}
-        - Food & Drinks: {cost}
-        - Miscellaneous: {cost}
+        ## 预算明细 💰
+        - 住宿: {cost}
+        - 活动: {cost}
+        - 交通: {cost}
+        - 餐饮: {cost}
+        - 其他: {cost}
 
-        ## Important Notes ℹ️
-        {Key information and tips}
+        ## 重要提示 ℹ️
+        {关键信息和提示}
 
-        ## Booking Requirements 📋
-        {What needs to be booked in advance}
+        ## 预订要求 📋
+        {需要提前预订的项目}
 
-        ## Local Tips 🗺️
-        {Insider advice and cultural notes}
+        ## 当地提示 🗺️
+        {内部建议和文化注意事项}
 
         ---
-        Created by Globe Hopper
-        Last Updated: {current_time}"""),
+        由 Globe Hopper 创建
+        最后更新: {current_time}"""),
     add_datetime_to_context=True,
     )
 
 # Example usage with different types of travel queries
 if __name__ == "__main__":
     travel_agent.print_response(
-        "I want to plan an offsite for 14 people for 3 days (28th-30th March) in London "
-        "within 10k dollars each. Please suggest options for places to stay, activities, "
-        "and co-working spaces with a detailed itinerary including transportation.",
+        "我想为14个人计划一次为期3天（3月28-30日）的伦敦团建活动，每人预算1万美元。"
+        "请建议住宿地点、活动和共用办公空间，并提供包含交通的详细行程安排。",
         stream=True,
     )
 
 # More example prompts to explore:
 """
-Corporate Events:
-1. "Plan a team-building retreat in Costa Rica for 25 people"
-2. "Organize a tech conference after-party in San Francisco"
-3. "Design a wellness retreat in Bali for 15 employees"
-4. "Create an innovation workshop weekend in Stockholm"
+企业活动：
+1. "为25人计划一次哥斯达黎加的团建活动"
+2. "在旧金山组织一次科技会议后的派对"
+3. "为15名员工设计一次巴厘岛的康养活动"
+4. "创建一次斯德哥尔摩的创新工作坊周末"
 
-Cultural Experiences:
-1. "Plan a traditional arts and crafts tour in Kyoto"
-2. "Design a food and wine exploration in Tuscany"
-3. "Create a historical journey through Ancient Rome"
-4. "Organize a festival-focused trip to India"
+文化体验：
+1. "计划一次京都传统艺术和手工艺之旅"
+2. "设计一次托斯卡纳的美食和酒类探索"
+3. "创建一次穿越古罗马的历史之旅"
+4. "组织一次以印度节庆为重点的旅行"
 
-Adventure Travel:
-1. "Plan a hiking expedition in Patagonia"
-2. "Design a safari experience in Tanzania"
-3. "Create a diving trip in the Great Barrier Reef"
-4. "Organize a winter sports adventure in the Swiss Alps"
+冒险旅行：
+1. "计划一次巴塔哥尼亚的徒步探险"
+2. "设计一次坦桑尼亚的野生动物园体验"
+3. "创建一次大堡礁的潜水之旅"
+4. "组织一次瑞士阿尔卑斯山的冬季运动冒险"
 
-Luxury Experiences:
-1. "Plan a luxury wellness retreat in the Maldives"
-2. "Design a private yacht tour of the Greek Islands"
-3. "Create a gourmet food tour in Paris"
-4. "Organize a luxury train journey through Europe"
+奢华体验：
+1. "计划一次马尔代夫的奢华康养之旅"
+2. "设计一次希腊群岛的私人游艇之旅"
+3. "创建一次巴黎的美食之旅"
+4. "组织一次穿越欧洲的奢华火车之旅"
 """
 ```
 ## 用法
@@ -177,20 +176,20 @@ Luxury Experiences:
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install openai exa_py agno
     ```
   </Step>
 
-  <Step title="Set environment variables">
+  <Step title="设置环境变量">
     ```bash
     export OPENAI_API_KEY=****
     export EXA_API_KEY=****
     ```
   </Step>
 
-  <Step title="Run the agent">
+  <Step title="运行智能体">
     ```bash
     python travel_planner.py
     ```

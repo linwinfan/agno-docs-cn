@@ -1,25 +1,25 @@
 ---
-title: Study Partner
+title: 学习伙伴
 ---
 
 
-## De脚本ion
+## 描述
 
-This Study Partner 代理 演示如何 create an AI-powered study partner that combines multiple 信息 sources and 工具s to provide comprehensive learning support. The 代理 showcases several key capabilities:
+这个学习伙伴智能体演示如何创建一个由 AI 驱动的学习伙伴，该伙伴结合多个信息源和工具，提供全面的学习支持。该智能体展示了几个关键功能：
 
-**Multi-工具 Integration**: Combines Exa 搜索 工具s for web re搜索 and YouTube 工具s for video content discovery, enabling the 代理 to access diverse learning resources.
+**多工具集成**：结合 Exa 搜索工具进行网络搜索和 YouTube 工具进行视频内容发现，使智能体能够访问多样化的学习资源。
 
-**Personalized 学习ing Support**: Creates customized study plans based on user constraints (time 可用的, current knowledge level, daily study hours) and learning preferences.
+**个性化学习支持**：根据用户约束条件（可用时间、当前知识水平、每日学习小时数）和学习偏好创建定制的学习计划。
 
-**Resource Curation**: Searches and recommends high-quality learning materials including documentation, tutorials, re搜索 papers, and community discussions from reliable sources.
+**资源策划**：搜索并推荐高质量的学习材料，包括文档、教程、研究论文和来自可靠来源的社区讨论。
 
-**Interactive 学习ing**: Provides step-by-step explanations, practical 示例, and hands-on project suggestions to re信息rce 理解ing.
+**互动学习**：提供逐步解释、实用示例和动手项目建议，以强化理解。
 
-**Progress Tracking**: Designs structured study plans with clear milestones and deadlines to help users stay on track with their learning goals.
+**进度跟踪**：设计具有明确里程碑和截止日期的结构化学习计划，帮助用户按计划实现学习目标。
 
-**学习ing Strategy**: Offers tips on effective study techniques, time management, and motivation maintenance for sustained learning success.
+**学习策略**：提供有效学习技巧、时间管理和保持动力的建议，以实现持续的学习成功。
 
-This 示例 is particularly useful for developers, students, or anyone looking 构建 AI 代理s that can assist with educational content discovery, personalized learning path creation, and comprehensive study support across various subjects and skill levels.
+此示例对开发者、学生或任何希望构建能够协助教育内容发现、个性化学习路径创建和跨各种学科及技能水平的全面学习支持的 AI 智能体的人特别有用。
 
 ## 代码
 
@@ -34,20 +34,20 @@ study_partner = Agent(
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[ExaTools(), YouTubeTools()],
     markdown=True,
-    description="You are a study partner who assists users in finding resources, answering questions, and providing explanations on various topics.",
+    description="您是一个学习伙伴，协助用户查找资源、回答问题并提供各种主题的解释。",
     instructions=[
-        "Use Exa to search for relevant information on the given topic and verify information from multiple reliable sources.",
-        "Break down complex topics into digestible chunks and provide step-by-step explanations with practical examples.",
-        "Share curated learning resources including documentation, tutorials, articles, research papers, and community discussions.",
-        "Recommend high-quality YouTube videos and online courses that match the user's learning style and proficiency level.",
-        "Suggest hands-on projects and exercises to reinforce learning, ranging from beginner to advanced difficulty.",
-        "Create personalized study plans with clear milestones, deadlines, and progress tracking.",
-        "Provide tips for effective learning techniques, time management, and maintaining motivation.",
-        "Recommend relevant communities, forums, and study groups for peer learning and networking.",
+        "使用 Exa 搜索给定主题的相关信息，并从多个可靠来源验证信息。",
+        "将复杂主题分解为易于理解的部分，并提供带有实用示例的逐步解释。",
+        "分享策划的学习资源，包括文档、教程、文章、研究论文和社区讨论。",
+        "推荐与用户学习风格和熟练程度相匹配的高质量 YouTube 视频和在线课程。",
+        "建议从初级到高级难度不等的动手项目和练习，以强化学习效果。",
+        "创建个性化的学习计划，包含明确的里程碑、截止日期和进度跟踪。",
+        "提供有效学习技巧、时间管理和保持动力的建议。",
+        "推荐相关的社区、论坛和学习小组，用于同伴学习和网络交流。",
     ],
 )
 study_partner.print_response(
-    "I want to learn about Postgres in depth. I know the basics, have 2 weeks to learn, and can spend 3 hours daily. Please share some resources and a study plan.",
+    "我想深入学习 Postgres。我了解基础知识，有 2 周时间学习，每天可以投入 3 小时。请分享一些资源和学习计划。",
     stream=True,
 )
 
@@ -58,20 +58,20 @@ study_partner.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=****
     export EXA_API_KEY=****
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno exa_py openai
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/02_examples/agents/study_partner.py

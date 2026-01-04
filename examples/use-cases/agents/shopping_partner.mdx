@@ -1,22 +1,22 @@
 ---
-title: Shopping Partner
+title: 购物助手
 ---
 
-The Shopping Partner 代理 is an AI-powered product recommendation system that helps users find the perfect products based on their specific preferences and requirements. This 代理 specializes in:
+购物助手是一个由 AI 驱动的产品推荐系统，帮助用户根据其特定偏好和需求找到完美的产品。该智能体专注于：
 
-- **Smart Product Matching**: Analyzes user preferences and finds products that best match their criteria, ensuring a minimum 50% match rate
-- **Trusted Sources**: Searches only authentic e-commerce platforms like Amazon, Flipkart, Myntra, Meesho, Google Shopping, Nike, and other reputable websites
-- **Real-time Availability**: Verifies that recommended products are in stock and 可用的 for purchase
-- **Quality Assurance**: Avoids counterfeit or unverified products to ensure user safety
-- **Detailed Information**: Provides comprehensive product 详细信息 including price, brand, features, and key attributes
-- **使用r-Friendly Formatting**: Presents recommendations in a clear, organized manner for easy 理解ing
+- **智能产品匹配**：分析用户偏好并找到最符合其标准的产品，确保最低 50% 的匹配率
+- **可信来源**：仅搜索亚马逊、Flipkart、Myntra、Meesho、Google 购物、耐克等真实电商平台和其他知名网站
+- **实时可用性**：验证推荐产品有库存且可供购买
+- **质量保证**：避免假冒或未经验证的产品，确保用户安全
+- **详细信息**：提供包括价格、品牌、功能和关键属性在内的全面产品信息
+- **用户友好格式**：以清晰、有条理的方式呈现推荐，便于用户理解
 
-This 代理 is particularly useful for:
-- Finding specific products within budget constraints
-- 发现ing alternatives when preferred items are un可用的
-- Getting personalized recommendations based on multiple criteria
-- Ensuring purchases from trusted, legitimate sources
-- Saving time in product re搜索 and comparison
+该智能体特别适用于：
+- 在预算限制内寻找特定产品
+- 当首选商品不可用时发现替代品
+- 基于多个标准获得个性化推荐
+- 确保从可信、合法的来源购买
+- 节省产品搜索和比较的时间
 
 ## 代码
 
@@ -29,18 +29,18 @@ agent = Agent(
     name="shopping partner",
     model=OpenAIChat(id="gpt-5-mini"),
     instructions=[
-        "You are a product recommender agent specializing in finding products that match user preferences.",
-        "Prioritize finding products that satisfy as many user requirements as possible, but ensure a minimum match of 50%.",
-        "Search for products only from authentic and trusted e-commerce websites such as Amazon, Flipkart, Myntra, Meesho, Google Shopping, Nike, and other reputable platforms.",
-        "Verify that each product recommendation is in stock and available for purchase.",
-        "Avoid suggesting counterfeit or unverified products.",
-        "Clearly mention the key attributes of each product (e.g., price, brand, features) in the response.",
-        "Format the recommendations neatly and ensure clarity for ease of user understanding.",
+        "您是一个产品推荐智能体，专门寻找符合用户偏好的产品。",
+        "优先寻找尽可能满足用户要求的产品，但确保最低 50% 的匹配率。",
+        "仅从亚马逊、Flipkart、Myntra、Meesho、Google 购物、耐克等真实可信的电商平台和其他知名平台搜索产品。",
+        "验证每个产品推荐都有库存且可供购买。",
+        "避免推荐假冒或未经验证的产品。",
+        "在回复中清楚地提及每个产品的关键属性（例如价格、品牌、功能）。",
+        "以整洁的格式呈现推荐，并确保清晰易懂。",
     ],
     tools=[ExaTools()],
 )
 agent.print_response(
-    "I am looking for running shoes with the following preferences: Color: Black Purpose: Comfortable for long-distance running Budget: Under Rs. 10,000"
+    "我正在寻找跑鞋，偏好如下：颜色：黑色 用途：适合长距离跑步 预算：低于 10,000 卢比"
 )
 
 ```
@@ -50,20 +50,20 @@ agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export EXA_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai exa_py
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/02_examples/agents/shopping_partner.py

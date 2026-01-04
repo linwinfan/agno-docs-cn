@@ -24,7 +24,7 @@ title: 媒体趋势分析智能体
 ## 代码
 
 ```python cookbook/02_examples/agents/media_trend_analysis_agent.py
-"""Please install dependencies using:
+"""请使用以下命令安装依赖：
 pip install openai exa-py agno firecrawl
 """
 
@@ -50,69 +50,69 @@ agent = Agent(
         FirecrawlTools(scrape=True),
     ],
     description=dedent("""\
-        You are an expert media trend analyst specializing in:
-        1. Identifying emerging trends across news and digital platforms
-        2. Recognizing pattern changes in media coverage
-        3. Providing actionable insights based on data
-        4. Forecasting potential future developments
+        您是一位专业的媒体趋势分析师，专注于：
+        1. 识别新闻和数字平台上的新兴趋势
+        2. 识别媒体报道中的模式变化
+        3. 基于数据提供可操作的洞察
+        4. 预测潜在的未来发展
     """),
     instructions=[
-        "Analyze the provided topic according to the user's specifications:",
-        "1. Use keywords to perform targeted searches",
-        "2. Identify key influencers and authoritative sources",
-        "3. Extract main themes and recurring patterns",
-        "4. Provide actionable recommendations",
-        "5. if got sources less then 2, only then scrape them using firecrawl tool, dont crawl it  and use them to generate the report",
-        "6. growth rate should be in percentage , and if not possible dont give growth rate",
+        "根据用户指定的条件分析提供的主题：",
+        "1. 使用关键词进行定向搜索",
+        "2. 识别关键影响者和权威来源",
+        "3. 提取主要主题和重复出现的模式",
+        "4. 提供可操作的建议",
+        "5. 如果获得的来源少于 2 个，才使用 firecrawl 工具抓取它们，不要抓取并使用它们生成报告",
+        "6. 增长率应以百分比表示，如果无法计算则不提供增长率",
     ],
     expected_output=dedent("""\
-    # Media Trend Analysis Report
+    # 媒体趋势分析报告
 
-    ## Executive Summary
-    {High-level overview of findings and key metrics}
+    ## 执行摘要
+    {发现和关键指标的高级概述}
 
-    ## Trend Analysis
-    ### Volume Metrics
-    - Peak discussion periods: {dates}
-    - Growth rate: {percentage or dont show this}
+    ## 趋势分析
+    ### 量级指标
+    - 讨论高峰期：{dates}
+    - 增长率：{percentage or dont show this}
 
-    ## Source Analysis
-    ### Top Sources
+    ## 来源分析
+    ### 主要来源
     1. {Source 1}
 
     2. {Source 2}
 
 
-    ## Actionable Insights
+    ## 可操作洞察
     1. {Insight 1}
-       - Evidence: {data points}
-       - Recommended action: {action}
+       - 证据：{data points}
+       - 建议行动：{action}
 
-    ## Future Predictions
+    ## 未来预测
     1. {Prediction 1}
-       - Supporting evidence: {evidence}
+       - 支持证据：{evidence}
 
-    ## References
-    {Detailed source list with links}
+    ## 参考文献
+    {带链接的详细来源列表}
     """),
     markdown=True,
     add_datetime_to_context=True,
 )
 
-# Example usage:
+# 使用示例：
 analysis_prompt = """\
-Analyze media trends for:
-Keywords: ai agents
-Sources: verge.com ,linkedin.com, x.com
+分析以下内容的媒体趋势：
+关键词：AI 智能体
+来源：verge.com, linkedin.com, x.com
 """
 
 agent.print_response(analysis_prompt, stream=True)
 
-# Alternative prompt example
+# 替代提示示例
 crypto_prompt = """\
-Analyze media trends for:
-Keywords: cryptocurrency, bitcoin, ethereum
-Sources: coindesk.com, cointelegraph.com
+分析以下内容的媒体趋势：
+关键词：加密货币、比特币、以太坊
+来源：coindesk.com, cointelegraph.com
 """
 
 # agent.print_response(crypto_prompt, stream=True)
@@ -123,7 +123,7 @@ Sources: coindesk.com, cointelegraph.com
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export EXA_API_KEY=xxx
@@ -131,13 +131,13 @@ Sources: coindesk.com, cointelegraph.com
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai exa-py agno firecrawl
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/02_examples/agents/media_trend_analysis_agent.py
@@ -150,37 +150,37 @@ Sources: coindesk.com, cointelegraph.com
   </Step>
 </Steps>
 
-## Customization Options
+## 自定义选项
 
-You can customize the 代理's behavior by:
-- **Adjusting Time Windows**: Modify the `calculate_start_date()` 函数 to analyze different time periods
-- **Adding Sources**: Include additional websites or platforms in your analysis prompts
-- **Modifying 密钥words**: Change 搜索 terms to focus on specific topics or industries
-- **Customizing Output**: Modify the `expected_output` template to match your reporting needs
+您可以通过以下方式自定义智能体的行为：
+- **调整时间窗口**：修改 `calculate_start_date()` 函数以分析不同的时间段
+- **添加来源**：在分析提示中包含额外的网站或平台
+- **修改关键词**：更改搜索词以专注于特定主题或行业
+- **自定义输出**：修改 `expected_output` 模板以匹配您的报告需求
 
-## 示例 Prompts
+## 示例提示
 
-Here are some additional prompt 示例 you can try:
+以下是您可以尝试的一些额外提示示例：
 
 ```python
-# Technology trends
+# 技术趋势
 tech_prompt = """\
-Analyze media trends for:
-Keywords: artificial intelligence, machine learning, automation
-Sources: techcrunch.com, arstechnica.com, wired.com
+分析以下内容的媒体趋势：
+关键词：人工智能、机器学习、自动化
+来源：techcrunch.com, arstechnica.com, wired.com
 """
 
-# Business trends
+# 商业趋势
 business_prompt = """\
-Analyze media trends for:
-Keywords: remote work, digital transformation, sustainability
-Sources: forbes.com, bloomberg.com, hbr.org
+分析以下内容的媒体趋势：
+关键词：远程工作、数字化转型、可持续发展
+来源：forbes.com, bloomberg.com, hbr.org
 """
 
-# Entertainment trends
+# 娱乐趋势
 entertainment_prompt = """\
-Analyze media trends for:
-Keywords: streaming, gaming, social media
-Sources: variety.com, polygon.com, theverge.com
+分析以下内容的媒体趋势：
+关键词：流媒体、游戏、社交媒体
+来源：variety.com, polygon.com, theverge.com
 """
 ```

@@ -1,14 +1,14 @@
 ---
-title: Tweet Analysis Agent
-description: An agent that analyzes tweets and provides comprehensive brand monitoring and sentiment analysis.
+title: 推文分析智能体
+description: 一个分析推文并提供全面品牌监控和情感分析的智能体。
 ---
 
 
-密钥 capabilities:
-- Real-time tweet analysis and sentiment 类ification
-- Engagement metrics analysis (likes, retweets, replies)
-- Brand health monitoring and competitive intelligence
-- Strategic recommendations and response strategies
+关键功能：
+- 实时推文分析和情感分类
+- 参与度指标分析（点赞、转发、回复）
+- 品牌健康监控和竞争情报
+- 战略建议和响应策略
 
 ## 代码
 ```python social_media_agent.py
@@ -28,62 +28,60 @@ social_media_agent = Agent(
         )
     ],
     instructions=dedent("""\
-        You are a senior Brand Intelligence Analyst specializing in social media
-        listening on X (Twitter).
-        Your mission: Transform raw tweet content and engagement metrics into
-        executive-ready intelligence reports.
+        你是一位资深的品牌情报分析师，专门从事 X（Twitter）上的社交媒体监听。
+        你的任务：将原始推文内容和参与度指标转化为高管级别的智能报告。
 
-        Core Analysis Steps:
-        1. Data Collection
-           - Retrieve tweets using X tools
-           - Analyze text content and engagement metrics
-           - Focus on likes, retweets, replies, and reach
+        核心分析步骤：
+        1. 数据收集
+           - 使用 X 工具检索推文
+           - 分析文本内容和参与度指标
+           - 重点关注点赞、转发、回复和覆盖范围
 
-        2. Sentiment Classification
-           - Classify each tweet: Positive/Negative/Neutral/Mixed
-           - Identify reasoning (feature praise, bug complaints, etc.)
-           - Weight by engagement volume and author influence
+        2. 情感分类
+           - 对每条推文进行分类：正面/负面/中性/混合
+           - 识别原因（功能赞扬、错误投诉等）
+           - 根据参与度数量和作者影响力加权
 
-        3. Pattern Detection
-           - Viral advocacy (high likes & retweets, low replies)
-           - Controversy signals (low likes, high replies)
-           - Influencer impact and verified account activity
+        3. 模式检测
+           - 病毒式推广（高点赞和转发，低回复）
+           - 争议信号（低点赞，高回复）
+           - 意见领袖影响和认证账户活动
 
-        4. Thematic Analysis
-           - Extract recurring keywords and themes
-           - Identify feature feedback and pain points
-           - Track competitor mentions and comparisons
-           - Spot emerging use cases
+        4. 主题分析
+           - 提取重复出现的关键词和主题
+           - 识别功能反馈和痛点
+           - 跟踪竞争对手提及和比较
+           - 发现新兴使用案例
 
-        Report Format:
-        - Executive summary with brand health score (1-10)
-        - Key themes with representative quotes
-        - Risk analysis and opportunity identification
-        - Strategic recommendations (immediate/short-term/long-term)
-        - Response playbook for high-impact posts
+        报告格式：
+        - 包含品牌健康评分（1-10）的执行摘要
+        - 包含代表性引述的关键主题
+        - 风险分析和机会识别
+        - 战略建议（即时/短期/长期）
+        - 高影响力帖子的响应策略
 
-        Guidelines:
-        - Be objective and evidence-backed
-        - Focus on actionable insights
-        - Highlight urgent issues requiring attention
-        - Provide solution-oriented recommendations"""),
+        指导原则：
+        - 保持客观和基于证据
+        - 专注于可操作的见解
+        - 突出需要关注的紧急问题
+        - 提供解决方案导向的建议"""),
     markdown=True,
     )
 
 social_media_agent.print_response(
-    "Analyze the sentiment of Agno and AgnoAGI on X (Twitter) for past 10 tweets"
+    "分析 X（Twitter）上 Agno 和 AgnoAGI 最近 10 条推文的情感"
 )
 ```
 
-<Note> Check out the 详细信息ed [Social Media Agent](https://github.com/agno-agi/agno/tree/main/cookbook/02_示例/代理s/social_media_代理.py). </Note>
+<Note> 查看详细的 [Social Media Agent](https://github.com/agno-agi/agno/tree/main/cookbook/02_examples/agents/social_media_agent.py). </Note>
 
 
-More prompts to try:
-- "Analyze sentiment around our brand on X for the past 10 tweets"
-- "Monitor competitor mentions and compare sentiment vs our brand"
-- "Generate a brand health report from recent social media activity"
-- "Identify trending topics and user sentiment 关于 our product"
-- "Create a social media intelligence report for executive re查看"
+更多可尝试的提示：
+- "分析我们品牌在 X 上最近 10 条推文的情感"
+- "监控竞争对手提及并对比我们品牌的情感"
+- "从最近的社交媒体活动生成品牌健康报告"
+- "识别热门话题和用户对我们产品的感想"
+- "为高管创建社交媒体智能报告"
 
 
 ## 用法
@@ -91,13 +89,13 @@ More prompts to try:
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=****
     ```
   </Step>
 
-  <Step title="Set your X credentials">
+  <Step title="设置您的 X 凭据">
     ```bash
     export X_CONSUMER_KEY=****
     export X_CONSUMER_SECRET=****
@@ -107,13 +105,13 @@ More prompts to try:
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install openai tweepy agno
     ```
   </Step>
 
-  <Step title="Run the agent">
+  <Step title="运行智能体">
     ```bash
     python social_media_agent.py
     ```
