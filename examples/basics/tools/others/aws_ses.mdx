@@ -1,5 +1,5 @@
 ---
-title: AWS SES Tools
+title: AWS SES 工具
 ---
 
 
@@ -20,22 +20,21 @@ region_name = "us-east-1"
 agent = Agent(
     name="Research Newsletter Agent",
     model=OpenAIChat(id="gpt-5-mini"),
-    description="""You are an AI research specialist who creates and sends
-    personalized email newsletters about the latest developments in artificial
-    intelligence and technology.""",
+    description="""您是一位AI研究专家，负责创建和发送
+    关于人工智能和科技最新发展的个性化电子邮件通讯。""",
     instructions=[
-        """When given a prompt:,
-        1. Extract the recipient's email address carefully. Look for the
-        complete email in format 'user@domain.com'.,
-        2. Research the latest AI developments using DuckDuckGo,
-        3. Compose a concise, engaging email with:
-           - A compelling subject line,
-           - 3-4 key developments or news items,
-           - Brief explanations of why they matter,
-           - Links to sources,
-        4. Format the content in a clean, readable way,
-        5. Send the email using AWS SES. IMPORTANT: The receiver_email parameter
-        must be the COMPLETE email address including the @ symbol and domain.""",
+        """当收到提示时：,
+        1. 仔细提取收件人的电子邮件地址。查找
+        格式为 'user@domain.com' 的完整电子邮件。,
+        2. 使用DuckDuckGo研究最新的AI发展,
+        3. 撰写简洁、引人入胜的电子邮件，包含：
+           - 一个引人注目的主题行,
+           - 3-4个关键发展或新闻项目,
+           - 简要说明它们的重要性,
+           - 源链接,
+        4. 以清晰、易读的方式格式化内容,
+        5. 使用AWS SES发送电子邮件。重要提示：receiver_email参数
+        必须是包含@符号和域名的完整电子邮件地址。""",
     ],
     tools=[
         AWSSESTool(
@@ -59,41 +58,41 @@ agent.print_response(
   <Snippet file="create-venv-step.mdx" />
 
 {" "}
-<Step title="Set up AWS SES">
-  ### Verify your email/domain: **For testing:** 1. Go to [AWS SES
-  Console](https://console.aws.amazon.com/ses/home) > Verified Identities >
-  Create Identity 2. Choose "Email Address" verification 3. Click verification
-  link sent to your email **For production:** 1. Choose "Domain" and follow DNS
-  verification steps 2. Add DKIM and SPF records to your domain's DNS **Note:**
-  In sandbox mode, both sender and recipient emails must be verified.
+<Step title="设置AWS SES">
+  ### 验证您的电子邮件/域名： **测试时：** 1. 前往 [AWS SES
+  控制台](https://console.aws.amazon.com/ses/home) > 已验证身份 >
+  创建身份 2. 选择"电子邮件地址"验证 3. 点击发送到您电子邮件的验证
+  链接 **生产环境：** 1. 选择"域名"并按照DNS
+  验证步骤操作 2. 向您域名的DNS添加DKIM和SPF记录 **注意：**
+  在沙盒模式下，发送方和接收方的电子邮件都必须经过验证。
 </Step>
 
 {" "}
-<Step title="Configure AWS credentials">
-  ### Create IAM user: 1. Go to IAM Console > Users > Add User 2. Enable
-  "Programmatic access" 3. Attach 'AmazonSESFullAccess' policy ### Set
-  credentials (choose one method): **Method 1 - Using AWS CLI:** ```bash aws
-  configure ``` **Method 2 - Environment variables:** ```bash export
+<Step title="配置AWS凭证">
+  ### 创建IAM用户： 1. 前往IAM控制台 > 用户 > 添加用户 2. 启用
+  "编程访问" 3. 附加'AmazonSESFullAccess'策略 ### 设置
+  凭证（选择一种方法）： **方法1 - 使用AWS CLI：** ```bash aws
+  configure ``` **方法2 - 环境变量：** ```bash export
   AWS_ACCESS_KEY_ID=xxx export AWS_SECRET_ACCESS_KEY=xxx export
   AWS_DEFAULT_REGION=us-east-1 export OPENAI_API_KEY=xxx ```
 </Step>
 
 {" "}
-<Step title="Install libraries">
+<Step title="安装库">
   ```bash pip install -U boto3 openai ddgs agno ```
 </Step>
 
 {" "}
-<Step title="Run Agent">
+<Step title="运行代理">
   ```bash python cookbook/14_tools/aws_ses_tools.py ```
 </Step>
 
-  <Step title="Troubleshooting">
-    If emails aren't sending, check:
-    - Both sender and recipient are verified (in sandbox mode)
-    - AWS credentials are correctly configured
-    - You're within sending limits
-    - Your IAM user has correct SES permissions
-    - Use SES Console's 'Send Test Email' feature to verify setup
+  <Step title="故障排除">
+    如果电子邮件无法发送，请检查：
+    - 发送方和接收方都已验证（在沙盒模式下）
+    - AWS凭证已正确配置
+    - 您在发送限制范围内
+    - 您的IAM用户具有正确的SES权限
+    - 使用SES控制台的"发送测试电子邮件"功能来验证设置
   </Step>
 </Steps>

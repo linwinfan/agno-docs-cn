@@ -1,5 +1,5 @@
 ---
-title: Couchbase Async
+title: Couchbase 异步
 ---
 
 
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
- <Step title="Start Couchbase">
+ <Step title="启动Couchbase">
     ```bash
     docker run -d --name couchbase-server \
       -p 8091-8096:8091-8096 \
@@ -167,12 +167,12 @@ if __name__ == "__main__":
     - Collection: `recipes`
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U couchbase pypdf openai agno
     ```
   </Step>
-  <Step title="Set environment variables">
+  <Step title="设置环境变量">
     ```bash
     export COUCHBASE_USER="Administrator"
     export COUCHBASE_PASSWORD="password"
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     export OPENAI_API_KEY=xxx
     ```
   </Step>
-  <Step title="Run Agent">
+  <Step title="运行Agent">
     <CodeGroup>
     ```bash Mac
     python cookbook/08_knowledge/vector_db/couchbase_db/async_couchbase_db.py

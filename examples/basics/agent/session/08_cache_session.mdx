@@ -1,37 +1,37 @@
 ---
-title: Session Caching
+title: 会话缓存
 ---
 
 
-此示例演示 how to enable 会话 caching in 内存 for faster access to 会话 data, improving performance when working with persistent 数据库s.
+此示例演示如何在内存中启用会话缓存，以更快地访问会话数据，从而在使用持久化数据库时提高性能。
 
 ## 代码
 
 ```python 08_cache_session.py
-"""Example of how to cache the session in memory for faster access."""
+"""在内存中缓存会话以实现更快访问的示例。"""
 
 from agno.agent.agent import Agent
 from agno.db.postgres import PostgresDb
 from agno.models.openai import OpenAIChat
 
-# Setup the database
+# 设置数据库
 db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
 db = PostgresDb(db_url=db_url, session_table="xxx")
 
-# Setup the agent
+# 设置代理
 agent = Agent(
     model=OpenAIChat(id="gpt-5-mini"),
     db=db,
     session_id="session_storage",
     add_history_to_context=True,
-    # Activate session caching. The session will be cached in memory for faster access.
+    # 激活会话缓存。会话将在内存中缓存以实现更快的访问。
     cache_session=True,
 )
 
-# Running the Agent
+# 运行代理
 agent.print_response("Tell me a new interesting fact about space")
 
-# You can get the cached session:
+# 您可以获取缓存的会话：
 session = agent.get_session()
 ```
 
@@ -40,20 +40,20 @@ session = agent.get_session()
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai psycopg
     ```
   </Step>
 
-  <Step title="Setup PostgreSQL">
+  <Step title="设置 PostgreSQL">
     ```bash
-    # Make sure PostgreSQL is running
-    # Update connection string in the code as needed
+    # 确保 PostgreSQL 正在运行
+    # 根据需要在代码中更新连接字符串
     ```
   </Step>
 
-  <Step title="Export your OpenAI API key">
+  <Step title="导出您的 OpenAI API 密钥">
 
     <CodeGroup>
 
@@ -67,14 +67,14 @@ session = agent.get_session()
     </CodeGroup> 
   </Step>
 
-  <Step title="Create a Python file">
-    Create a Python file and add the above code.
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上面的代码。
     ```bash
     touch 08_cache_session.py
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python 08_cache_session.py
@@ -86,11 +86,11 @@ session = agent.get_session()
     </CodeGroup>
   </Step>
 
-  <Step title="Find All Cookbooks">
-  Explore all the available cookbooks in the Agno repository. Click the link below to view the code on GitHub:
+  <Step title="查找所有示例">
+  在 Agno 仓库中探索所有可用的示例。点击下面的链接在 GitHub 上查看代码：
 
   <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/session" target="_blank">
-    Agno Cookbooks on GitHub
+    GitHub 上的 Agno 示例
   </Link>
 </Step>
 </Steps>

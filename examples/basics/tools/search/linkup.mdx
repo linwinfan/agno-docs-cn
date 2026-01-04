@@ -1,5 +1,5 @@
 ---
-title: Linkup Tools
+title: Linkup 工具
 ---
 
 
@@ -11,15 +11,15 @@ from agno.tools.linkup import LinkupTools
 
 agent = Agent(
     instructions=[
-        "You are a web search assistant that provides comprehensive search results",
-        "Use Linkup to find detailed and relevant information from the web",
-        "Provide structured search results with source attribution",
+        "您是一个提供全面搜索结果的网络搜索助手",
+        "使用 Linkup 从网络中查找详细和相关的信息",
+        "提供带有来源归属的结构化搜索结果",
     ],
     tools=[LinkupTools()],
     markdown=True,
 )
 
-agent.print_response("Search for the latest developments in quantum computing")
+agent.print_response("搜索量子计算领域的最新发展")
 ```
 
 ## 用法
@@ -27,20 +27,20 @@ agent.print_response("Search for the latest developments in quantum computing")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的 API 密钥">
     ```bash
     export LINKUP_API_KEY=your-linkup-api-key
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U linkup-sdk openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/linkup_tools.py

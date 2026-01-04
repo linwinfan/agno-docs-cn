@@ -1,86 +1,86 @@
 ---
-title: Tic Tac Toe Battle
+title: 井字棋对战
 ---
 
 
-Tic Tac Toe Battle is a tic-tac-toe game where multiple AI 代理s compete against each other, demonstrating the power of multi-代理 systems in complex game 环境s.
+井字棋对战是一个井字棋游戏，多个 AI 智能体相互竞争，展示了多智能体系统在复杂游戏环境中的强大能力。
 
-### 密钥 Capabilities
-- Multi-Agent System: Features X and O Piece Agents for move selection
-- Move Validation: Dedicated Board Agent ensures game rule compliance
-- Game Coordination: Master Agent over查看s the game flow and end conditions
-- Interactive UI: Built with Streamlit for real-time game visualization
+### 关键功能
+- 多智能体系统：包含 X 和 O 棋子智能体用于选择移动
+- 移动验证：专门的棋盘智能体确保遵守游戏规则
+- 游戏协调：主智能体监督游戏流程和结束条件
+- 交互式界面：使用 Streamlit 构建实时游戏可视化
 
 <video
   autoPlay
   muted
   controls
-  类Name="w-full aspect-video"
+  className="w-full aspect-video"
   src="/videos/tic-tac-toe.mp4"
 ></video>
 
-### System Components
-- X Piece Agent: Strategizes and selects moves for X pieces
-- O Piece Agent: Controls and determines moves for O pieces
-- Board Agent: Validates 所有 proposed moves against game rules
-- Master Agent: Coordinates the game flow and monitors game status
+### 系统组件
+- X 棋子智能体：为 X 棋子制定策略并选择移动
+- O 棋子智能体：控制并确定 O 棋子的移动
+- 棋盘智能体：验证所有提议的移动是否符合游戏规则
+- 主智能体：协调游戏流程并监控游戏状态
 
-### 高级 Features
-The system 演示 complex 代理 interactions where each AI component has a specific role. The 代理s communicate and coordinate 创建 a complete tic-tac-toe experience, showcasing how multiple specialized AIs can work together effectively.
+### 高级特性
+该系统演示了复杂的智能体交互，其中每个 AI 组件都有特定的角色。智能体们相互通信和协调，创建完整的井字棋体验，展示了多个专业 AI 如何有效协同工作。
 
 ### 代码
-The complete code is 可用的 in the [Agno 存储库](https://github.com/agno-agi/agno/tree/main/cookbook/02_示例/streamlit_apps/tic_tac_toe).
+完整代码可在 [Agno 存储库](https://github.com/agno-agi/agno/tree/main/cookbook/02_examples/streamlit_apps/tic_tac_toe) 中找到。
 
 ### 用法
 <Steps>
-  <Step title="Clone the repository">
+  <Step title="克隆仓库">
     ```bash
     git clone https://github.com/agno-agi/agno.git
     cd agno
     ```
   </Step>
 
-  <Step title="Create a Virtual Environment">
+  <Step title="创建虚拟环境">
     ```bash
     python3 -m venv .venv
-    source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+    source .venv/bin/activate  # Windows 使用：.venv\Scripts\activate
     ```
   </Step>
 
-  <Step title="Install Dependencies">
+  <Step title="安装依赖">
     ```bash
     pip install -r cookbook/02_examples/streamlit_apps/tic_tac_toe/requirements.txt
     ```
   </Step>
 
-  <Step title="Set up API Keys">
-    The Tic Tac Toe Battle supports multiple AI models:
+  <Step title="设置 API 密钥">
+    井字棋对战支持多种 AI 模型：
 
     ```bash
-    # Required for OpenAI models (GPT-4, GPT-3.5)
+    # OpenAI 模型必需（GPT-4, GPT-3.5）
     export OPENAI_API_KEY=your_api_key_here
 
-    # Optional - for additional models
-    export ANTHROPIC_API_KEY=your_api_key_here  # For Claude models
-    export GOOGLE_API_KEY=your_api_key_here     # For Gemini models
-    export GROQ_API_KEY=your_api_key_here       # For Groq models
+    # 可选 - 用于额外模型
+    export ANTHROPIC_API_KEY=your_api_key_here  # Claude 模型
+    export GOOGLE_API_KEY=your_api_key_here     # Gemini 模型
+    export GROQ_API_KEY=your_api_key_here       # Groq 模型
     ```
   </Step>
 
-  <Step title="Launch the App">
+  <Step title="启动应用">
     ```bash
     streamlit run cookbook/02_examples/streamlit_apps/tic_tac_toe/app.py
     ```
   </Step>
 
-  <Step title="Open the App">
-    Then, open http://localhost:8501 in your browser to start watching the AI agents play tic-tac-toe.
+  <Step title="打开应用">
+    然后，在浏览器中打开 http://localhost:8501 开始观看 AI 智能体玩井字棋。
   </Step>
 </Steps>
 
-### Pro Tips
-- Watch Complete Games: Observe full matches to 理解 代理 decision-making
-- Monitor Agent Interactions: Pay attention to how 代理s communicate and coordinate
-- Try Different Models: Experiment with various AI 模型s to 查看 different playing styles
+### 专业提示
+- 观看完整对局：观察完整比赛以理解智能体决策过程
+- 监控智能体交互：注意智能体如何通信和协调
+- 尝试不同模型：使用各种 AI 模型查看不同的下棋风格
 
-Need help? Join our [Discourse community](https://agno.链接/community) for support!
+需要帮助？加入我们的 [Discourse 社区](https://community.agno.com) 获取支持！

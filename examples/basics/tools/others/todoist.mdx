@@ -14,7 +14,7 @@ Requirements:
 - pip install todoist-api-python
 
 Usage:
-- Set the following environment variables:
+- 设置 the following environment variables:
     export TODOIST_API_TOKEN="your_api_token"
 
 - Or provide them when creating the TodoistTools instance
@@ -63,20 +63,20 @@ todoist_agent.print_response("Get all the todoist tasks")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API Token">
+  <Step title="设置 your API Token">
     ```bash
     export TODOIST_API_TOKEN=xxx
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U todoist-api-python openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/todoist_tools.py

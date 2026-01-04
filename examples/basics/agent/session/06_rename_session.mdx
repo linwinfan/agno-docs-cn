@@ -1,9 +1,9 @@
 ---
-title: Session Name Management
+title: 会话名称管理
 ---
 
 
-此示例演示 how to set and manage 会话 names, both manu所有y and automatic所有y, 所有owing for better organization and identification of conversation 会话s.
+此示例演示如何设置和管理会话名称，包括手动和自动生成，以便更好地组织和识别对话会话。
 
 ## 代码
 
@@ -41,20 +41,20 @@ print(session.session_data.get("session_name"))
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai psycopg
     ```
   </Step>
 
-  <Step title="Setup PostgreSQL">
+  <Step title="设置 PostgreSQL">
     ```bash
-    # Make sure PostgreSQL is running
-    # Update connection string in the code as needed
+    # 确保 PostgreSQL 正在运行
+    # 根据需要在代码中更新连接字符串
     ```
   </Step>
 
-  <Step title="Export your OpenAI API key">
+  <Step title="导出您的 OpenAI API 密钥">
 
     <CodeGroup>
 
@@ -68,30 +68,30 @@ print(session.session_data.get("session_name"))
     </CodeGroup> 
   </Step>
 
-  <Step title="Create a Python file">
-    Create a Python file and add the above code.
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上面的代码。
     ```bash
     touch 06_rename_session.py
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python 06_rename_session.py
     ```
-    
+
     ```bash Windows
     python 06_rename_session.py
     ```
     </CodeGroup>
   </Step>
 
-  <Step title="Find All Cookbooks">
-  Explore all the available cookbooks in the Agno repository. Click the link below to view the code on GitHub:
+  <Step title="查找所有示例">
+  在 Agno 仓库中探索所有可用的示例。点击下面的链接在 GitHub 上查看代码：
 
   <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/session" target="_blank">
-    Agno Cookbooks on GitHub
+    GitHub 上的 Agno 示例
   </Link>
 </Step>
 </Steps>

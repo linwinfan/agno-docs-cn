@@ -1,5 +1,5 @@
 ---
-title: Jira Tools
+title: Jira 工具
 ---
 
 
@@ -23,7 +23,7 @@ agent.print_response("Create a new task in project 'DEMO' with high priority")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your Jira credentials">
+  <Step title="设置您的Jira凭证">
     ```bash
     export JIRA_API_TOKEN=xxx
     export JIRA_SERVER_URL=xxx
@@ -32,13 +32,13 @@ agent.print_response("Create a new task in project 'DEMO' with high priority")
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U jira openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/jira_tools.py

@@ -1,16 +1,16 @@
 ---
-title: Disable Storing History Messages
-description: This example demonstrates how to disable storing history messages in a session.
+title: 禁用存储历史消息
+description: 此示例演示如何在会话中禁用存储历史消息。
 ---
 
 
-此示例展示 how to disable storing history messages in a 会话.
+此示例展示如何在会话中禁用存储历史消息。
 
 ## 代码
 
 ```python disable_storing_history_messages.py
 """
-Simple example demonstrating store_history_messages option
+演示 store_history_messages 选项的简单示例
 """
 
 from agno.agent import Agent
@@ -21,27 +21,27 @@ from agno.utils.pprint import pprint_run_response
 agent = Agent(
     model=OpenAIChat(id="gpt-4o-mini"),
     db=SqliteDb(db_file="tmp/example_no_history.db"),
-    add_history_to_context=True,  # Use history during execution
+    add_history_to_context=True,  # 执行期间使用历史记录
     num_history_runs=3,
-    store_history_messages=False,  # Don't store history messages in database
+    store_history_messages=False,  # 不在数据库中存储历史消息
 )
 
 if __name__ == "__main__":
-    print("\n=== First Run: Establishing context ===")
+    print("\n=== 第一次运行：建立上下文 ===")
     response1 = agent.run("My name is Alice and I love Python programming.")
     pprint_run_response(response1)
 
-    print("\n=== Second Run: Using history (but not storing it) ===")
+    print("\n=== 第二次运行：使用历史记录（但不存储） ===")
     response2 = agent.run("What is my name and what do I love?")
     pprint_run_response(response2)
 
-    # Check what was stored
+    # 检查存储的内容
     stored_run = agent.get_last_run_output()
     if stored_run and stored_run.messages:
         history_messages = [m for m in stored_run.messages if m.from_history]
-        print("\n Storage Info:")
-        print(f"   Total messages stored: {len(stored_run.messages)}")
-        print(f"   History messages: {len(history_messages)} (scrubbed!)")
-        print("\n History was used during execution (agent knew the answer)")
-        print("   but history messages are NOT stored in the database!")
+        print("\n 存储信息：")
+        print(f"   存储的总消息数：{len(stored_run.messages)}")
+        print(f"   历史消息数：{len(history_messages)}（已清除！）")
+        print("\n 执行期间使用了历史记录（代理知道答案）")
+        print("   但历史消息并未存储在数据库中！")
 ```

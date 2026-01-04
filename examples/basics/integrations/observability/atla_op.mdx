@@ -3,7 +3,7 @@ title: Atla
 ---
 
 
-此示例展示 how to add observability to your agno 代理 with Atla.
+此示例展示如何使用 Atla 为您的 agno 智能体添加可观测性。
 
 ## 代码
 
@@ -18,14 +18,14 @@ from atla_insights import configure, instrument_agno
 configure(token=getenv("ATLA_API_KEY"))
 
 agent = Agent(
-    name="Internet Search Agent",
+    name="互联网搜索智能体",
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[DuckDuckGoTools()],
-    instructions="You are an internet search agent. Find and provide accurate information on any topic.",
+    instructions="您是一个互联网搜索智能体。查找并提供任何主题的准确信息。",
     debug_mode=True,
 )
 
-# Instrument and run
+# 检测并运行
 with instrument_agno("openai"):
     agent.print_response("What are the latest developments in artificial intelligence?")
 
@@ -36,20 +36,20 @@ with instrument_agno("openai"):
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
-  Sign up for an account at https://app.atla-ai.com
+  <Step title="设置您的 API 密钥">
+  在 https://app.atla-ai.com 注册账户
     ```bash
     export ATLA_API_KEY=<your-key>
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno atla-insights openai
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/13_integrations/observability/atla_op.py

@@ -1,33 +1,33 @@
 ---
-title: Employee Recruiter
+title: 员工招聘官
 mode: wide
 ---
 
 
-Build an automated employee recruitment 工作流 that handles resume screening, inter查看 scheduling, and email communication. This multi-代理 system processes PDF resumes, evaluates candidates, and coordinates the hiring pipeline.
+构建一个自动化的员工招聘工作流，处理简历筛选、面试安排和电子邮件沟通。此多代理系统处理PDF简历，评估候选人，并协调整个招聘流程。
 
-## What You'll 学习
+## 您将学到的内容
 
-By building this 工作流, you'll 理解:
-- How 创建 multi-代理 systems for complex business processes
-- How to process PDF resumes and extract candidate 信息
-- How to implement conditional logic based on screening scores
-- How to coordinate asynchronous streaming for real-time feedback
+通过构建此工作流，您将理解：
+- 如何为复杂业务流程创建多代理系统
+- 如何处理PDF简历并提取候选人信息
+- 如何基于筛选分数实现条件逻辑
+- 如何协调异步流以实现实时反馈
 
-## 使用 Cases
+## 使用场景
 
-Build automated recruitment systems, candidate screening platforms, inter查看 scheduling 工具s, or HR automation 工作流s.
+构建自动化招聘系统、候选人筛选平台、面试安排工具或人力资源自动化工作流。
 
-## How It Works
+## 工作原理
 
-The 工作流 automates the complete hiring pipeline through specialized 代理s:
+工作流通过专业代理自动化完整的招聘流程：
 
-1. **Screen**: Screening 代理 analyzes resumes against job requirements and assigns scores
-2. **Schedule**: If candidate scores >= 5.0, scheduler 代理 creates inter查看 appointments
-3. **Notify**: Email writer crafts professional invitation and sender delivers it
-4. **Cache**: Resume content is 缓存d in 会话 state to avoid re-processing
+1. **筛选**: 筛选代理根据职位要求分析简历并分配分数
+2. **安排**: 如果候选人分数 >= 5.0，调度代理创建面试预约
+3. **通知**: 邮件撰写者制作专业邀请函，发送者进行投递
+4. **缓存**: 简历内容缓存在会话状态中以避免重复处理
 
-The 工作流 uses simulated Zoom scheduling and email 工具s for demonstration (replace with real 工具s in production).
+工作流使用模拟的Zoom调度和电子邮件工具进行演示（在生产环境中替换为真实工具）。
 
 ## 代码
 
@@ -344,30 +344,30 @@ if __name__ == "__main__":
     )
 ```
 
-## What to Expect
+## 预期效果
 
-The 工作流 processes candidate resumes through multiple phases with real-time streaming updates. You'll 查看 screening results with scores and feedback, inter查看 scheduling confirmations for qualified candidates (score >= 5.0), and email delivery notifications.
+工作流通过多个阶段处理候选人简历，并提供实时流更新。您将看到包含分数和反馈的筛选结果、合格候选人（分数 >= 5.0）的面试安排确认以及电子邮件投递通知。
 
-The 工作流 缓存s resume content in 会话 state to avoid re-processing. Note that Zoom scheduling and email sending use simulated 工具s for demonstration - replace with real integrations for production use.
+工作流在会话状态中缓存简历内容以避免重复处理。请注意，Zoom调度和电子邮件发送使用模拟工具进行演示 - 在生产环境中替换为真实集成。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai fastapi pypdf requests
     ```
   </Step>
 
-  <Step title="Run Workflow">
+  <Step title="运行工作流">
     <CodeGroup>
     ```bash Mac
     python employee_recruiter.py
@@ -380,9 +380,9 @@ The 工作流 缓存s resume content in 会话 state to avoid re-processing. Not
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Replace simulated Zoom and email 工具s with real integrations (Zoom API, SendGrid, etc.)
-- Modify scoring criteria in the screening 代理's 说明
-- Adjust the qualifying score threshold (currently 5.0) for inter查看 scheduling
-- 探索 [Workflows](/basics/工作流s/over查看) for advanced 工作流 patterns
+- 将模拟的Zoom和电子邮件工具替换为真实集成（Zoom API、SendGrid等）
+- 修改筛选代理说明中的评分标准
+- 调整面试安排的合格分数阈值（目前为5.0）
+- 探索 [工作流](/basics/工作流s/overview) 以了解高级工作流模式

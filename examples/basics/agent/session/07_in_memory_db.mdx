@@ -1,17 +1,17 @@
 ---
-title: In-Memory Database Storage
+title: 内存数据库存储
 ---
 
 
-此示例演示 how 使用 an in-内存 数据库 for 会话 存储, enabling conversation history and context management without requiring a persistent 数据库 setup.
+此示例演示如何使用内存数据库进行会话存储，在不需要持久化数据库设置的情况下启用对话历史和上下文管理。
 
 ## 代码
 
 ```python 07_in_memory_db.py
-"""This example shows how to use an in-memory database.
+"""此示例展示如何使用内存数据库。
 
-With this you will be able to store sessions, user memories, etc. without setting up a database.
-Keep in mind that in production setups it is recommended to use a database.
+使用此功能，您无需设置数据库即可存储会话、用户记忆等。
+请记住，在生产环境中建议使用数据库。
 """
 
 from agno.agent import Agent
@@ -19,23 +19,23 @@ from agno.db.in_memory import InMemoryDb
 from agno.models.openai import OpenAIChat
 from rich.pretty import pprint
 
-# Setup the in-memory database
+# 设置内存数据库
 db = InMemoryDb()
 
 agent = Agent(
     model=OpenAIChat(id="gpt-5-mini"),
-    # Use the in-memory database. All db features will be available.
+    # 使用内存数据库。所有数据库功能都可用。
     db=db,
-    # Set add_history_to_context=true to add the previous chat history to the context sent to the Model.
+    # 设置 add_history_to_context=true 将先前的聊天历史添加到发送给模型的上下文中。
     add_history_to_context=True,
-    # Number of historical responses to add to the messages.
+    # 要添加到消息中的历史响应数量。
     num_history_runs=3,
     description="You are a helpful assistant that always responds in a polite, upbeat and positive manner.",
 )
 
-# -*- Create a run
+# -*- 创建一个运行
 agent.print_response("Share a 2 sentence horror story", stream=True)
-# -*- Print the messages in the memory
+# -*- 打印内存中的消息
 pprint(
     [
         m.model_dump(include={"role", "content"})
@@ -43,9 +43,9 @@ pprint(
     ]
 )
 
-# -*- Ask a follow up question that continues the conversation
+# -*- 提出一个延续对话的后续问题
 agent.print_response("What was my first message?", stream=True)
-# -*- Print the messages in the memory
+# -*- 打印内存中的消息
 pprint(
     [
         m.model_dump(include={"role", "content"})
@@ -59,13 +59,13 @@ pprint(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai rich
     ```
   </Step>
 
-  <Step title="Export your OpenAI API key">
+  <Step title="导出您的 OpenAI API 密钥">
 
     <CodeGroup>
 
@@ -79,14 +79,14 @@ pprint(
     </CodeGroup>
   </Step>
 
-  <Step title="Create a Python file">
-    Create a Python file and add the above code.
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上面的代码。
     ```bash
     touch 07_in_memory_db.py
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python 07_in_memory_db.py
@@ -98,11 +98,11 @@ pprint(
     </CodeGroup>
   </Step>
 
-  <Step title="Find All Cookbooks">
-  Explore all the available cookbooks in the Agno repository. Click the link below to view the code on GitHub:
+  <Step title="查找所有示例">
+  在 Agno 仓库中探索所有可用的示例。点击下面的链接在 GitHub 上查看代码：
 
   <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/session" target="_blank">
-    Agno Cookbooks on GitHub
+    GitHub 上的 Agno 示例
   </Link>
 </Step>
 </Steps>

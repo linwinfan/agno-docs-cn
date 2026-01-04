@@ -1,5 +1,5 @@
 ---
-title: BrightData Tools
+title: BrightData 工具
 ---
 
 
@@ -21,9 +21,9 @@ agent = Agent(
     markdown=True,
     )
 
-# Example 1: Scrape a webpage as Markdown
+# 示例 1: 将网页抓取为Markdown格式
 agent.print_response(
-    "Scrape this webpage as markdown: https://docs.agno.com/introduction",
+    "将此网页抓取为markdown格式: https://docs.agno.com/introduction",
 )
 ```
 
@@ -32,20 +32,20 @@ agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export BRIGHT_DATA_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U requests openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/brightdata_tools.py

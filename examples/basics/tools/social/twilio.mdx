@@ -1,5 +1,5 @@
 ---
-title: Twilio Tools
+title: Twilio 工具
 ---
 
 
@@ -21,13 +21,13 @@ agent.print_response("Send an SMS to +1234567890 saying 'Hello from Agno!'")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Set your Twilio credentials">
+  <Step title="设置您的Twilio凭证">
     ```bash
     export TWILIO_ACCOUNT_SID=xxx
     export TWILIO_AUTH_TOKEN=xxx
@@ -35,13 +35,13 @@ agent.print_response("Send an SMS to +1234567890 saying 'Hello from Agno!'")
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U twilio openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/twilio_tools.py

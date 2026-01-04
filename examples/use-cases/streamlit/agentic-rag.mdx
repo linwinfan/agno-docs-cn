@@ -28,50 +28,50 @@ title: 智能体 RAG
 ></video>
 
 ## 可尝试的示例查询：
-- "What are the key points from this document?"
-- "Can you summarize the main arguments and supporting evidence?"
-- "What are the important statistics and findings?"
-- "How does this relate to [topic X]?"
-- "What are the limitations or gaps in this analysis?"
-- "Can you explain [concept X] in more 详细信息?"
-- "What other sources support or contradict these claims?"
+- "这个文档的关键点是什么？"
+- "可以总结一下主要论点和支持证据吗？"
+- "有哪些重要的统计数据和发现？"
+- "这与[主题X]有什么关系？"
+- "这个分析存在哪些局限性或空白？"
+- "你能更详细地解释[概念X]吗？"
+- "还有哪些其他来源支持或反驳这些主张？"
 
 ## 代码
 
-The complete code is 可用的 in the [Agno 存储库](https://github.com/agno-agi/agno).
+完整代码可在 [Agno 仓库](https://github.com/agno-agi/agno) 中获得。
 
 ## 用法
 
 <Steps>
-  <Step title="Clone the repository">
+  <Step title="克隆仓库">
     ```bash
     git clone https://github.com/agno-agi/agno.git
     cd agno
     ```
   </Step>
 
-  <Step title="Create virtual environment">
+  <Step title="创建虚拟环境">
     ```bash
     python3 -m venv .venv
     source .venv/bin/activate
     ```
   </Step>
 
-  <Step title="Install dependencies">
+  <Step title="安装依赖">
     ```bash
     pip install -r cookbook/02_examples/streamlit_apps/agentic_rag/requirements.txt
     ```
   </Step>
 
-  <Step title="Run PgVector">
-    First, install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/).
+  <Step title="运行PgVector">
+    首先，安装 [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)。
 
-    Then run either using the helper script:
+    然后使用辅助脚本运行：
     ```bash
     ./cookbook/scripts/run_pgvector.sh
     ```
 
-    Or directly with Docker:
+    或直接使用Docker：
     ```bash
     docker run -d \
       -e POSTGRES_DB=ai \
@@ -86,24 +86,24 @@ The complete code is 可用的 in the [Agno 存储库](https://github.com/agno-a
   </Step>
 
 
-  <Step title="Set up API keys">
+  <Step title="设置API密钥">
     ```bash
-    # Required
+    # 必需
     export OPENAI_API_KEY=***
-    # Optional
+    # 可选
     export ANTHROPIC_API_KEY=***
     export GOOGLE_API_KEY=***
 
     ```
-    We recommend using gpt-5-mini for optimal performance.
+    我们建议使用 gpt-5-mini 以获得最佳性能。
   </Step>
 
-  <Step title="Launch the app">
+  <Step title="启动应用程序">
     ```bash
     streamlit run cookbook/02_examples/streamlit_apps/agentic_rag/app.py
     ```
-    Open localhost:8501 to start using the Agentic RAG.
+    打开 localhost:8501 开始使用智能体RAG。
   </Step>
 </Steps>
 
-Need help? Join our [Discourse community](https://community.agno.com) for support!
+需要帮助？加入我们的 [Discourse 社区](https://community.agno.com) 获取支持！

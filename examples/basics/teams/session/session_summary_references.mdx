@@ -1,18 +1,18 @@
 ---
-title: Session Summary with Context References
+title: 带上下文引用的会话摘要
 ---
 
 
-此示例展示 how 使用 the `add_session_summary_to_context` parameter to add 会话 summaries to 团队 context for maintaining conversation continuity.
+此示例展示如何使用 `add_session_summary_to_context` 参数将会话摘要添加到团队上下文中，以保持对话连续性。
 
 ## 代码
 
 ```python cookbook/02_examples/teams/session/04_session_summary_references.py
 """
-This example shows how to use the `add_session_summary_to_context` parameter in the Team config to
-add session summaries to the Team context.
+此示例展示如何在团队配置中使用 `add_session_summary_to_context` 参数
+将会话摘要添加到团队上下文中。
 
-Start the postgres db locally on Docker by running: cookbook/scripts/run_pgvector.sh
+通过运行以下命令在本地 Docker 上启动 postgres 数据库：cookbook/scripts/run_pgvector.sh
 """
 
 from agno.agent.agent import Agent
@@ -35,12 +35,12 @@ team = Team(
     enable_session_summaries=True,
 )
 
-# This will create a new session summary
+# 这将创建一个新的会话摘要
 team.print_response(
-    "My name is John Doe and I like to hike in the mountains on weekends.",
+    "我叫约翰·多伊，我喜欢在周末去山里徒步。",
 )
 
-# You can use existing session summaries from session storage without creating or updating any new ones.
+# 您可以使用会话存储中的现有会话摘要，而无需创建或更新任何新摘要。
 team = Team(
     model=OpenAIChat(id="gpt-5-mini"),
     db=db,
@@ -49,9 +49,9 @@ team = Team(
     members=[agent],
 )
 
-team.print_response("I also like to play basketball.")
+team.print_response("我也喜欢打篮球。")
 
-# Alternatively, you can create a new session summary without adding the session summary to context.
+# 或者，您可以创建一个新的会话摘要，而不将会话摘要添加到上下文中。
 
 # team = Team(
 #     model=OpenAIChat(id="gpt-5-mini"),
@@ -61,7 +61,7 @@ team.print_response("I also like to play basketball.")
 #     add_session_summary_to_context=False,
 # )
 
-# team.print_response("I also like to play basketball.")
+# team.print_response("我也喜欢打篮球。")
 ```
 
 ## 用法
@@ -70,25 +70,25 @@ team.print_response("I also like to play basketball.")
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno psycopg2-binary
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Start PostgreSQL database">
+    <Step title="启动 PostgreSQL 数据库">
         ```bash
         cookbook/run_pgvector.sh
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/session/04_session_summary_references.py
         ```

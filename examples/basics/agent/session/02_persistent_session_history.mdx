@@ -1,17 +1,17 @@
 ---
-title: Persistent Session with History Limit
+title: 带历史记录限制的持久化会话
 ---
 
 
-此示例演示 how 使用 会话 history with a configurable number of previous runs added to context, 所有owing control over how much conversation history is included.
+此示例演示如何使用会话历史记录，通过可配置的先前运行次数添加到上下文中，从而控制包含多少对话历史。
 
 ## 代码
 
 ```python 02_persistent_session_history.py
 """
-This example shows how to use the session history to store the conversation history.
-add_history_to_context flag is used to add the history to the messages.
-num_history_runs is used to set the number of history runs to add to the messages.
+此示例展示了如何使用会话历史记录来存储对话历史。
+add_history_to_context 标志用于将历史记录添加到消息中。
+num_history_runs 用于设置要添加到消息中的历史运行次数。
 """
 
 from agno.agent.agent import Agent
@@ -30,7 +30,7 @@ agent = Agent(
     num_history_runs=2,
 )
 
-agent.print_response("Tell me a new interesting fact about space")
+agent.print_response("告诉我一个关于太空的新奇事实")
 ```
 
 ## 用法
@@ -38,19 +38,19 @@ agent.print_response("Tell me a new interesting fact about space")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai psycopg2-binary
     ```
   </Step>
 
-  <Step title="Setup PostgreSQL">
+  <Step title="设置 PostgreSQL">
     ```bash
-    # Make sure PostgreSQL is running
-    # Update connection string in the code as needed
+    # 确保 PostgreSQL 正在运行
+    # 根据需要更新代码中的连接字符串
     ```
   </Step>
-  <Step title="Export your OpenAI API key">
+  <Step title="导出您的 OpenAI API 密钥">
 
     <CodeGroup>
 
@@ -64,30 +64,30 @@ agent.print_response("Tell me a new interesting fact about space")
     </CodeGroup> 
   </Step>
 
-  <Step title="Create a Python file">
-    Create a Python file and add the above code.
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上述代码。
     ```bash
     touch 02_persistent_session_history.py
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python 02_persistent_session_history.py
     ```
-    
+
     ```bash Windows
     python 02_persistent_session_history.py
     ```
     </CodeGroup>
   </Step>
 
-  <Step title="Find All Cookbooks">
-  Explore all the available cookbooks in the Agno repository. Click the link below to view the code on GitHub:
+  <Step title="查找所有示例代码">
+  探索 Agno 存储库中所有可用的示例代码。点击下面的链接在 GitHub 上查看代码：
 
   <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/session" target="_blank">
-    Agno Cookbooks on GitHub
+    GitHub 上的 Agno 示例代码
   </Link>
 </Step>
 </Steps>

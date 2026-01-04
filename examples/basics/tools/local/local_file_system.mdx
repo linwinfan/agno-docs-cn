@@ -1,5 +1,5 @@
 ---
-title: Local File System Tools
+title: 本地文件系统工具
 ---
 
 
@@ -11,15 +11,15 @@ from agno.tools.local_file_system import LocalFileSystemTools
 
 agent = Agent(
     instructions=[
-        "You are a file management assistant that helps save content to local files",
-        "Create files with appropriate names and extensions",
-        "Organize files in the specified directory structure",
+        "您是一个文件管理助手，帮助将内容保存到本地文件",
+        "使用适当的名称和扩展名创建文件",
+        "在指定的目录结构中组织文件",
     ],
     tools=[LocalFileSystemTools(target_directory="./output")],
     markdown=True,
 )
 
-agent.print_response("Save this meeting summary to a file: 'Discussed Q4 goals and budget allocation'")
+agent.print_response("将此会议摘要保存到文件中：'讨论了第四季度目标和预算分配'")
 ```
 
 ## 用法
@@ -27,19 +27,19 @@ agent.print_response("Save this meeting summary to a file: 'Discussed Q4 goals a
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/local_file_system_tools.py

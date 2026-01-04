@@ -69,13 +69,13 @@ vector_db.delete_by_metadata({"doc_type": "recipe_book"})
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U cassandra-driver pypdf openai agno
     ```
   </Step>
 
-  <Step title="Run Cassandra">
+  <Step title="运行Cassandra">
     ```bash
   docker run -d \
     --name cassandra-db \
@@ -83,7 +83,7 @@ vector_db.delete_by_metadata({"doc_type": "recipe_book"})
     cassandra:latest
     ```
   </Step>
-  <Step title="Set environment variables">
+  <Step title="设置环境变量">
     ```bash
     export CASSANDRA_HOST="localhost"
     export CASSANDRA_PORT="9042"
@@ -92,7 +92,7 @@ vector_db.delete_by_metadata({"doc_type": "recipe_book"})
     export OPENAI_API_KEY=xxx
     ```
   </Step>
-  <Step title="Run Agent">
+  <Step title="运行Agent">
     <CodeGroup>
     ```bash Mac
     python cookbook/08_knowledge/vector_db/cassandra_db/cassandra_db.py

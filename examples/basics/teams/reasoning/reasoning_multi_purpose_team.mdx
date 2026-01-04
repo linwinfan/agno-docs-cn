@@ -1,25 +1,25 @@
 ---
-title: Multi-Purpose Reasoning Team
+title: 多用途推理团队
 ---
 
 
-此示例演示 a comprehensive 团队 of specialist 代理s that uses reasoning 工具s to analyze questions and intelligently delegate tasks to appropriate 成员 including web 搜索, finance, writing, medical re搜索, and code execution 代理s.
+此示例演示一个综合的专家代理团队，该团队使用推理工具来分析问题并将任务智能地委派给适当的成员，包括网络搜索、金融、写作、医学搜索和代码执行代理。
 
 ## 代码
 
 ```python cookbook/02_examples/teams/reasoning/01_reasoning_multi_purpose_team.py
 """
-This example demonstrates a team of agents that can answer a variety of questions.
+此示例演示一个可以回答各种问题的代理团队。
 
-The team uses reasoning tools to reason about the questions and delegate to the appropriate agent.
+团队使用推理工具来推理问题并委派给适当的代理。
 
-The team consists of:
-- A web agent that can search the web for information
-- A finance agent that can get financial data
-- A writer agent that can write content
-- A calculator agent that can calculate
-- A FastAPI assistant that can explain how to write FastAPI code
-- A code execution agent that can execute code in a secure E2B sandbox
+团队组成包括：
+- 可以搜索网络信息的网络代理
+- 可以获取金融数据的金融代理
+- 可以编写内容的写作代理
+- 可以进行计算的计算器代理
+- 可以解释如何编写 FastAPI 代码的 FastAPI 助手
+- 可以在安全 E2B 沙盒中执行代码的代码执行代理
 """
 
 import asyncio
@@ -46,32 +46,32 @@ from agno.vectordb.search import SearchType
 
 cwd = Path(__file__).parent.resolve()
 
-# Agent that can search the web for information
+# 可以搜索网络信息的代理
 web_agent = Agent(
     name="Web Agent",
-    role="Search the web for information",
+    role="搜索网络信息",
     model=Claude(id="claude-3-5-sonnet-latest"),
     tools=[DuckDuckGoTools(cache_results=True)],
-    instructions=["Always include sources"],
+    instructions=["始终包含来源"],
 )
 
 reddit_researcher = Agent(
     name="Reddit Researcher",
-    role="Research a topic on Reddit",
+    role="在 Reddit 上研究一个主题",
     model=Claude(id="claude-3-5-sonnet-latest"),
     tools=[DuckDuckGoTools(cache_results=True)],
     add_name_to_context=True,
     instructions=dedent("""
-    You are a Reddit researcher.
-    You will be given a topic to research on Reddit.
-    You will need to find the most relevant information on Reddit.
+    您是一个 Reddit 研究员。
+    您将获得一个在 Reddit 上研究的主题。
+    您需要在 Reddit 上找到最相关的信息。
     """),
 )
 
-# Agent that can get financial data
+# 可以获取金融数据的代理
 finance_agent = Agent(
     name="Finance Agent",
-    role="Get financial data",
+    role="获取金融数据",
     model=Claude(id="claude-3-5-sonnet-latest"),
     tools=[
         ExaTools(
@@ -81,42 +81,42 @@ finance_agent = Agent(
             highlights=False,
         )
     ],
-    instructions=["Use tables to display data"],
+    instructions=["使用表格显示数据"],
 )
 
-# Writer agent that can write content
+# 可以编写内容的写手代理
 writer_agent = Agent(
     name="Write Agent",
-    role="Write content",
+    role="编写内容",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    description="You are an AI agent that can write content.",
+    description="您是一个可以编写内容的 AI 代理。",
     instructions=[
-        "You are a versatile writer who can create content on any topic.",
-        "When given a topic, write engaging and informative content in the requested format and style.",
-        "If you receive mathematical expressions or calculations from the calculator agent, convert them into clear written text.",
-        "Ensure your writing is clear, accurate and tailored to the specific request.",
-        "Maintain a natural, engaging tone while being factually precise.",
-        "Write something that would be good enough to be published in a newspaper like the New York Times.",
+        "您是一个多才多艺的写手，可以就任何主题创建内容。",
+        "当给定一个主题时，以请求的格式和风格编写引人入胜且信息丰富的内容。",
+        "如果您从计算器代理收到数学表达式或计算，将其转换为清晰的文字。",
+        "确保您的写作清晰、准确，并针对特定请求量身定制。",
+        "在保持事实准确的同时维持自然、引人入胜的语调。",
+        "写一些足够好可以发表在《纽约时报》等报纸上的内容。",
     ],
 )
 
-# Writer agent that can write content
+# 可以编写内容的写手代理
 medical_agent = Agent(
     name="Medical Agent",
-    role="Write content",
+    role="编写内容",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    description="You are an AI agent that can write content.",
+    description="您是一个可以编写内容的 AI 代理。",
     tools=[PubmedTools()],
     instructions=[
-        "You are a medical agent that can answer questions about medical topics.",
+        "您是一个可以回答医学话题问题的医学代理。",
     ],
 )
 
-# Calculator agent that can calculate
+# 可以进行计算的计算器代理
 calculator_agent = Agent(
     name="Calculator Agent",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    role="Calculate",
+    role="计算",
     tools=[
         CalculatorTools()
     ],
@@ -133,9 +133,9 @@ agno_assist_knowledge = Knowledge(
 
 agno_assist = Agent(
     name="Agno Assist",
-    role="You help answer questions about the Agno framework.",
+    role="您帮助回答关于 Agno 框架的问题。",
     model=OpenAIChat(id="gpt-5-mini"),
-    instructions="Search your knowledge before answering the question. Help me to write working code for Agno Agents.",
+    instructions="回答问题前先搜索您的知识。帮助我为 Agno 代理编写可运行的代码。",
     tools=[
         KnowledgeTools(
             knowledge=agno_assist_knowledge, add_instructions=True, add_few_shot=True
@@ -147,11 +147,11 @@ agno_assist = Agent(
 
 github_agent = Agent(
     name="Github Agent",
-    role="Do analysis on Github repositories",
+    role="对 Github 仓库进行分析",
     model=OpenAIChat(id="gpt-5-mini"),
     instructions=[
-        "Use your tools to answer questions about the repo: agno-agi/agno",
-        "Do not create any issues or pull requests unless explicitly asked to do so",
+        "使用您的工具回答关于仓库 agno-agi/agno 的问题",
+        "除非明确要求，否则不要创建任何问题或拉取请求",
     ],
     tools=[
         GithubTools(
@@ -166,10 +166,10 @@ github_agent = Agent(
 
 local_python_agent = Agent(
     name="Local Python Agent",
-    role="Run Python code locally",
+    role="在本地运行 Python 代码",
     model=OpenAIChat(id="gpt-5-mini"),
     instructions=[
-        "Use your tools to run Python code locally",
+        "使用您的工具在本地运行 Python 代码",
     ],
     tools=[
         FileTools(base_dir=cwd),
@@ -181,7 +181,7 @@ local_python_agent = Agent(
 
 
 agent_team = Team(
-    name="Multi-Purpose Team",
+    name="多用途团队",
     model=Claude(id="claude-3-7-sonnet-latest"),
     tools=[
         ReasoningTools(add_instructions=True, add_few_shot=True),
@@ -196,11 +196,11 @@ agent_team = Team(
         local_python_agent,
     ],
     instructions=[
-        "You are a team of agents that can answer a variety of questions.",
-        "You can use your member agents to answer the questions.",
-        "You can also answer directly, you don't HAVE to forward the question to a member agent.",
-        "Reason about more complex questions before delegating to a member agent.",
-        "If the user is only being conversational, don't use any tools, just answer directly.",
+        "您是一个可以回答各种问题的代理团队。",
+        "您可以使用成员代理来回答问题。",
+        "您也可以直接回答，不必将问题转发给成员代理。",
+        "在委派给成员代理之前，先对更复杂的问题进行推理。",
+        "如果用户只是在进行对话，请不要使用任何工具，直接回答即可。",
     ],
     markdown=True,
     show_members_responses=True,
@@ -213,30 +213,30 @@ if __name__ == "__main__":
         agno_assist_knowledge.add_contents_async(url="https://docs.agno.com/llms-full.txt")
     )
 
-    # asyncio.run(agent_team.aprint_response("Hi! What are you capable of doing?"))
+    # asyncio.run(agent_team.aprint_response("你好！您能做什么？"))
 
-    # Python code execution
-    # asyncio.run(agent_team.aprint_response(dedent("""What is the right way to implement an Agno Agent that searches Hacker News for good articles?
-    #                                        Create a minimal example for me and test it locally to ensure it won't immediately crash.
-    #                                        Make save the created code in a file called `./python/hacker_news_agent.py`.
-    #                                        Don't mock anything. Use the real information from the Agno documentation."""), stream=True))
+    # Python 代码执行
+    # asyncio.run(agent_team.aprint_response(dedent("""实现一个搜索 Hacker News 上好文章的 Agno 代理的正确方法是什么？
+    #                                        为我创建一个最小示例，并在本地测试以确保它不会立即崩溃。
+    #                                        将创建的代码保存在名为 `./python/hacker_news_agent.py` 的文件中。
+    #                                        不要模拟任何内容。使用 Agno 文档中的真实信息。"""), stream=True))
 
-    # # Reddit research
-    # asyncio.run(agent_team.aprint_response(dedent("""What should I be investing in right now?
-    #                                        Find some popular subreddits and do some reseach of your own.
-    #                                        Write a detailed report about your findings that could be given to a financial advisor."""), stream=True))
+    # # Reddit 研究
+    # asyncio.run(agent_team.aprint_response(dedent("""我现在应该投资什么？
+    #                                        找一些热门的子版块并进行自己的研究。
+    #                                        编写一份详细的报告，可以提供给金融顾问。"""), stream=True))
 
-    # Github analysis
-    # asyncio.run(agent_team.aprint_response(dedent("""List open pull requests in the agno-agi/agno repository.
-    #                                        Find an issue that you think you can resolve and give me the issue number,
-    #                                        your suggested solution and some code snippets."""), stream=True))
+    # Github 分析
+    # asyncio.run(agent_team.aprint_response(dedent("""列出 agno-agi/agno 仓库中的开放拉取请求。
+    #                                        找到一个您认为可以解决的问题，并告诉我问题编号、
+    #                                        您的建议解决方案和一些代码片段。"""), stream=True))
 
-    # Medical research
+    # 医学研究
     txt_path = Path(__file__).parent.resolve() / "medical_history.txt"
     loaded_txt = open(txt_path, "r", encoding="utf-8").read()
     agent_team.print_response(
-        input=dedent(f"""I have a patient with the following medical information:\n {loaded_txt}
-                         What is the most likely diagnosis?
+        input=dedent(f"""我有一个患者，其医学信息如下：\n {loaded_txt}
+                         最可能的诊断是什么？
                         """),
     )
 ```
@@ -247,13 +247,13 @@ if __name__ == "__main__":
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno lancedb exa_py ddgs pubmed-parser
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         export ANTHROPIC_API_KEY=****
@@ -262,13 +262,13 @@ if __name__ == "__main__":
         ```
     </Step>
 
-    <Step title="Create medical history file">
+    <Step title="创建医学历史文件">
         ```bash
         # Create medical_history.txt with sample medical data in the same directory
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/reasoning/01_reasoning_multi_purpose_team.py
         ```

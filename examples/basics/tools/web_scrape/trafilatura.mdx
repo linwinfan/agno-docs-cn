@@ -1,5 +1,5 @@
 ---
-title: Trafilatura Tools
+title: Trafilatura 工具
 ---
 
 
@@ -11,9 +11,9 @@ from agno.tools.trafilatura import TrafilaturaTools
 
 agent = Agent(
     instructions=[
-        "You are a web content extraction specialist",
-        "Extract clean text and structured data from web pages",
-        "Provide detailed analysis of web content and metadata",
+        "您是网页内容提取专家",
+        "从网页中提取干净的文本和结构化数据",
+        "提供网页内容和元数据的详细分析",
     ],
     tools=[TrafilaturaTools()],
     markdown=True,
@@ -27,19 +27,19 @@ agent.print_response("Extract the main content from https://example.com/article"
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U trafilatura openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/trafilatura_tools.py

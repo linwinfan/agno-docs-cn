@@ -1,33 +1,33 @@
 ---
-title: Content Team
+title: 内容团队
 mode: wide
 ---
 
 
-Build a content creation 团队 with specialized re搜索ers and writers that collaborate to produce high-quality articles. 此示例演示 团队 coordination where 代理s work together on complex tasks.
+构建一个内容创作团队，其中包含专门的搜索员和写作者，他们协作生产高质量的文章。此示例演示了团队协调，其中代理在复杂任务上协同工作。
 
-## What You'll 学习
+## 您将学习的内容
 
-By building this 团队, you'll 理解:
-- How 创建 specialized 代理s with distinct roles and capabilities
-- How 团队s coordinate multiple 代理s using the coordinate mode
-- How to combine web 搜索 工具s with writing expertise for content creation
-- How to structure 团队 说明 for collaborative 工作流s
+通过构建此团队，您将理解：
+- 如何创建具有不同角色和能力的专门代理
+- 团队如何使用协调模式协调多个代理
+- 如何将网络搜索工具与写作专业知识相结合以创建内容
+- 如何构建团队说明以实现协作工作流
 
-## 使用 Cases
+## 使用案例
 
-Build content creation platforms, automated journalism systems, re搜索 report generators, or marketing content pipelines.
+构建内容创作平台、自动化新闻系统、搜索报告生成器或营销内容管道。
 
-## How It Works
+## 工作原理
 
-The 团队 uses coordinate mode 管理 collaboration between specialized 代理s:
+团队使用协调模式管理专门代理之间的协作：
 
-1. **Re搜索**: Re搜索er 代理 搜索es the web using DuckDuckGo for relevant 信息
-2. **Coordinate**: Team leader coordinates task distribution between 成员
-3. **Write**: Writer 代理 crafts clear, engaging content based on re搜索 findings
-4. **Integrate**: Team combines re搜索 and writing into cohesive articles
+1. **搜索**: 搜索代理使用DuckDuckGo搜索相关网络信息
+2. **协调**: 团队负责人在成员之间协调任务分配
+3. **写作**: 写作代理根据搜索结果制作清晰、引人入胜的内容
+4. **整合**: 团队将搜索和写作结合成连贯的文章
 
-The 团队 leader manages the 工作流 and ensures both 代理s contribute their expertise.
+团队负责人管理工作流并确保两个代理都贡献他们的专业知识。
 
 ## 代码
 
@@ -64,30 +64,30 @@ content_team = Team(
 content_team.print_response("Create a short article about quantum computing")
 ```
 
-## What to Expect
+## 期望结果
 
-The 团队 will create an article by first re搜索ing the topic through web 搜索, then writing content based on the findings. The re搜索er finds relevant 信息 and sources, while the writer transforms this into engaging prose.
+团队将首先通过网络搜索研究主题，然后根据研究结果编写内容来创建文章。搜索员找到相关信息和来源，而写作者则将其转化为引人入胜的文章。
 
-The output 展示 responses from both 团队 成员 so you can 查看 how they collaborate. The final article combines accurate re搜索 with clear, professional writing.
+输出显示来自团队成员的响应，以便您可以查看他们如何协作。最终文章将准确的搜索与清晰、专业的写作相结合。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai ddgs
     ```
   </Step>
 
-  <Step title="Run Team">
+  <Step title="运行团队">
     <CodeGroup>
     ```bash Mac
     python content_team.py
@@ -100,9 +100,9 @@ The output 展示 responses from both 团队 成员 so you can 查看 how they c
   </Step>
 </Steps>
 
-## Next Steps
+## 下一步
 
-- Modify the task in `print_response()` 创建 different types of content
-- Add more specialized 代理s like editors or fact-checkers to the 团队
-- Adjust `show_members_responses` to control visibility of individual 代理 outputs
-- 探索 [Teams](/basics/团队s/over查看) for advanced collaboration patterns
+- 修改 `print_response()` 中的任务以创建不同类型的内容
+- 向团队添加更多专门代理，如编辑或事实核查员
+- 调整 `show_members_responses` 以控制单个代理输出的可见性
+- 探索 [团队](/basics/teams/overview) 以了解高级协作模式

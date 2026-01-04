@@ -5,7 +5,7 @@ title: Weave
 
 ## 概述
 
-此示例演示 how 使用 Weave by Weights & Biases (WandB) to log 模型 c所有s from your Agno 代理.
+此示例演示如何使用 Weights & Biases (WandB) 的 Weave 来记录您的 Agno 智能体的模型调用。
 
 ## 代码
 
@@ -14,39 +14,39 @@ import weave
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 
-# Create and configure the agent
+# 创建并配置智能体
 agent = Agent(model=OpenAIChat(id="gpt-5-mini"), markdown=True, debug_mode=True)
 
-# Initialize Weave with your project name
+# 使用您的项目名称初始化 Weave
 weave.init("agno")
 
-# Define a function to run the agent, decorated with weave.op()
+# 定义一个运行智能体的函数，并使用 weave.op() 装饰器
 @weave.op()
 def run(content: str):
     return agent.run(content)
 
-# Use the function to log a model call
+# 使用该函数记录模型调用
 run("Share a 2 sentence horror story")
 ```
 
 ## 用法
 
 <Steps>
-  <Step title="Install Weave">
+  <Step title="安装 Weave">
     ```bash
     pip install agno openai weave
     ```
   </Step>
 
-  <Step title="Authenticate with WandB">
-    - Go to [WandB](https://wandb.ai) and copy your API key from [here](https://wandb.ai/authorize).
-    - Enter your API key in the terminal when prompted, or export it as an environment variable:
+  <Step title="使用 WandB 进行身份验证">
+    - 访问 [WandB](https://wandb.ai) 并从 [此处](https://wandb.ai/authorize) 复制您的 API 密钥。
+    - 在终端提示时输入您的 API 密钥，或将其导出为环境变量：
     ```bash
     export WANDB_API_KEY=<your-api-key>
     ```
   </Step>
 
-  <Step title="Run the Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/observability/weave_op.py
@@ -59,7 +59,7 @@ run("Share a 2 sentence horror story")
   </Step>
 </Steps>
 
-## Notes
+## 注意事项
 
-- **Initialization**: C所有 `weave.init("project-name")` to initialize Weave with your project name.
-- **Decorators**: 使用 `@weave.op()` to decorate 函数s you want to log with Weave.
+- **初始化**: 调用 `weave.init("project-name")` 使用您的项目名称初始化 Weave。
+- **装饰器**: 使用 `@weave.op()` 装饰您想要用 Weave 记录的函数。

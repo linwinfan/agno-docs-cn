@@ -1,9 +1,9 @@
 ---
-title: Collaboration Team
+title: 讨论团队
 ---
 
 
-此示例展示 how 创建 a collaboration 团队 that 所有ows multiple 代理s to work together on re搜索 topics using the `collaborate` mode. In Collaborate Mode, 所有 团队 成员 are given the same task and the 团队 leader synthesizes their outputs into a cohesive response.
+此示例展示如何创建一个协作团队，允许多个代理使用`collaborate`模式共同研究主题。在协作模式下，所有团队成员都获得相同的任务，团队负责人将他们的输出综合成一个连贯的响应。
 
 ## 代码
 
@@ -24,64 +24,64 @@ arxiv_download_dir = Path(__file__).parent.joinpath("tmp", "arxiv_pdfs__{session
 arxiv_download_dir.mkdir(parents=True, exist_ok=True)
 
 reddit_researcher = Agent(
-    name="Reddit Researcher",
-    role="Research a topic on Reddit",
+    name="Reddit研究员",
+    role="在Reddit上研究主题",
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[DuckDuckGoTools()],
     add_name_to_context=True,
     instructions=dedent("""
-    You are a Reddit researcher.
-    You will be given a topic to research on Reddit.
-    You will need to find the most relevant posts on Reddit.
+    您是Reddit研究员。
+    您将获得一个在Reddit上研究的主题。
+    您需要找到Reddit上最相关的帖子。
     """),
 )
 
 hackernews_researcher = Agent(
-    name="HackerNews Researcher",
+    name="HackerNews研究员",
     model=OpenAIChat("gpt-5-mini"),
-    role="Research a topic on HackerNews.",
+    role="在HackerNews上研究主题",
     tools=[HackerNewsTools()],
     add_name_to_context=True,
     instructions=dedent("""
-    You are a HackerNews researcher.
-    You will be given a topic to research on HackerNews.
-    You will need to find the most relevant posts on HackerNews.
+    您是HackerNews研究员。
+    您将获得一个在HackerNews上研究的主题。
+    您需要找到HackerNews上最相关的帖子。
     """),
 )
 
 academic_paper_researcher = Agent(
-    name="Academic Paper Researcher",
+    name="学术论文研究员",
     model=OpenAIChat("gpt-5-mini"),
-    role="Research academic papers and scholarly content",
+    role="研究学术论文和学术内容",
     tools=[DuckDuckGoTools(), ArxivTools(download_dir=arxiv_download_dir)],
     add_name_to_context=True,
     instructions=dedent("""
-    You are a academic paper researcher.
-    You will be given a topic to research in academic literature.
-    You will need to find relevant scholarly articles, papers, and academic discussions.
-    Focus on peer-reviewed content and citations from reputable sources.
-    Provide brief summaries of key findings and methodologies.
+    您是学术论文研究员。
+    您将获得一个在学术文献中研究的主题。
+    您需要找到相关的学术文章、论文和学术讨论。
+    重点关注同行评审的内容和来自可靠来源的引用。
+    提供关键发现和方法论的简要摘要。
     """),
 )
 
 twitter_researcher = Agent(
-    name="Twitter Researcher",
+    name="Twitter研究员",
     model=OpenAIChat("gpt-5-mini"),
-    role="Research trending discussions and real-time updates",
+    role="研究热门讨论和实时更新",
     tools=[DuckDuckGoTools()],
     add_name_to_context=True,
     instructions=dedent("""
-    You are a Twitter/X researcher.
-    You will be given a topic to research on Twitter/X.
-    You will need to find trending discussions, influential voices, and real-time updates.
-    Focus on verified accounts and credible sources when possible.
-    Track relevant hashtags and ongoing conversations.
+    您是Twitter/X研究员。
+    您将获得一个在Twitter/X上研究的主题。
+    您需要找到热门讨论、有影响力的声音和实时更新。
+    尽可能关注经过验证的账户和可靠来源。
+    跟踪相关话题标签和正在进行的对话。
     """),
 )
 
 
 agent_team = Team(
-    name="Discussion Team",
+    name="讨论团队",
     delegate_to_all_members=True,
     model=OpenAIChat("gpt-5-mini"),
     members=[
@@ -91,8 +91,8 @@ agent_team = Team(
         twitter_researcher,
     ],
     instructions=[
-        "You are a discussion master.",
-        "You have to stop the discussion when you think the team has reached a consensus.",
+        "您是讨论主持人。",
+        "当您认为团队已达成共识时，必须停止讨论。",
     ],
     markdown=True,
     show_members_responses=True,
@@ -114,19 +114,19 @@ if __name__ == "__main__":
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno arxiv pypdf pycountry
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/collaboration_team.py
         ```

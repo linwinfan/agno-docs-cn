@@ -1,5 +1,5 @@
 ---
-title: ClickHouse Async
+title: ClickHouse 异步
 ---
 
 
@@ -41,12 +41,12 @@ if __name__ == "__main__":
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U clickhouse-connect pypdf openai agno
     ```
   </Step>
-  <Step title="Run ClickHouse">
+  <Step title="运行ClickHouse">
     ```bash
 docker run -d \
   -e CLICKHOUSE_DB=ai \
@@ -62,7 +62,7 @@ docker run -d \
   clickhouse/clickhouse-server
     ```
   </Step>
-  <Step title="Set environment variables">
+  <Step title="设置环境变量">
     ```bash
     export CLICKHOUSE_HOST="localhost"
     export CLICKHOUSE_PORT="8123"
@@ -72,7 +72,7 @@ docker run -d \
     export OPENAI_API_KEY=xxx
     ```
   </Step>
-  <Step title="Run Agent">
+  <Step title="运行Agent">
     <CodeGroup>
     ```bash Mac
     python cookbook/08_knowledge/vector_db/clickhouse_db/async_clickhouse.py

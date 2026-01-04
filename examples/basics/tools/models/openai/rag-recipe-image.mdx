@@ -8,11 +8,11 @@ title: 食谱 RAG 图像智能体
 ## 代码
 
 ```python ref/recipe_rag_image.py
-"""Example: Multi-Modal RAG & Image Agent
+"""示例：多模态 RAG 与图像智能体
 
-An agent that uses Llama 4 for multi-modal RAG and OpenAITools to create a visual, step-by-step image manual for a recipe.
+一个使用 Llama 4 进行多模态 RAG 和 OpenAITools 来创建食谱的可视化、分步图像手册的智能体。
 
-Run: `pip install openai agno groq cohere` to install the dependencies
+运行: `pip install openai agno groq cohere` 来安装依赖项
 """
 
 from pathlib import Path
@@ -45,19 +45,19 @@ agent = Agent(
     tools=[OpenAITools()],
     knowledge=knowledge_base,
     instructions=[
-        "You are a specialized recipe assistant.",
-        "When asked for a recipe:",
-        "1. Search the knowledge base to retrieve the relevant recipe details.",
-        "2. Analyze the retrieved recipe steps carefully.",
-        "3. Use the `generate_image` tool to create a visual, step-by-step image manual for the recipe.",
-        "4. Present the recipe text clearly and mention that you have generated an accompanying image manual. Add instructions while generating the image.",
+        "您是专业的食谱助手。",
+        "当被要求提供食谱时：",
+        "1. 搜索知识库以检索相关食谱详细信息。",
+        "2. 仔细分析检索到的食谱步骤。",
+        "3. 使用 `generate_image` 工具为食谱创建可视化、分步的图像手册。",
+        "4. 清晰地呈现食谱文本，并提及您已生成了配套的图像手册。在生成图像时添加说明。",
     ],
     markdown=True,
     debug_mode=True,
 )
 
 response = agent.print_response(
-    "What is the recipe for a Thai curry?",
+    "泰式咖喱的食谱是什么？",
 )
 if response.images:
     download_image(response.images[0].url, Path("tmp/recipe_image.png"))

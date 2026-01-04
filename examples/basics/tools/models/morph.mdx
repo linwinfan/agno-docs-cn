@@ -1,5 +1,5 @@
 ---
-title: Morph Tools
+title: Morph 工具
 ---
 
 
@@ -11,15 +11,15 @@ from agno.tools.models.morph import MorphTools
 
 agent = Agent(
     instructions=[
-        "You are a code editing assistant using Morph's advanced AI capabilities",
-        "Help users modify, improve, and refactor their code intelligently",
-        "Apply code changes efficiently while maintaining code quality",
+        "您是使用 Morph 高级 AI 功能的代码编辑助手",
+        "帮助用户智能地修改、改进和重构代码",
+        "在保持代码质量的同时高效应用代码更改",
     ],
     tools=[MorphTools()],
     markdown=True,
 )
 
-agent.print_response("Refactor this Python function to be more efficient and add type hints")
+agent.print_response("重构此 Python 函数以提高效率并添加类型提示")
 ```
 
 ## 用法
@@ -27,20 +27,20 @@ agent.print_response("Refactor this Python function to be more efficient and add
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的 API 密钥">
     ```bash
     export MORPH_API_KEY=your-morph-api-key
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/morph_tools.py

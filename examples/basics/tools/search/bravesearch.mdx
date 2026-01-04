@@ -1,5 +1,5 @@
 ---
-title: Brave Search Tools
+title: Brave 搜索工具
 ---
 
 
@@ -11,12 +11,12 @@ from agno.tools.bravesearch import BraveSearchTools
 
 agent = Agent(
     tools=[BraveSearchTools()],
-    description="You are a news agent that helps users find the latest news.",
+    description="您是一个新闻智能体，帮助用户查找最新新闻。",
     instructions=[
-        "Given a topic by the user, respond with 4 latest news items about that topic."
+        "根据用户提供的主题，回复该主题的4个最新新闻条目。"
     ],
     )
-agent.print_response("AI Agents", markdown=True)
+agent.print_response("AI智能体", markdown=True)
 ```
 
 ## 用法
@@ -24,19 +24,19 @@ agent.print_response("AI Agents", markdown=True)
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API credentials">
+  <Step title="设置您的 API 凭据">
     ```bash
     export BRAVE_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U brave-search openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/bravesearch_tools.py

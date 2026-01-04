@@ -1,5 +1,5 @@
 ---
-title: ClickUp Tools
+title: ClickUp 工具
 ---
 
 
@@ -11,9 +11,9 @@ from agno.tools.clickup import ClickUpTools
 
 agent = Agent(
     instructions=[
-        "You are a ClickUp project management assistant",
-        "Help users manage their tasks, projects, and workspaces",
-        "Create, update, and organize tasks efficiently",
+        "您是ClickUp项目管理助手",
+        "帮助用户管理他们的任务、项目和工作区",
+        "高效地创建、更新和组织任务",
     ],
     tools=[ClickUpTools()],
     markdown=True,
@@ -27,7 +27,7 @@ agent.print_response("Create a new task called 'Review documentation' and list a
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export CLICKUP_API_KEY=your-clickup-api-key
     export MASTER_SPACE_ID=your-space-id
@@ -35,13 +35,13 @@ agent.print_response("Create a new task called 'Review documentation' and list a
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U requests openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/clickup_tools.py

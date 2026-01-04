@@ -1,14 +1,14 @@
 ---
-title: GeoBuddy
+title: 地理伙伴
 ---
 
 
-GeoBuddy is a geography 代理 that analyzes images to predict locations based on visible cues such as landmarks, architecture, and cultural symbols.
+地理伙伴是一个地理智能体，通过分析图像来预测位置，基于可见线索如地标、建筑和文化符号。
 
-### 密钥 Capabilities
-- Location Identification: Predicts location 详细信息 from uploaded images
-- Detailed Reasoning: Explains predictions based on visual cues
-- 使用r-Friendly Ul: Built with Streamlit for an intuitive experience
+### 主要功能
+- 位置识别：从上传的图像中预测位置详情
+- 详细推理：基于视觉线索解释预测结果
+- 用户友好界面：使用Streamlit构建直观体验
 
 <video
   autoPlay
@@ -18,65 +18,65 @@ GeoBuddy is a geography 代理 that analyzes images to predict locations based o
   src="/videos/geobuddy.mp4"
 ></video>
 
-### 简单 示例s to Try
-- Landscape: A city skyline, a mountain panorama, or a famous landmark
-- Architecture: Distinct buildings, bridges, or unique cityscapes
-- Cultural Clues: Text on signboards, language hints, flags, or unique clothing
+### 简单示例尝试
+- 风景：城市天际线、山景全景或著名地标
+- 建筑：独特的建筑、桥梁或独特的城市景观
+- 文化线索：标牌上的文字、语言提示、旗帜或独特的服装
 
-### 高级 用法
-Try providing images with subtle 详细信息, like store signs in different languages or iconic but less glob所有y famous landmarks. GeoBuddy will attempt to reason more deeply 关于 architectural style, 环境 (e.g. desert vs. tropical), and cultural references.
+### 高级用法
+尝试提供带有细微详情的图像，比如不同语言的商店招牌或标志性但不太全球知名的地標。地理伙伴将尝试更深入地推理建筑风格、环境（例如沙漠与热带地区）和文化参考。
 
 
 ### 代码
-The complete code is 可用的 in the [Agno 存储库](https://github.com/agno-agi/agno).
+完整代码可在 [Agno 仓库](https://github.com/agno-agi/agno) 中获得。
 
 
 ### 用法
 <Steps>
-  <Step title="Clone the repository">
+  <Step title="克隆仓库">
     ```bash
     git clone https://github.com/agno-agi/agno.git
     cd agno
     ```
   </Step>
 
-  <Step title="Create a Virtual Environment">
+  <Step title="创建虚拟环境">
     ```bash
     python3 -m venv .venv
     source .venv/bin/activate
     ```
   </Step>
 
-  <Step title="Install Dependencies">
+  <Step title="安装依赖">
     ```bash
     pip install -r cookbook/02_examples/streamlit_apps/geobuddy/requirements.txt
     ```
   </Step>
 
-  <Step title="Set up API Key">
-    GeoBuddy uses the Google PaLM API for advanced image reasoning:
+  <Step title="设置API密钥">
+    地理伙伴使用Google PaLM API进行高级图像推理：
 
     ```bash
     export GOOGLE_API_KEY=***
     ```
   </Step>
 
-  <Step title="Launch the App">
+  <Step title="启动应用程序">
     ```bash
     streamlit run cookbook/02_examples/streamlit_apps/geobuddy/app.py
     ```
   </Step>
 
-  <Step title="Open the App">
-    Then, open http://localhost:8501 in your browser to start using GeoBuddy.
+  <Step title="打开应用程序">
+    然后，在浏览器中打开 http://localhost:8501 开始使用地理伙伴。
   </Step>
 </Steps>
 
 
-### Pro Tips
-- High-Resolution Images: Clearer images with visible signboards or landmarks improve accuracy.
-- Variety of Angles: Different angles (e.g. street-level vs. aerial 查看s) can showcase unique clues.
-- Contextual Clues: Sometimes minor 详细信息 like license plates, local architectural elements or even vegetation can significantly influence the location guess.
+### 专业提示
+- 高分辨率图像：带有清晰标牌或地标的图像可提高准确性。
+- 多样化角度：不同角度（例如街景与航拍视角）可以展示独特的线索。
+- 上下文线索：有时细微的详情如车牌、当地建筑元素甚至植被都能显著影响位置判断。
 
 
-Need help? Join our [Discourse community](https://community.agno.com) for support!
+需要帮助？加入我们的 [Discourse 社区](https://community.agno.com) 获取支持！

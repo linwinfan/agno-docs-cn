@@ -1,9 +1,9 @@
 ---
-title: Persistent Session with Database
+title: 使用数据库的持久化会话
 ---
 
 
-此示例演示 how 使用 persistent 会话 存储 with a PostgreSQL 数据库 to maintain 团队 conversations across multiple runs.
+此示例演示如何使用持久化会话存储与 PostgreSQL 数据库配合，在多次运行之间维护团队对话。
 
 ## 代码
 
@@ -25,7 +25,7 @@ team = Team(
     db=db,
 )
 
-team.print_response("Tell me a new interesting fact about space")
+team.print_response("告诉我一个关于太空的有趣新事实")
 ```
 
 ## 用法
@@ -34,25 +34,25 @@ team.print_response("Tell me a new interesting fact about space")
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno psycopg2-binary
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Start PostgreSQL database">
+    <Step title="启动 PostgreSQL 数据库">
         ```bash
         cookbook/run_pgvector.sh
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/session/01_persistent_session.py
         ```

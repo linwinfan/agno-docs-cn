@@ -1,15 +1,15 @@
 ---
-title: Session Summary Management
+title: 会话摘要管理
 ---
 
 
-此示例演示 how to enable automatic 会话 summaries that help maintain conversation context across longer interactions by summarizing previous conversations.
+此示例演示如何启用自动会话摘要，通过总结先前的对话来帮助在较长的交互过程中维持对话上下文。
 
 ## 代码
 
 ```python 03_session_summary.py
 """
-This example shows how to use the session summary to store the conversation summary.
+此示例展示如何使用会话摘要存储对话摘要。
 """
 
 from agno.agent.agent import Agent
@@ -21,7 +21,7 @@ db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
 
 db = PostgresDb(db_url=db_url, session_table="sessions")
 
-# Method 1: Set enable_session_summaries to True
+# 方法 1: 将 enable_session_summaries 设置为 True
 
 agent = Agent(
     model=OpenAIChat(id="gpt-5-mini"),
@@ -33,7 +33,7 @@ agent = Agent(
 agent.print_response("Hi my name is John and I live in New York")
 agent.print_response("I like to play basketball and hike in the mountains")
 
-# Method 2: Set session_summary_manager
+# 方法 2: 设置 session_summary_manager
 
 # session_summary_manager = SessionSummaryManager(model=OpenAIChat(id="gpt-5-mini"))
 
@@ -53,20 +53,20 @@ agent.print_response("I like to play basketball and hike in the mountains")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai psycopg2-binary
     ```
   </Step>
 
-  <Step title="Setup PostgreSQL">
+  <Step title="设置 PostgreSQL">
     ```bash
-    # Make sure PostgreSQL is running
-    # Update connection string in the code as needed
+    # 确保 PostgreSQL 正在运行
+    # 根据需要在代码中更新连接字符串
     ```
   </Step>
 
-  <Step title="Export your OpenAI API key">
+  <Step title="导出您的 OpenAI API 密钥">
 
     <CodeGroup>
 
@@ -80,30 +80,30 @@ agent.print_response("I like to play basketball and hike in the mountains")
     </CodeGroup> 
   </Step>
 
-  <Step title="Create a Python file">
-    Create a Python file and add the above code.
+  <Step title="创建 Python 文件">
+    创建一个 Python 文件并添加上面的代码。
     ```bash
     touch 03_session_summary.py
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python 03_session_summary.py
     ```
-    
+
     ```bash Windows
     python 03_session_summary.py
     ```
     </CodeGroup>
   </Step>
 
-  <Step title="Find All Cookbooks">
-  Explore all the available cookbooks in the Agno repository. Click the link below to view the code on GitHub:
+  <Step title="查找所有示例">
+  在 Agno 仓库中探索所有可用的示例。点击下面的链接在 GitHub 上查看代码：
 
   <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/session" target="_blank">
-    Agno Cookbooks on GitHub
+    GitHub 上的 Agno 示例
   </Link>
 </Step>
 </Steps>

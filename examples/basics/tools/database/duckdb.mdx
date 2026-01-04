@@ -11,10 +11,10 @@ from agno.tools.duckdb import DuckDbTools
 
 agent = Agent(
     tools=[DuckDbTools()],
-        instructions="Use this file for Movies data: https://agno-public.s3.amazonaws.com/demo_data/IMDB-Movie-Data.csv",
+        instructions="使用此文件获取电影数据: https://agno-public.s3.amazonaws.com/demo_data/IMDB-Movie-Data.csv",
 )
 agent.print_response(
-    "What is the average rating of movies?", markdown=True, stream=False
+    "电影的平均评分是多少?", markdown=True, stream=False
 )
 ```
 
@@ -23,19 +23,19 @@ agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置你的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U duckdb openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/duckdb_tools.py

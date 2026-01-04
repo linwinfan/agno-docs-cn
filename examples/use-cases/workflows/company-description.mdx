@@ -1,53 +1,53 @@
 ---
-title: Company Description Workflow
+title: 公司描述工作流
 mode: wide
 ---
 
 
-Build a comprehensive supplier pro文件 generator that combines web crawling, 搜索 engines, Wikipedia, and competitor analysis. This 工作流 processes company 信息 through specialized 代理s and delivers 详细信息ed markdown reports via email.
+构建一个全面的供应商档案生成器，结合网络爬虫、搜索引擎、维基百科和竞争对手分析。此工作流通过专业代理处理公司信息，并通过电子邮件发送详细的markdown格式报告。
 
-## What You'll 学习
+## 您将学到的内容
 
-By building this 工作流, you'll 理解:
-- How to coordinate multiple 代理s running in par所有el for data gathering
-- How to integrate diverse data sources (web crawling, 搜索, Wikipedia)
-- How to implement 工作流 会话 state caching for expensive operations
-- How to automate report generation and email delivery with Resend
+通过构建此工作流，您将理解：
+- 如何协调多个并行运行的代理以进行数据收集
+- 如何整合多样化的数据源（网络爬虫、搜索、维基百科）
+- 如何为昂贵操作实施工作流会话状态缓存
+- 如何使用Resend自动化报告生成和电子邮件发送
 
-## 使用 Cases
+## 使用场景
 
-Build supplier re搜索 platforms, company intelligence systems, vendor evaluation 工具s, or automated due diligence reports.
+构建供应商搜索平台、公司情报系统、供应商评估工具或自动化尽职调查报告。
 
-## How It Works
+## 工作原理
 
-The 工作流 coordinates four specialized 代理s running in par所有el:
+工作流协调四个并行运行的专业代理：
 
-1. **Crawl**: Crawler 代理 uses Firecrawl to extract 信息 from the company website
-2. **Search**: Search 代理 uses DuckDuckGo to find recent news and articles
-3. **Re搜索**: Wikipedia 代理 gathers background and historical 信息
-4. **Analyze**: Competitor 代理 identifies and analyzes market competitors
-5. **Synthesize**: Pro文件 代理 combines 所有 findings into a structured markdown report
-6. **Deliver**: Report is automatic所有y sent via email using Resend
+1. **爬取**: 爬虫代理使用Firecrawl从公司网站提取信息
+2. **搜索**: 搜索代理使用DuckDuckGo查找最新新闻和文章
+3. **研究**: 维基百科代理收集背景和历史信息
+4. **分析**: 竞争对手代理识别和分析市场竞争对手
+5. **综合**: 档案代理将所有发现综合成结构化的markdown报告
+6. **发送**: 报告通过Resend自动通过电子邮件发送
 
-The 工作流 缓存s analysis results in 会话 state - subsequent requests for the same supplier return 缓存d data.
+工作流在会话状态中缓存分析结果 - 后续对同一供应商的请求将返回缓存数据。
 ```
 export OPENAI_API_KEY="your-openai-key"
 export RESEND_API_KEY="your-resend-key"
 export FIRECRAWL_API_KEY="your-firecrawl-key"
 ```
 
-Inst所有 依赖项
+安装依赖项
 ```
 pip install agno openai firecrawl-py resend
 ```
 
-## 代码 Structure
+## 代码结构
 
-This company de脚本ion 工作流 consists of three main 文件s:
+此公司描述工作流包含三个主要文件：
 
-### 1. Agents (`agents.py`)
+### 1. 代理 (`agents.py`)
 
-Specialized 代理s for gathering 信息 from multiple sources:
+用于从多个来源收集信息的专业代理：
 
 ```python agents.py
 from agno.agent import Agent
@@ -101,9 +101,9 @@ profile_agent: Agent = Agent(
 )
 ```
 
-### 2. Prompts (`prompts.py`)
+### 2. 提示 (`prompts.py`)
 
-Detailed 说明 for each specialized 代理:
+每个专业代理的详细说明：
 
 ```python prompts.py
 CRAWLER_INSTRUCTIONS = """
@@ -246,9 +246,9 @@ Credit Ratings: [If available, include credit ratings or financial stability ind
 }
 ```
 
-### 3. Workflow Implementation (`run_workflow.py`)
+### 3. 工作流实现 (`run_workflow.py`)
 
-Complete 工作流 with par所有el 信息 gathering and email delivery:
+包含并行信息收集和电子邮件发送的完整工作流：
 
 ```python run_workflow.py
 import markdown
@@ -408,44 +408,44 @@ if __name__ == "__main__":
     )
 ```
 
-## 密钥 Features
+## 关键特性
 
-- **Par所有el Processing**: Four 代理s gather 信息 simultaneously for maximum efficiency
-- **Multi-Source Data**: Combines web crawling, 搜索 engines, Wikipedia, and competitor analysis
-- **Email Integration**: Automatic所有y sends formatted reports via email using Resend
-- **Markdown Formatting**: Generates structured, readable reports in HTML format
-- **Modular Design**: Clean separation of 代理s, prompts, and 工作流 logic
-- **Efficient Execution**: 使用s par所有el steps to minimize execution time
-- **Type Safety**: Pydantic 模型s for structured data validation
+- **并行处理**: 四个代理同时收集信息以实现最高效率
+- **多源数据**: 结合网络爬虫、搜索引擎、维基百科和竞争对手分析
+- **电子邮件集成**: 使用Resend自动通过电子邮件发送格式化报告
+- **Markdown格式**: 生成结构化、可读的HTML格式报告
+- **模块化设计**: 代理、提示和工作流逻辑的清晰分离
+- **高效执行**: 使用并行步骤以最小化执行时间
+- **类型安全**: 使用Pydantic模型进行结构化数据验证
 
-## 用法 示例
+## 用法示例
 
 ```python
-# Create supplier profile request
+# 创建供应商档案请求
 supplier_request = SupplierProfile(
     supplier_name="Your Company Name",
     supplier_homepage_url="https://yourcompany.com",
     user_email="your.email@company.com",
 )
 
-# Run the workflow
+# 运行工作流
 company_description_workflow.print_response(
     input=supplier_request,
 )
 ```
 
-## What to Expect
+## 预期效果
 
-The 工作流 will simultaneously gather 信息 from multiple sources (website crawling, web 搜索, Wikipedia, competitor analysis) then generate a comprehensive supplier pro文件. You'll 查看 progress indicators for each 代理's data collection.
+工作流将同时从多个来源（网站爬虫、网络搜索、维基百科、竞争对手分析）收集信息，然后生成全面的供应商档案。您将看到每个代理数据收集的进度指示器。
 
-The final output is a structured markdown report delivered via email. The 工作流 缓存s 所有 analysis results - if you request the same supplier again, it returns the 缓存d pro文件 instantly instead of re-running the expensive analysis pipeline.
+最终输出是通过电子邮件发送的结构化markdown报告。工作流缓存所有分析结果 - 如果您再次请求同一供应商，它将立即返回缓存的档案，而不是重新运行昂贵的分析管道。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export RESEND_API_KEY=xxx
@@ -453,13 +453,13 @@ The final output is a structured markdown report delivered via email. The 工作
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai fastapi firecrawl-py resend markdown ddgs
     ```
   </Step>
 
-  <Step title="Run Workflow">
+  <Step title="运行工作流">
     <CodeGroup>
     ```bash Mac
     python cookbook/02_examples/workflows/company_description/run_workflow.py
@@ -472,9 +472,9 @@ The final output is a structured markdown report delivered via email. The 工作
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Modify `supplier_request` to analyze different companies
-- Customize 代理 说明 in `prompts.py` to focus on specific analysis areas
-- Adjust the pro文件 template in `SUPPLIER_PROFILE_INSTRUCTIONS_GENERAL` for different report formats
-- 探索 [Workflows](/basics/工作流s/over查看) for advanced 工作流 patterns
+- 修改 `supplier_request` 以分析不同公司
+- 自定义 `prompts.py` 中的代理说明以专注于特定分析领域
+- 调整 `SUPPLIER_PROFILE_INSTRUCTIONS_GENERAL` 中的档案模板以适应不同的报告格式
+- 探索 [工作流](/basics/工作流s/overview) 以了解高级工作流模式

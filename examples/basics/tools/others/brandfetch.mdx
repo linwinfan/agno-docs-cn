@@ -1,5 +1,5 @@
 ---
-title: Brandfetch Tools
+title: Brandfetch 工具
 ---
 
 
@@ -11,9 +11,9 @@ from agno.tools.brandfetch import BrandfetchTools
 
 agent = Agent(
     instructions=[
-        "You are a brand research assistant that helps find brand information",
-        "Use Brandfetch to retrieve logos, colors, and other brand assets",
-        "Provide comprehensive brand information when requested",
+        "您是一个品牌研究助手，帮助查找品牌信息",
+        "使用Brandfetch检索徽标、颜色和其他品牌资产",
+        "在请求时提供全面的品牌信息",
     ],
     tools=[BrandfetchTools()],
     markdown=True,
@@ -27,20 +27,20 @@ agent.print_response("Find brand information for Apple Inc.")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export BRANDFETCH_API_KEY=your-brandfetch-api-key
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U httpx openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/brandfetch_tools.py

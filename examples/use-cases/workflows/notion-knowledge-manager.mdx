@@ -1,33 +1,33 @@
 ---
-title: Notion Knowledge Manager
+title: Notion知识管理器
 mode: wide
 ---
 
 
-Build a knowledge management 工作流 that automatic所有y creates, updates, and 搜索es Notion pages based on content 类ification. This 工作流 uses AI to categorize 信息 and organize it in your Notion 数据库.
+构建一个知识管理工作流，根据内容分类自动创建、更新和搜索Notion页面。此工作流使用AI对信息进行分类，并在您的Notion数据库中进行组织。
 
-## What You'll 学习
+## 您将学到的内容
 
-By building this 工作流, you'll 理解:
-- How to integrate Notion API for automated knowledge management
-- How 使用 代理s for content 类ification and tagging
-- How to implement conditional logic based on 类ification results
-- How to coordinate multiple Notion operations (create, update, 搜索)
+通过构建此工作流，您将理解：
+- 如何集成Notion API以实现自动化知识管理
+- 如何使用代理进行内容分类和标记
+- 如何基于分类结果实现条件逻辑
+- 如何协调多个Notion操作（创建、更新、搜索）
 
-## 使用 Cases
+## 使用场景
 
-Build 知识库 managers, automated documentation systems, content organization 工具s, or re搜索 note-taking 应用程序s.
+构建知识库管理器、自动化文档系统、内容组织工具或研究笔记应用程序。
 
-## How It Works
+## 工作原理
 
-The 工作流 manages Notion pages through a multi-step 类ification and organization process:
+工作流通过多步骤分类和组织流程管理Notion页面：
 
-1. **Classify**: Classification 代理 analyzes content and determines tags/categories
-2. **Route**: Based on 类ification, decides whether 创建, update, or 搜索
-3. **Execute**: Notion 代理 performs the appropriate operation (create page, update tags, or 搜索)
-4. **Organize**: Content is automatic所有y organized in your Notion 数据库 with proper tags
+1. **分类**: 分类代理分析内容并确定标签/类别
+2. **路由**: 基于分类结果，决定是创建、更新还是搜索
+3. **执行**: Notion代理执行适当的操作（创建页面、更新标签或搜索）
+4. **组织**: 内容在您的Notion数据库中自动按正确标签进行组织
 
-The 工作流 uses NotionTools to interact with your Notion 数据库 programmatic所有y.
+工作流使用NotionTools以编程方式与您的Notion数据库交互。
 
 ## 代码
 
@@ -216,18 +216,18 @@ if __name__ == "__main__":
     agent_os.serve(app="notion_manager:app", reload=True)
 ```
 
-## What to Expect
+## 预期效果
 
-The 工作流 will 类ify your input content, determine the appropriate Notion operation (create, update, or 搜索), and execute it automatic所有y. You'll 查看 类ification results showing the assigned tags and categories.
+工作流将对您的输入内容进行分类，确定适当的Notion操作（创建、更新或搜索），并自动执行。您将看到显示已分配标签和类别的分类结果。
 
-The 工作流 integrates directly with your Notion 数据库, automatic所有y creating pages with proper tags, updating existing pages, or 搜索ing for 相关 content based on the 类ification.
+工作流直接与您的Notion数据库集成，根据分类结果自动创建带有正确标签的页面、更新现有页面或搜索相关内容。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export NOTION_API_KEY=xxx
@@ -235,13 +235,13 @@ The 工作流 integrates directly with your Notion 数据库, automatic所有y c
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai fastapi notion-client
     ```
   </Step>
 
-  <Step title="Run Workflow">
+  <Step title="运行工作流">
     <CodeGroup>
     ```bash Mac
     python notion_knowledge_manager.py
@@ -254,9 +254,9 @@ The 工作流 integrates directly with your Notion 数据库, automatic所有y c
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Customize 类ification categories in the 类ification 代理's 说明
-- Modify Notion page templates to match your 数据库 structure
-- Add more sophisticated routing logic based on content type
-- 探索 [Workflows](/basics/工作流s/over查看) for advanced 工作流 patterns
+- 自定义分类代理说明中的分类类别
+- 修改Notion页面模板以匹配您的数据库结构
+- 基于内容类型添加更复杂的路由逻辑
+- 探索 [工作流](/basics/工作流s/overview) 以了解高级工作流模式

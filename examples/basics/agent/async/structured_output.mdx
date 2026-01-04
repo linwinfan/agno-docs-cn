@@ -19,20 +19,20 @@ from rich.pretty import pprint  # noqa
 
 class MovieScript(BaseModel):
     setting: str = Field(
-        ..., description="Provide a nice setting for a blockbuster movie."
+        ..., description="为一部大片提供一个不错的场景。"
     )
     ending: str = Field(
         ...,
-        description="Ending of the movie. If not available, provide a happy ending.",
+        description="电影的结局。如果不可用，请提供一个快乐的结局。",
     )
     genre: str = Field(
         ...,
-        description="Genre of the movie. If not available, select action, thriller or romantic comedy.",
+        description="电影的类型。如果不可用，请选择动作片、惊悚片或浪漫喜剧。",
     )
-    name: str = Field(..., description="Give a name to this movie")
-    characters: List[str] = Field(..., description="Name of characters for this movie.")
+    name: str = Field(..., description="给这部电影起个名字")
+    characters: List[str] = Field(..., description="这部电影的角色名称。")
     storyline: str = Field(
-        ..., description="3 sentence storyline for the movie. Make it exciting!"
+        ..., description="电影的三句话剧情。让它令人兴奋！"
     )
 
 

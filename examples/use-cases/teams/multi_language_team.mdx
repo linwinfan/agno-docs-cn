@@ -1,33 +1,33 @@
 ---
-title: Multi Language Team
+title: 多语言团队
 mode: wide
 ---
 
 
-Build a language routing 团队 that automatic所有y detects user language and responds with native speakers. 此示例演示 intelligent routing across multiple AI 模型s specialized for different languages.
+构建一个语言路由团队，自动检测用户语言并用母语回应。此示例演示了跨多个专用于不同语言的AI模型的智能路由。
 
-## What You'll 学习
+## 您将学习的内容
 
-By building this 团队, you'll 理解:
-- How 创建 language-specific 代理s using different AI 模型s
-- How to implement intelligent routing based on user input language
-- How 使用 multiple AI providers (OpenAI, Claude, Mistral, DeepSeek) in one 团队
-- How to handle unsupported languages with graceful f所有back responses
+通过构建此团队，您将理解：
+- 如何使用不同的AI模型创建特定语言的代理
+- 如何基于用户输入语言实现智能路由
+- 如何在一个团队中使用多个AI提供商（OpenAI、Claude、Mistral、DeepSeek）
+- 如何优雅地处理不支持的语言并提供回退响应
 
-## 使用 Cases
+## 使用案例
 
-Build multilingual customer support, international chatbots, translation services, or global help desk systems.
+构建多语言客户支持、国际聊天机器人、翻译服务或全球帮助台系统。
 
-## How It Works
+## 工作原理
 
-The 团队 uses route mode to direct queries to language-specific 代理s:
+团队使用路由模式将查询引导至特定语言的代理：
 
-1. **Detect**: Team leader analyzes the language of the user's question
-2. **Route**: Directs the query to the appropriate language-specialized 代理
-3. **Respond**: Language 代理 answers in the user's native language
-4. **F所有back**: Handles unsupported languages with English response
+1. **检测**: 团队负责人分析用户问题的语言
+2. **路由**: 将查询导向适当的特定语言代理
+3. **响应**: 语言代理用用户的母语回答
+4. **回退**: 用英语响应处理不支持的语言
 
-Each language 代理 uses a different AI 模型 optimized for that language's characteristics.
+每个语言代理使用针对该语言特征优化的不同AI模型。
 
 ## 代码
 
@@ -101,18 +101,18 @@ if __name__ == "__main__":
     multi_language_team.print_response("Come stai?", stream=True)  # Italian
 ```
 
-## What to Expect
+## 期望结果
 
-The 团队 will automatic所有y detect the language of your input and route it to the appropriate language-specific 代理. Each 代理 responds fluently in their designated language using 模型s optimized for that language.
+团队将自动检测您输入的语言并将其路由到适当的特定语言代理。每个代理使用针对该语言优化的模型，流利地用其指定语言回应。
 
-The output 展示 which 代理 handled each request. For unsupported languages, you'll receive a polite message in English listing 可用的 languages.
+输出显示哪个代理处理了每个请求。对于不支持的语言，您将收到一条礼貌的英文消息，列出可用的语言。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export ANTHROPIC_API_KEY=xxx
@@ -121,13 +121,13 @@ The output 展示 which 代理 handled each request. For unsupported languages, 
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai anthropic mistralai deepseek-ai
     ```
   </Step>
 
-  <Step title="Run Team">
+  <Step title="运行团队">
     <CodeGroup>
     ```bash Mac
     python multi_language_team.py
@@ -140,10 +140,10 @@ The output 展示 which 代理 handled each request. For unsupported languages, 
   </Step>
 </Steps>
 
-## Next Steps
+## 下一步
 
-- Add more language 代理s for additional language support
-- Modify the routing logic in `instructions` to handle dialects or regional variations
-- Experiment with different AI 模型s for each language to optimize quality
-- 探索 [Teams](/basics/团队s/over查看) for advanced request distribution
+- 添加更多语言代理以支持更多语言
+- 修改`instructions`中的路由逻辑以处理方言或地区变体
+- 为每种语言尝试不同的AI模型以优化质量
+- 探索 [团队](/basics/teams/overview) 以实现高级请求分发
 

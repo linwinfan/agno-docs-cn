@@ -1,5 +1,5 @@
 ---
-title: Cassandra Async
+title: Cassandra 异步
 ---
 
 
@@ -63,12 +63,12 @@ if __name__ == "__main__":
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U cassandra-driver pypdf mistralai agno
     ```
   </Step>
-  <Step title="Run Cassandra">
+  <Step title="运行Cassandra">
     ```bash
   docker run -d \
     --name cassandra-db \
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     cassandra:latest
     ```
   </Step>
-  <Step title="Set environment variables">
+  <Step title="设置环境变量">
     ```bash
     export CASSANDRA_HOST="localhost"
     export CASSANDRA_PORT="9042"
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     export MISTRAL_API_KEY="your-mistral-api-key"
     ```
   </Step>
-  <Step title="Run Agent">
+  <Step title="运行Agent">
     <CodeGroup>
     ```bash Mac
     python cookbook/08_knowledge/vector_db/cassandra_db/async_cassandra_db.py

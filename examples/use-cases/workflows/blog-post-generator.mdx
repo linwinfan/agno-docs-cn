@@ -1,33 +1,33 @@
 ---
-title: Blog Post Generator
+title: 博客文章生成器
 mode: wide
 ---
 
 
-Build a sophisticated blog post generator that combines web re搜索 with professional writing expertise. This 工作流 uses a multi-stage approach 创建 high-quality, well-re搜索ed blog content with proper citations.
+构建一个复杂的博客文章生成器，结合网络搜索与专业写作技巧。此工作流使用多阶段方法创建高质量、经过充分搜索的博客内容，并提供适当的引用。
 
-## What You'll 学习
+## 您将学到的内容
 
-By building this 工作流, you'll 理解:
-- How to structure multi-phase 工作流s with re搜索, extraction, and writing stages
-- How to implement caching strategies for expensive operations like web scraping
-- How to coordinate multiple specialized 代理s for complex content creation
-- How to integrate web 搜索 and content extraction 工具s effectively
+通过构建此工作流，您将理解：
+- 如何构建包含搜索、提取和写作阶段的多阶段工作流
+- 如何为爬虫等昂贵操作实施缓存策略
+- 如何协调多个专业代理以进行复杂内容创作
+- 如何有效整合网络搜索和内容提取工具
 
-## 使用 Cases
+## 使用场景
 
-Build content creation platforms, automated journalism systems, SEO content generators, or re搜索-based article writers.
+构建内容创作平台、自动化新闻系统、SEO内容生成器或基于搜索的文章撰写工具。
 
-## How It Works
+## 工作原理
 
-The 工作流 follows a three-phase content creation process:
+工作流遵循三阶段内容创作过程：
 
-1. **Re搜索**: Re搜索 代理 搜索es the web and evaluates 10-15 sources to find the 5-7 best articles
-2. **Extract**: Content scraper 代理 extracts and processes full article content in markdown format
-3. **Write**: Writer 代理 crafts an engaging blog post with proper citations and SEO optimization
-4. **Cache**: All intermediate results are 缓存d in 会话 state for efficiency
+1. **搜索**: 搜索代理在网络上搜索并评估10-15个来源以找到5-7篇最佳文章
+2. **提取**: 内容爬虫代理以markdown格式提取和处理完整文章内容
+3. **撰写**: 作家代理创作包含适当引用和SEO优化的吸引人博客文章
+4. **缓存**: 所有中间结果都缓存在会话状态中以提高效率
 
-The 工作流 uses SQLite for 会话 persistence and 缓存s 搜索 results, scraped articles, and final blog posts.
+工作流使用SQLite进行会话持久化，并缓存搜索结果、抓取的文章和最终博客文章。
 
 ## 代码
 
@@ -516,30 +516,30 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## What to Expect
+## 预期效果
 
-The 工作流 will generate a comprehensive blog post through three phases: re搜索, content extraction, and writing. You'll 查看 progress indicators for each phase showing which articles are being found and scraped.
+工作流将通过三个阶段（搜索、内容提取和撰写）生成一篇全面的博客文章。您将看到每个阶段的进度指示器，显示正在查找和抓取的文章。
 
-The 工作流 缓存s 所有 intermediate results (搜索 results, scraped articles, final blog posts) in SQLite for efficiency. Subsequent runs with the same topic will use 缓存d data. The final output is a profession所有y formatted blog post with proper citations, SEO optimization, and engaging structure.
+工作流在SQLite中缓存所有中间结果（搜索结果、抓取的文章、最终博客文章）以提高效率。后续使用相同主题的运行将使用缓存数据。最终输出是一篇专业格式化的博客文章，包含适当的引用、SEO优化和吸引人的结构。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai ddgs pycountry newspaper4k lxml_html_clean sqlalchemy fastapi
     ```
   </Step>
 
-  <Step title="Run Workflow">
+  <Step title="运行工作流">
     <CodeGroup>
     ```bash Mac
     python blog_post_generator.py
@@ -552,9 +552,9 @@ The 工作流 缓存s 所有 intermediate results (搜索 results, scraped artic
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Modify the 示例 topics in the code to generate content 关于 your specific interests
-- Adjust caching behavior by changing `use_search_cache`, `use_scrape_cache`, or `use_blog_cache` parameters
-- Customize 代理 说明 to match your writing style or SEO requirements
-- 探索 [Workflows](/basics/工作流s/over查看) for advanced 工作流 patterns
+- 修改代码中的示例主题以生成关于您特定兴趣的内容
+- 通过更改 `use_search_cache`、`use_scrape_cache` 或 `use_blog_cache` 参数来调整缓存行为
+- 自定义代理说明以匹配您的写作风格或SEO要求
+- 探索 [工作流](/basics/工作流s/overview) 以了解高级工作流模式

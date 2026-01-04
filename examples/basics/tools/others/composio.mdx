@@ -7,9 +7,9 @@ title: Composio Tools
 
 ```python cookbook/14_tools/composio_tools.py
 from agno.agent import Agent
-from composio_agno import Action, ComposioToolSet
+from composio_agno import Action, ComposioTool设置
 
-toolset = ComposioToolSet()
+toolset = ComposioTool设置()
 composio_tools = toolset.get_tools(
     actions=[Action.GITHUB_STAR_A_REPOSITORY_FOR_THE_AUTHENTICATED_USER]
 )
@@ -23,20 +23,20 @@ agent.print_response("Can you star agno-agi/agno repo?")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置API密钥">
     ```bash
     export COMPOSIO_API_KEY=xxx
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U composio-agno openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/composio_tools.py

@@ -1,6 +1,6 @@
 ---
-title: Oxylabs Tools
-description: Use Oxylabs with Agno to scrape and crawl the web.
+title: Oxylabs 工具
+description: 将Oxylabs与Agno结合使用来抓取和爬取网络。
 ---
 
 
@@ -16,7 +16,7 @@ agent = Agent(
     )
 
 agent.print_response("""
-Let's search for 'latest iPhone reviews' and provide a summary of the top 3 results.
+让我们搜索'最新iPhone评测'并提供前3个结果的摘要。
 """)
 
 print(response)
@@ -27,20 +27,20 @@ print(response)
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export OXYLABS_USERNAME=your_oxylabs_username
     export OXYLABS_PASSWORD=your_oxylabs_password
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U oxylabs agno openai
     ```
   </Step>
 
-  <Step title="Run the example">
+  <Step title="运行示例">
     ```bash
     python cookbook/14_tools/oxylabs_tools.py
     ```

@@ -23,9 +23,9 @@ agent = Agent(
     tools=[CsvTools(csvs=[imdb_csv])],
     markdown=True,
         instructions=[
-        "First always get the list of files",
-        "Then check the columns in the file",
-        "Then run the query to answer the question",
+        "首先始终获取文件列表",
+        "然后检查文件中的列",
+        "然后运行查询以回答问题",
     ],
 )
 agent.cli_app(stream=False)
@@ -36,19 +36,19 @@ agent.cli_app(stream=False)
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置你的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U httpx openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/csv_tools.py

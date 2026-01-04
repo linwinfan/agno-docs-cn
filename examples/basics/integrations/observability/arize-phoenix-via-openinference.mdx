@@ -1,11 +1,11 @@
 ---
-title: Arize Phoenix via OpenInference
+title: 通过 OpenInference 使用 Arize Phoenix
 ---
 
 
 ## 概述
 
-此示例演示 how to instrument your Agno 代理 with OpenInference and send traces to Arize Phoenix.
+此示例演示如何使用 OpenInference 为您的 Agno 智能体添加检测并将跟踪信息发送到 Arize Phoenix。
 
 ## 代码
 
@@ -18,45 +18,45 @@ from agno.models.openai import OpenAIChat
 from agno.tools.duckduckgo import DuckDuckGoTools
 from phoenix.otel import register
 
-# Set environment variables for Arize Phoenix
+# 设置 Arize Phoenix 环境变量
 os.environ["PHOENIX_CLIENT_HEADERS"] = f"api_key={os.getenv('ARIZE_PHOENIX_API_KEY')}"
 os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
 
-# Configure the Phoenix tracer
+# 配置 Phoenix 追踪器
 tracer_provider = register(
-    project_name="agno-stock-price-agent",  # Default is 'default'
-    auto_instrument=True,  # Automatically use the installed OpenInference instrumentation
+    project_name="agno-stock-price-agent",  # 默认为 'default'
+    auto_instrument=True,  # 自动使用已安装的 OpenInference 检测
 )
 
-# Create and configure the agent
+# 创建并配置智能体
 agent = Agent(
-    name="Stock Price Agent",
+    name="股票价格智能体",
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[DuckDuckGoTools()],
-    instructions="You are an internet search agent. Find and provide accurate information on any topic.",
+    instructions="您是一个互联网搜索智能体。查找并提供任何主题的准确信息。",
     debug_mode=True,
 )
 
-# Use the agent
+# 使用智能体
 agent.print_response("What are the latest developments in artificial intelligence?")
 ```
 
 ## 用法
 
 <Steps>
-  <Step title="Install Dependencies">
+  <Step title="安装依赖项">
     ```bash
     pip install -U agno arize-phoenix ddgs openai openinference-instrumentation-agno opentelemetry-sdk opentelemetry-exporter-otlp
     ```
   </Step>
 
-  <Step title="Set Environment Variables">
+  <Step title="设置环境变量">
     ```bash
     export ARIZE_PHOENIX_API_KEY=<your-key>
     ```
   </Step>
 
-  <Step title="Run the Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/observability/arize_phoenix_via_openinference.py

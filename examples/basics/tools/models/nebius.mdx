@@ -1,5 +1,5 @@
 ---
-title: Nebius Tools
+title: Nebius 工具
 ---
 
 
@@ -11,15 +11,15 @@ from agno.tools.models.nebius import NebiusTools
 
 agent = Agent(
     instructions=[
-        "You are an AI image generation assistant using Nebius Token Factory",
-        "Create high-quality images based on user descriptions",
-        "Provide detailed information about the generated images",
+        "您是使用 Nebius Token Factory 的 AI 图像生成助手",
+        "根据用户描述创建高质量图像",
+        "提供有关生成图像的详细信息",
     ],
     tools=[NebiusTools()],
     markdown=True,
 )
 
-agent.print_response("Generate an image of a futuristic city with flying cars at sunset")
+agent.print_response("生成一张夕阳下有飞行汽车的未来城市图像")
 ```
 
 ## 用法
@@ -27,20 +27,20 @@ agent.print_response("Generate an image of a futuristic city with flying cars at
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的 API 密钥">
     ```bash
     export NEBIUS_API_KEY=your-nebius-api-key
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/nebius_tools.py

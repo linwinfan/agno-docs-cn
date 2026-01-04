@@ -1,5 +1,5 @@
 ---
-title: Mem0 Memory
+title: Mem0 记忆
 ---
 
 ## 代码
@@ -18,7 +18,7 @@ messages = [
     {"role": "user", "content": "I live in NYC."},
     {"role": "user", "content": "I'm going to a concert tomorrow."},
 ]
-# Comment out the following line after running the script once
+# 第一次运行脚本后请注释掉以下行
 client.add(messages, user_id=user_id)
 
 agent = Agent(
@@ -39,7 +39,7 @@ client.add(messages, user_id=user_id)
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置你的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export MEM0_API_KEY=xxx (optional)
@@ -48,13 +48,13 @@ client.add(messages, user_id=user_id)
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U openai mem0ai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/agent_basics/memory/mem0_memory.py

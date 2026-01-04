@@ -1,10 +1,10 @@
 ---
-title: Custom Events
-description: Learn how to yield custom events from your own tools.
+title: 自定义事件
+description: 了解如何从自己的工具中产生自定义事件。
 ---
 
 
-### Complete 示例
+### 完整示例
 
 ```python
 import asyncio
@@ -18,21 +18,21 @@ from agno.run.team import CustomEvent
 from agno.tools import tool
 
 
-# Our custom event, extending the CustomEvent class
+# 我们的自定义事件，扩展 CustomEvent 类
 @dataclass
 class CustomerProfileEvent(CustomEvent):
-    """CustomEvent for customer profile."""
+    """客户资料的自定义事件。"""
 
     customer_name: Optional[str] = None
     customer_email: Optional[str] = None
     customer_phone: Optional[str] = None
 
 
-# Our custom tool
+# 我们的自定义工具
 @tool()
 async def get_customer_profile():
     """
-    Get the customer profile for the customer with ID 123.
+    获取 ID 为 123 的客户资料。
     """
     yield CustomerProfileEvent(
         customer_name="John Doe",
@@ -43,27 +43,27 @@ async def get_customer_profile():
 
 agent = Agent(
     name="Customer Support Agent",
-    role="Support agent that handles customer requests.",
+    role="处理客户请求的支持代理。",
     model=OpenAIChat(id="gpt-4o"),
 )
 
-# Setup the Team with our custom tool.
+# 使用我们的自定义工具设置团队。
 team = Team(
     members=[agent],
     tools=[get_customer_profile],
     model=OpenAIChat(id="gpt-4o"),
-    instructions="You are a team that handles customer requests.",
+    instructions="您是一个处理客户请求的团队。",
 )
 
 
 async def run_team():
-    # Running the Team: The team should call our custom tool and yield the custom event
+    # 运行团队：团队应该调用我们的自定义工具并产生自定义事件
     async for event in team.arun(
-        "Hello, can you get me the customer profile for customer with ID 123?",
+        "你好，你能为我获取 ID 为 123 的客户资料吗？",
         stream=True,
     ):
         if isinstance(event, CustomEvent):
-            print(f"✅ Custom event emitted: {event}")
+            print(f"✅ 自定义事件已发出: {event}")
 
 
 asyncio.run(run_team())

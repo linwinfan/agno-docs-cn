@@ -1,34 +1,34 @@
 ---
-title: Reasoning Team
+title: 推理团队
 mode: wide
 ---
 
 
-Build a reasoning 团队 that handles complex queries by combining web 搜索, financial data, and transparent analytical thinking. 此示例演示 how reasoning 工具s make the 团队's decision-making process visible.
+构建一个推理团队，通过结合网络搜索、财务数据和透明的分析思维来处理复杂查询。此示例演示了推理工具如何使团队的决策过程可见。
 
-## What You'll 学习
+## 您将学习的内容
 
-By building this 团队, you'll 理解:
-- How to integrate reasoning 工具s for transparent analytical thinking
-- How to combine multiple specialized 代理s with different data sources
-- How 使用 domain-specific 搜索 with Exa for financial 信息
-- How to stream reasoning events to 查看 the 团队's thought process in real-time
+通过构建此团队，您将理解：
+- 如何集成推理工具以实现透明的分析思维
+- 如何结合具有不同数据源的多个专门代理
+- 如何使用Exa进行特定领域的搜索以获取财务信息
+- 如何流式传输推理事件以实时查看团队的思考过程
 
-## 使用 Cases
+## 使用案例
 
-Build financial re搜索 platforms, investment analysis 工具s, market intelligence systems, or decision support 应用程序s.
+构建财务搜索平台、投资分析工具、市场情报系统或决策支持应用程序。
 
-## How It Works
+## 工作原理
 
-The 团队 coordinates specialized 代理s with transparent reasoning:
+团队通过透明推理协调专门代理：
 
-1. **Analyze**: Team leader uses reasoning 工具s to plan the approach
-2. **Search**: Web 代理 finds general 信息 using DuckDuckGo
-3. **Re搜索**: Finance 代理 retrieves financial data from trusted sources
-4. **Synthesize**: Team combines findings with visible reasoning process
-5. **Present**: Outputs structured data with supporting logic
+1. **分析**: 团队负责人使用推理工具规划方法
+2. **搜索**: 网络代理使用DuckDuckGo查找一般信息
+3. **研究**: 财务代理从可信来源检索财务数据
+4. **综合**: 团队结合发现结果并展示可见的推理过程
+5. **呈现**: 输出带有支持逻辑的结构化数据
 
-Reasoning 工具s provide transparency into how the 团队 thinks through complex queries.
+推理工具提供了团队如何思考复杂查询的透明度。
 
 ## 代码
 
@@ -83,18 +83,18 @@ team_leader.print_response(
 )
 ```
 
-## What to Expect
+## 期望结果
 
-The 团队 will re搜索 companies and stock prices by coordinating between web 搜索 and financial data 代理s. You'll 查看 the reasoning process as the 团队 plans its approach, delegates tasks, and synthesizes 信息.
+团队将通过协调网络搜索和财务数据代理来研究公司和股票价格。您将查看推理过程，了解团队如何规划方法、委派任务并综合信息。
 
-The output includes visible thinking through reasoning 工具s, showing how the 团队 decides which 代理 使用 and how to combine their findings. Financial data is presented in tables with sources from trusted financial news outlets.
+输出包括通过推理工具展示的可见思维，显示团队如何决定使用哪个代理以及如何结合他们的发现。财务数据以表格形式呈现，并附有来自可信财经新闻媒体的来源。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export ANTHROPIC_API_KEY=xxx
@@ -102,13 +102,13 @@ The output includes visible thinking through reasoning 工具s, showing how the 
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai anthropic ddgs exa-py
     ```
   </Step>
 
-  <Step title="Run Team">
+  <Step title="运行团队">
     <CodeGroup>
     ```bash Mac
     python reasoning_team.py
@@ -121,9 +121,9 @@ The output includes visible thinking through reasoning 工具s, showing how the 
   </Step>
 </Steps>
 
-## Next Steps
+## 下一步
 
-- Modify the query to re搜索 different types of companies or markets
-- Adjust `include_domains` in ExaTools to focus on specific financial sources
-- Toggle `show_full_reasoning` to control visibility of the thinking process
-- 探索 [Reasoning Tools](/basics/工具s/reasoning_工具s/reasoning-工具s) for advanced analytical capabilities
+- 修改查询以研究不同类型的公司或市场
+- 调整ExaTools中的`include_domains`以专注于特定的财务来源
+- 切换`show_full_reasoning`以控制思考过程的可见性
+- 探索 [推理工具](/basics/tools/reasoning_tools/reasoning-tools) 以获得高级分析能力

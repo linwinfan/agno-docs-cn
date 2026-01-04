@@ -1,9 +1,9 @@
 ---
-title: News Agency Team
+title: 新闻机构团队
 ---
 
 
-此示例展示 how 创建 a news agency 团队 that can 搜索 the web, write an article, and edit it.
+此示例展示如何创建一个新闻机构团队，该团队可以搜索网络、撰写文章并进行编辑。
 
 ## 代码
 
@@ -22,49 +22,49 @@ urls_file.parent.mkdir(parents=True, exist_ok=True)
 
 
 searcher = Agent(
-    name="Searcher",
-    role="Searches the top URLs for a topic",
+    name="搜索员",
+    role="搜索主题的顶级URL",
     instructions=[
-        "Given a topic, first generate a list of 3 search terms related to that topic.",
-        "For each search term, search the web and analyze the results.Return the 10 most relevant URLs to the topic.",
-        "You are writing for the New York Times, so the quality of the sources is important.",
+        "给定一个主题，首先生成3个与该主题相关的搜索词列表。",
+        "对每个搜索词，搜索网络并分析结果。返回与该主题最相关的10个URL。",
+        "您为《纽约时报》撰稿，因此来源的质量很重要。",
     ],
     tools=[DuckDuckGoTools()],
     add_datetime_to_context=True,
 )
 writer = Agent(
-    name="Writer",
-    role="Writes a high-quality article",
+    name="撰稿人",
+    role="撰写高质量文章",
     description=(
-        "You are a senior writer for the New York Times. Given a topic and a list of URLs, "
-        "your goal is to write a high-quality NYT-worthy article on the topic."
+        "您是《纽约时报》的资深撰稿人。给定一个主题和URL列表，"
+        "您的目标是撰写一篇符合《纽约时报》水准的高质量文章。"
     ),
     instructions=[
-        "First read all urls using `read_article`."
-        "Then write a high-quality NYT-worthy article on the topic."
-        "The article should be well-structured, informative, engaging and catchy.",
-        "Ensure the length is at least as long as a NYT cover story -- at a minimum, 15 paragraphs.",
-        "Ensure you provide a nuanced and balanced opinion, quoting facts where possible.",
-        "Focus on clarity, coherence, and overall quality.",
-        "Never make up facts or plagiarize. Always provide proper attribution.",
-        "Remember: you are writing for the New York Times, so the quality of the article is important.",
+        "首先使用`read_article`阅读所有URL。"
+        "然后撰写一篇符合《纽约时报》水准的高质量文章。"
+        "文章应结构良好、信息丰富、引人入胜且吸引人。",
+        "确保文章长度至少与《纽约时报》封面故事相当——至少15段。",
+        "确保提供细致入微且平衡的观点，在可能的情况下引用事实。",
+        "注重清晰度、连贯性和整体质量。",
+        "切勿编造事实或抄袭。始终提供适当的引用。",
+        "记住：您为《纽约时报》撰稿，因此文章质量很重要。",
     ],
     tools=[Newspaper4kTools()],
     add_datetime_to_context=True,
 )
 
 editor = Team(
-    name="Editor",
+    name="编辑",
     model=OpenAIChat("gpt-5-mini"),
     members=[searcher, writer],
-    description="You are a senior NYT editor. Given a topic, your goal is to write a NYT worthy article.",
+    description="您是《纽约时报》的资深编辑。给定一个主题，您的目标是撰写一篇符合《纽约时报》水准的文章。",
     instructions=[
-        "First ask the search journalist to search for the most relevant URLs for that topic.",
-        "Then ask the writer to get an engaging draft of the article.",
-        "Edit, proofread, and refine the article to ensure it meets the high standards of the New York Times.",
-        "The article should be extremely articulate and well written. "
-        "Focus on clarity, coherence, and overall quality.",
-        "Remember: you are the final gatekeeper before the article is published, so make sure the article is perfect.",
+        "首先要求搜索记者为该主题搜索最相关的URL。",
+        "然后要求撰稿人获取一篇引人入胜的文章草稿。",
+        "编辑、校对和润色文章，确保其符合《纽约时报》的高标准。",
+        "文章应该极其清晰且文笔优美。"
+        "注重清晰度、连贯性和整体质量。",
+        "记住：您是文章发布前的最后一道把关人，因此请确保文章完美无缺。",
     ],
     add_datetime_to_context=True,
     markdown=True,
@@ -81,19 +81,19 @@ editor.print_response("Write an article about latest developments in AI.")
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install openai ddgs newspaper4k lxml_html_clean
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/news_agency_team.py
         ```

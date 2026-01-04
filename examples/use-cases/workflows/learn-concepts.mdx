@@ -1,132 +1,132 @@
 ---
-title: Learn Workflow Concepts by Examples
-sidebarTitle: Workflow Concepts
-description: Progressive examples that teach Agno Workflows step by step, from basic sequential workflows to advanced orchestration patterns.
+title: 通过示例学习工作流概念
+sidebarTitle: 工作流概念
+description: 循序渐进的示例，逐步教授Agno工作流，从基础的顺序工作流到高级编排模式。
 ---
 
 
-学习 Agno Workflow concepts through hands-on 示例. These progressive tutorials build upon each other, introducing new capabilities and patterns as you advance.
+通过动手示例学习Agno工作流概念。这些循序渐进的教程相互构建，随着您的深入学习，逐步引入新的功能和模式。
 
-## Getting Started
+## 入门指南
 
-All 示例 are 可用的 in the [Agno cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/工作流s). Start with the basics and work your way through advanced concepts.
+所有示例均可在[Agno cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/工作流s)中找到。从基础开始，逐步深入到高级概念。
 
-## 示例s
+## 示例
 
 <CardGroup cols={3}>
   <Card
-    title="基础 Sequential Workflow"
+    title="基础顺序工作流"
     icon="arrow-right"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_01_basic_工作流s/_01_sequence_of_steps"
   >
-    Create your first 工作流 with 代理s executing in sequence, passing data from step to step.
+    创建您的第一个工作流，代理按顺序执行，将数据从一个步骤传递到下一个步骤。
   </Card>
   <Card
-    title="Workflow with Functions"
+    title="带函数的工作流"
     icon="code"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_01_basic_工作流s/_02_step_with_函数"
   >
-    Add custom Python 函数s as 工作流 steps for specialized processing logic.
+    添加自定义Python函数作为工作流步骤，用于专门的处理逻辑。
   </Card>
   <Card
-    title="Function-Based Workflow"
+    title="基于函数的工作流"
     icon="函数"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_01_basic_工作流s/_03_函数_instead_of_steps"
   >
-    Build 工作流s entirely with Python 函数s for complete control over execution.
+    完全使用Python函数构建工作流，以完全控制执行过程。
   </Card>
   <Card
-    title="Par所有el Execution"
+    title="并行执行"
     icon="arrows-split-up-and-left"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_04_工作流s_par所有el_execution"
   >
-    Execute multiple steps concurrently to improve performance and handle independent tasks.
+    并发执行多个步骤以提高性能并处理独立任务。
   </Card>
   <Card
-    title="Conditional Steps"
+    title="条件步骤"
     icon="code-branch"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_02_工作流s_conditional_execution"
   >
-    Add branching logic to your 工作流s based on conditions and step outputs.
+    根据条件和步骤输出为您的工作流添加分支逻辑。
   </Card>
   <Card
-    title="Loop Execution"
+    title="循环执行"
     icon="rotate"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_03_工作流s_loop_execution"
   >
-    Repeat steps until conditions are met, perfect for iterative refinement and quality control.
+    重复步骤直到满足条件，非常适合迭代优化和质量控制。
   </Card>
   <Card
-    title="Router Steps"
+    title="路由步骤"
     icon="sitemap"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_05_工作流s_conditional_branching"
   >
-    Create dynamic routing logic to select which steps execute based on 工作流 state.
+    创建动态路由逻辑，根据工作流状态选择执行哪些步骤。
   </Card>
   <Card
-    title="Workflow with Teams"
+    title="带团队的工作流"
     icon="people-group"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/blob/main/cookbook/06_代理_os/工作流/basic_工作流_团队.py"
   >
-    Orchestrate 团队s of 代理s within 工作流s for complex multi-代理 coordination.
+    在工作流中编排代理团队，实现复杂的多代理协调。
   </Card>
   <Card
-    title="Structured Input/Output"
+    title="结构化输入/输出"
     icon="table"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_06_advanced_basics/_01_structured_io_at_each_level"
   >
-    使用 structured data types for type-safe data flow between 工作流 steps.
+    使用结构化数据类型实现工作流步骤之间的类型安全数据流。
   </Card>
   <Card
-    title="Early Stopping"
+    title="提前终止"
     icon="stop"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_06_advanced_concepts/_02_early_stopping"
   >
-    Implement early termination logic to exit 工作流s when conditions are met.
+    实现提前终止逻辑，在满足条件时退出工作流。
   </Card>
   <Card
-    title="Shared Session State"
+    title="共享会话状态"
     icon="数据库"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_06_advanced_concepts/_04_shared_会话_state"
   >
-    Share state across 工作流 steps and maintain context throughout execution.
+    在工作流步骤之间共享状态，并在整个执行过程中保持上下文。
   </Card>
   <Card
-    title="Background Execution"
+    title="后台执行"
     icon="clock"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_06_advanced_concepts/_05_background_execution"
   >
-    Run 工作流s asynchronously in the background with polling or websocket updates.
+    在后台异步运行工作流，并通过轮询或WebSocket更新。
   </Card>
   <Card
-    title="Conversational Workflows"
+    title="对话式工作流"
     icon="comments"
     iconType="duotone"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s/_06_advanced_concepts/_08_工作流_代理"
   >
-    Create chat-like interactions with 工作流s using WorkflowAgent for natural conversations.
+    使用WorkflowAgent创建工作流的类聊天交互，实现自然对话。
   </Card>
 </CardGroup>
 
-## 探索 More 示例s
+## 探索更多示例
 
-Browse the complete collection of 工作流 示例 in the [Agno cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s).
+浏览[Agno cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/05_工作流s)中的完整工作流示例集合。
 
-## Related Documentation
+## 相关文档
 
-- [Workflows 概述](/basics/工作流s/over查看) - 学习 what 工作流s are and when 使用 them
-- [Workflow Patterns](/basics/工作流s/工作流-patterns/over查看) - 探索 different 工作流 patterns
-- [Running Workflows](/basics/工作流s/running-工作流s) - 学习如何 execute 工作流s
-- [Workflow Reference](/reference/工作流s/工作流) - Complete API reference
+- [工作流概述](/basics/工作流s/overview) - 学习工作流是什么以及何时使用它们
+- [工作流模式](/basics/工作流s/工作流-patterns/overview) - 探索不同的工作流模式
+- [运行工作流](/basics/工作流s/running-工作流s) - 学习如何执行工作流
+- [工作流参考](/reference/工作流s/工作流) - 完整的API参考

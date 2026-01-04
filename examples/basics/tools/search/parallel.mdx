@@ -1,6 +1,6 @@
 ---
-title: Parallel Tools
-description: Use Parallel with Agno for AI-optimized web search and content extraction.
+title: Parallel 工具
+description: 将 Parallel 与 Agno 结合使用，实现 AI 优化的网络搜索和内容提取。
 ---
 
 
@@ -22,14 +22,14 @@ agent = Agent(
     markdown=True,
 )
 
-# Should use parallel_search
+# 应使用 parallel_search
 agent.print_response(
-    "Search for the latest information on 'AI agents and autonomous systems' and summarize the key findings"
+    "搜索有关'AI智能体和自主系统'的最新信息并总结关键发现"
 )
 
-# Should use parallel_extract
+# 应使用 parallel_extract
 agent.print_response(
-    "Extract information about the product features from https://parallel.ai and https://docs.parallel.ai"
+    "从 https://parallel.ai 和 https://docs.parallel.ai 提取有关产品功能的信息"
 )
 ```
 
@@ -38,20 +38,20 @@ agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export PARALLEL_API_KEY=xxx
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U parallel-web openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/parallel_tools.py

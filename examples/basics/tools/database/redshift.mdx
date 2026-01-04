@@ -1,22 +1,22 @@
 ---
-title: Redshift Tools
-sidebarTitle: Redshift Tools
-keywords: [redshift, aws, database, sql, data warehouse]
-description: This example demonstrates how to use RedshiftTools to enable an Agent to interact with Amazon Redshift data warehouses, supporting both standard and IAM authentication.
+title: Redshift 工具
+sidebarTitle: Redshift 工具
+keywords: [redshift, aws, 数据库, sql, 数据仓库]
+description: 本示例演示如何使用 RedshiftTools 使智能体能够与 Amazon Redshift 数据仓库交互，支持标准和 IAM 身份验证。
 mode: wide
 ---
 
 
 <Steps>
 
-  <Step title="Create a Python file">
-    Create a Python file and add the code below.
+  <Step title="创建一个 Python 文件">
+    创建一个 Python 文件并添加以下代码。
     ```bash
     touch redshift_tools.py
     ```
   </Step>
 
-  <Step title="Add the following code to your Python file">
+  <Step title="将以下代码添加到你的 Python 文件中">
     ```python redshift_tools.py
     from agno.agent import Agent
     from agno.models.openai import OpenAIChat
@@ -30,40 +30,40 @@ mode: wide
                 table_schema="public",
             )
         ],
-        name="Redshift Agent",
-        description="An agent that can query and analyze data in Amazon Redshift.",
+        name="Redshift 智能体",
+        description="一个可以在 Amazon Redshift 中查询和分析数据的智能体。",
         instructions=[
-            "You are a data analyst assistant with access to a Redshift data warehouse.",
-            "Use the available tools to list tables, describe schemas, and run SQL queries.",
-            "Always inspect queries before running them to ensure they are optimized.",
-            "Provide clear explanations of your findings.",
+            "你是可以访问 Redshift 数据仓库的数据分析师助手。",
+            "使用可用的工具列出表、描述模式并运行 SQL 查询。",
+            "在运行查询之前始终检查它们以确保已优化。",
+            "提供清晰的发现解释。",
         ],
         markdown=True,
     )
 
-    # List tables and describe one
+    # 列出表并描述其中一个
     response = agent.run(
-        "List all tables in the database and describe the schema of the sales table."
+        "列出数据库中的所有表并描述销售表的模式。"
     )
-    print(f"Agent Response:\n{response.content}\n")
+    print(f"智能体响应:\n{response.content}\n")
 
-    # Run a query
+    # 运行查询
     response = agent.run(
-        "Write and run a query to get the top 10 customers by total revenue."
+        "编写并运行一个查询以获取总收入排名前 10 的客户。"
     )
-    print(f"Agent Response:\n{response.content}")
+    print(f"智能体响应:\n{response.content}")
     ```
   </Step>
 
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai redshift-connector
     ```
   </Step>
 
-  <Step title="Export your OpenAI API key">
+  <Step title="导出你的 OpenAI API 密钥">
     <CodeGroup>
     ```bash Mac/Linux
       export OPENAI_API_KEY="your_openai_api_key_here"
@@ -75,8 +75,8 @@ mode: wide
     </CodeGroup>
   </Step>
 
-  <Step title="Set your Redshift connection details">
-    Set your AWS credentials and Redshift connection details:
+  <Step title="设置你的 Redshift 连接详情">
+    设置你的 AWS 凭据和 Redshift 连接详情：
     <CodeGroup>
     ```bash Mac/Linux
       export REDSHIFT_HOST="your-cluster.abc123.us-east-1.redshift.amazonaws.com"
@@ -96,7 +96,7 @@ mode: wide
     </CodeGroup>
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python redshift_tools.py
@@ -108,8 +108,8 @@ mode: wide
     </CodeGroup>
   </Step>
 
-  <Step title="Find All Cookbooks">
-  Explore all the available cookbooks in the Agno repository. Click the link below to view the code on GitHub:
+  <Step title="查找所有示例代码">
+  浏览 Agno 仓库中所有可用的示例代码。点击下面的链接在 GitHub 上查看代码：
 
   <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/14_tools" target="_blank">
     Agno Tools Cookbooks on GitHub

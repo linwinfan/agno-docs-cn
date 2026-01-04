@@ -31,32 +31,32 @@ class CustomerProfileEvent(CustomEvent):
 @tool()
 async def get_customer_profile():
     """
-    Get customer profiles.
+    获取客户档案。
     """
 
     yield CustomerProfileEvent(
-        customer_name="John Doe",
-        customer_email="john.doe@example.com",
-        customer_phone="1234567890",
+        customer_name="张三",
+        customer_email="zhang.san@example.com",
+        customer_phone="13800138000",
     )
 
 
-# Setup an Agent with our custom tool.
+# 使用我们的自定义工具设置代理。
 agent = Agent(
     model=OpenAIChat(id="gpt-4o"),
     tools=[get_customer_profile],
-    instructions="Your task is to retrieve customer profiles for the user.",
+    instructions="您的任务是为用户检索客户档案。",
 )
 
 
 async def run_agent():
-    # Running the Agent: it should call our custom tool and yield the custom event
+    # 运行代理：它应该调用我们的自定义工具并产生自定义事件
     async for event in agent.arun(
-        "Hello, can you get me the customer profile for customer with ID 123?",
+        "你好，你能帮我获取 ID 为 123 的客户的档案吗？",
         stream=True,
     ):
         if isinstance(event, CustomEvent):
-            print(f"✅ Custom event emitted: {event}")
+            print(f"✅ 自定义事件已发出：{event}")
 
 
 asyncio.run(run_agent())

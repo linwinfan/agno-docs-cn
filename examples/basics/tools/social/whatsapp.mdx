@@ -1,5 +1,5 @@
 ---
-title: WhatsApp Tools
+title: WhatsApp 工具
 ---
 
 
@@ -16,10 +16,10 @@ agent = Agent(
     tools=[WhatsAppTools()],
 )
 
-# Example: Send a template message
-# Note: Replace '''hello_world''' with your actual template name
+# 示例：发送模板消息
+# 注意：将'''hello_world'''替换为您实际的模板名称
 agent.print_response(
-    "Send a template message using the '''hello_world''' template in English to +91 1234567890"
+    "使用英文的'''hello_world'''模板向+91 1234567890发送模板消息"
 )
 ```
 
@@ -28,27 +28,27 @@ agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set up WhatsApp Business API">
-    1. Go to [Meta for Developers](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
-    2. Create a Meta App and set up the WhatsApp Business API.
-    3. Obtain your Phone Number ID and a permanent System User Access Token.
+  <Step title="设置WhatsApp Business API">
+    1. 前往 [Meta for Developers](https://developers.facebook.com/docs/whatsapp/cloud-api/get-started)
+    2. 创建Meta应用并设置WhatsApp Business API。
+    3. 获取您的电话号码ID和永久系统用户访问令牌。
   </Step>
 
-  <Step title="Set your API keys and identifiers">
+  <Step title="设置您的API密钥和标识符">
     ```bash
     export WHATSAPP_ACCESS_TOKEN=xxx
     export WHATSAPP_PHONE_NUMBER_ID=xxx
-    export OPENAI_API_KEY=xxx # Or your preferred LLM API key
+    export OPENAI_API_KEY=xxx # 或您首选的LLM API密钥
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
-    pip install -U agno openai google-generativeai # Add any other necessary WhatsApp SDKs
+    pip install -U agno openai google-generativeai # 添加任何其他必要的WhatsApp SDK
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/whatsapp_tools.py

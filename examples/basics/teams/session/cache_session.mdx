@@ -1,21 +1,21 @@
 ---
-title: Session Caching for Performance
+title: 会话缓存以提升性能
 ---
 
 
-此示例演示 how to enable 会话 caching to store 团队 会话s in 内存 for faster access and improved performance.
+此示例演示如何启用会话缓存，将会话存储在内存中以实现更快的访问和提升性能。
 
 ## 代码
 
 ```python cookbook/02_examples/teams/session/08_cache_session.py
-"""Example of how to cache the team session in memory for faster access."""
+"""将会话缓存在内存中以实现更快访问的示例。"""
 
 from agno.agent import Agent
 from agno.db.postgres import PostgresDb
 from agno.models.openai import OpenAIChat
 from agno.team import Team
 
-# Setup the database
+# 设置数据库
 db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
 db = PostgresDb(db_url=db_url, session_table="sessions")
 
@@ -24,18 +24,18 @@ agent = Agent(
     name="Research Assistant",
 )
 
-# Setup the team
+# 设置团队
 team = Team(
     model=OpenAIChat(id="gpt-5-mini"),
     members=[agent],
     db=db,
     session_id="team_session_cache",
     add_history_to_context=True,
-    # Activate session caching. The session will be cached in memory for faster access.
+    # 激活会话缓存。会话将在内存中缓存以实现更快的访问。
     cache_session=True,
 )
 
-team.print_response("Tell me a new interesting fact about space")
+team.print_response("告诉我一个关于太空的有趣新事实")
 ```
 
 ## 用法
@@ -44,25 +44,25 @@ team.print_response("Tell me a new interesting fact about space")
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno psycopg2-binary
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Start PostgreSQL database">
+    <Step title="启动 PostgreSQL 数据库">
         ```bash
         cookbook/run_pgvector.sh
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/session/08_cache_session.py
         ```

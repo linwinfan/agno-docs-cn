@@ -1,5 +1,5 @@
 ---
-title: DuckDuckGo Search
+title: DuckDuckGo 搜索
 ---
 
 
@@ -10,14 +10,14 @@ from agno.agent import Agent
 from agno.tools.duckduckgo import DuckDuckGoTools
 
 agent = Agent(tools=[DuckDuckGoTools()])
-agent.print_response("Whats happening in France?", markdown=True)
+agent.print_response("法国发生了什么？", markdown=True)
 
-# We will search DDG but limit the site to Politifact
+# 我们将搜索 DDG 但限制站点为 Politifact
 agent = Agent(
     tools=[DuckDuckGoTools(modifier="site:politifact.com")]
 )
 agent.print_response(
-    "Is Taylor Swift promoting energy-saving devices with Elon Musk?", markdown=False
+    "Taylor Swift 是否在与 Elon Musk 一起推广节能设备？", markdown=False
 )
 ```
 
@@ -26,19 +26,19 @@ agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U ddgs openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/duckduckgo_tools.py

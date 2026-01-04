@@ -1,33 +1,33 @@
 ---
-title: HackerNews Team
+title: HackerNews 团队
 mode: wide
 ---
 
 
-Build a 团队 that aggregates, curates, and analyzes trending HackerNews stories. This 示例 combines multiple specialized 代理s to re搜索 topics, read articles, and generate comprehensive summaries with structured output.
+构建一个聚合、策划和分析热门HackerNews故事的团队。此示例结合了多个专门代理来搜索主题、阅读文章并生成具有结构化输出的综合摘要。
 
-## What You'll 学习
+## 您将学习的内容
 
-By building this 团队, you'll 理解:
-- How to integrate multiple data sources (HackerNews API, web 搜索, article readers)
-- How to define structured output schemas using Pydantic 模型s
-- How to coordinate 代理s with specific 说明 for complex 工作流s
-- How to combine real-time data with web re搜索 for comprehensive analysis
+通过构建此团队，您将理解：
+- 如何集成多个数据源（HackerNews API、网络搜索、文章阅读器）
+- 如何使用Pydantic模型定义结构化输出模式
+- 如何协调具有特定说明的代理以处理复杂工作流
+- 如何将实时数据与网络搜索结合进行全面分析
 
-## 使用 Cases
+## 使用案例
 
-Build news aggregation platforms, trend analysis systems, content curation 工具s, or automated newsletter generators.
+构建新闻聚合平台、趋势分析系统、内容策划工具或自动化通讯生成器。
 
-## How It Works
+## 工作原理
 
-The 团队 coordinates three specialized 代理s 创建 详细信息ed articles:
+团队协调三个专门代理创建详细的文章：
 
-1. **发现**: HackerNews re搜索er finds trending stories from HackerNews
-2. **Read**: Article reader extracts full content from story URLs
-3. **Re搜索**: Web 搜索er finds additional context and 相关 信息
-4. **Synthesize**: Team combines 所有 findings into structured articles with summaries and references
+1. **发现**: HackerNews搜索器从HackerNews找到热门故事
+2. **阅读**: 文章阅读器从故事URL提取完整内容
+3. **搜索**: 网络搜索器查找额外的上下文和相关信息
+4. **综合**: 团队将所有发现结合成带有摘要和引用的结构化文章
 
-The 团队 outputs structured data following a defined schema with title, summary, and reference 链接s.
+团队输出遵循定义模式的结构化数据，包含标题、摘要和参考链接。
 
 ## 代码
 
@@ -89,30 +89,30 @@ hn_team = Team(
 hn_team.print_response("Write an article about the top 2 stories on hackernews")
 ```
 
-## What to Expect
+## 期望结果
 
-The 团队 will re搜索 HackerNews stories, read the full articles, and 搜索 for additional context. Each 代理 contributes their specialized capability: finding stories, extracting article content, and web re搜索.
+团队将搜索HackerNews故事、阅读完整文章并搜索额外上下文。每个代理贡献其专业能力：发现故事、提取文章内容和网络搜索。
 
-The output is a structured Article object with a title, comprehensive summary, and reference 链接s. You'll 查看 responses from 所有 团队 成员 showing how they collaborate to gather and synthesize 信息.
+输出是一个结构化的Article对象，包含标题、综合摘要和参考链接。您将查看来自所有团队成员的响应，展示他们如何协作收集和综合信息。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的API密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai ddgs newspaper4k lxml_html_clean
     ```
   </Step>
 
-  <Step title="Run Team">
+  <Step title="运行团队">
     <CodeGroup>
     ```bash Mac
     python hackernews_team.py
@@ -125,10 +125,10 @@ The output is a structured Article object with a title, comprehensive summary, a
   </Step>
 </Steps>
 
-## Next Steps
+## 下一步
 
-- Modify the query to track specific topics or keywords on HackerNews
-- Adjust the `Article` schema to include additional fields like categories or sentiment
-- Change the number of stories analyzed in the prompt
-- 探索 [Input & Output](/basics/input-output/over查看) for custom data schemas
+- 修改查询以跟踪HackerNews上的特定主题或关键词
+- 调整`Article`模式以包含其他字段，如类别或情感
+- 更改提示中分析的故事数量
+- 探索 [输入与输出](/basics/input-output/overview) 以了解自定义数据模式
 

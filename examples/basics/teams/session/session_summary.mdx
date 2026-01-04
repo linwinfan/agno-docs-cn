@@ -1,15 +1,15 @@
 ---
-title: Session Summary Management
+title: 会话摘要管理
 ---
 
 
-此示例展示 how 使用 会话 summary to store and maintain conversation summaries for better context management over long conversations.
+此示例展示如何使用会话摘要来存储和维护对话摘要，以便在长对话中更好地管理上下文。
 
 ## 代码
 
 ```python 03_session_summary.py
 """
-This example shows how to use the session summary to store the conversation summary.
+此示例展示如何使用会话摘要来存储对话摘要。
 """
 
 from agno.agent.agent import Agent
@@ -22,7 +22,7 @@ db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
 
 db = PostgresDb(db_url=db_url, session_table="sessions")
 
-# Method 1: Set enable_session_summaries to True
+# 方法 1：将 enable_session_summaries 设置为 True
 
 agent = Agent(
     model=OpenAIChat(id="gpt-5-mini"),
@@ -35,10 +35,10 @@ team = Team(
     enable_session_summaries=True,
 )
 
-team.print_response("Hi my name is John and I live in New York")
-team.print_response("I like to play basketball and hike in the mountains")
+team.print_response("你好，我叫约翰，住在纽约")
+team.print_response("我喜欢打篮球和在山里徒步")
 
-# Method 2: Set session_summary_manager
+# 方法 2：设置 session_summary_manager
 
 # session_summary_manager = SessionSummaryManager(model=OpenAIChat(id="gpt-5-mini"))
 
@@ -53,8 +53,8 @@ team.print_response("I like to play basketball and hike in the mountains")
 #     session_summary_manager=session_summary_manager,
 # )
 
-# team.print_response("Hi my name is John and I live in New York")
-# team.print_response("I like to play basketball and hike in the mountains")
+# team.print_response("你好，我叫约翰，住在纽约")
+# team.print_response("我喜欢打篮球和在山里徒步")
 ```
 
 ## 用法
@@ -63,25 +63,25 @@ team.print_response("I like to play basketball and hike in the mountains")
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno psycopg2-binary
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Start PostgreSQL database">
+    <Step title="启动 PostgreSQL 数据库">
         ```bash
         cookbook/run_pgvector.sh
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python 03_session_summary.py
         ```

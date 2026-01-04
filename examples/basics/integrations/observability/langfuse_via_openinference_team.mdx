@@ -1,5 +1,5 @@
 ---
-title: Teams with Langfuse Via Openinference
+title: 使用 Langfuse 通过 Openinference 进行团队协作
 ---
 
 
@@ -25,10 +25,10 @@ LANGFUSE_AUTH = base64.b64encode(
     f"{os.getenv('LANGFUSE_PUBLIC_KEY')}:{os.getenv('LANGFUSE_SECRET_KEY')}".encode()
 ).decode()
 os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"] = (
-    "https://us.cloud.langfuse.com/api/public/otel"  # 🇺🇸 US data region
+    "https://us.cloud.langfuse.com/api/public/otel"  # 🇺🇸 美国数据区域
 )
-# os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"]="https://cloud.langfuse.com/api/public/otel" # 🇪🇺 EU data region
-# os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"]="http://localhost:3000/api/public/otel" # 🏠 Local deployment (>= v3.22.0)
+# os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"]="https://cloud.langfuse.com/api/public/otel" # 🇪🇺 欧洲数据区域
+# os.environ["OTEL_EXPORTER_OTLP_ENDPOINT"]="http://localhost:3000/api/public/otel" # 🏠 本地部署 (>= v3.22.0)
 
 os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = f"Authorization=Basic {LANGFUSE_AUTH}"
 
@@ -37,40 +37,40 @@ tracer_provider = TracerProvider()
 tracer_provider.add_span_processor(SimpleSpanProcessor(OTLPSpanExporter()))
 trace_api.set_tracer_provider(tracer_provider=tracer_provider)
 
-# Start instrumenting agno
+# 开始检测 agno
 AgnoInstrumentor().instrument()
 
-# First agent for article summarization
+# 第一个智能体用于文章摘要
 article_agent = Agent(
-    name="Article Summarization Agent",
-    role="Summarize articles from URLs",
+    name="文章摘要智能体",
+    role="从 URL 摘要文章",
     id="article-summarizer",
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[Newspaper4kTools()],
     instructions=[
-        "You are a content summarization specialist.",
-        "Extract key information from articles and create concise summaries.",
-        "Focus on main points, facts, and insights.",
+        "您是内容摘要专家。",
+        "从文章中提取关键信息并创建简洁的摘要。",
+        "关注要点、事实和见解。",
     ],
 )
 
-# Second agent for news research
+# 第二个智能体用于新闻研究
 news_research_agent = Agent(
-    name="News Research Agent",
-    role="Research and find related news",
+    name="新闻研究智能体",
+    role="研究并查找相关新闻",
     id="news-research",
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[DuckDuckGoTools()],
     instructions=[
-        "You are a news research analyst.",
-        "Find relevant and recent news articles on given topics.",
-        "Always provide reliable sources and context.",
+        "您是新闻研究分析师。",
+        "查找给定主题的相关和最新新闻文章。",
+        "始终提供可靠的来源和背景。",
     ],
 )
 
-# Create team with both agents
+# 创建包含两个智能体的团队
 news_analysis_team = Team(
-    name="News Analysis Team",
+    name="新闻分析团队",
     id=str(uuid4()),
     user_id=str(uuid4()),
     model=OpenAIChat(id="gpt-5-mini"),
@@ -79,9 +79,9 @@ news_analysis_team = Team(
         news_research_agent,
     ],
     instructions=[
-        "Coordinate between article summarization and news research.",
-        "First summarize any provided articles, then find related news.",
-        "Combine information to provide comprehensive analysis.",
+        "协调文章摘要和新闻研究之间的工作。",
+        "首先摘要提供的文章，然后查找相关新闻。",
+        "结合信息以提供全面的分析。",
     ],
     show_members_responses=True,
     markdown=True,
@@ -99,21 +99,21 @@ if __name__ == "__main__":
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
-  Either self-host or sign up for an account at https://us.cloud.langfuse.com
+  <Step title="设置您的 API 密钥">
+  自托管或在 https://us.cloud.langfuse.com 注册账户
     ```bash
     export LANGFUSE_PUBLIC_KEY=<your-key>
     export LANGFUSE_SECRET_KEY=<your-key>
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai ddgs newspaper4k langfuse opentelemetry-sdk opentelemetry-exporter-otlp openinference-instrumentation-agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/13_integrations/observability/langfuse_via_openinference_team.py

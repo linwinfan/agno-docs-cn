@@ -1,18 +1,17 @@
 ---
-title: Async Multi-Purpose Reasoning Team
+title: 异步多用途推理团队
 ---
 
 
-此示例演示 an asynchronous multi-purpose reasoning 团队 that uses reasoning 工具s to analyze questions and delegate to appropriate specialist 代理s asynchronously, showcasing coordination and intelligent task routing.
+此示例演示一个异步多用途推理团队，该团队使用推理工具来分析问题并异步委派给适当的专家代理，展示协调和智能任务路由。
 
 ## 代码
 
 ```python cookbook/02_examples/teams/reasoning/02_async_multi_purpose_reasoning_team.py
 """
-This example demonstrates an async multi-purpose reasoning team.
+此示例演示一个异步多用途推理团队。
 
-The team uses reasoning tools to analyze questions and delegate to appropriate
-specialist agents asynchronously, showcasing coordination and intelligent task routing.
+团队使用推理工具来分析问题并异步委派给适当的专家代理，展示协调和智能任务路由。
 """
 
 import asyncio
@@ -36,20 +35,20 @@ from agno.vectordb.search import SearchType
 
 cwd = Path(__file__).parent.resolve()
 
-# Web search agent
+# 网络搜索代理
 web_agent = Agent(
     name="Web Agent",
-    role="Search the web for information",
+    role="搜索网络信息",
     model=Claude(id="claude-3-5-sonnet-latest"),
     tools=[DuckDuckGoTools(cache_results=True)],
-    instructions=["Always include sources"],
+    instructions=["始终包含来源"],
 )
 
-# Financial data agent
+# 金融数据代理
 finance_agent = Agent(
     name="Finance Agent",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    role="Get financial data",
+    role="获取金融数据",
     tools=[
         ExaTools(
             include_domains=["cnbc.com", "reuters.com", "bloomberg.com", "wsj.com"],
@@ -59,38 +58,38 @@ finance_agent = Agent(
         )
     ],
     instructions=[
-        "You are a finance agent that can get financial data about stocks, companies, and the economy.",
-        "Always use real-time data when possible.",
+        "您是一个可以获取股票、公司和经济金融数据的金融代理。",
+        "尽量使用实时数据。",
     ],
 )
 
-# Medical research agent
+# 医学研究代理
 medical_agent = Agent(
     name="Medical Agent",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    role="Medical researcher",
+    role="医学研究员",
     tools=[PubmedTools()],
     instructions=[
-        "You are a medical agent that can answer questions about medical topics.",
-        "Always search for recent medical literature and evidence.",
+        "您是一个可以回答医学话题问题的医学代理。",
+        "始终搜索最新的医学文献和证据。",
     ],
 )
 
-# Calculator agent
+# 计算器代理
 calculator_agent = Agent(
     name="Calculator Agent",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    role="Perform mathematical calculations",
+    role="执行数学计算",
     tools=[
         CalculatorTools()
     ],
     instructions=[
-        "Perform accurate mathematical calculations.",
-        "Show your work step by step.",
+        "执行准确的数学计算。",
+        "逐步显示您的工作。",
     ],
 )
 
-# Agno documentation knowledge base
+# Agno 文档知识库
 agno_assist_knowledge = Knowledge(
     vector_db=LanceDb(
         uri="tmp/lancedb",
@@ -100,12 +99,12 @@ agno_assist_knowledge = Knowledge(
     ),
 )
 
-# Agno framework assistant
+# Agno 框架助手
 agno_assist = Agent(
     name="Agno Assist",
-    role="Help with Agno framework questions and code",
+    role="帮助解决 Agno 框架问题和代码",
     model=OpenAIChat(id="gpt-5-mini"),
-    instructions="Search your knowledge before answering. Help write working Agno code.",
+    instructions="回答前先搜索您的知识。帮助编写可用的 Agno 代码。",
     tools=[
         KnowledgeTools(
             knowledge=agno_assist_knowledge, add_instructions=True, add_few_shot=True
@@ -115,24 +114,24 @@ agno_assist = Agent(
     add_datetime_to_context=True,
 )
 
-# Code execution agent
+# 代码执行代理
 code_agent = Agent(
     name="Code Agent",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    role="Execute and test code",
+    role="执行和测试代码",
     tools=[E2BTools()],
     instructions=[
-        "Execute code safely in the sandbox environment.",
-        "Test code thoroughly before providing results.",
-        "Provide clear explanations of code execution.",
+        "在沙盒环境中安全执行代码。",
+        "在提供结果前彻底测试代码。",
+        "提供清晰的代码执行解释。",
     ],
 )
 
-# Create multi-purpose reasoning team
+# 创建多用途推理团队
 agent_team = Team(
     name="Multi-Purpose Agent Team",
     model=Claude(id="claude-3-5-sonnet-latest"),
-    tools=[ReasoningTools()],  # Enable reasoning capabilities
+    tools=[ReasoningTools()],  # 启用推理功能
     members=[
         web_agent,
         finance_agent,
@@ -142,11 +141,11 @@ agent_team = Team(
         code_agent,
     ],
     instructions=[
-        "You are a team of agents that can answer a variety of questions.",
-        "Use reasoning tools to analyze questions before delegating.",
-        "You can answer directly or forward to appropriate specialist agents.",
-        "For complex questions, reason about the best approach first.",
-        "If the user is just being conversational, respond directly without tools.",
+        "您是一个可以回答各种问题的代理团队。",
+        "委派前使用推理工具分析问题。",
+        "您可以直接回答或转发给适当的专家代理。",
+        "对于复杂问题，首先推理最佳方法。",
+        "如果用户只是在进行对话，请直接回应而不使用工具。",
     ],
     markdown=True,
     show_members_responses=True,
@@ -155,36 +154,36 @@ agent_team = Team(
 
 
 async def main():
-    """Main async function to demonstrate different team capabilities."""
+    """主异步函数，用于演示不同团队功能。"""
 
-    # Add Agno documentation content
+    # 添加 Agno 文档内容
     await agno_assist_knowledge.add_contents_async(url="https://docs.agno.com/llms-full.txt")
 
-    # Example interactions:
+    # 示例交互：
 
-    # 1. General capability query
-    await agent_team.aprint_response(input="Hi! What are you capable of doing?")
+    # 1. 一般功能查询
+    await agent_team.aprint_response(input="你好！您能做什么？")
 
-    # 2. Technical code question
+    # 2. 技术代码问题
     # await agent_team.aprint_response(dedent("""
-    #     Create a minimal Agno Agent that searches Hacker News for articles.
-    #     Test it locally and save it as './python/hacker_news_agent.py'.
-    #     Use real Agno documentation, don't mock anything.
+    #     创建一个最小的 Agno 代理，用于搜索 Hacker News 上的文章。
+    #     在本地测试并保存为 './python/hacker_news_agent.py'。
+    #     使用真实的 Agno 文档，不要模拟任何内容。
     # """), stream=True)
 
-    # 3. Financial research
+    # 3. 金融研究
     # await agent_team.aprint_response(dedent("""
-    #     What should I be investing in right now?
-    #     Research current market trends and write a detailed report
-    #     suitable for a financial advisor.
+    #     我现在应该投资什么？
+    #     研究当前市场趋势并编写详细的报告
+    #     适合金融顾问使用。
     # """), stream=True)
 
-    # 4. Medical analysis (using external medical history file)
+    # 4. 医学分析（使用外部医学历史文件）
     # txt_path = Path(__file__).parent.resolve() / "medical_history.txt"
     # if txt_path.exists():
     #     loaded_txt = open(txt_path, "r").read()
     #     await agent_team.aprint_response(
-    #         f"Analyze this medical information and suggest a likely diagnosis:\n{loaded_txt}",
+    #         f"分析这些医学信息并建议可能的诊断：\n{loaded_txt}",
     #         stream=True,
     #     )
 
@@ -199,13 +198,13 @@ if __name__ == "__main__":
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno lancedb exa_py ddgs pubmed-parser e2b
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         export ANTHROPIC_API_KEY=****
@@ -214,7 +213,7 @@ if __name__ == "__main__":
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/reasoning/02_async_multi_purpose_reasoning_team.py
         ```

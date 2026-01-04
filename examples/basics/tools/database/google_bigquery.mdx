@@ -1,5 +1,5 @@
 ---
-title: Google BigQuery Tools
+title: Google BigQuery 工具
 ---
 
 
@@ -11,15 +11,15 @@ from agno.tools.google_bigquery import GoogleBigQueryTools
 
 agent = Agent(
     instructions=[
-        "You are a data analyst assistant that helps with BigQuery operations",
-        "Execute SQL queries to analyze large datasets",
-        "Provide insights and summaries of query results",
+        "你是帮助处理 BigQuery 操作的数据分析师助手",
+        "执行 SQL 查询以分析大型数据集",
+        "提供查询结果的见解和摘要",
     ],
     tools=[GoogleBigQueryTools(dataset="your_dataset_name")],
     markdown=True,
 )
 
-agent.print_response("List all tables in the dataset and describe the sales table")
+agent.print_response("列出数据集中的所有表并描述销售表")
 ```
 
 ## 用法
@@ -27,7 +27,7 @@ agent.print_response("List all tables in the dataset and describe the sales tabl
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your credentials">
+  <Step title="设置你的凭据">
     ```bash
     export GOOGLE_CLOUD_PROJECT=your-project-id
     export GOOGLE_CLOUD_LOCATION=US
@@ -36,13 +36,13 @@ agent.print_response("List all tables in the dataset and describe the sales tabl
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U google-cloud-bigquery openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/google_bigquery_tools.py

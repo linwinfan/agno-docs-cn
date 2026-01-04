@@ -3,7 +3,7 @@ title: Agent Ops
 ---
 
 
-此示例展示 how to add observability to your agno 代理 with Agent Ops.
+此示例展示如何为您的 agno 智能体添加 Agent Ops 可观测性。
 
 ## 代码
 
@@ -12,14 +12,14 @@ import agentops
 from agno.agent import Agent
 from agno.models.openai import OpenAIChat
 
-# Initialize AgentOps
+# 初始化 AgentOps
 agentops.init()
 
-# Create and run an agent
+# 创建并运行智能体
 agent = Agent(model=OpenAIChat(id="gpt-5-mini"))
 response = agent.run("Share a 2 sentence horror story")
 
-# Print the response
+# 打印响应
 print(response.content)
 
 ```
@@ -29,20 +29,20 @@ print(response.content)
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
-  Obtain an API key from https://app.agentops.ai/
+  <Step title="设置您的 API 密钥">
+  从 https://app.agentops.ai/ 获取 API 密钥
     ```bash
     export AGENTOPS_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno agentops openai
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/13_integrations/observability/agent_ops.py
@@ -53,8 +53,8 @@ print(response.content)
     ```
     </CodeGroup>
 
-    <Step title="Set your API key">
-    You can view the logs in the AgentOps dashboard: https://app.agentops.ai/
+    <Step title="查看日志">
+    您可以在 AgentOps 仪表板中查看日志：https://app.agentops.ai/
   </Step>
   </Step>
 </Steps>

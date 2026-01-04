@@ -1,5 +1,5 @@
 ---
-title: Postgres Tools
+title: Postgres 工具
 ---
 
 
@@ -13,7 +13,7 @@ agent = Agent(
     tools=[PostgresTools(db_url="postgresql://user:pass@localhost:5432/db")],
         markdown=True,
 )
-agent.print_response("Show me all tables in the database")
+agent.print_response("显示数据库中的所有表")
 ```
 
 ## 用法
@@ -21,25 +21,25 @@ agent.print_response("Show me all tables in the database")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置你的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Set your database URL">
+  <Step title="设置你的数据库 URL">
     ```bash
     export DATABASE_URL=postgresql://user:pass@localhost:5432/db
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U psycopg2-binary sqlalchemy openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/postgres_tools.py

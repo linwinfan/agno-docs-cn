@@ -1,5 +1,5 @@
 ---
-title: Valyu Tools
+title: Valyu 工具
 ---
 
 
@@ -11,15 +11,15 @@ from agno.tools.valyu import ValyuTools
 
 agent = Agent(
     instructions=[
-        "You are a research assistant that helps find academic papers and web content",
-        "Use Valyu to search for high-quality, relevant information",
-        "Provide detailed analysis of search results with relevance scores",
+        "您是一个帮助查找学术论文和网络内容的研究助手",
+        "使用 Valyu 搜索高质量、相关的信息",
+        "提供带有相关性评分的搜索结果详细分析",
     ],
     tools=[ValyuTools()],
     markdown=True,
 )
 
-agent.print_response("Find recent research papers about machine learning in healthcare")
+agent.print_response("查找关于医疗保健中机器学习的最新研究论文")
 ```
 
 ## 用法
@@ -27,20 +27,20 @@ agent.print_response("Find recent research papers about machine learning in heal
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API keys">
+  <Step title="设置您的 API 密钥">
     ```bash
     export VALYU_API_KEY=your-valyu-api-key
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U valyu openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/valyu_tools.py

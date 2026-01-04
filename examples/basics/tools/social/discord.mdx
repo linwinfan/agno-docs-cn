@@ -1,5 +1,5 @@
 ---
-title: Discord Tools
+title: Discord 工具
 ---
 
 
@@ -12,8 +12,8 @@ from agno.tools.discord import DiscordTools
 discord_agent = Agent(
     name="Discord Agent",
     instructions=[
-        "You are a Discord bot that can perform various operations.",
-        "You can send messages, read message history, manage channels, and delete messages.",
+        "您是一个可以执行各种操作的Discord机器人。",
+        "您可以发送消息、读取消息历史、管理频道和删除消息。",
     ],
     tools=[
         DiscordTools(
@@ -49,20 +49,20 @@ discord_agent.print_response(
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your Discord token">
+  <Step title="设置您的Discord令牌">
     ```bash
     export DISCORD_BOT_TOKEN=xxx
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U discord.py openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行代理">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/discord_tools.py

@@ -2,7 +2,7 @@
 title: Maxim
 ---
 
-此示例展示 how to instrument your agno 代理 and send traces to Maxim AI. We are building a simple Financial Conversation Agent.
+此示例展示如何为您的 agno 智能体添加检测并将跟踪信息发送到 Maxim AI。我们正在构建一个简单的金融对话智能体。
 
 
 # 代码 
@@ -22,58 +22,58 @@ except ImportError:
         "`maxim` not installed. Please install using `pip install maxim-py`"
     )
 
-# Instrument Agno with Maxim for automatic tracing and logging
+# 使用 Maxim 检测 Agno 以实现自动跟踪和日志记录
 instrument_agno(Maxim().logger())
 
-# Web Search Agent: Fetches financial information from the web
+# 网络搜索智能体：从网络获取金融信息
 web_search_agent = Agent(
-    name="Web Agent",
+    name="网络智能体",
     model=OpenAIChat(id="gpt-4o"),
     tools=[DuckDuckGoTools()],
-    instructions="Always include sources",
+    instructions="始终包含来源",
     markdown=True,
 )
 
-# Finance Agent: Gets financial data using YFinance tools
+# 金融智能体：使用 YFinance 工具获取金融数据
 finance_agent = Agent(
-    name="Finance Agent",
+    name="金融智能体",
     model=OpenAIChat(id="gpt-4o"),
     tools=[YFinanceTools()],
-    instructions="Use tables to display data",
+    instructions="使用表格显示数据",
     markdown=True,
 )
 
-# Aggregate both agents into a multi-agent system
+# 将两个智能体聚合到多智能体系统中
 multi_ai_team = Team(
     members=[web_search_agent, finance_agent],
     model=OpenAIChat(id="gpt-4o"),
-    instructions="You are a helpful financial assistant. Answer user questions about stocks, companies, and financial data.",
+    instructions="您是一个有用的金融助手。回答用户关于股票、公司和金融数据的问题。",
     markdown=True,
 )
 
 if __name__ == "__main__":
-    print("Welcome to the Financial Conversational Agent! Type 'exit' to quit.")
+    print("欢迎使用金融对话智能体！输入 'exit' 退出。")
     messages = []
     while True:
         print("********************************")
-        user_input = input("You: ")
+        user_input = input("您: ")
         if user_input.strip().lower() in ["exit", "quit"]:
-            print("Goodbye!")
+            print("再见！")
             break
         messages.append({"role": "user", "content": user_input})
         conversation = "\n".join(
             [
-                ("User: " + m["content"])
+                ("用户: " + m["content"])
                 if m["role"] == "user"
-                else ("Agent: " + m["content"])
+                else ("智能体: " + m["content"])
                 for m in messages
             ]
         )
         response = multi_ai_team.run(
-            f"Conversation so far:\n{conversation}\n\nRespond to the latest user message."
+            f"到目前为止的对话：\n{conversation}\n\n回复最新的用户消息。"
         )
         agent_reply = getattr(response, "content", response)
         print("---------------------------------")
-        print("Agent:", agent_reply)
+        print("智能体:", agent_reply)
         messages.append({"role": "agent", "content": str(agent_reply)})
 ```

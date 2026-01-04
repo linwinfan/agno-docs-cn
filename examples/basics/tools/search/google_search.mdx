@@ -1,5 +1,5 @@
 ---
-title: Google Search Tools
+title: Google 搜索工具
 ---
 
 
@@ -13,7 +13,7 @@ agent = Agent(
     tools=[DuckDuckGoTools()],
         markdown=True,
 )
-agent.print_response("What are the latest developments in AI?")
+agent.print_response("AI领域有哪些最新发展？")
 ```
 
 ## 用法
@@ -21,7 +21,7 @@ agent.print_response("What are the latest developments in AI?")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API credentials">
+  <Step title="设置您的 API 凭据">
     ```bash
     export GOOGLE_CSE_ID=xxx
     export GOOGLE_API_KEY=xxx
@@ -29,13 +29,13 @@ agent.print_response("What are the latest developments in AI?")
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U google-api-python-client openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/googlesearch_tools.py

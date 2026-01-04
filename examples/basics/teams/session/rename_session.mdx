@@ -1,9 +1,9 @@
 ---
-title: Session Name Management
+title: 会话名称管理
 ---
 
 
-此示例演示 how to set custom 会话 names or automatic所有y generate meaningful names for better 会话 organization and identification.
+此示例演示如何设置自定义会话名称或自动生成有意义的名称，以更好地组织和识别会话。
 
 ## 代码
 
@@ -27,11 +27,11 @@ team = Team(
     db=db,
 )
 
-team.print_response("Tell me a new interesting fact about space")
-team.set_session_name(session_name="Interesting Space Facts")
+team.print_response("告诉我一个关于太空的有趣新事实")
+team.set_session_name(session_name="有趣的太空事实")
 print(team.get_session_name())
 
-# Autogenerate session name
+# 自动生成会话名称
 team.set_session_name(autogenerate=True)
 print(team.get_session_name())
 ```
@@ -42,25 +42,25 @@ print(team.get_session_name())
 
     <Snippet file="create-venv-step.mdx" />
 
-    <Step title="Install required libraries">
+    <Step title="安装所需库">
         ```bash
         pip install agno psycopg2-binary
         ```
     </Step>
 
-    <Step title="Set environment variables">
+    <Step title="设置环境变量">
         ```bash
         export OPENAI_API_KEY=****
         ```
     </Step>
 
-    <Step title="Start PostgreSQL database">
+    <Step title="启动 PostgreSQL 数据库">
         ```bash
         cookbook/run_pgvector.sh
         ```
     </Step>
 
-    <Step title="Run the agent">
+    <Step title="运行代理">
         ```bash
         python cookbook/02_examples/teams/session/06_rename_session.py
         ```

@@ -1,5 +1,5 @@
 ---
-title: ArXiv Tools
+title: ArXiv 工具
 ---
 
 
@@ -10,7 +10,7 @@ from agno.agent import Agent
 from agno.tools.arxiv_toolkit import ArxivTools
 
 agent = Agent(tools=[ArxivTools()])
-agent.print_response("Search arxiv for 'language models'", markdown=True)
+agent.print_response("搜索 arxiv 中关于 'language models' 的内容", markdown=True)
 ```
 
 ## 用法
@@ -18,19 +18,19 @@ agent.print_response("Search arxiv for 'language models'", markdown=True)
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置您的 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U arxiv openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/arxiv_tools.py

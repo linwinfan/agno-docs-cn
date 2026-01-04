@@ -1,5 +1,5 @@
 ---
-title: Azure OpenAI Tools
+title: Azure OpenAI 工具
 ---
 
 
@@ -11,15 +11,15 @@ from agno.tools.models.azure_openai import AzureOpenAITools
 
 agent = Agent(
     instructions=[
-        "You are an AI image generation assistant using Azure OpenAI",
-        "Generate high-quality images based on user descriptions",
-        "Provide detailed descriptions of the generated images",
+        "您是使用 Azure OpenAI 的 AI 图像生成助手",
+        "根据用户描述生成高质量图像",
+        "提供生成图像的详细描述",
     ],
     tools=[AzureOpenAITools()],
     markdown=True,
 )
 
-agent.print_response("Generate an image of a sunset over mountains")
+agent.print_response("生成一张山间日落的图像")
 ```
 
 ## 用法
@@ -27,7 +27,7 @@ agent.print_response("Generate an image of a sunset over mountains")
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your credentials">
+  <Step title="设置您的凭证">
     ```bash
     export AZURE_OPENAI_API_KEY=your-azure-openai-api-key
     export AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
@@ -36,13 +36,13 @@ agent.print_response("Generate an image of a sunset over mountains")
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U requests openai agno
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python cookbook/14_tools/azure_openai_tools.py

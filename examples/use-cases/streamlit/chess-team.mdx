@@ -1,15 +1,15 @@
 ---
-title: Chess Battle
+title: 棋局对战
 ---
 
 
-Chess Battle is a chess 应用程序 where multiple AI 代理s collaborate to play chess against each other, demonstrating the power of multi-代理 systems in complex game 环境s.
+棋局对战是一个国际象棋应用程序，其中多个AI智能体协作相互对战，展示了多智能体系统在复杂游戏环境中的强大功能。
 
-### 密钥 Capabilities
-- Multi-Agent System: Features White and Black Piece Agents for move selection
-- Move Validation: Dedicated Legal Move Agent ensures game rule compliance
-- Game Coordination: Master Agent over查看s the game flow and end conditions
-- Interactive UI: Built with Streamlit for real-time game visualization
+### 主要功能
+- 多智能体系统：包含白色棋子和黑色棋子智能体进行走子选择
+- 移动验证：专用合法移动智能体确保游戏规则合规
+- 游戏协调：主智能体监督游戏流程和结束条件
+- 交互式界面：使用Streamlit构建实时游戏可视化
 
 <video
   autoPlay
@@ -19,61 +19,61 @@ Chess Battle is a chess 应用程序 where multiple AI 代理s collaborate to pl
   src="/videos/chess-团队.mp4"
 ></video>
 
-### System Components
-- White Piece Agent: Strategizes and selects moves for white pieces
-- Black Piece Agent: Controls and determines moves for black pieces
-- Legal Move Agent: Validates 所有 proposed moves against chess rules
-- Master Agent: Coordinates the game flow and monitors game status
+### 系统组件
+- 白棋智能体：为白棋制定策略并选择走子
+- 黑棋智能体：控制并确定黑棋的走子
+- 合法移动智能体：根据国际象棋规则验证所有提出的走子
+- 主智能体：协调游戏流程并监控游戏状态
 
-### 高级 Features
-The system 演示 complex 代理 interactions where each AI component has a specific role. The 代理s communicate and coordinate 创建 a complete chess-playing experience, showcasing how multiple specialized AIs can work together effectively.
+### 高级特性
+该系统展示了复杂的智能体交互，其中每个AI组件都有特定角色。智能体之间进行沟通和协调，创建完整的下棋体验，展示了多个专业化的AI如何有效协作。
 
 ### 代码
-The complete code is 可用的 in the [Agno 存储库](https://github.com/agno-agi/agno/tree/main/cookbook/02_示例/streamlit_apps/chess_团队).
+完整代码可在 [Agno 仓库](https://github.com/agno-agi/agno/tree/main/cookbook/02_示例/streamlit_apps/chess_团队) 中获得。
 
 ### 用法
 <Steps>
-  <Step title="Clone the repository">
+  <Step title="克隆仓库">
     ```bash
     git clone https://github.com/agno-agi/agno.git
     cd agno
     ```
   </Step>
 
-  <Step title="Create a Virtual Environment">
+  <Step title="创建虚拟环境">
     ```bash
     python3 -m venv .venv
-    source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+    source .venv/bin/activate  # Windows上使用: .venv\Scripts\activate
     ```
   </Step>
 
-  <Step title="Install Dependencies">
+  <Step title="安装依赖">
     ```bash
     pip install -r cookbook/02_examples/streamlit_apps/chess_team/requirements.txt
     ```
   </Step>
 
-  <Step title="Set up API Key">
-    The Chess Team Agent uses the Anthropic API for agent reasoning:
+  <Step title="设置API密钥">
+    棋队智能体使用Anthropic API进行智能体推理：
 
     ```bash
     export ANTHROPIC_API_KEY=your_api_key_here
     ```
   </Step>
 
-  <Step title="Launch the App">
+  <Step title="启动应用程序">
     ```bash
     streamlit run cookbook/02_examples/streamlit_apps/chess_team/app.py
     ```
   </Step>
 
-  <Step title="Open the App">
-    Then, open http://localhost:8501 in your browser to start watching the AI agents play chess.
+  <Step title="打开应用程序">
+    然后，在浏览器中打开 http://localhost:8501 开始观看AI智能体下棋。
   </Step>
 </Steps>
 
-### Pro Tips
-- Watch Complete Games: Observe full matches to 理解 代理 decision-making
-- Monitor Agent Interactions: Pay attention to how 代理s communicate and coordinate
+### 专业提示
+- 观看完整游戏：观察完整比赛以理解智能体决策过程
+- 监控智能体交互：注意智能体如何沟通和协调
 
-Need help? Join our [Discourse community](https://agno.链接/community) for support!
+需要帮助？加入我们的 [Discourse 社区](https://agno.链接/community) 获取支持！
