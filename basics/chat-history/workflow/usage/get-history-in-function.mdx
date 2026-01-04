@@ -1,11 +1,11 @@
 ---
-title: Get History in Function
-description: This example demonstrates how to get workflow history in a custom function.
+title: 在函数中获取历史记录
+description: 此示例演示如何在自定义函数中获取工作流历史记录。
 ---
 
-This example shows how to get workflow history in a custom function.
-- Using `step_input.get_workflow_history(num_runs=5)` we can get the history as a list of tuples.
-- We can also use `step_input.get_workflow_history_context(num_runs=5)` to get the history as a string.
+此示例展示了如何在自定义函数中获取工作流历史记录。
+- 使用 `step_input.get_workflow_history(num_runs=5)` 可以将历史记录作为元组列表获取。
+- 我们还可以使用 `step_input.get_workflow_history_context(num_runs=5)` 将历史记录作为字符串获取。
 
 ```python 04_get_history_in_function.py
 import json

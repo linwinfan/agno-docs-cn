@@ -1,22 +1,22 @@
 ---
-title: Basic Agent Tracing
-description: Learn how to trace your agents with Agno
-sidebarTitle: Basic Agent Tracing
-keywords: [tracing, observability, agents, agno, opentelemetry]
+title: 基本智能体追踪
+description: 学习如何使用Agno追踪您的智能体
+sidebarTitle: 基本智能体追踪
+keywords: ["追踪", "可观测性", "智能体", "agno", "opentelemetry"]
 mode: wide
 ---
 
-This example shows how to enable tracing for an agent. Once tracing is enabled, all agent runs, model calls, and tool executions are automatically captured and stored in your database.
+此示例展示了如何为智能体启用追踪。一旦启用了追踪，所有智能体运行、模型调用和工具执行都会自动捕获并存储在您的数据库中。
 
 <Steps>
 
-  <Step title="Create a Python file">
+  <Step title="创建Python文件">
     ```bash
     touch basic_agent_tracing.py
     ```
   </Step>
 
-  <Step title="Add the following code to your Python file">
+  <Step title="将以下代码添加到您的Python文件中">
     ```python basic_agent_tracing.py
     from agno.agent import Agent
     from agno.db.sqlite import SqliteDb
@@ -24,13 +24,13 @@ This example shows how to enable tracing for an agent. Once tracing is enabled, 
     from agno.tools.hackernews import HackerNewsTools
     from agno.tracing import setup_tracing
 
-    # Set up database for traces
+    # 设置追踪数据库
     db = SqliteDb(db_file="tmp/traces.db")
 
-    # Enable tracing (call once at startup)
+    # 启用追踪（在启动时调用一次）
     setup_tracing(db=db)
 
-    # Create agent - automatically traced!
+    # 创建智能体 - 自动被追踪！
     agent = Agent(
         name="HackerNews Agent",
         model=OpenAIChat(id="gpt-5-mini"),
@@ -40,10 +40,10 @@ This example shows how to enable tracing for an agent. Once tracing is enabled, 
         db=db,
     )
 
-    # Run the agent - traces are captured automatically
+    # 运行智能体 - 追踪数据会自动捕获
     agent.print_response("What's trending on HackerNews?")
 
-    # Query traces from the database
+    # 从数据库查询追踪数据
     traces, count = db.get_traces(agent_id=agent.id, limit=10)
     print(f"\nFound {count} traces for agent '{agent.name}'")
     for trace in traces:
@@ -53,13 +53,13 @@ This example shows how to enable tracing for an agent. Once tracing is enabled, 
 
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U openai agno opentelemetry-api opentelemetry-sdk openinference-instrumentation-agno
     ```
   </Step>
 
-  <Step title="Export your OpenAI API key">
+  <Step title="导出您的OpenAI API密钥">
     <CodeGroup>
     ```bash Mac/Linux
     export OPENAI_API_KEY="your_openai_api_key_here"
@@ -71,7 +71,7 @@ This example shows how to enable tracing for an agent. Once tracing is enabled, 
     </CodeGroup>
   </Step>
 
-  <Step title="Run the agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python basic_agent_tracing.py
@@ -85,6 +85,6 @@ This example shows how to enable tracing for an agent. Once tracing is enabled, 
 
 </Steps>
 
-## Developer Resources
+## 开发者资源
 
-- View the [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/13_integrations/observability/trace_to_database.py) for a full example that visualizes the trace tree in CLI.
+- 查看[Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/13_integrations/observability/trace_to_database.py)以获取完整的示例，该示例在CLI中可视化追踪树。

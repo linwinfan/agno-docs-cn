@@ -1,49 +1,49 @@
 ---
-title: Accessing your Traces
-description: Database convenience functions for querying traces and spans
-sidebarTitle: Accessing your Traces
-keywords: [tracing, database, querying, functions, api]
+title: 访问您的追踪数据
+description: 用于查询追踪和跨度的数据库便捷函数
+sidebarTitle: 访问您的追踪数据
+keywords: ["追踪", "数据库", "查询", "函数", "api"]
 ---
 
-Agno provides convenience functions on your database instance to query traces and spans. These functions work with any supported database (SQLite, PostgreSQL, etc.).
+Agno在您的数据库实例上提供了便捷函数来查询追踪和跨度。这些函数适用于任何支持的数据库（SQLite、PostgreSQL等）。
 
-## Trace Functions
+## 追踪函数
 
 ### `db.get_trace()`
 
-Get a single trace by identifier.
+通过标识符获取单个追踪。
 
 ```python
-# Get by trace_id
+# 通过trace_id获取
 trace = db.get_trace(trace_id="abc123...")
 
-# Get by run_id (returns most recent match)
+# 通过run_id获取（返回最近的匹配项）
 trace = db.get_trace(run_id=response.run_id)
 ```
 
-**Parameters:**
+**参数:**
 
-| Parameter | Type | Description |
+| 参数 | 类型 | 描述 |
 |-----------|------|-------------|
-| `trace_id` | `Optional[str]` | Unique trace identifier |
-| `run_id` | `Optional[str]` | Filter by run ID |
+| `trace_id` | `Optional[str]` | 唯一的追踪标识符 |
+| `run_id` | `Optional[str]` | 按运行ID过滤 |
 
-**Returns:** `Trace` or `None`
+**返回值:** `Trace` 或 `None`
 
-See the reference for [Trace](/reference/tracing/trace) for more information.
+有关更多信息，请参阅[Trace](/reference/tracing/trace)参考文档。
 
 ### `db.get_traces()`
 
-Get multiple traces with filtering and pagination.
+获取多个追踪，支持过滤和分页。
 
 ```python
-# Get recent traces
+# 获取最近的追踪
 traces, total_count = db.get_traces(limit=20)
 
-# Filter by agent
+# 按智能体过滤
 traces, count = db.get_traces(agent_id=agent.id)
 
-# Filter by time range
+# 按时间范围过滤
 from datetime import datetime, timedelta, timezone
 
 now = datetime.now(timezone.utc)
@@ -54,29 +54,29 @@ traces, count = db.get_traces(
 )
 ```
 
-**Parameters:**
+**参数:**
 
-| Parameter | Type | Default | Description |
+| 参数 | 类型 | 默认值 | 描述 |
 |-----------|------|---------|-------------|
-| `run_id` | `Optional[str]` | `None` | Filter by run ID |
-| `session_id` | `Optional[str]` | `None` | Filter by session ID |
-| `user_id` | `Optional[str]` | `None` | Filter by user ID |
-| `agent_id` | `Optional[str]` | `None` | Filter by agent ID |
-| `team_id` | `Optional[str]` | `None` | Filter by team ID |
-| `workflow_id` | `Optional[str]` | `None` | Filter by workflow ID |
-| `status` | `Optional[str]` | `None` | Filter by status (`OK`, `ERROR`, `UNSET`) |
-| `start_time` | `Optional[datetime]` | `None` | Filter traces after this time |
-| `end_time` | `Optional[datetime]` | `None` | Filter traces before this time |
-| `limit` | `Optional[int]` | `20` | Max traces to return |
-| `page` | `Optional[int]` | `1` | Page number for pagination |
+| `run_id` | `Optional[str]` | `None` | 按运行ID过滤 |
+| `session_id` | `Optional[str]` | `None` | 按会话ID过滤 |
+| `user_id` | `Optional[str]` | `None` | 按用户ID过滤 |
+| `agent_id` | `Optional[str]` | `None` | 按智能体ID过滤 |
+| `team_id` | `Optional[str]` | `None` | 按团队ID过滤 |
+| `workflow_id` | `Optional[str]` | `None` | 按工作流ID过滤 |
+| `status` | `Optional[str]` | `None` | 按状态过滤 (`OK`, `ERROR`, `UNSET`) |
+| `start_time` | `Optional[datetime]` | `None` | 过滤此时间之后的追踪 |
+| `end_time` | `Optional[datetime]` | `None` | 过滤此时间之前的追踪 |
+| `limit` | `Optional[int]` | `20` | 返回的最大追踪数量 |
+| `page` | `Optional[int]` | `1` | 分页的页码 |
 
-**Returns:** `tuple[List[Trace], int]` - (traces, total_count)
+**返回值:** `tuple[List[Trace], int]` - (追踪列表, 总数量)
 
-## Span Functions
+## 跨度函数
 
 ### `db.get_span()`
 
-Get a single span by ID.
+通过ID获取单个跨度。
 
 ```python
 span = db.get_span(span_id="xyz789...")
@@ -84,66 +84,65 @@ if span:
     print(f"{span.name}: {span.duration_ms}ms")
 ```
 
-**Parameters:**
+**参数:**
 
-| Parameter | Type | Description |
+| 参数 | 类型 | 描述 |
 |-----------|------|-------------|
-| `span_id` | `str` | Unique span identifier |
+| `span_id` | `str` | 唯一的跨度标识符 |
 
-**Returns:** `Span` or `None`
+**返回值:** `Span` 或 `None`
 
-See the reference for [Span](/reference/tracing/span) for more information.
+有关更多信息，请参阅[Span](/reference/tracing/span)参考文档。
 
 ### `db.get_spans()`
 
-Get multiple spans for a trace or parent.
+获取追踪或父级的多个跨度。
 
 ```python
-# Get all spans in a trace
+# 获取追踪中的所有跨度
 spans = db.get_spans(trace_id=trace.trace_id)
 
-# Get child spans of a specific parent
+# 获取特定父级的子跨度
 children = db.get_spans(parent_span_id=root_span.span_id)
 ```
 
-**Parameters:**
+**参数:**
 
-| Parameter | Type | Description |
+| 参数 | 类型 | 描述 |
 |-----------|------|-------------|
-| `trace_id` | `Optional[str]` | Filter by trace ID |
-| `parent_span_id` | `Optional[str]` | Filter by parent span ID |
+| `trace_id` | `Optional[str]` | 按追踪ID过滤 |
+| `parent_span_id` | `Optional[str]` | 按父跨度ID过滤 |
 
-**Returns:** `List[Span]`
+**返回值:** `List[Span]`
 
 <Note>
-  Unlike `get_traces()`, `get_spans()` returns a list without a count.
+  与`get_traces()`不同，`get_spans()`返回一个不包含计数的列表。
 </Note>
 
-## Example: Analyzing a Run
+## 示例：分析一次运行
 
 ```python
 from agno.db.sqlite import SqliteDb
 
 db = SqliteDb(db_file="tmp/traces.db")
 
-# Get trace for a run
+# 获取运行的追踪
 trace = db.get_trace(run_id=response.run_id)
 
 if trace:
-    print(f"Trace: {trace.name} ({trace.duration_ms}ms)")
+    print(f"追踪: {trace.name} ({trace.duration_ms}ms)")
 
-    # Get all spans
+    # 获取所有跨度
     spans = db.get_spans(trace_id=trace.trace_id)
 
-    # Print execution tree
+    # 打印执行树
     for span in sorted(spans, key=lambda s: s.start_time):
         indent = "  " if span.parent_span_id else ""
         print(f"{indent}- {span.name} ({span.duration_ms}ms)")
 ```
 
-## See Also
+## 参见
 
-- [Trace Reference](/reference/tracing/trace) - Full `Trace` object definition
-- [Span Reference](/reference/tracing/span) - Full `Span` object definition
-- [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/13_integrations/observability/trace_to_database.py) - Full example code
-
+- [Trace参考](/reference/tracing/trace) - 完整的`Trace`对象定义
+- [Span参考](/reference/tracing/span) - 完整的`Span`对象定义
+- [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/13_integrations/observability/trace_to_database.py) - 完整示例代码

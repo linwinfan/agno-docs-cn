@@ -1,24 +1,24 @@
-﻿---
-title: Token计数
-sidebarTitle: Token计数
-description: 学习我们如何为上下文规划和基于token的压缩估算token数量。
+---
+title: Token 计数
+sidebarTitle: Token 计数
+description: 学习我们如何为上下文规划和基于 token 的压缩估算 token 数量。
 keywords:
   [
-    token counting,
-    tokens,
-    context window,
-    compression,
-    tiktoken,
-    tokenizers,
-    tools,
-    schema,
-    multimodal,
+    "token计数",
+    "tokens",
+    "上下文窗口",
+    "压缩",
+    "tiktoken",
+    "分词器",
+    "工具",
+    "模式",
+    "多模态",
   ]
 ---
 
-Token计数帮助您估算代理运行的上下文token数量。Token计数可用于基于token的上下文压缩和内存优化等功能。
+Token 计数帮助您估算代理运行的上下文 token 数量。Token 计数可用于基于 token 的上下文压缩和内存优化等功能。
 
-## 
+## 上下文内容
 
 上下文可以包括：
 
@@ -28,33 +28,32 @@ Token计数帮助您估算代理运行的上下文token数量。Token计数可�
   - 可选的推理内容
   - 多模态内容块
 - **工具**
-  - 工具定义可以是总token数量的重要部分，特别是在有大型参数模式或长描述的情况下。
+  - 工具定义可以是总 token 数量的重要部分，特别是在有大型参数模式或长描述的情况下。
 - **输出模式**
-  - 如果您使用输出模式，该模式会包含在token计数中。
+  - 如果您使用输出模式，该模式会包含在 token 计数中。
 - **多模态附件**
   - 附加到消息的图像、音频、视频和文件使用保守估算进行计数。
 
 <Warning>
-  Token数量是**估算值**。由于模型/提供者行为、隐藏/系统提示以及工具/模式的内部序列化方式，提供者计费和确切的token化可能会有所不同。
+  Token 数量是**估算值**。由于模型/提供者行为、隐藏/系统提示以及工具/模式的内部序列化方式，提供者计费和确切的token化可能会有所不同。
 </Warning>
 ## 可选依赖项（推荐）
 
-为了获得更好的本地token计数估算，请安装tokenizers：
+为了获得更好的本地 token 计数估算，请安装 tokenizers：
 
-`ash
+```bash
 pip install -U tiktoken tokenizers
-`
+```
 
-- 	iktoken: 在可用时用于OpenAI风格的token化。
-- 	okenizers: 在可用时用于某些开源tokenizers。
+- tiktoken: 在可用时用于 OpenAI 风格的 token 化。
+- tokenizers: 在可用时用于某些开源 tokenizers。
 - 如果给定模型两者都不可用，我们会回退到启发式估算。
 
-## 示例：计算token
-
-`python
-from pydantic import BaseModel
+## 示例：计算 token
 
 ```python
+from pydantic import BaseModel
+
 from agno.models.message import Message
 from agno.models.openai import OpenAIChat
 
@@ -88,24 +87,23 @@ tools = [
 
 tokens = model.count_tokens(messages=messages, tools=tools, output_schema=Answer)
 print(f"Estimated tokens: {tokens}")
-`
 
-## 基于token的上下文压缩中的token计数
+## 基于 token 的上下文压缩中的token 计数
 
-当您设置 compress_token_limit 时，Agno在运行循环中检查估算的token数量，并在达到阈值时触发压缩。
+当您设置 compress_token_limit 时，Agno在运行循环中检查估算的 token 数量，并在达到阈值时触发压缩。
 
-由于token计数可以包括**消息历史**、**工具定义**和**输出模式/响应格式**，它比仅计算消息文本更接近"真实"的请求大小。
+由于token 计数可以包括**消息历史**、**工具定义**和**输出模式/响应格式**，它比仅计算消息文本更接近"真实"的请求大小。
 
 ## 多模态估算
 
 Agno对多模态输入使用保守估算以支持上下文规划：
 
 - **图像**: 通过基于平铺的方法估算（视觉风格计数）
-- **音频**: 使用每秒token数估算
+- **音频**: 使用每秒 token 数估算
 - **视频**: 估算为与图像类似计算的帧数（如果fps/尺寸未知则使用保守默认值）
 - **文件**: 基于文件类型/大小估算
 
 ## 注意事项：
 
-- Token计数仍处于Beta阶段。我们尽力提供估算，但我们不声称它在所有提供者和模型中都100%准确。请谨慎使用此token计数来计算成本。
-- 对于像Claude这样的某些提供者，我们能够调用确切的端点并获得准确的token计数。这尚未对所有提供者提供支持。
+- Token 计数仍处于Beta阶段。我们尽力提供估算，但我们不声称它在所有提供者和模型中都100%准确。请谨慎使用此 token 计数来计算成本。
+- 对于像Claude这样的某些提供者，我们能够调用确切的端点并获得准确的 token 计数。这尚未对所有提供者提供支持。

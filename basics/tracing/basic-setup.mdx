@@ -1,34 +1,34 @@
 ---
-title: Basic Setup
-description: Configure and enable tracing for your Agno agents
-keywords: [tracing, setup, configuration, database, opentelemetry]
+title: 基本设置
+description: 为您的Agno智能体配置和启用追踪
+keywords: ["追踪", "设置", "配置", "数据库", "opentelemetry"]
 ---
 
-This guide walks you through setting up tracing for your Agno agents. Tracing is designed to be simple: install dependencies, enable tracing, and all your agents are automatically instrumented.
+本指南将引导您为Agno智能体设置追踪。追踪设计得非常简单：安装依赖、启用追踪，您的所有智能体都会自动被检测。
 
-## Installation
+## 安装
 
-Install the required OpenTelemetry packages:
+安装所需的OpenTelemetry包：
 
 ```bash
 pip install -U opentelemetry-api opentelemetry-sdk openinference-instrumentation-agno
 ```
 
 <Note>
-  These packages provide the OpenTelemetry instrumentation infrastructure and the Agno-specific instrumentation logic.
+  这些包提供了OpenTelemetry检测基础设施和Agno特定的检测逻辑。
 </Note>
 
-## Two Ways to Enable Tracing
+## 启用追踪的两种方式
 
-There are two ways to enable tracing in Agno:
+在Agno中有两种启用追踪的方式：
 
-1. **`setup_tracing()`** - Use this function for standalone scripts, notebooks, and custom applications. Provides full control over configuration options like batch processing, queue sizes, and export delays.
+1. **`setup_tracing()`** - 在独立脚本、笔记本和自定义应用程序中使用此函数。提供对批处理、队列大小和导出延迟等配置选项的完全控制。
 
-2. **AgentOS `tracing=True`** - Use this parameter when deploying agents through AgentOS. Simpler setup for production deployments with sensible defaults.
+2. **AgentOS `tracing=True`** - 在通过AgentOS部署智能体时使用此参数。为生产部署提供更简单的设置和合理的默认值。
 
-### Option 1: Using tracing with SDK
+### 选项1：使用SDK进行追踪
 
-For standalone scripts, notebooks, or custom applications use `setup_tracing()`:
+对于独立脚本、笔记本或自定义应用程序，请使用`setup_tracing()`：
 
 ```python
 from agno.agent import Agent
@@ -36,13 +36,13 @@ from agno.db.sqlite import SqliteDb
 from agno.models.openai import OpenAIChat
 from agno.tracing import setup_tracing
 
-# Set up your tracing database
+# 设置您的追踪数据库
 tracing_db = SqliteDb(db_file="tmp/traces.db")
 
-# Enable tracing (call this ONCE at startup)
+# 启用追踪（在启动时调用一次）
 setup_tracing(db=tracing_db)
 
-# Create and run agents - they're automatically traced!
+# 创建并运行智能体 - 它们会自动被追踪！
 agent = Agent(
     name="Research Agent",
     model=OpenAIChat(id="gpt-4o-mini"),
@@ -53,12 +53,12 @@ response = agent.run("What is quantum computing?")
 ```
 
 <Warning>
-  Call `setup_tracing()` **before** creating your agents. This ensures the instrumentation is active when agents are initialized.
+  在创建智能体**之前**调用`setup_tracing()`。这确保在智能体初始化时检测已激活。
 </Warning>
 
-### Option 2: Using tracing with AgentOS
+### 选项2：使用AgentOS进行追踪
 
-When deploying agents with AgentOS, you can enable tracing with a simple parameter:
+当使用AgentOS部署智能体时，您可以使用一个简单的参数启用追踪：
 
 ```python
 from agno.os import AgentOS
@@ -68,13 +68,13 @@ tracing_db = SqliteDb(db_file="tmp/traces.db")
 
 agent_os = AgentOS(
     agents=[my_agent],
-    tracing=True,  # Enable tracing
+    tracing=True,  # 启用追踪
     tracing_db=tracing_db,
 )
 ```
 
 <Tip>
-You can also use `setup_tracing()` to configure tracing for AgentOS but make sure to pass the `tracing_db` to AgentOS so traces are accessible through the AgentOS API and UI.
+您也可以使用`setup_tracing()`来为AgentOS配置追踪，但请确保将`tracing_db`传递给AgentOS，以便通过AgentOS API和UI访问追踪数据。
 
 ```python
 from agno.os import AgentOS
@@ -85,29 +85,29 @@ setup_tracing(db=tracing_db)
 
 agent_os = AgentOS(
     agents=[my_agent],
-    tracing_db=tracing_db, # <-- Pass the tracing_db to AgentOS so traces are accessible through the AgentOS API and UI.
+    tracing_db=tracing_db, # <-- 将tracing_db传递给AgentOS，以便通过AgentOS API和UI访问追踪数据。
 )
 ```
 
-`tracing_db` is required in AgentOS to ensure traces are accessible through the AgentOS API and UI.
+在AgentOS中需要`tracing_db`以确保可以通过AgentOS API和UI访问追踪数据。
 </Tip>
 
-For detailed AgentOS tracing configuration including multi-database setups, see [Tracing in AgentOS](/agent-os/tracing/overview).
+有关包括多数据库设置在内的详细AgentOS追踪配置，请参阅[AgentOS中的追踪](/agent-os/tracing/overview)。
 
-## Dedicated Traces Database
+## 专用追踪数据库
 
 <Warning>
-  **Recommended**: Use a separate database for storing traces, especially when you have multiple agents or teams with their own databases.
+  **推荐**: 使用单独的数据库存储追踪数据，特别是当您有多个智能体或团队拥有各自的数据库时。
 </Warning>
 
-When agents and teams each have their own databases for sessions and memory, traces should go to a **dedicated central database**. This ensures:
+当智能体和团队各自拥有用于会话和记忆的数据库时，追踪数据应该存入**专用的中央数据库**。这确保了：
 
-- **Unified observability**: All traces in one place for cross-agent analysis
-- **Simpler querying**: No need to search multiple databases
-- **Independent scaling**: Traces can grow independently from agent data
-- **Cleaner separation**: Agent data and observability data don't mix
+- **统一的可观测性**: 所有追踪数据集中在一个地方，便于跨智能体分析
+- **更简单的查询**: 无需搜索多个数据库
+- **独立扩展**: 追踪数据可以独立于智能体数据增长
+- **清晰的分离**: 智能体数据和可观测性数据不会混合
 
-<Accordion title="Example: Multiple Agents with Shared Tracing">
+<Accordion title="示例：具有共享追踪的多个智能体">
 
 ```python
 from agno.agent import Agent
@@ -117,14 +117,14 @@ from agno.tracing import setup_tracing
 from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.hackernews import HackerNewsTools
 
-# Each agent has its own database for sessions/memory
+# 每个智能体都有自己的会话/记忆数据库
 agent1_db = SqliteDb(db_file="tmp/agent1.db", id="agent1_db")
 agent2_db = SqliteDb(db_file="tmp/agent2.db", id="agent2_db")
 
-# Dedicated database for ALL traces (separate from agent databases)
+# 专用数据库用于存储所有追踪数据（与智能体数据库分离）
 tracing_db = SqliteDb(db_file="tmp/traces.db", id="traces_db")
 
-# Enable tracing to the dedicated database
+# 启用追踪到专用数据库
 setup_tracing(
     db=tracing_db,
     batch_processing=True,
@@ -132,75 +132,75 @@ setup_tracing(
     max_export_batch_size=256,
 )
 
-# Agent 1: HackerNews specialist with its own database
+# 智能体1：HackerNews专家，拥有自己的数据库
 hackernews_agent = Agent(
     name="HackerNews Agent",
     model=OpenAIChat(id="gpt-4o-mini"),
     tools=[HackerNewsTools()],
     instructions="You are a hacker news agent. Answer questions concisely.",
     markdown=True,
-    db=agent1_db,  # Agent's own database
+    db=agent1_db,  # 智能体自己的数据库
 )
 
-# Agent 2: Web search specialist with its own database
+# 智能体2：网络搜索专家，拥有自己的数据库
 search_agent = Agent(
     name="Web Search Agent",
     model=OpenAIChat(id="gpt-4o-mini"),
     tools=[DuckDuckGoTools()],
     instructions="You are a web search agent. Answer questions concisely.",
     markdown=True,
-    db=agent2_db,  # Agent's own database
+    db=agent2_db,  # 智能体自己的数据库
 )
 
-# Both agents are traced to the same tracing_db
+# 两个智能体都被追踪到同一个tracing_db
 hackernews_agent.run("What's trending on HackerNews?")
 search_agent.run("Latest AI news")
 
-# Query traces for both agents from one place
+# 从一个地方查询两个智能体的追踪数据
 traces, count = tracing_db.get_traces(limit=20)
 print(f"Found {count} traces across all agents")
 ```
 
 </Accordion>
 
-Once configured, traces and spans are automatically stored in your database. The tracing system creates two tables: `agno_traces` for high-level trace information and `agno_spans` for individual span details.
+配置完成后，追踪和跨度会自动存储在您的数据库中。追踪系统会创建两个表：`agno_traces`用于存储高级追踪信息，`agno_spans`用于存储单个跨度的详细信息。
 
-<Frame caption="Traces stored in SQLite database viewed with TablePlus">
-  <img src="/images/traces-in-db.png" alt="Database view showing agno_spans table with trace data including span_id, trace_id, parent_span_id, and operation names" />
+<Frame caption="在TablePlus中查看存储在SQLite数据库中的追踪数据">
+  <img src="/images/traces-in-db.png" alt="数据库视图显示agno_spans表，包含span_id、trace_id、parent_span_id和操作名称等追踪数据" />
 </Frame>
 
-Each span record includes the `trace_id` to group related operations, `parent_span_id` for hierarchy, and the operation `name` (e.g., `Stock_Price_Agent.run`, `OpenAIChat.invoke`, `get_current_stock_price`).
+每个跨度记录都包含`trace_id`用于组合相关操作，`parent_span_id`用于层次结构，以及操作`name`（例如，`Stock_Price_Agent.run`、`OpenAIChat.invoke`、`get_current_stock_price`）。
 
-## Processing Modes
+## 处理模式
 
-Agno supports two trace processing modes:
+Agno支持两种追踪处理模式：
 
-### Batch Processing
+### 批处理
 
-Batch processing collects traces in memory and writes them in batches. This is more efficient and recommended for production:
+批处理在内存中收集追踪数据并批量写入。这种方式效率更高，推荐用于生产环境：
 
 ```python
 setup_tracing(
     db=tracing_db,
     batch_processing=True,
-    max_queue_size=2048,           # Max traces in memory
-    max_export_batch_size=512,     # Traces per batch write
-    schedule_delay_millis=5000,    # Export every 5 seconds
+    max_queue_size=2048,           # 内存中的最大追踪数量
+    max_export_batch_size=512,     # 每批写入的追踪数量
+    schedule_delay_millis=5000,    # 每5秒导出一次
 )
 ```
 
-**Pros:**
-- Lower database load
-- Better performance
-- Minimal impact on agent execution
+**优点:**
+- 数据库负载更低
+- 性能更好
+- 对智能体执行的影响最小
 
-**Cons:**
-- Slight delay before traces appear (default 5 seconds)
-- Traces in memory if application crashes before export
+**缺点:**
+- 追踪数据显示略有延迟（默认5秒）
+- 如果应用程序在导出前崩溃，内存中的追踪数据会丢失
 
-### Simple Processing (Default)
+### 简单处理（默认）
 
-Simple processing writes each trace immediately:
+简单处理立即写入每个追踪：
 
 ```python
 setup_tracing(
@@ -209,33 +209,33 @@ setup_tracing(
 )
 ```
 
-**Pros:**
-- Traces appear immediately
-- No memory buffering
+**优点:**
+- 追踪数据立即显示
+- 无内存缓冲
 
-**Cons:**
-- More database writes
-- Slight performance overhead
+**缺点:**
+- 更多的数据库写入
+- 略微的性能开销
 
 <Tip>
-  Use **batch processing** in production and **simple processing** for development/debugging when you need immediate trace visibility.
+  在生产环境中使用**批处理**，在开发/调试时使用**简单处理**，当您需要立即查看追踪数据时。
 </Tip>
 
-## Next Steps
+## 后续步骤
 
 <CardGroup cols={2}>
   <Card
-    title="DB Functions"
+    title="数据库函数"
     icon="database"
     href="/basics/tracing/db-functions"
   >
-    Query traces and spans from your database
+    从您的数据库查询追踪和跨度
   </Card>
   <Card
     title="Cookbook"
     icon="book"
     href="https://github.com/agno-agi/agno/tree/main/cookbook/13_integrations/observability/trace_to_database.py"
   >
-    Full example code
+    完整示例代码
   </Card>
 </CardGroup>

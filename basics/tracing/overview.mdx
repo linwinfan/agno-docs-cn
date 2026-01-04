@@ -1,112 +1,111 @@
 ---
-title: Tracing
-description: Gain deep visibility into your Agno agents with OpenTelemetry-based observability
-sidebarTitle: Overview
-keywords: [tracing, observability, opentelemetry, debugging, monitoring]
+title: 追踪
+description: 通过基于OpenTelemetry的可观测性，深入了解您的Agno智能体
+sidebarTitle: 概述
+keywords: ["追踪", "可观测性", "opentelemetry", "调试", "监控"]
 ---
 
 <Badge icon="code-branch" color="orange">
-    <Tooltip tip="Introduced in v2.3.5" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.3.5">v2.3.5</Tooltip>
+    <Tooltip tip="在 v2.3.5 中引入" cta="查看发布说明" href="https://github.com/agno-agi/agno/releases/tag/v2.3.5">v2.3.5</Tooltip>
 </Badge>
 
-In the systems you build with Agno, agents will make autonomous decisions, interact with external tools, and coordinate with each other in ways that aren't immediately visible from your recorded sessions alone. Observability is key to staying on top of what your agents are doing and how your system is performing.
+在您使用Agno构建的系统中，智能体会自主做出决策，与外部工具交互，并以仅从记录的会话中无法立即看到的方式相互协调。可观测性是掌握您的智能体正在做什么以及系统性能如何的关键。
 
-**Agno Tracing** is the recommended way to introduce observability for your Agno agents, teams, and workflows. 
-It automatically captures all relevant execution details, helping you understand what your agents are doing, simplifying debugging and helping you optimize your system.
+**Agno 追踪** 是为您的Agno智能体、团队和工作流引入可观测性的推荐方式。
+它会自动捕获所有相关的执行细节，帮助您了解智能体的行为，简化调试并帮助您优化系统。
 
-Tracing leverages [OpenTelemetry](https://opentelemetry.io/) to instrument the Agno agents and teams, capturing traces and spans.
+追踪利用 [OpenTelemetry](https://opentelemetry.io/) 对Agno智能体和团队进行检测，捕获追踪和跨度。
 
-<Frame caption="Traces stored in SQLite database viewed with AgentOS">
-  <img src="/images/traces-in-os.png" alt="Traces viewed in AgentOS" />
+<Frame caption="在AgentOS中查看存储在SQLite数据库中的追踪数据">
+  <img src="/images/traces-in-os.png" alt="在AgentOS中查看追踪数据" />
 </Frame>
 
-## Why is Observability Important?
+## 为什么可观测性很重要？
 
-As your Agno system become more complex (Agents using multiple tools, making sequential decisions, and coordinating with other agents), understanding its behavior becomes challenging. 
+随着您的Agno系统变得越来越复杂（智能体使用多个工具、做出顺序决策并与其它智能体协调），理解其行为变得具有挑战性。
 
-**Agno Tracing** solves this:
+**Agno 追踪** 解决了这个问题：
 
-- **Debugging**: See exactly what went wrong when an agent fails
-- **Performance**: Identify bottlenecks in agent execution
-- **Cost Tracking**: Monitor token usage and API calls
-- **Behavior Analysis**: Understand decision-making patterns
-- **Audit Trail**: Track what agents did and why
+- **调试**: 当智能体失败时，准确查看出了什么问题
+- **性能**: 识别智能体执行中的瓶颈
+- **成本跟踪**: 监控token使用量和API调用
+- **行为分析**: 理解决策模式
+- **审计跟踪**: 跟踪智能体做了什么以及为什么这样做
 
 <Note>
-All Agno Tracing data is stored in your own database. No tracing data will leave your system, or be sent to third parties: you are in complete control.
+所有Agno追踪数据都存储在您自己的数据库中。追踪数据不会离开您的系统，也不会发送给第三方：您完全掌控。
 </Note>
 
-## Understanding Traces and Spans
+## 理解追踪和跨度
 
-Think of tracing like a family tree for your agent's execution:
+将追踪想象成智能体执行的家族树：
 
-### Trace
-A **trace** represents one complete agent execution from start to finish. Each trace has a unique `trace_id` that groups all related operations together.
+### 追踪 (Trace)
+一个 **追踪** 代表从开始到结束的一次完整智能体执行。每个追踪都有一个唯一的 `trace_id`，用于将所有相关操作组合在一起。
 
-### Span
-A **span** is a single operation within that execution. Spans form a parent-child hierarchy:
+### 跨度 (Span)
+一个 **跨度** 是该执行中的单个操作。跨度形成父子层次结构：
 
-<img 
-  className="block dark:hidden" 
-  src="/images/traces-vs-spans-light.png" 
-  alt="Traces vs spans diagram"
+<img
+  className="block dark:hidden"
+  src="/images/traces-vs-spans-light.png"
+  alt="追踪与跨度图示"
 />
 
-<img 
-  className="hidden dark:block" 
-  src="/images/traces-vs-spans-dark.png" 
-  alt="Traces vs spans diagram"
+<img
+  className="hidden dark:block"
+  src="/images/traces-vs-spans-dark.png"
+  alt="追踪与跨度图示"
 />
 
-Each span captures:
-- **What happened**: Operation name (e.g., `agent.run`, `model.response`)
-- **When**: Start and end timestamps
-- **Context**: Input arguments, outputs, token usage
-- **Relationships**: Parent span, child spans
-- **Metadata**: Agent ID, session ID, run ID
+每个跨度捕获：
+- **发生了什么**: 操作名称（例如，`agent.run`、`model.response`）
+- **何时发生**: 开始和结束时间戳
+- **上下文**: 输入参数、输出、token使用量
+- **关系**: 父跨度、子跨度
+- **元数据**: 智能体ID、会话ID、运行ID
 
-## What Gets Traced
+## 追踪的内容
 
-Agno automatically captures:
+Agno自动捕获：
 
-| Operation          | What Gets Traced                                                                 |
+| 操作          | 追踪内容                                                                 |
 |--------------------|---------------------------------------------------------------------------------|
-| **Agent Runs**     | Every `agent.run()` or `agent.arun()` call with full context                    |
-| **Model Calls**    | LLM interactions including prompts, responses, and token usage                  |
-| **Tool Executions**| Tool invocations with arguments and results                                     |
-| **Team Operations**| Team coordination and member agent runs                                         |
-| **Workflow Operations**| Coming soon!                                        |
+| **智能体运行**     | 每次 `agent.run()` 或 `agent.arun()` 调用及其完整上下文                    |
+| **模型调用**    | LLM交互，包括提示、响应和token使用量                  |
+| **工具执行**| 工具调用及其参数和结果                                     |
+| **团队操作**| 团队协调和成员智能体运行                                         |
+| **工作流操作**| 即将推出！                                        |
 
+## 主要特性
 
-## Key Features
+- **零代码检测**: 无需修改您的智能体代码
+- **数据库存储**: 追踪数据存储在您的Agno数据库中（SQLite、PostgreSQL等）
+- **灵活查询**: 按智能体、会话、运行或时间范围过滤
+- **OpenTelemetry标准**: 导出到Arize Phoenix、Langfuse等外部工具
+- **非阻塞**: 追踪永远不会减慢您的智能体
+- **可配置**: 根据您的需求调整批处理大小和处理方式
 
-- **Zero-Code Instrumentation**: No need to modify your agent code
-- **Database Storage**: Traces stored in your Agno database (SQLite, PostgreSQL, etc.)
-- **Flexible Querying**: Filter by agent, session, run, or time range
-- **OpenTelemetry Standard**: Export to external tools like Arize Phoenix, Langfuse
-- **Non-Blocking**: Tracing never slows down your agents
-- **Configurable**: Adjust batch sizes and processing for your needs
-
-## Quick Start
+## 快速开始
 
 <Steps>
-  <Step title="Install Dependencies">
+  <Step title="安装依赖">
     ```bash
     pip install -U opentelemetry-api opentelemetry-sdk openinference-instrumentation-agno
     ```
   </Step>
-  
-  <Step title="Enable Tracing">
+
+  <Step title="启用追踪">
     ```python
     from agno.tracing import setup_tracing
     from agno.db.sqlite import SqliteDb
 
     db = SqliteDb(db_file="tmp/traces.db")
-    setup_tracing(db=db) # Call this once at startup
+    setup_tracing(db=db) # 在启动时调用一次
     ```
   </Step>
-  
-  <Step title="Run Your Agent">
+
+  <Step title="运行您的智能体">
     ```python
     from agno.agent import Agent
     from agno.models.openai import OpenAIChat
@@ -116,12 +115,12 @@ Agno automatically captures:
         model=OpenAIChat(id="gpt-4o-mini"),
         instructions="You are a helpful assistant",
     )
-    
-    agent.run("Hello!")  # Automatically traced!
+
+    agent.run("Hello!")  # 自动追踪！
     ```
   </Step>
-  
-  <Step title="Query Traces">
+
+  <Step title="查询追踪">
     ```python
     traces, total = db.get_traces(agent_id=agent.id, limit=10)
     for trace in traces:
@@ -130,28 +129,28 @@ Agno automatically captures:
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
 <CardGroup cols={3}>
   <Card
-    title="Basic Setup"
+    title="基本设置"
     icon="rocket"
     href="/basics/tracing/basic-setup"
   >
-    Configure and enable tracing
+    配置和启用追踪
   </Card>
   <Card
-    title="Tracing in AgentOS"
+    title="AgentOS中的追踪"
     icon="rocket"
     href="/agent-os/tracing/overview"
   >
-    Trace your agents, teams, and workflows in AgentOS
+    在AgentOS中追踪您的智能体、团队和工作流
   </Card>
   <Card
-    title="DB Functions"
+    title="数据库函数"
     icon="database"
     href="/basics/tracing/db-functions"
   >
-    Query traces and spans from your database
+    从您的数据库查询追踪和跨度
   </Card>
 </CardGroup>

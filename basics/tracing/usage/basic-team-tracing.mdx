@@ -1,22 +1,22 @@
 ---
-title: Basic Team Tracing
-description: Learn how to trace your teams with Agno
-sidebarTitle: Basic Team Tracing
-keywords: [tracing, observability, teams, agno, opentelemetry]
+title: 基本团队追踪
+description: 学习如何使用Agno追踪您的团队
+sidebarTitle: 基本团队追踪
+keywords: ["追踪", "可观测性", "团队", "agno", "opentelemetry"]
 mode: wide
 ---
 
-This example shows how to enable tracing for a team. When tracing is enabled, all team operations, member agent runs, model calls, and tool executions are automatically captured and stored in your database.
+此示例展示了如何为团队启用追踪。当启用了追踪后，所有团队操作、成员智能体运行、模型调用和工具执行都会自动捕获并存储在您的数据库中。
 
 <Steps>
 
-  <Step title="Create a Python file">
+  <Step title="创建Python文件">
     ```bash
     touch basic_team_tracing.py
     ```
   </Step>
 
-  <Step title="Add the following code to your Python file">
+  <Step title="将以下代码添加到您的Python文件中">
     ```python basic_team_tracing.py
     from agno.agent import Agent
     from agno.db.sqlite import SqliteDb
@@ -25,13 +25,13 @@ This example shows how to enable tracing for a team. When tracing is enabled, al
     from agno.tools.hackernews import HackerNewsTools
     from agno.tracing import setup_tracing
 
-    # Set up database for traces
+    # 设置追踪数据库
     db = SqliteDb(db_file="tmp/traces.db")
 
-    # Enable tracing (call once at startup)
+    # 启用追踪（在启动时调用一次）
     setup_tracing(db=db)
 
-    # Create member agent - no need to set tracing on each one!
+    # 创建成员智能体 - 无需在每个智能体上单独设置追踪！
     hackernews_agent = Agent(
         name="HackerNews Agent",
         model=OpenAIChat(id="gpt-5-mini"),
@@ -40,7 +40,7 @@ This example shows how to enable tracing for a team. When tracing is enabled, al
         markdown=True,
     )
 
-    # Create team with the agent as a member
+    # 创建包含该智能体作为成员的团队
     team = Team(
         name="HackerNews Team",
         model=OpenAIChat(id="gpt-5-mini"),
@@ -49,10 +49,10 @@ This example shows how to enable tracing for a team. When tracing is enabled, al
         db=db,
     )
 
-    # Run the team - traces are captured automatically
+    # 运行团队 - 追踪数据会自动捕获
     team.print_response("What's trending on HackerNews?")
 
-    # Query traces from the database
+    # 从数据库查询追踪数据
     traces, count = db.get_traces(team_id=team.id, limit=10)
     print(f"\nFound {count} traces for team '{team.name}'")
     for trace in traces:
@@ -62,13 +62,13 @@ This example shows how to enable tracing for a team. When tracing is enabled, al
 
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U openai agno opentelemetry-api opentelemetry-sdk openinference-instrumentation-agno
     ```
   </Step>
 
-  <Step title="Export your OpenAI API key">
+  <Step title="导出您的OpenAI API密钥">
     <CodeGroup>
     ```bash Mac/Linux
     export OPENAI_API_KEY="your_openai_api_key_here"
@@ -80,7 +80,7 @@ This example shows how to enable tracing for a team. When tracing is enabled, al
     </CodeGroup>
   </Step>
 
-  <Step title="Run the team">
+  <Step title="运行团队">
     <CodeGroup>
     ```bash Mac
     python basic_team_tracing.py

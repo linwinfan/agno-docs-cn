@@ -1,13 +1,13 @@
 ---
-title: Single Step Continuous Execution Workflow
-description: This example demonstrates a workflow with a single step that is executed continuously with access to workflow history.
+title: 单步骤连续执行工作流
+description: 此示例演示了一个具有单个步骤的工作流，该步骤可以连续执行并访问工作流历史记录。
 ---
 
-This example shows how to use the `add_workflow_history_to_steps` flag to add workflow history to all the steps in the workflow.
+此示例展示了如何使用 `add_workflow_history_to_steps` 标志将工作流历史记录添加到工作流中的所有步骤。
 
-In this case we have a single step workflow with a single agent.
+在此情况下，我们有一个包含单个代理的单步骤工作流。
 
-The agent has access to the workflow history and uses it to provide personalized educational support.
+该代理可以访问工作流历史记录，并利用它来提供个性化的教育支持。
 
 ```python 01_single_step_continuous_execution_workflow.py
 from agno.agent import Agent

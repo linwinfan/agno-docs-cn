@@ -1,51 +1,50 @@
 ---
-title: What is Culture?
-description: Enable your agents to share universal knowledge, principles, and best practices that compound across all interactions.
-sidebarTitle: Overview
-keywords: [culture, culture management, culture sharing, cultural knowledge]
+title: 什么是文化？
+description: 使您的代理能够共享通用知识、原则和最佳实践，这些内容会在所有交互中不断积累。
+sidebarTitle: 概述
+keywords: ["文化", "文化管理", "文化共享", "文化知识"]
 ---
 
 <Badge icon="code-branch" color="orange">
-    <Tooltip tip="Introduced in v2.1.10" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.1.10">v2.1.10</Tooltip>
+    <Tooltip tip="在 v2.1.10 中引入" cta="查看发布说明" href="https://github.com/agno-agi/agno/releases/tag/v2.1.10">v2.1.10</Tooltip>
 </Badge>
 
-Imagine agents that learn from every interaction and share those learnings with each other. 
-A support agent discovers that customers prefer step-by-step solutions with code examples. 
-A technical writer agent learns that "Operational Thinking" produces better documentation. 
-These insights shouldn't be lost—they should become part of a shared culture that benefits all agents, forever. Culture turns these patterns into reusable rules your agents can follow from day one.
+想象一下，代理能够从每次交互中学习并将这些学习成果相互分享。
+支持代理发现客户更喜欢带有代码示例的分步解决方案。
+技术写作代理了解到"操作性思维"能产生更好的文档。
+这些见解不应该丢失——它们应该成为共享文化的一部分，永远造福所有代理。文化将这些模式转化为可重用的规则，您的代理从第一天起就可以遵循。
 
+## 文化如何工作
 
-## How Culture Works
+文化提供了一个共享知识层，代理在此存储适用于所有交互的通用原则、最佳实践和可重用见解。与存储用户特定事实（"Sarah 偏好电子邮件"）的记忆不同，文化存储对所有人都有益的通用知识（"始终提供具有明确后续步骤的可操作解决方案"）。
 
-Culture provides a shared knowledge layer where agents store universal principles, best practices, and reusable insights that apply across all interactions. Unlike Memory, which stores user-specific facts ("Sarah prefers email"), Culture stores universal knowledge that benefits everyone ("Always provide actionable solutions with clear next steps").
-
-When an agent completes a task, it can reflect on what worked well and distill that into cultural knowledge. Later, when any agent faces a similar situation, it automatically accesses this shared culture and applies those learnings.
+当代理完成任务时，它可以反思哪些方法有效，并将其提炼为文化知识。之后，当任何代理面临类似情况时，它会自动访问这种共享文化并应用这些学习成果。
 
 <Tip>
-**Culture ≠ Memory:** Culture stores universal principles and best practices that apply to all interactions. [Memory](/basics/memory/overview) stores user-specific facts and preferences. Think of Culture as "how we do things here" and Memory as "what I know about you."
+**文化 ≠ 记忆：** 文化存储适用于所有交互的通用原则和最佳实践。[记忆](/basics/memory/overview) 存储用户特定的事实和偏好。将文化视为"我们在这里做事的方式"，将记忆视为"我对你的了解"。
 </Tip>
 
 <Note>
-**Notice:** Culture is an experimental feature and is subject to change. The current goal is helping agents stay consistent in tone, reasoning, and behavior. The eventual goal is to transform isolated agents into a living, evolving system of collective intelligence.
+**注意：** 文化是一项实验性功能，可能会发生变化。当前目标是帮助代理在语调、推理和行为上保持一致。最终目标是将孤立的代理转变为一个活生生的、不断进化的集体智能系统。
 </Note>
 
-## Why Use Culture?
+## 为什么要使用文化？
 
-Culture enables intelligence to compound. Instead of each agent starting from scratch, they build on collective experience:
+文化使智能能够复利增长。代理不是每次都从零开始，而是建立在集体经验之上：
 
-- **Consistency:** All agents follow the same communication standards, formatting rules, and best practices
-- **Evolution:** Your agent system improves over time as agents learn what works
-- **Efficiency:** Agents don't re-learn the same lessons repeatedly
+- **一致性：** 所有代理遵循相同的沟通标准、格式规则和最佳实践
+- **进化：** 随着代理学习什么有效，您的代理系统会随时间改进
+- **效率：** 代理不会重复学习相同的教训
 
-**Example Use Cases:**
-- Technical documentation agents that maintain consistent style and structure
-- Customer support teams that apply proven problem-solving patterns
-- Development assistants that follow your organization's coding standards
-- Content generation that adheres to brand voice and formatting guidelines
+**使用案例示例：**
+- 保持一致风格和结构的技术文档代理
+- 应用经过验证的问题解决模式的客户支持团队
+- 遵循组织编码标准的开发助手
+- 遵守品牌语调和格式指南的内容生成
 
-## Getting Started with Culture
+## 开始使用文化
 
-Setting up culture is straightforward: connect a database and enable the culture feature. Here's a basic setup:
+设置文化非常简单：连接数据库并启用文化功能。以下是一个基本设置：
 
 ```python
 from agno.agent import Agent
@@ -62,19 +61,19 @@ agent = Agent(
 )
 ```
 
-With these flags enabled, your agent automatically:
-1. Loads relevant cultural knowledge when starting a task
-2. Applies that knowledge during reasoning and response generation
-3. Reflects on the interaction afterward
-4. Updates or adds cultural knowledge based on what it learned
+启用这些标志后，您的代理会自动：
+1. 在开始任务时加载相关的文化知识
+2. 在推理和响应生成过程中应用这些知识
+3. 在交互后进行反思
+4. 根据所学内容更新或添加文化知识
 
-## Three Approaches to Culture Management
+## 文化管理的三种方法
 
-Agno gives you three ways to manage cultural knowledge, depending on your needs:
+Agno 根据您的需求提供了三种管理文化知识的方法：
 
-### 1. Automatic Culture (`update_cultural_knowledge=True`)
+### 1. 自动文化（`update_cultural_knowledge=True`）
 
-After each agent run, the system automatically reflects on the interaction and updates cultural knowledge. This is the recommended approach for most production use cases.
+每次代理运行后，系统会自动反思交互并更新文化知识。这是大多数生产用例的推荐方法。
 
 ```python
 from agno.agent import Agent
@@ -84,22 +83,22 @@ db = SqliteDb(db_file="agno.db")
 
 agent = Agent(
     db=db,
-    add_culture_to_context=True,  # Read culture
-    update_cultural_knowledge=True,  # Update culture automatically
+    add_culture_to_context=True,  # 读取文化
+    update_cultural_knowledge=True,  # 自动更新文化
 )
 
-# The agent will learn from this interaction
+# 代理将从此次交互中学习
 agent.print_response(
-    "How do I set up a FastAPI service using Docker?",
+    "如何使用 Docker 设置 FastAPI 服务？",
     stream=True,
 )
 ```
 
-**Best for:** Production systems where you want agents to continuously improve their approach based on what works.
+**最适合：** 希望代理根据有效方法持续改进其方法的生产系统。
 
-### 2. Agentic Culture (`enable_agentic_culture=True`)
+### 2. 代理驱动的文化（`enable_agentic_culture=True`）
 
-The agent gets full control over culture management through built-in tools. It decides when and what to add to the cultural knowledge base.
+代理通过内置工具完全控制文化管理。它决定何时以及向文化知识库中添加什么内容。
 
 ```python
 from agno.agent import Agent
@@ -109,18 +108,18 @@ db = SqliteDb(db_file="agno.db")
 
 agent = Agent(
     db=db,
-    add_culture_to_context=True,  # Read culture
-    enable_agentic_culture=True,  # Agent-controlled culture tools
+    add_culture_to_context=True,  # 读取文化
+    enable_agentic_culture=True,  # 代理控制的文化工具
 )
 ```
 
-With agentic culture, the agent is equipped with tools to manage cultural knowledge when it deems relevant during the conversation itself, not just after completion.
+使用代理驱动的文化，代理配备了在对话过程中（而不仅仅是在完成后）管理文化知识的工具，当它认为相关时就会使用这些工具。
 
-**Best for:** Complex workflows where the agent should actively decide what principles to establish or update during the task.
+**最适合：** 代理需要在任务期间主动决定建立或更新哪些原则的复杂工作流。
 
-### 3. Manual Culture Management
+### 3. 手动文化管理
 
-Create cultural knowledge explicitly using the `CultureManager` or by directly instantiating `CulturalKnowledge` objects. Perfect for seeding organizational standards.
+使用 `CultureManager` 或直接实例化 `CulturalKnowledge` 对象来显式创建文化知识。非常适合播种组织标准。
 
 ```python
 from agno.culture.manager import CultureManager
@@ -130,46 +129,46 @@ from agno.models.anthropic import Claude
 
 db = SqliteDb(db_file="agno.db")
 
-# Option A: Use CultureManager with a model to process principles
+# 选项 A：使用 CultureManager 和模型处理原则
 culture_manager = CultureManager(
     db=db,
     model=Claude(id="claude-sonnet-4-5"),
 )
 
 message = """
-All technical guidance should follow 'Operational Thinking':
-1. State the Objective — What outcome and why
-2. Show the Procedure — Clear, reproducible steps
-3. Surface Pitfalls — What usually fails
-4. Define Validation — How to confirm it works
-5. Close the Loop — Suggest next iterations
+所有技术指导都应遵循"操作性思维"：
+1. 陈述目标 — 说明结果及其原因
+2. 展示流程 — 清晰、可复现的步骤
+3. 揭示陷阱 — 通常会失败的地方
+4. 定义验证 — 如何确认其有效性
+5. 闭环反馈 — 建议下一步迭代
 """
 
 culture_manager.create_cultural_knowledge(message=message)
 
-# Option B: Manually add cultural knowledge without a model
+# 选项 B：手动添加文化知识（无需模型）
 response_format = CulturalKnowledge(
-    name="Response Format Standard",
-    summary="Keep responses concise, scannable, and runnable-first",
+    name="响应格式标准",
+    summary="保持响应简洁、易扫描，并以可运行代码为先",
     categories=["communication", "ux"],
     content=(
-        "- Lead with minimal runnable snippet\n"
-        "- Use numbered steps for procedures\n"
-        "- End with validation checklist"
+        "- 以最少的可运行代码片段开头\n"
+        "- 使用编号步骤描述流程\n"
+        "- 以验证清单结尾"
     ),
-    notes=["Derived from user feedback"],
+    notes=["源自用户反馈"],
 )
 
 culture_manager.add_cultural_knowledge(response_format)
 ```
 
-**Best for:** Seeding initial organizational principles, onboarding standards, or brand guidelines that all agents should follow.
+**最适合：** 播种初始组织原则、入职标准或所有代理都应遵循的品牌指南。
 
-## Storage: Where Culture Lives
+## 存储：文化存放的位置
 
-Cultural knowledge is stored in the database you connect to your agent. Agno supports all major database systems: Postgres, SQLite, MongoDB, and more. Check the [Database documentation](/basics/database/overview) for the full list.
+文化知识存储在您连接到代理的数据库中。Agno 支持所有主要数据库系统：Postgres、SQLite、MongoDB 等。完整的列表请查看[数据库文档](/basics/database/overview)。
 
-By default, cultural knowledge is stored in the `agno_cultural_knowledge` table (or collection for document databases). A custom table name can also be configured. If this table doesn't exist, Agno creates it automatically.
+默认情况下，文化知识存储在 `agno_cultural_knowledge` 表中（对于文档数据库则是集合）。也可以配置自定义表名。如果该表不存在，Agno 会自动创建它。
 
 
 ```python
@@ -178,19 +177,19 @@ from agno.db.postgres import PostgresDb
 
 db = PostgresDb(
     db_url="postgresql://user:password@localhost:5432/my_database",
-    cultural_knowledge_table="my_culture_table",  # Custom table name
+    cultural_knowledge_table="my_culture_table",  # 自定义表名
 )
 
 agent = Agent(
-    db=db, 
+    db=db,
     add_culture_to_context=True,
     update_cultural_knowledge=True,
 )
 ```
 
-### Manual Culture Retrieval
+### 手动检索文化
 
-You can manually retrieve cultural knowledge using the `CultureManager`:
+您可以使用 `CultureManager` 手动检索文化知识：
 
 ```python
 from agno.culture.manager import CultureManager
@@ -199,89 +198,88 @@ from agno.db.sqlite import SqliteDb
 db = SqliteDb(db_file="agno.db")
 culture_manager = CultureManager(db=db)
 
-# Get all cultural knowledge
+# 获取所有文化知识
 all_knowledge = culture_manager.get_all_knowledge()
 print(all_knowledge)
 
-# Preview cultural knowledge (truncated for readability)
+# 预览文化知识（为可读性截断）
 for knowledge in all_knowledge:
     print(knowledge.preview())
 ```
 
-## Cultural Knowledge Data Model
+## 文化知识数据模型
 
-Each cultural knowledge entry in your database contains the following fields:
+数据库中的每个文化知识条目包含以下字段：
 
-| Field        | Type     | Description                                      |
+| 字段 | 类型 | 描述 |
 | ------------ | -------- | ------------------------------------------------ |
-| `id`         | `str`    | Unique identifier (auto-generated)               |
-| `name`       | `str`    | Name/title of the cultural knowledge             |
-| `content`    | `str`    | The main content of the principle/knowledge      |
-| `summary`    | `str`    | Brief summary of the knowledge                   |
-| `categories` | `list`   | Categories (e.g., "communication", "engineering")|
-| `notes`      | `list`   | Additional notes or context                      |
-| `metadata`   | `dict`   | Arbitrary metadata (source, version, etc.)       |
-| `input`      | `str`    | Original input that generated this knowledge     |
-| `created_at` | `int`    | Timestamp when created (epoch seconds)           |
-| `updated_at` | `int`    | Timestamp when last updated (epoch seconds)      |
-| `agent_id`   | `str`    | ID of the agent that created it                  |
-| `team_id`    | `str`    | ID of the team associated with it                |
+| `id` | `str` | 唯一标识符（自动生成） |
+| `name` | `str` | 文化知识的名称/标题 |
+| `content` | `str` | 原则/知识的主要内容 |
+| `summary` | `str` | 知识的简要摘要 |
+| `categories` | `list` | 分类（例如："communication"、"engineering"）|
+| `notes` | `list` | 附加说明或上下文 |
+| `metadata` | `dict` | 任意元数据（来源、版本等） |
+| `input` | `str` | 生成此知识的原始输入 |
+| `created_at` | `int` | 创建时间戳（纪元秒） |
+| `updated_at` | `int` | 最后更新时间戳（纪元秒） |
+| `agent_id` | `str` | 创建它的代理 ID |
+| `team_id` | `str` | 关联的团队 ID |
 
+## 最佳实践
 
-## Best Practices
+1. **从手动播种开始：** 预先定义核心组织原则、沟通标准和最佳实践
+2. **在生产中使用自动更新：** 让 `update_cultural_knowledge=True` 自然地处理演进
+3. **定期审查：** 检查已积累的文化知识并根据需要进行优化
+4. **保持文化专注：** 文化应包含通用原则，而不是特定任务的细节
+5. **与记忆结合使用：** 使用文化表示"我们做事的方式"，使用记忆表示"我对你的了解"
 
-1. **Start with Manual Seeding:** Define core organizational principles, communication standards, and best practices upfront
-2. **Use Automatic Updates in Production:** Let `update_cultural_knowledge=True` handle the evolution naturally
-3. **Review Periodically:** Check what cultural knowledge has accumulated and refine as needed
-4. **Keep Culture Focused:** Culture should contain universal principles, not task-specific details
-5. **Combine with Memory:** Use Culture for "how we do things" and Memory for "what I know about you"
+## 常见用例
 
-## Common Use Cases
-
-### Technical Documentation Standards
+### 技术文档标准
 ```python
-# Seed documentation standards
+# 播种文档标准
 doc_standard = CulturalKnowledge(
-    name="Documentation Standard",
-    summary="All docs follow structure: Example → Explanation → Validation",
+    name="文档标准",
+    summary="所有文档遵循结构：示例 → 解释 → 验证",
     categories=["documentation", "engineering"],
     content=(
-        "1. Start with a minimal working example\n"
-        "2. Explain key concepts and decisions\n"
-        "3. Provide validation steps\n"
-        "4. Link to related resources"
+        "1. 从最小工作示例开始\n"
+        "2. 解释关键概念和决策\n"
+        "3. 提供验证步骤\n"
+        "4. 链接到相关资源"
     ),
 )
 ```
 
-### Customer Communication Tone
+### 客户沟通语调
 ```python
-# Define communication standards
+# 定义沟通标准
 comm_standard = CulturalKnowledge(
-    name="Customer Communication Tone",
-    summary="Professional, empathetic, solution-focused",
+    name="客户沟通语调",
+    summary="专业、富有同理心、以解决方案为导向",
     categories=["communication", "support"],
     content=(
-        "- Acknowledge the customer's situation first\n"
-        "- Provide clear, actionable steps\n"
-        "- Avoid jargon unless necessary\n"
-        "- Always offer next steps or alternatives"
+        "- 首先确认客户的情况\n"
+        "- 提供清晰、可操作的步骤\n"
+        "- 除非必要，否则避免使用术语\n"
+        "- 始终提供后续步骤或替代方案"
     ),
 )
 ```
 
-### Code Review Principles
+### 代码审查原则
 ```python
-# Engineering standards
+# 工程标准
 code_review = CulturalKnowledge(
-    name="Code Review Standards",
-    summary="Focus on maintainability, security, and performance",
+    name="代码审查标准",
+    summary="关注可维护性、安全性和性能",
     categories=["engineering", "code-review"],
     content=(
-        "- Check for security vulnerabilities first\n"
-        "- Verify error handling is comprehensive\n"
-        "- Ensure code is self-documenting\n"
-        "- Suggest performance optimizations where relevant"
+        "- 首先检查安全漏洞\n"
+        "- 验证错误处理是否全面\n"
+        "- 确保代码具有自文档化特性\n"
+        "- 在相关位置建议性能优化"
     ),
 )
 ```

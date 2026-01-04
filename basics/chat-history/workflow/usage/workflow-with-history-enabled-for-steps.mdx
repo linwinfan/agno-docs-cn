@@ -1,14 +1,14 @@
 ---
-title: Workflow with History Enabled for Steps
-description: This example demonstrates a workflow with history enabled for specific steps.
+title: 为步骤启用历史记录的工作流
+description: 此示例演示了一个为特定步骤启用历史记录的工作流。
 ---
 
 
-This example shows how to use the `add_workflow_history_to_steps` flag to add workflow history to multiple steps in the workflow.
-In this case we have a workflow with three steps.
-- The first step is a meal suggester that suggests meal categories and cuisines.
-- The second step is a preference analysis step that analyzes the conversation history to understand user food preferences.
-- The third step is a recipe specialist that provides recipe recommendations based on the user's preferences.
+此示例展示了如何使用 `add_workflow_history_to_steps` 标志将工作流历史记录添加到工作流中的多个步骤。
+在此情况下，我们有一个包含三个步骤的工作流。
+- 第一个步骤是膳食建议器，用于建议膳食类别和菜系。
+- 第二个步骤是偏好分析步骤，通过分析对话历史来了解用户的饮食偏好。
+- 第三个步骤是食谱专家，根据用户的偏好提供食谱推荐。
 
 ```python 02_workflow_with_history_enabled_for_steps.py
 from agno.agent import Agent
