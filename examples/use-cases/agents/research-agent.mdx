@@ -1,34 +1,33 @@
 ---
-title: Research Agent
+title: "研究智能体"
 mode: wide
 ---
 
+构建一个 AI 研究智能体，结合网络搜索与专业新闻报道，进行全面的研究、事实核查，并提供结构良好的纽约时报风格文章。
 
-Build an AI re搜索 代理 that combines web 搜索 with professional journalism to perform comprehensive re搜索, fact-check 信息, and deliver well-structured NYT-style articles.
+## 您将学到的内容
 
-## What You'll 学习
+通过构建此智能体，您将理解：
+- 如何使用网络搜索工具（DuckDuckGo）进行多源研究
+- 如何使用 Newspaper4k 从网络文章中提取和分析内容
+- 如何以清晰的说明构建专业的新闻写作结构
+- 如何定义输出模板以确保文章格式的一致性
 
-By building this 代理, you'll 理解:
-- How 使用 web 搜索 工具s (DuckDuckGo) for multi-source re搜索
-- How to extract and analyze content from web articles using Newspaper4k
-- How to structure professional journalistic writing with clear 说明
-- How to define output templates for consistent article formatting
+## 使用场景
 
-## 使用 Cases
+构建调查新闻工具、研究报告生成器、事实核查系统或内容分析平台。
 
-Build investigative journalism 工具s, re搜索 report generators, fact-checking systems, or content analysis platforms.
+## 工作原理
 
-## How It Works
+该智能体遵循专业新闻研究工作流程：
 
-The 代理 follows a professional journalism re搜索 工作流:
+1. **研究**：使用 DuckDuckGo 搜索 10+ 个权威来源
+2. **提取**：使用 Newspaper4k 从相关文章中提取内容
+3. **分析**：交叉引用事实，识别模式和趋势
+4. **写作**：将发现整理成具有平衡视角的纽约时报风格文章
+5. **验证**：确保所有事实和引用的准确性
 
-1. **Re搜索**: Searches 10+ authoritative sources using DuckDuckGo
-2. **Extract**: 使用s Newspaper4k to pull content from relevant articles
-3. **Analyze**: Cross-references facts, identifies patterns and trends
-4. **Write**: Structures findings into NYT-style articles with balanced perspectives
-5. **Verify**: Ensures 所有 facts and attributions are accurate
-
-The 代理 maintains journalistic standards of objectivity and includes proper sourcing throughout.
+该智能体保持新闻客观性标准，并在整个过程中包含适当的引用来源。
 
 ## 代码
 
@@ -162,30 +161,30 @@ Societal Impact:
 """
 ```
 
-## What to Expect
+## 预期效果
 
-The 代理 will conduct comprehensive re搜索 on your query using DuckDuckGo to find multiple authoritative sources. It extracts content from relevant articles using Newspaper4k, cross-references 信息, and synthesizes findings into a professional NYT-style article.
+该智能体会使用 DuckDuckGo 对您的查询进行全面研究，找到多个权威来源。它使用 Newspaper4k 从相关文章中提取内容，交叉引用信息，并将发现综合成专业的纽约时报风格文章。
 
-The output includes an executive summary, background context, key findings with expert quotes and statistics, impact analysis, future outlook, and a complete list of sources. All content follows journalistic standards with balanced perspectives and verified facts.
+输出包括执行摘要、背景上下文、带有专家引述和统计数据的关键发现、影响分析、未来展望以及完整的来源列表。所有内容都遵循新闻标准，具有平衡的视角和经过验证的事实。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai ddgs newspaper4k lxml_html_clean
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python research_agent.py
@@ -198,9 +197,9 @@ The output includes an executive summary, background context, key findings with 
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Modify the re搜索 topic to explore different subjects
-- Adjust the number of sources 搜索ed for more comprehensive coverage
-- Customize the `expected_output` template to match your preferred article style
-- 探索 [DuckDuckGo Tools](/integrations/工具kits/搜索/duckduckgo) for advanced 搜索 options
+- 修改研究主题以探索不同主题
+- 调整搜索的来源数量以获得更全面的覆盖
+- 自定义 `expected_output` 模板以匹配您偏好的文章风格
+- 探索 [DuckDuckGo 工具](/integrations/toolkits/search/duckduckgo) 以获取高级搜索选项

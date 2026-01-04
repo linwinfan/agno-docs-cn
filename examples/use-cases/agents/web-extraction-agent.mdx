@@ -1,33 +1,32 @@
 ---
-title: Web Extraction Agent
+title: "网页提取智能体"
 mode: wide
 ---
 
+构建一个 AI 智能体，通过结合 Firecrawl 的网页抓取和 Pydantic 的结构化输出验证，将非结构化的网页内容转换为有组织的结构化数据。
 
-Build an AI 代理 that transforms unstructured web content into organized, structured data by combining Firecrawl's web scraping with Pydantic's structured output validation.
+## 您将学到的内容
 
-## What You'll 学习
+通过构建此智能体，您将理解：
+- 如何集成 Firecrawl 进行可靠的网页抓取和内容提取
+- 如何使用 Pydantic 模型定义结构化输出模式
+- 如何为复杂的网页内容创建嵌套数据结构
+- 如何处理可选字段和多样的页面结构
 
-By building this 代理, you'll 理解:
-- How to integrate Firecrawl for reliable web scraping and content extraction
-- How to define structured output schemas using Pydantic 模型s
-- How 创建 nested data structures for complex web content
-- How to handle optional fields and varied page structures
+## 使用场景
 
-## 使用 Cases
+构建竞争情报工具、内容聚合系统、知识库构建器或自动化文档生成器。
 
-Build competitive intelligence 工具s, content aggregation systems, 知识库 constructors, or automated documentation generators.
+## 工作原理
 
-## How It Works
+该智能体通过系统化流程从网页中提取结构化数据：
 
-The 代理 extracts structured data from web pages in a systematic process:
+1. **获取**：使用 Firecrawl 检索和解析目标网页
+2. **分析**：识别关键部分、元素和层次结构
+3. **提取**：根据 Pydantic 输出模式提取信息
+4. **结构化**：将内容组织成嵌套模型（章节、元数据、链接、联系信息）
 
-1. **Fetch**: 使用s Firecrawl to retrieve and parse the target webpage
-2. **Analyze**: Identifies key sections, elements, and hierarchical structure
-3. **Extract**: Pulls 信息 according to the Pydantic output schema
-4. **Structure**: Organizes content into nested 模型s (sections, metadata, 链接s, contact 信息)
-
-The Pydantic schema ensures consistent output format regardless of the source website's structure, with optional fields handling varied page layouts gracefully.
+Pydantic 模式确保无论源网站结构如何，都能保持一致的输出格式，可选字段能够优雅地处理多样的页面布局。
 
 ## 代码
 
@@ -95,31 +94,31 @@ pprint(result.content)
 
 ```
 
-## What to Expect
+## 预期效果
 
-The 代理 will scrape the target URL using Firecrawl and extract 所有 信息 into a structured PageInformation object. The output includes the page title, de脚本ion, features, organized content sections with headings, important 链接s, contact 信息, and additional metadata.
+该智能体会使用 Firecrawl 抓取目标 URL，并将所有信息提取到结构化的 PageInformation 对象中。输出包括页面标题、描述、功能特性、带有标题的组织化内容章节、重要链接、联系信息以及其他元数据。
 
-The structured output ensures consistency and makes the extracted data easy to process, store, or display programmatic所有y. Optional fields handle pages with varying structures gracefully.
+结构化输出确保了一致性，使提取的数据易于以编程方式处理、存储或显示。可选字段能够优雅地处理具有不同结构的页面。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     export FIRECRAWL_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai firecrawl-py
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python web_extraction_agent.py
@@ -132,9 +131,9 @@ The structured output ensures consistency and makes the extracted data easy to p
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Change the target URL to extract data from different websites
-- Modify the `PageInformation` Pydantic 模型 to capture additional fields
-- Adjust the 代理's 说明 to focus on specific content types
-- 探索 [Firecrawl Tools](/integrations/工具kits/web-scrape/firecrawl) for advanced scraping options
+- 更改目标 URL 以从不同网站提取数据
+- 修改 `PageInformation` Pydantic 模型以捕获额外字段
+- 调整智能体的说明以专注于特定内容类型
+- 探索 [Firecrawl 工具](/integrations/toolkits/web-scrape/firecrawl) 以获取高级抓取选项

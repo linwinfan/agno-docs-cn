@@ -1,33 +1,32 @@
 ---
-title: YouTube Agent
+title: "YouTube 智能体"
 mode: wide
 ---
 
+构建一个 AI 智能体，分析 YouTube 视频并创建带有准确时间戳的结构化摘要。该智能体从视频内容中提取关键见解，使用户无需完整观看即可轻松浏览教育视频、教程和演示文稿。
 
-Build an AI 代理 that analyzes YouTube videos and creates structured summaries with accurate timestamps. This 代理 extracts key insights from video content, making it easy to navigate educational videos, tutorials, and presentations without watching them in full.
+## 您将学到的内容
 
-## What You'll 学习
+通过构建此智能体，您将理解：
+- 如何将 YouTube 字幕提取集成到智能体中
+- 如何构建提示以生成一致的时间戳
+- 如何将视频内容组织成逻辑章节
+- 如何创建将非结构化媒体转换为可搜索内容的智能体
 
-By building this 代理, you'll 理解:
-- How to integrate YouTube tran脚本 extraction into 代理s
-- How to structure prompts for consistent timestamp generation
-- How to organize video content into logical sections
-- How 创建 代理s that transform unstructured media into 搜索able content
+## 使用场景
 
-## 使用 Cases
+从讲座创建学习指南、从会议演讲中提取见解、构建可搜索的视频索引，或从教程视频生成文档。
 
-Create study guides from lectures, extract insights from conference talks, build 搜索able video indexes, or generate documentation from tutorial videos.
+## 工作原理
 
-## How It Works
+该智能体使用 YouTubeTools 获取视频字幕和元数据，然后分析内容以：
 
-The 代理 uses YouTubeTools to fetch video tran脚本s and metadata, then analyzes the content to:
+1. **提取**：获取视频元数据（标题、时长）和完整字幕
+2. **分析**：识别视频类型和内容结构
+3. **组织**：为主要话题转换创建时间戳
+4. **总结**：生成基于章节的摘要和关键要点
 
-1. **Extract**: Gets video metadata (title, duration) and full tran脚本
-2. **Analyze**: Identifies video type and content structure
-3. **Organize**: Creates timestamps for major topic transitions
-4. **Summarize**: Generates section-based summaries with key points
-
-The structured output makes long-form video content quickly scannable and 搜索able.
+结构化输出使长篇视频内容能够快速浏览和搜索。
 
 ## 代码
 
@@ -117,36 +116,36 @@ Creative Content:
 """
 ```
 
-## What to Expect
+## 预期效果
 
-The 代理 analyzes YouTube videos by fetching tran脚本s and generating comprehensive breakdowns. For a typical video, you'll receive:
+该智能体通过获取字幕来分析 YouTube 视频并生成全面的分解。对于典型视频，您将收到：
 
-- Video metadata (title, duration, type, and audience)
-- High-level structure over查看
-- Timestamped breakdown of major topics with key 示例
-- Content organization showing recurring themes
-- Practical highlights and actionable takeaways
+- 视频元数据（标题、时长、类型和受众）
+- 高层次结构概览
+- 带有关键示例的主要话题时间戳分解
+- 显示重复主题的内容组织
+- 实用亮点和可操作的要点
 
-Analysis typic所有y takes 30-60 seconds depending on video length and complexity.
+分析通常需要 30-60 秒，具体取决于视频长度和复杂性。
 
 ## 用法
 
 <Steps>
   <Snippet file="create-venv-step.mdx" />
 
-  <Step title="Set your API key">
+  <Step title="设置 API 密钥">
     ```bash
     export OPENAI_API_KEY=xxx
     ```
   </Step>
 
-  <Step title="Install libraries">
+  <Step title="安装库">
     ```bash
     pip install -U agno openai youtube_transcript_api
     ```
   </Step>
 
-  <Step title="Run Agent">
+  <Step title="运行智能体">
     <CodeGroup>
     ```bash Mac
     python youtube_agent.py
@@ -159,9 +158,9 @@ Analysis typic所有y takes 30-60 seconds depending on video length and complexi
   </Step>
 </Steps>
 
-## Next Steps
+## 后续步骤
 
-- Try analyzing different video types (tutorials, lectures, re查看s)
-- Modify `instructions` to focus on specific content types
-- Combine with other 工具s for enhanced analysis
-- 探索 [Tools](/basics/工具s/over查看) for additional capabilities
+- 尝试分析不同类型的视频（教程、讲座、评论）
+- 修改 `instructions` 以专注于特定内容类型
+- 结合其他工具以增强分析能力
+- 探索 [工具](/basics/tools/overview) 以获取更多功能
