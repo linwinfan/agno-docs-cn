@@ -24,7 +24,7 @@ title: 初创企业创意验证器
 1. **澄清**：创意澄清智能体提炼并结构化核心商业概念
 2. **评估**：原创性评估器评估与现有解决方案相比的独特性
 3. **定义**：使命定义器建立清晰的目标和愿景
-4. **调研**：市场调研员使用Google搜索进行全面分析
+4. **调研**：市场调研员使用网络搜索进行全面分析
 5. **综合**：将所有见解综合成包含建议的验证报告
 
 每个智能体专注于特定的验证方面，确保全面分析。
@@ -33,50 +33,49 @@ title: 初创企业创意验证器
 
 ```python startup_idea_validator.py
 """
-Startup Idea Validator - Your Personal Business Validation Assistant!
+初创企业创意验证器 - 您的个人商业验证助手！
 
-This workflow helps entrepreneurs validate their startup ideas by:
-1. Clarifying and refining the core business concept
-2. Evaluating originality compared to existing solutions
-3. Defining clear mission and objectives
-4. Conducting comprehensive market research and analysis
+该工作流通过以下方式帮助创业者验证他们的初创企业创意：
+1. 澄清和优化核心商业概念
+2. 评估与现有解决方案相比的原创性
+3. 定义明确的使命和目标
+4. 进行全面的市场调研和分析
 
-Why is this helpful?
+为什么这很有帮助？
 --------------------------------------------------------------------------------
-• Get objective feedback on your startup idea before investing resources
-• Understand your total addressable market and target segments
-• Validate assumptions about market opportunity and competition
-• Define clear mission and objectives to guide execution
+• 在投入资源之前获得关于您的初创企业创意的客观反馈
+• 了解您的总可寻址市场和目标细分
+• 验证关于市场机会和竞争的假设
+• 定义明确的使命和目标以指导执行
 
-Who should use this?
+谁应该使用这个工具？
 --------------------------------------------------------------------------------
-• Entrepreneurs and Startup Founders
-• Product Managers and Business Strategists
-• Innovation Teams
-• Angel Investors and VCs doing initial screening
+• 企业家和初创企业创始人
+• 产品经理和业务策略师
+• 创新团队
+• 进行初步筛选的天使投资者和风险投资家
 
-Example use cases:
+使用示例：
 --------------------------------------------------------------------------------
-• New product/service validation
-• Market opportunity assessment
-• Competitive analysis
-• Business model validation
-• Target customer segmentation
-• Mission/vision refinement
+• 新产品/服务验证
+• 市场机会评估
+• 竞争分析
+• 商业模式验证
+• 目标客户细分
+• 使命/愿景优化
 
-Quick Start:
+快速开始：
 --------------------------------------------------------------------------------
-1. Install dependencies:
+1. 安装依赖：
    pip install openai agno
 
-2. Set environment variables:
+2. 设置环境变量：
    - OPENAI_API_KEY
 
-3. Run:
+3. 运行：
    python startup_idea_validator.py
 
-The workflow will guide you through validating your startup idea with AI-powered
-analysis and research. Use the insights to refine your concept and business plan!
+该工作流将引导您通过AI驱动的分析和研究来验证您的初创企业创意。使用这些见解来优化您的概念和商业计划！
 """
 
 import asyncio
@@ -94,54 +93,54 @@ from pydantic import BaseModel, Field
 
 # --- Response models ---
 class IdeaClarification(BaseModel):
-    originality: str = Field(..., description="Originality of the idea.")
-    mission: str = Field(..., description="Mission of the company.")
-    objectives: str = Field(..., description="Objectives of the company.")
+    originality: str = Field(..., description="创意的原创性。")
+    mission: str = Field(..., description="公司的使命。")
+    objectives: str = Field(..., description="公司的目标。")
 
 
 class MarketResearch(BaseModel):
     total_addressable_market: str = Field(
-        ..., description="Total addressable market (TAM)."
+        ..., description="总可寻址市场 (TAM)。"
     )
     serviceable_available_market: str = Field(
-        ..., description="Serviceable available market (SAM)."
+        ..., description="可服务可用市场 (SAM)。"
     )
     serviceable_obtainable_market: str = Field(
-        ..., description="Serviceable obtainable market (SOM)."
+        ..., description="可服务可获得市场 (SOM)。"
     )
-    target_customer_segments: str = Field(..., description="Target customer segments.")
+    target_customer_segments: str = Field(..., description="目标客户细分。")
 
 
 class CompetitorAnalysis(BaseModel):
-    competitors: str = Field(..., description="List of identified competitors.")
-    swot_analysis: str = Field(..., description="SWOT analysis for each competitor.")
+    competitors: str = Field(..., description="已识别的竞争对手列表。")
+    swot_analysis: str = Field(..., description="每个竞争对手的SWOT分析。")
     positioning: str = Field(
-        ..., description="Startup's potential positioning relative to competitors."
+        ..., description="初创企业相对于竞争对手的潜在定位。"
     )
 
 
 class ValidationReport(BaseModel):
     executive_summary: str = Field(
-        ..., description="Executive summary of the validation."
+        ..., description="验证的执行摘要。"
     )
-    idea_assessment: str = Field(..., description="Assessment of the startup idea.")
-    market_opportunity: str = Field(..., description="Market opportunity analysis.")
+    idea_assessment: str = Field(..., description="初创企业创意的评估。")
+    market_opportunity: str = Field(..., description="市场机会分析。")
     competitive_landscape: str = Field(
-        ..., description="Competitive landscape overview."
+        ..., description="竞争格局概览。"
     )
-    recommendations: str = Field(..., description="Strategic recommendations.")
-    next_steps: str = Field(..., description="Recommended next steps.")
+    recommendations: str = Field(..., description="战略建议。")
+    next_steps: str = Field(..., description="推荐的下一步行动。")
 
 
 # --- Agents ---
 idea_clarifier_agent = Agent(
-    name="Idea Clarifier",
+    name="创意澄清器",
     model=OpenAIChat(id="gpt-4o"),
     instructions=[
-        "Given a user's startup idea, your goal is to refine that idea.",
-        "Evaluate the originality of the idea by comparing it with existing concepts.",
-        "Define the mission and objectives of the startup.",
-        "Provide clear, actionable insights about the core business concept.",
+        "给定用户的初创企业创意，您的目标是优化该创意。",
+        "通过与现有概念进行比较来评估创意的原创性。",
+        "定义初创企业的使命和目标。",
+        "就核心商业概念提供清晰、可操作的见解。",
     ],
     add_history_to_context=True,
     add_datetime_to_context=True,
@@ -150,15 +149,15 @@ idea_clarifier_agent = Agent(
 )
 
 market_research_agent = Agent(
-    name="Market Research Agent",
+    name="市场调研智能体",
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[DuckDuckGoTools()],
     instructions=[
-        "You are provided with a startup idea and the company's mission and objectives.",
-        "Estimate the total addressable market (TAM), serviceable available market (SAM), and serviceable obtainable market (SOM).",
-        "Define target customer segments and their characteristics.",
-        "Search the web for resources and data to support your analysis.",
-        "Provide specific market size estimates with supporting data sources.",
+        "您将获得一个初创企业创意以及公司的使命和目标。",
+        "估算总可寻址市场(TAM)、可服务可用市场(SAM)和可服务可获得市场(SOM)。",
+        "定义目标客户细分及其特征。",
+        "搜索网络资源和数据以支持您的分析。",
+        "提供具有支持性数据源的具体市场规模估算。",
     ],
     add_history_to_context=True,
     add_datetime_to_context=True,
@@ -166,15 +165,15 @@ market_research_agent = Agent(
 )
 
 competitor_analysis_agent = Agent(
-    name="Competitor Analysis Agent",
+    name="竞争分析智能体",
     model=OpenAIChat(id="gpt-5-mini"),
     tools=[DuckDuckGoTools()],
     instructions=[
-        "You are provided with a startup idea and market research data.",
-        "Identify existing competitors in the market.",
-        "Perform Strengths, Weaknesses, Opportunities, and Threats (SWOT) analysis for each competitor.",
-        "Assess the startup's potential positioning relative to competitors.",
-        "Search for recent competitor information and market positioning.",
+        "您将获得一个初创企业创意和市场调研数据。",
+        "识别市场中的现有竞争对手。",
+        "对每个竞争对手进行优势、劣势、机会和威胁(SWOT)分析。",
+        "评估初创企业相对于竞争对手的潜在定位。",
+        "搜索最近的竞争对手信息和市场定位。",
     ],
     add_history_to_context=True,
     add_datetime_to_context=True,
@@ -183,14 +182,14 @@ competitor_analysis_agent = Agent(
 )
 
 report_agent = Agent(
-    name="Report Generator",
+    name="报告生成器",
     model=OpenAIChat(id="gpt-4o"),
     instructions=[
-        "You are provided with comprehensive data about a startup idea including clarification, market research, and competitor analysis.",
-        "Synthesize all information into a comprehensive validation report.",
-        "Provide clear executive summary, assessment, and actionable recommendations.",
-        "Structure the report professionally with clear sections and insights.",
-        "Include specific next steps for the entrepreneur.",
+        "您将获得关于初创企业创意的综合数据，包括澄清、市场调研和竞争分析。",
+        "将所有信息综合成一份全面的验证报告。",
+        "提供清晰的执行摘要、评估和可操作的建议。",
+        "以专业的结构组织报告，包含清晰的部分和见解。",
+        "包括针对企业家的具体下一步行动。",
     ],
     add_history_to_context=True,
     add_datetime_to_context=True,
@@ -206,204 +205,204 @@ async def startup_validation_execution(
     startup_idea: str,
     **kwargs: Any,
 ) -> str:
-    """Execute the complete startup idea validation workflow"""
+    """执行完整的初创企业创意验证工作流"""
 
     # Get inputs
     message: str = execution_input.input
     idea: str = startup_idea
 
     if not idea:
-        return "No startup idea provided"
+        return "未提供初创企业创意"
 
-    print(f"Starting startup idea validation for: {idea}")
-    print(f"Validation request: {message}")
+    print(f"开始为以下初创企业创意进行验证: {idea}")
+    print(f"验证请求: {message}")
 
     # Phase 1: Idea Clarification
-    print("\nPHASE 1: IDEA CLARIFICATION & REFINEMENT")
+    print("\n第1阶段: 创意澄清与优化")
     print("=" * 60)
 
     clarification_prompt = f"""
     {message}
 
-    Please analyze and refine the following startup idea:
+    请分析并优化以下初创企业创意：
 
-    STARTUP IDEA: {idea}
+    初创企业创意: {idea}
 
-    Evaluate:
-    1. The originality of this idea compared to existing solutions
-    2. Define a clear mission statement for this startup
-    3. Outline specific, measurable objectives
-    Provide insights on how to strengthen and focus the core concept.
+    评估:
+    1. 该创意与现有解决方案相比的原创性
+    2. 为该初创企业定义清晰的使命声明
+    3. 概述具体、可衡量的目标
+    提供关于如何加强和聚焦核心概念的见解。
     """
 
-    print("Analyzing and refining the startup concept...")
+    print("分析和优化初创企业概念...")
 
     try:
         clarification_result = await idea_clarifier_agent.arun(clarification_prompt)
         idea_clarification = clarification_result.content
 
-        print("Idea clarification completed")
-        print(f"Mission: {idea_clarification.mission[:100]}...")
+        print("创意澄清完成")
+        print(f"使命: {idea_clarification.mission[:100]}...")
 
     except Exception as e:
-        return f"Failed to clarify idea: {str(e)}"
+        return f"创意澄清失败: {str(e)}"
 
     # Phase 2: Market Research
-    print("\nPHASE 2: MARKET RESEARCH & ANALYSIS")
+    print("\n第2阶段: 市场调研与分析")
     print("=" * 60)
 
     market_research_prompt = f"""
-    Based on the refined startup idea and clarification below, conduct comprehensive market research:
-    STARTUP IDEA: {idea}
-    ORIGINALITY: {idea_clarification.originality}
-    MISSION: {idea_clarification.mission}
-    OBJECTIVES: {idea_clarification.objectives}
-    Please research and provide:
-    1. Total Addressable Market (TAM) - overall market size
-    2. Serviceable Available Market (SAM) - portion you could serve
-    3. Serviceable Obtainable Market (SOM) - realistic market share
-    4. Target customer segments with detailed characteristics
-    Use web search to find current market data and trends.
+    基于下面优化后的初创企业创意和澄清内容，进行综合市场调研：
+    初创企业创意: {idea}
+    原创性: {idea_clarification.originality}
+    使命: {idea_clarification.mission}
+    目标: {idea_clarification.objectives}
+    请调研并提供：
+    1. 总可寻址市场(TAM) - 整体市场规模
+    2. 可服务可用市场(SAM) - 您可以服务的部分
+    3. 可服务可获得市场(SOM) - 现实的市场份额
+    4. 具有详细特征的目标客户细分
+    使用网络搜索查找当前市场数据和趋势。
     """
 
-    print("Researching market size and customer segments...")
+    print("研究市场规模和客户细分...")
 
     try:
         market_result = await market_research_agent.arun(market_research_prompt)
         market_research = market_result.content
 
-        print("Market research completed")
+        print("市场调研完成")
         print(f"TAM: {market_research.total_addressable_market[:100]}...")
 
     except Exception as e:
-        return f"Failed to complete market research: {str(e)}"
+        return f"市场调研失败: {str(e)}"
 
     # Phase 3: Competitor Analysis
-    print("\nPHASE 3: COMPETITIVE LANDSCAPE ANALYSIS")
+    print("\n第3阶段: 竞争格局分析")
     print("=" * 60)
 
     competitor_prompt = f"""
-    Based on the startup idea and market research below, analyze the competitive landscape:
-    STARTUP IDEA: {idea}
+    基于下面的初创企业创意和市场调研，分析竞争格局：
+    初创企业创意: {idea}
     TAM: {market_research.total_addressable_market}
     SAM: {market_research.serviceable_available_market}
     SOM: {market_research.serviceable_obtainable_market}
-    TARGET SEGMENTS: {market_research.target_customer_segments}
-    Please research and provide:
-    1. Identify direct and indirect competitors
-    2. SWOT analysis for each major competitor
-    3. Assessment of startup's potential competitive positioning
-    4. Market gaps and opportunities
-    Use web search to find current competitor information.
+    目标细分: {market_research.target_customer_segments}
+    请调研并提供：
+    1. 识别直接和间接竞争对手
+    2. 每个主要竞争对手的SWOT分析
+    3. 对初创企业潜在竞争定位的评估
+    4. 市场空白和机会
+    使用网络搜索查找当前竞争对手信息。
     """
 
-    print("Analyzing competitive landscape...")
+    print("分析竞争格局...")
 
     try:
         competitor_result = await competitor_analysis_agent.arun(competitor_prompt)
         competitor_analysis = competitor_result.content
 
-        print("Competitor analysis completed")
-        print(f"Positioning: {competitor_analysis.positioning[:100]}...")
+        print("竞争分析完成")
+        print(f"定位: {competitor_analysis.positioning[:100]}...")
 
     except Exception as e:
-        return f"Failed to complete competitor analysis: {str(e)}"
+        return f"竞争分析失败: {str(e)}"
 
     # Phase 4: Final Validation Report
-    print("\nPHASE 4: COMPREHENSIVE VALIDATION REPORT")
+    print("\n第4阶段: 综合验证报告")
     print("=" * 60)
 
     report_prompt = f"""
-    Synthesize all the research and analysis into a comprehensive startup validation report:
+    将所有研究和分析综合成一份全面的初创企业验证报告：
 
-    STARTUP IDEA: {idea}
+    初创企业创意: {idea}
 
-    IDEA CLARIFICATION:
-    - Originality: {idea_clarification.originality}
-    - Mission: {idea_clarification.mission}
-    - Objectives: {idea_clarification.objectives}
-    MARKET RESEARCH:
+    创意澄清:
+    - 原创性: {idea_clarification.originality}
+    - 使命: {idea_clarification.mission}
+    - 目标: {idea_clarification.objectives}
+    市场调研:
     - TAM: {market_research.total_addressable_market}
     - SAM: {market_research.serviceable_available_market}
     - SOM: {market_research.serviceable_obtainable_market}
-    - Target Segments: {market_research.target_customer_segments}
-    COMPETITOR ANALYSIS:
-    - Competitors: {competitor_analysis.competitors}
+    - 目标细分: {market_research.target_customer_segments}
+    竞争分析:
+    - 竞争对手: {competitor_analysis.competitors}
     - SWOT: {competitor_analysis.swot_analysis}
-    - Positioning: {competitor_analysis.positioning}
-    Create a professional validation report with:
-    1. Executive summary
-    2. Idea assessment (strengths/weaknesses)
-    3. Market opportunity analysis
-    4. Competitive landscape overview
-    5. Strategic recommendations
-    6. Specific next steps for the entrepreneur
+    - 定位: {competitor_analysis.positioning}
+    创建一份专业的验证报告，包含：
+    1. 执行摘要
+    2. 创意评估（优势/劣势）
+    3. 市场机会分析
+    4. 竞争格局概览
+    5. 战略建议
+    6. 企业家的具体下一步行动
     """
 
-    print("Generating comprehensive validation report...")
+    print("生成综合验证报告...")
 
     try:
         final_result = await report_agent.arun(report_prompt)
         validation_report = final_result.content
 
-        print("Validation report completed")
+        print("验证报告完成")
 
     except Exception as e:
-        return f"Failed to generate final report: {str(e)}"
+        return f"生成最终报告失败: {str(e)}"
 
     # Final summary
     summary = f"""
-    STARTUP IDEA VALIDATION COMPLETED!
-    Validation Summary:
-    • Startup Idea: {idea}
-    • Idea Clarification: Completed
-    • Market Research: Completed
-    • Competitor Analysis: Completed
-    • Final Report: Generated
+    初创企业创意验证完成！
+    验证摘要:
+    • 初创企业创意: {idea}
+    • 创意澄清: 已完成
+    • 市场调研: 已完成
+    • 竞争分析: 已完成
+    • 最终报告: 已生成
 
-    Key Market Insights:
+    关键市场洞察:
     • TAM: {market_research.total_addressable_market[:150]}...
-    • Target Segments: {market_research.target_customer_segments[:150]}...
+    • 目标细分: {market_research.target_customer_segments[:150]}...
 
-    Competitive Positioning:
+    竞争定位:
     {competitor_analysis.positioning[:200]}...
 
-    COMPREHENSIVE VALIDATION REPORT:
+    综合验证报告:
 
-    ## Executive Summary
+    ## 执行摘要
     {validation_report.executive_summary}
 
-    ## Idea Assessment
+    ## 创意评估
     {validation_report.idea_assessment}
 
-    ## Market Opportunity
+    ## 市场机会
     {validation_report.market_opportunity}
 
-    ## Competitive Landscape
+    ## 竞争格局
     {validation_report.competitive_landscape}
 
-    ## Strategic Recommendations
+    ## 战略建议
     {validation_report.recommendations}
 
-    ## Next Steps
+    ## 下一步行动
     {validation_report.next_steps}
 
-    Disclaimer: This validation is for informational purposes only. Conduct additional due diligence before making investment decisions.
+    免责声明: 此验证仅用于信息目的。在做出投资决策之前进行额外的尽职调查。
     """
 
     return summary
 
 
-# --- Workflow definition ---
+# --- 工作流定义 ---
 startup_validation_workflow = Workflow(
-    name="Startup Idea Validator",
-    description="Comprehensive startup idea validation with market research and competitive analysis",
+    name="初创企业创意验证器",
+    description="通过市场调研和竞争分析进行全面的初创企业创意验证",
     db=SqliteDb(
         session_table="workflow_session",
         db_file="tmp/workflows.db",
     ),
     steps=startup_validation_execution,
-    session_state={},  # Initialize empty workflow session state
+    session_state={},  # 初始化空的工作流会话状态
 )
 
 
@@ -412,17 +411,17 @@ if __name__ == "__main__":
     async def main():
         from rich.prompt import Prompt
 
-        # Get idea from user
+        # 从用户获取创意
         idea = Prompt.ask(
-            "[bold]What is your startup idea?[/bold]\n",
-            default="A marketplace for Christmas Ornaments made from leather",
+            "[bold]您的初创企业创意是什么？[/bold]\n",
+            default="一个制作皮革圣诞装饰品的市场平台",
         )
 
-        print("Testing Startup Idea Validator with New Workflow Structure")
+        print("测试初创企业创意验证器（使用新的工作流结构）")
         print("=" * 70)
 
         result = await startup_validation_workflow.arun(
-            input="Please validate this startup idea with comprehensive market research and competitive analysis",
+            input="请通过综合市场调研和竞争分析来验证这个初创企业创意",
             startup_idea=idea,
         )
 
