@@ -1,44 +1,44 @@
 ---
-title: Performance
-description: Get extreme performance out of the box with Agno.
+title: 性能
+description: 使用 Agno 获得开箱即用的极致性能。
 mode: wide
 ---
 
-If you're building with Agno, you're guaranteed best-in-class performance by default. Our obsession with performance is necessary because even simple AI workflows can spawn hundreds of Agents and because many tasks are long-running -- stateless, horizontal scalability is key for success.
+如果您使用 Agno 进行构建，默认就能获得业界领先的性能。我们对性能的执着是必要的，因为即使是简单的 AI 工作流也可能产生数百个智能体，而且许多任务都是长时间运行的——无状态、水平可扩展性是成功的关键。
 
-At Agno, we optimize performance across 3 dimensions:
+在 Agno 中，我们在三个维度上优化性能：
 
-1. **Agent performance:** We optimize static operations (instantiation, memory footprint) and runtime operations (tool calls, memory updates, history management).
-2. **System performance:** The AgentOS API is async by default and has a minimal memory footprint. The system is stateless and horizontally scalable, with a focus on preventing memory leaks. It handles parallel and batch embedding generation during knowledge ingestion, metrics collection in background tasks, and other system-level optimizations.
-3. **Agent reliability and accuracy:** Monitored through evals, which we’ll explore later.
+1. **智能体性能**：我们优化静态操作（实例化、内存占用）和运行时操作（工具调用、内存更新、历史管理）。
+2. **系统性能**：AgentOS API 默认是异步的，并且具有最小的内存占用。系统是无状态且水平可扩展的，重点关注防止内存泄漏。它处理知识摄取过程中的并行和批量嵌入生成、后台任务中的指标收集以及其他系统级优化。
+3. **智能体可靠性和准确性**：通过评估（evals）进行监控，我们稍后会详细探讨。
 
-## Agent Performance
+## 智能体性能
 
-Let's measure the time it takes to instantiate an Agent and the memory footprint of an Agent. Here are the numbers (last measured in Oct 2025, on an Apple M4 MacBook Pro):
+让我们测量实例化一个智能体所需的时间和智能体的内存占用。以下是数据（最后在 2025 年 10 月，在 Apple M4 MacBook Pro 上测量）：
 
-- **Agent instantiation:** ~3μs on average
-- **Memory footprint:** ~6.6Kib on average
+- **智能体实例化**：平均约 3μs
+- **内存占用**：平均约 6.6Kib
 
-We'll show below that Agno Agents instantiate **529× faster than Langgraph**, **57× faster than PydanticAI**, and **70× faster than CrewAI**. Agno Agents also use **24× lower memory than Langgraph**, **4× lower than PydanticAI**, and **10× lower than CrewAI**.
+下面我们将展示 Agno 智能体的实例化速度比 Langgraph **快 529 倍**，比 PydanticAI **快 57 倍**，比 CrewAI **快 70 倍**。Agno 智能体的内存使用量也比 Langgraph **低 24 倍**，比 PydanticAI **低 4 倍**，比 CrewAI **低 10 倍**。
 
 <Note>
 
-Run time performance is bottlenecked by inference and hard to benchmark accurately, so we focus on minimizing overhead, reducing memory usage, and parallelizing tool calls.
+运行时性能受推理瓶颈限制，难以准确基准测试，因此我们专注于最小化开销、减少内存使用和并行化工具调用。
 
 </Note>
 
-### Instantiation Time
+### 实例化时间
 
-Let's measure instantiation time for an Agent with 1 tool. We'll run the evaluation 1000 times to get a baseline measurement. We'll compare Agno to LangGraph, CrewAI and Pydantic AI.
+让我们测量带有一个工具的智能体的实例化时间。我们将运行评估 1000 次以获得基线测量值。我们将 Agno 与 LangGraph、CrewAI 和 Pydantic AI 进行比较。
 
 <Note>
 
-The code for this benchmark is available [here](https://github.com/agno-agi/agno/tree/main/cookbook/evals/performance). You should run the evaluation yourself on your own machine, please, do not take these results at face value.
+此基准测试的代码可在[此处](https://github.com/agno-agi/agno/tree/main/cookbook/evals/performance)获取。请在您自己的机器上运行评估，不要盲目相信这些结果。
 
 </Note>
 
 ```shell
-# Setup virtual environment
+# 设置虚拟环境
 ./scripts/perf_setup.sh
 source .venvs/perfenv/bin/activate
 
@@ -53,7 +53,7 @@ python cookbook/evals/performance/comparison/crewai_instantiation.py
 python cookbook/evals/performance/comparison/pydantic_ai_instantiation.py
 ```
 
-LangGraph is on the right, **let's start it first and give it a head start**. Then CrewAI and Pydantic AI follow, and finally Agno. Agno obviously finishes first, but let's see by how much.
+LangGraph 在右侧，**让我们先启动它并给它一个领先优势**。然后是 CrewAI 和 Pydantic AI，最后是 Agno。Agno 显然最先完成，但让我们看看差距有多大。
 
 <Frame>
   <video
@@ -67,30 +67,30 @@ LangGraph is on the right, **let's start it first and give it a head start**. Th
   </video>
 </Frame>
 
-### Memory Usage
+### 内存使用
 
-To measure memory usage, we use the `tracemalloc` library. We first calculate a baseline memory usage by running an empty function, then run the Agent 1000x times and calculate the difference. This gives a (reasonably) isolated measurement of the memory usage of the Agent.
+为了测量内存使用情况，我们使用 `tracemalloc` 库。我们首先通过运行空函数计算基线内存使用量，然后运行智能体 1000 次并计算差值。这给出了智能体内存使用的（相对）独立测量。
 
-We recommend running the evaluation yourself on your own machine, and digging into the code to see how it works. If we've made a mistake, please let us know.
+我们建议您在自己的机器上运行评估，并深入研究代码以了解其工作原理。如果我们犯了错误，请告诉我们。
 
-### Results
+### 结果
 
-Taking Agno as the baseline, we can see that:
+以 Agno 为基准，我们可以看到：
 
-| Metric             | Agno | Langgraph   | PydanticAI | CrewAI     |
+| 指标             | Agno | Langgraph   | PydanticAI | CrewAI     |
 | ------------------ | ---- | ----------- | ---------- | ---------- |
-| **Time (seconds)** | 1×   | 529× slower | 57× slower | 70× slower |
-| **Memory (MiB)**   | 1×   | 24× higher  | 4× higher  | 10× higher |
+| **时间（秒）** | 1×   | 慢 529× | 慢 57× | 慢 70× |
+| **内存（MiB）**   | 1×   | 高 24×  | 高 4×  | 高 10× |
 
-Exact numbers from the benchmark:
+基准测试的确切数字：
 
-| Metric             | Agno     | Langgraph | PydanticAI | CrewAI   |
+| 指标             | Agno     | Langgraph | PydanticAI | CrewAI   |
 | ------------------ | -------- | --------- | ---------- | -------- |
-| **Time (seconds)** | 0.000003 | 0.001587  | 0.000170   | 0.000210 |
-| **Memory (MiB)**   | 0.006642 | 0.161435  | 0.028712   | 0.065652 |
+| **时间（秒）** | 0.000003 | 0.001587  | 0.000170   | 0.000210 |
+| **内存（MiB）**   | 0.006642 | 0.161435  | 0.028712   | 0.065652 |
 
 <Note>
 
-Agno agents are designed for performance and while we share benchmarks against other frameworks, we should be mindful that accuracy and reliability are more important than speed.
+Agno 智能体专为性能而设计，虽然我们分享了与其他框架的基准对比，但我们应该记住，准确性和可靠性比速度更重要。
 
 </Note>

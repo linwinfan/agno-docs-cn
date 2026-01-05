@@ -1,132 +1,87 @@
-# 处理 examples/use-cases/teams 目录下的文件中文化计划
+# 中文化计划：get-started, how-to, public 目录
 
-## 目标
-批量处理 examples/use-cases/teams 目录下除 overview.mdx 外的所有文件，将所有英文内容完全中文化。
+## 任务概述
+对 get-started、how-to、public 三个目录进行中文化。经过分析，发现：
+- **get-started 目录**：4个文件中有2个需要中文化（agent-engineering.mdx, performance.mdx）
+- **how-to 目录**：6个文件已全部中文化
+- **public 目录**：robots.txt 文件无需中文化
 
-## 需要处理的文件
-- [x] ai_support_team.mdx
-- [x] autonomous_startup_team.mdx
-- [x] content_team.mdx
-- [x] discussion_team.mdx
-- [x] hackernews_team.mdx
-- [x] learn-concepts.mdx
-- [x] multi_language_team.mdx
-- [x] news_agency_team.mdx
-- [x] reasoning_team.mdx
+## 计划项目
 
-## 处理原则
-- 完全中文化用户可见内容
-- 保留技术术语和代码不变
-- 保持文件结构和格式不变
+### ✅ 已完成
+- [x] 分析当前代码库结构，定位目标目录
+- [x] 检查 get-started 目录内容和中文化状态
+- [x] 检查 how-to 目录内容和中文化状态
+- [x] 检查 public 目录内容和中文化状态
+- [x] 中文化 get-started/agent-engineering.mdx
+- [x] 中文化 get-started/performance.mdx
+- [x] 验证中文化质量和一致性
+- [x] 完成中文化报告
 
-## 详细计划
+## 中文化原则
+1. **保持技术术语准确性**：确保专业术语翻译准确且符合中文技术社区习惯
+2. **保持原文结构**：保留原有的 Markdown 结构、代码块、链接等
+3. **保持语境连贯性**：确保翻译后的文本在中文语境下自然流畅
+4. **保持品牌一致性**：Agno、AgentOS 等专有名词保持原样
+5. **保持代码不变**：所有代码块、命令行示例、配置文件等保持英文原样
 
-### 1. ai_support_team.mdx
-- 将标题 "AI Support Team" 改为 "AI 支持团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
+## 文件详细分析
 
-### 2. autonomous_startup_team.mdx
-- 将标题 "Autonomous Startup Team" 改为 "自主创业团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
+### get-started/agent-engineering.mdx
+- **文件类型**：产品介绍和技术特性文档
+- **主要内容**：Agno 框架的核心功能、架构优势、企业级特性
+- **特殊元素**：Card 组件、Note 组件、链接引用
+- **翻译重点**：技术概念准确传达，保持营销文案的感染力
 
-### 3. content_team.mdx
-- 将标题 "Content Team" 改为 "内容团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
+### get-started/performance.mdx
+- **文件类型**：性能基准测试和技术文档
+- **主要内容**：性能指标、基准测试结果、与其他框架的对比
+- **特殊元素**：表格数据、代码示例、视频嵌入、Note 组件
+- **翻译重点**：数据准确性，技术指标清晰表达，保持客观性
 
-### 4. discussion_team.mdx
-- 将标题 "Discussion Team" 改为 "讨论团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
+## 质量保证
+- 确保所有内部链接保持有效
+- 确保所有代码示例和命令行保持原样
+- 确保技术术语翻译一致性
+- 保持原有的文档元数据（title, description, sidebarTitle 等）
 
-### 5. hackernews_team.mdx
-- 将标题 "HackerNews Team" 改为 "HackerNews 团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
-
-### 6. learn-concepts.mdx
-- 将标题 "Learn Concepts" 改为 "学习概念"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
-
-### 7. multi_language_team.mdx
-- 将标题 "Multi Language Team" 改为 "多语言团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
-
-### 8. news_agency_team.mdx
-- 将标题 "News Agency Team" 改为 "新闻机构团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
-
-### 9. reasoning_team.mdx
-- 将标题 "Reasoning Team" 改为 "推理团队"
-- 中文化团队描述和 instructions
-- 保持代码和工具定义不变
-
-## 验证步骤
-- 检查每个文件是否完成中文化
-- 确认代码部分未被误改
-- 确认技术术语保留
+## 预期完成时间
+预计在本次会话中完成所有中文化工作。
 
 ## Review 总结
 
 ### 工作概述
-本次中文化工作主要针对 examples/use-cases/teams 目录下除 overview.mdx 外的9个文件。所有文件的英文内容都已完全中文化，包括标题、概述、代码注释、instructions、步骤标题等用户可见内容。
+本次中文化工作成功完成了 get-started、how-to、public 三个目录的中文化任务。具体包括：
+- **get-started 目录**：中文化了 2 个之前未中文化的文件（agent-engineering.mdx, performance.mdx），使该目录的 4 个文件全部完成中文化
+- **how-to 目录**：确认 6 个文件已全部中文化，无需额外工作
+- **public 目录**：确认 robots.txt 文件为标准配置文件，无需中文化
 
 ### 处理的文件列表
 
-1. **examples/use-cases/teams/ai_support_team.mdx**
-   - 标题：AI 支持团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
+1. **get-started/agent-engineering.mdx**
+   - 标题：专为智能体工程设计
+   - 完整翻译了所有用户可见文本，包括核心原语、上下文工程、核心智能、记忆知识持久化、执行控制、运行时评估、安全隐私等部分
+   - 保留了所有 Card 组件、Note 组件、链接和 Markdown 结构
 
-2. **examples/use-cases/teams/autonomous_startup_team.mdx**
-   - 标题：自主创业团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
-
-3. **examples/use-cases/teams/content_team.mdx**
-   - 标题：内容团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
-
-4. **examples/use-cases/teams/discussion_team.mdx**
-   - 标题：讨论团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
-
-5. **examples/use-cases/teams/hackernews_team.mdx**
-   - 标题：HackerNews 团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
-
-6. **examples/use-cases/teams/learn-concepts.mdx**
-   - 标题：通过示例学习团队概念
-   - 完整翻译了所有用户可见文本、Card标题和描述
-
-7. **examples/use-cases/teams/multi_language_team.mdx**
-   - 标题：多语言团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
-
-8. **examples/use-cases/teams/news_agency_team.mdx**
-   - 标题：新闻机构团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
-
-9. **examples/use-cases/teams/reasoning_team.mdx**
-   - 标题：推理团队
-   - 完整翻译了所有用户可见文本、instructions、代码注释和步骤标题
+2. **get-started/performance.mdx**
+   - 标题：性能
+   - 完整翻译了所有用户可见文本，包括性能优化三个维度、智能体性能、实例化时间、内存使用、结果分析等部分
+   - 保留了所有代码块、表格数据、视频嵌入、Note 组件和 Markdown 结构
 
 ### 保留的内容
-- 所有 Markdown 和 MDX 语法格式（如 `<Steps>`、`<Snippet>`、`<CodeGroup>`、`<Step>` 等标签）
+- 所有 Markdown 和 MDX 语法格式（如 `<CardGroup>`、`<Card>`、`<Note>`、`<Frame>` 等标签）
 - 所有代码块和终端命令
 - 所有链接和路径
-- 所有技术术语（如 API 名称、库名等）
+- 所有技术术语（如 API 名称、库名、框架名等）
 - 所有环境变量和配置项
+- 所有表格中的具体数值和单位
 
 ### 质量保证
-- 所有技术术语保持一致性
+- 所有技术术语保持一致性（如 Agent→智能体，Team→团队，Workflow→工作流等）
 - 文档结构完整性得到保持
-- 所有链接和引用仍然有效
+- 所有内部链接仍然有效
 - Markdown/MDX 语法正确性得到验证
-- 没有混合中英文的内容（除了必要的技术术语）
+- 没有混合中英文的内容（除了必要的技术术语和专有名词）
 
 ### 最终成果
-examples/use-cases/teams 目录下除 overview.mdx 外的所有文件现已完成高质量中文化，提供了完整的中文版团队用例文档，同时保持了原有的技术准确性和文档结构。
+get-started、how-to、public 三个目录现已完成高质量中文化，提供了完整的中文版入门指南、操作指南和公共资源配置，同时保持了原有的技术准确性和文档结构。
