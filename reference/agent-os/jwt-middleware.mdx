@@ -3,48 +3,48 @@ title: JWTMiddleware
 sidebarTitle: JWTMiddleware
 ---
 
-JWT Authentication Middleware with optional RBAC (Role-Based Access Control) for AgentOS.
+用于AgentOS的JWT认证中间件，可选RBAC（基于角色的访问控制）。
 
-## Import
+## 导入
 
 ```python
 from agno.os.middleware import JWTMiddleware
 from agno.os.middleware.jwt import TokenSource
 ```
 
-## JWTMiddleware Parameters
+## JWTMiddleware参数
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `verification_keys` | `Optional[List[str]]` | `JWT_VERIFICATION_KEY` env var | List of keys for JWT verification. For RS256, use public keys. For HS256, use shared secrets. Each key is tried in order until one succeeds - useful for accepting tokens from multiple issuers. |
-| `jwks_file` | `Optional[str]` | `JWT_JWKS_FILE` env var | Path to a static JWKS (JSON Web Key Set) file. Keys are looked up by `kid` (key ID) from the JWT header. |
-| `secret_key` | `Optional[str]` | `None` | **(Deprecated)** Use `verification_keys` instead. |
-| `algorithm` | `str` | `"RS256"` | JWT algorithm (RS256, HS256, ES256, etc.) |
-| `validate` | `bool` | `True` | Whether to validate JWT tokens |
-| `authorization` | `Optional[bool]` | `None` | Enable RBAC scope checking |
-| `token_source` | `TokenSource` | `TokenSource.HEADER` | Where to extract JWT token from |
-| `token_header_key` | `str` | `"Authorization"` | Header key for Authorization |
-| `cookie_name` | `str` | `"access_token"` | Cookie name for JWT token |
-| `scopes_claim` | `str` | `"scopes"` | JWT claim name for scopes |
-| `user_id_claim` | `str` | `"sub"` | JWT claim name for user ID |
-| `session_id_claim` | `str` | `"session_id"` | JWT claim name for session ID |
-| `audience_claim` | `str` | `"aud"` | JWT claim name for audience/OS ID |
-| `verify_audience` | `bool` | `False` | Verify `aud` claim matches AgentOS ID |
-| `dependencies_claims` | `Optional[List[str]]` | `None` | Claims to extract for `dependencies` parameter |
-| `session_state_claims` | `Optional[List[str]]` | `None` | Claims to extract for `session_state` parameter |
-| `scope_mappings` | `Optional[Dict[str, List[str]]]` | `None` | Custom route-to-scope mappings (additive to defaults) |
-| `excluded_route_paths` | `Optional[List[str]]` | See below | Routes to skip JWT/RBAC checks |
-| `admin_scope` | `Optional[str]` | `"agent_os:admin"` | Scope that grants full admin access |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `verification_keys` | `Optional[List[str]]` | `JWT_VERIFICATION_KEY`环境变量 | 用于JWT验证的密钥列表。对于RS256，使用公钥。对于HS256，使用共享密钥。按顺序尝试每个密钥直到成功 - 适用于接受来自多个颁发者的令牌。 |
+| `jwks_file` | `Optional[str]` | `JWT_JWKS_FILE`环境变量 | 静态JWKS（JSON Web Key Set）文件路径。根据JWT头部中的`kid`（密钥ID）查找密钥。 |
+| `secret_key` | `Optional[str]` | `None` | **(已弃用)** 请改用`verification_keys`。 |
+| `algorithm` | `str` | `"RS256"` | JWT算法（RS256, HS256, ES256等） |
+| `validate` | `bool` | `True` | 是否验证JWT令牌 |
+| `authorization` | `Optional[bool]` | `None` | 启用RBAC范围检查 |
+| `token_source` | `TokenSource` | `TokenSource.HEADER` | 从何处提取JWT令牌 |
+| `token_header_key` | `str` | `"Authorization"` | 授权的头部键 |
+| `cookie_name` | `str` | `"access_token"` | JWT令牌的Cookie名称 |
+| `scopes_claim` | `str` | `"scopes"` | 范围的JWT声明名称 |
+| `user_id_claim` | `str` | `"sub"` | 用户ID的JWT声明名称 |
+| `session_id_claim` | `str` | `"session_id"` | 会话ID的JWT声明名称 |
+| `audience_claim` | `str` | `"aud"` | 受众/OS ID的JWT声明名称 |
+| `verify_audience` | `bool` | `False` | 验证`aud`声明是否匹配AgentOS ID |
+| `dependencies_claims` | `Optional[List[str]]` | `None` | 为`dependencies`参数提取的声明 |
+| `session_state_claims` | `Optional[List[str]]` | `None` | 为`session_state`参数提取的声明 |
+| `scope_mappings` | `Optional[Dict[str, List[str]]]` | `None` | 自定义路由到范围的映射（添加到默认值） |
+| `excluded_route_paths` | `Optional[List[str]]` | 见下文 | 跳过JWT/RBAC检查的路由 |
+| `admin_scope` | `Optional[str]` | `"agent_os:admin"` | 授予完全管理员访问权限的范围 |
 
-## TokenSource Enum
+## TokenSource枚举
 
-| Value | Description |
-|-------|-------------|
-| `TokenSource.HEADER` | Extract JWT from `Authorization: Bearer <token>` header |
-| `TokenSource.COOKIE` | Extract JWT from HTTP cookie |
-| `TokenSource.BOTH` | Try header first, then cookie as fallback |
+| 值 | 描述 |
+|----|------|
+| `TokenSource.HEADER` | 从`Authorization: Bearer <token>`头部提取JWT |
+| `TokenSource.COOKIE` | 从HTTP Cookie提取JWT |
+| `TokenSource.BOTH` | 先尝试头部，然后回退到Cookie |
 
-## Default Excluded Routes
+## 默认排除的路由
 
 ```python
 [
@@ -57,9 +57,9 @@ from agno.os.middleware.jwt import TokenSource
 ]
 ```
 
-## Usage
+## 使用方法
 
-### Basic JWT Validation
+### 基本JWT验证
 
 ```python
 from agno.os import AgentOS
@@ -76,7 +76,7 @@ app.add_middleware(
 )
 ```
 
-### JWT with RBAC Authorization
+### 带RBAC授权的JWT
 
 ```python
 app.add_middleware(
@@ -88,7 +88,7 @@ app.add_middleware(
 )
 ```
 
-### JWT from Cookies
+### 从Cookie获取JWT
 
 ```python
 from agno.os.middleware.jwt import TokenSource
@@ -101,7 +101,7 @@ app.add_middleware(
 )
 ```
 
-### Parameter Injection
+### 参数注入
 
 ```python
 app.add_middleware(
@@ -114,10 +114,10 @@ app.add_middleware(
 )
 ```
 
-### Using JWKS File
+### 使用JWKS文件
 
 ```python
-# Using a static JWKS file (e.g., from your identity provider)
+# 使用静态JWKS文件（例如，来自您的身份提供商）
 app.add_middleware(
     JWTMiddleware,
     jwks_file="/path/to/jwks.json",
@@ -126,7 +126,7 @@ app.add_middleware(
 )
 ```
 
-The JWKS file should have the standard format:
+JWKS文件应具有标准格式：
 
 ```json
 {
@@ -143,7 +143,7 @@ The JWKS file should have the standard format:
 }
 ```
 
-### Custom Scope Mappings
+### 自定义范围映射
 
 ```python
 app.add_middleware(
@@ -151,46 +151,46 @@ app.add_middleware(
     verification_keys=["your-jwt-key"],
     authorization=True,
     scope_mappings={
-        # Override default scope
+        # 覆盖默认范围
         "GET /agents": ["custom:agents:list"],
-        # Add new endpoint
+        # 添加新端点
         "POST /custom/action": ["custom:write"],
-        # Allow without scopes
+        # 允许无需范围
         "GET /public": [],
     }
 )
 ```
 
-## Request State
+## 请求状态
 
-After processing, the middleware stores the following in `request.state`:
+处理后，中间件将以下内容存储在`request.state`中：
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `authenticated` | `bool` | Whether the user is authenticated |
-| `user_id` | `Optional[str]` | User ID from token claims |
-| `session_id` | `Optional[str]` | Session ID from token claims |
-| `scopes` | `List[str]` | User's permission scopes |
-| `audience` | `Optional[str]` | Audience claim value |
-| `token` | `str` | The raw JWT token |
-| `authorization_enabled` | `bool` | Whether RBAC is enabled |
-| `dependencies` | `Dict[str, Any]` | Extracted dependencies claims |
-| `session_state` | `Dict[str, Any]` | Extracted session state claims |
-| `accessible_resource_ids` | `Set[str]` | Resource IDs user can access (for listing endpoints) |
+| 属性 | 类型 | 描述 |
+|------|------|------|
+| `authenticated` | `bool` | 用户是否已认证 |
+| `user_id` | `Optional[str]` | 令牌声明中的用户ID |
+| `session_id` | `Optional[str]` | 令牌声明中的会话ID |
+| `scopes` | `List[str]` | 用户的权限范围 |
+| `audience` | `Optional[str]` | 受众声明值 |
+| `token` | `str` | 原始JWT令牌 |
+| `authorization_enabled` | `bool` | 是否启用了RBAC |
+| `dependencies` | `Dict[str, Any]` | 提取的依赖声明 |
+| `session_state` | `Dict[str, Any]` | 提取的会话状态声明 |
+| `accessible_resource_ids` | `Set[str]` | 用户可访问的资源ID（用于列表端点） |
 
-## Error Responses
+## 错误响应
 
-| Status Code | Description |
-|-------------|-------------|
-| `401 Unauthorized` | Missing or invalid JWT token |
-| `401 Unauthorized` | Token has expired |
-| `401 Unauthorized` | Invalid audience (token not for this AgentOS) |
-| `403 Forbidden` | Insufficient scopes for the requested operation |
+| 状态码 | 描述 |
+|--------|------|
+| `401 Unauthorized` | 缺少或无效的JWT令牌 |
+| `401 Unauthorized` | 令牌已过期 |
+| `401 Unauthorized` | 无效受众（令牌不是为此AgentOS准备的） |
+| `403 Forbidden` | 请求操作的范围不足 |
 
-## See Also
+## 参见
 
-- [Security Overview](/agent-os/security/overview) - AgentOS security overview
-- [JWT Middleware Guide](/agent-os/middleware/jwt) - Configuration guide
-- [RBAC Documentation](/agent-os/security/rbac) - Complete scope reference
-- [AuthorizationConfig](/reference/agent-os/authorization-config) - Authorization configuration
+- [安全概述](/agent-os/security/overview) - AgentOS安全概述
+- [JWT中间件指南](/agent-os/middleware/jwt) - 配置指南
+- [RBAC文档](/agent-os/security/rbac) - 完整的范围参考
+- [AuthorizationConfig](/reference/agent-os/authorization-config) - 授权配置
 

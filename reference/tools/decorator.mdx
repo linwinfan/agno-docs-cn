@@ -1,21 +1,21 @@
 ---
-title: Tool Decorator
-sidebarTitle: Tool Decorator
-description: Reference for the @tool decorator.
+title: 工具装饰器
+sidebarTitle: 工具装饰器
+description: @tool 装饰器的参考文档。
 ---
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `name` | `str` | Override for the function name |
-| `description` | `str` | Override for the function description |
-| `stop_after_tool_call` | `bool` | If True, the agent will stop after the function call |
-| `tool_hooks` | `list[Callable]` | List of hooks that wrap the function execution |
-| `pre_hook` | `Callable` | Hook to run before the function is executed |
-| `post_hook` | `Callable` | Hook to run after the function is executed |
-| `requires_confirmation` | `bool` | If True, requires user confirmation before execution |
-| `requires_user_input` | `bool` | If True, requires user input before execution |
-| `user_input_fields` | `list[str]` | List of fields that require user input |
-| `external_execution` | `bool` | If True, the tool will be executed outside of the agent's control |
-| `cache_results` | `bool` | If True, enable caching of function results |
-| `cache_dir` | `str` | Directory to store cache files |
-| `cache_ttl` | `int` | Time-to-live for cached results in seconds (default: 3600) |
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `name` | `str` | 函数名称的覆盖值 |
+| `description` | `str` | 函数描述的覆盖值 |
+| `stop_after_tool_call` | `bool` | 如果为True，智能体将在函数调用后停止 |
+| `tool_hooks` | `list[Callable]` | 包装函数执行的钩子列表 |
+| `pre_hook` | `Callable` | 在函数执行前运行的钩子 |
+| `post_hook` | `Callable` | 在函数执行后运行的钩子 |
+| `requires_confirmation` | `bool` | 如果为True，执行前需要用户确认 |
+| `requires_user_input` | `bool` | 如果为True，执行前需要用户输入 |
+| `user_input_fields` | `list[str]` | 需要用户输入的字段列表 |
+| `external_execution` | `bool` | 如果为True，工具将在智能体控制之外执行 |
+| `cache_results` | `bool` | 如果为True，启用函数结果缓存 |
+| `cache_dir` | `str` | 存储缓存文件的目录 |
+| `cache_ttl` | `int` | 缓存结果的生存时间（秒）（默认：3600） |

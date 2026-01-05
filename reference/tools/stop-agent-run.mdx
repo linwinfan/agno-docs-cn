@@ -1,16 +1,16 @@
 ---
 title: StopAgentRun
 sidebarTitle: StopAgentRun
-description: API reference for the StopAgentRun exception used to exit the tool call loop and complete the agent run.
+description: StopAgentRun异常的API参考，用于退出工具调用循环并完成智能体运行。
 ---
 
-The `StopAgentRun` exception allows you to exit the model execution loop and end the agent run. When raised from a tool function, the agent immediately exits the tool call loop, and the run status is set to `COMPLETED`. All session state, messages, tool calls, and tool results up to that point are stored in the database.
+`StopAgentRun`异常允许您退出模型执行循环并结束智能体运行。当从工具函数中抛出时，智能体会立即退出工具调用循环，并将运行状态设置为`COMPLETED`。到该点为止的所有会话状态、消息、工具调用和工具结果都会存储在数据库中。
 
 <Note>
-This does **not** cancel the agent run. It completes the run gracefully after exiting the tool call loop.
+这**不会**取消智能体运行。它在退出工具调用循环后优雅地完成运行。
 </Note>
 
-## Constructor
+## 构造函数
 
 ```python
 StopAgentRun(
@@ -21,48 +21,48 @@ StopAgentRun(
 )
 ```
 
-### Parameters
+### 参数
 
 <ResponseField name="exc" type="str" required>
-  The reason for stopping execution. This message is logged and can be used for debugging or user feedback.
+  停止执行的原因。此消息会被记录，可用于调试或用户反馈。
 </ResponseField>
 
 <ResponseField name="user_message" type="Union[str, Message]" optional>
-  An optional message to display to the user about why execution stopped.
+  可选的消息，向用户显示为什么执行停止。
 </ResponseField>
 
 <ResponseField name="agent_message" type="Union[str, Message]" optional>
-  An optional message from the agent's perspective about the stop.
+  可选的消息，从智能体的角度显示停止信息。
 </ResponseField>
 
 <ResponseField name="messages" type="List[Union[dict, Message]]" optional>
-  An optional list of messages to add to the conversation history before stopping.
+  可选的消息列表，在停止前添加到对话历史中。
 </ResponseField>
 
-## When to Use
+## 使用场景
 
-Use `StopAgentRun` when:
+在以下情况下使用`StopAgentRun`：
 
-- **Critical errors**: An error occurs that cannot be recovered from
-- **Security triggers**: A security threshold or policy is violated
-- **Task completion**: The task is fully completed and no further tool calls are needed
-- **Resource limits**: A resource limit (time, cost, API calls) is reached
-- **Manual intervention needed**: The situation requires human review or approval
-- **Early termination**: You want to exit the tool call loop based on business logic
+- **严重错误**：发生无法恢复的错误
+- **安全触发**：违反安全阈值或策略
+- **任务完成**：任务已完全完成，不需要进一步的工具调用
+- **资源限制**：达到资源限制（时间、成本、API调用次数）
+- **需要人工干预**：情况需要人工审查或批准
+- **提前终止**：您希望基于业务逻辑退出工具调用循环
 
-## Behavior
+## 行为
 
-When `StopAgentRun` is raised:
+当抛出`StopAgentRun`时：
 
-1. The tool call loop exits immediately
-2. No further tool calls are executed
-3. The run status is set to `COMPLETED`
-4. All session state is saved to the database
-5. All messages and tool calls up to that point are preserved
-6. The optional `user_message` or `agent_message` can be displayed to the user
+1. 工具调用循环立即退出
+2. 不再执行进一步的工具调用
+3. 运行状态设置为`COMPLETED`
+4. 所有会话状态保存到数据库
+5. 到该点为止的所有消息和工具调用都被保留
+6. 可选的`user_message`或`agent_message`可以显示给用户
 
-## See Also
+## 参见
 
-- [RetryAgentRun Exception](/reference/tools/retry-agent-run)
-- [Exceptions & Retries Guide](/basics/tools/exceptions)
+- [RetryAgentRun异常](/reference/tools/retry-agent-run)
+- [异常与重试指南](/basics/tools/exceptions)
 

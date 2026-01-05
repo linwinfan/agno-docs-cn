@@ -1,16 +1,16 @@
 ---
 title: RetryAgentRun
 sidebarTitle: RetryAgentRun
-description: API reference for the RetryAgentRun exception used to provide feedback to the model within the tool call loop.
+description: RetryAgentRun异常的API参考，用于在工具调用循环内向模型提供反馈。
 ---
 
-The `RetryAgentRun` exception allows you to provide instructions to the model for how to change its behavior and have the model retry within the current agent run. The exception message is passed to the model as a tool call error, allowing the model to adjust its approach in the next iteration of the LLM loop.
+`RetryAgentRun`异常允许您向模型提供关于如何更改其行为的指令，并让模型在当前智能体运行中重试。异常消息作为工具调用错误传递给模型，使模型能够在LLM循环的下一次迭代中调整其方法。
 
 <Note>
-This does **not** retry the full agent run—it only provides feedback to the model within the current run's tool call loop.
+这**不会**重试整个智能体运行——它只在当前运行的工具调用循环内向模型提供反馈。
 </Note>
 
-## Constructor
+## 构造函数
 
 ```python
 RetryAgentRun(
@@ -21,46 +21,46 @@ RetryAgentRun(
 )
 ```
 
-### Parameters
+### 参数
 
 <ResponseField name="exc" type="str" required>
-  The error message to pass to the model. This message provides instructions or feedback to help the model adjust its behavior in the next iteration.
+  要传递给模型的错误消息。此消息提供指令或反馈，帮助模型在下一次迭代中调整其行为。
 </ResponseField>
 
 <ResponseField name="user_message" type="Union[str, Message]" optional>
-  An optional message to display to the user about the retry.
+  可选的消息，向用户显示有关重试的信息。
 </ResponseField>
 
 <ResponseField name="agent_message" type="Union[str, Message]" optional>
-  An optional message from the agent's perspective about the retry.
+  可选的消息，从智能体的角度显示有关重试的信息。
 </ResponseField>
 
 <ResponseField name="messages" type="List[Union[dict, Message]]" optional>
-  An optional list of messages to add to the conversation history.
+  可选的消息列表，添加到对话历史中。
 </ResponseField>
 
 
-## When to Use
+## 使用场景
 
-Use `RetryAgentRun` when:
+在以下情况下使用`RetryAgentRun`：
 
-- **Validation fails**: Input doesn't meet requirements, and you want the model to try again with corrected input
-- **State requirements**: The current state doesn't meet prerequisites, and you want the model to perform additional actions
-- **Business logic**: A condition isn't met, and you want to guide the model on how to proceed
-- **Iterative refinement**: You want the model to improve its approach based on feedback
+- **验证失败**：输入不符合要求，您希望模型使用修正后的输入重试
+- **状态要求**：当前状态不满足先决条件，您希望模型执行额外的操作
+- **业务逻辑**：条件未满足，您希望指导模型如何继续
+- **迭代优化**：您希望模型根据反馈改进其方法
 
-## Behavior
+## 行为
 
-When `RetryAgentRun` is raised:
+当抛出`RetryAgentRun`时：
 
-1. The exception message is added to the tool call result as an error
-2. The model receives this error in the next LLM call
-3. The model can adjust its approach and retry the tool call or try a different approach
-4. The agent run continues (does not stop or exit)
-5. All messages and tool calls are preserved in the session
+1. 异常消息作为错误添加到工具调用结果中
+2. 模型在下一次LLM调用中接收此错误
+3. 模型可以调整其方法并重试工具调用或尝试不同的方法
+4. 智能体运行继续（不会停止或退出）
+5. 所有消息和工具调用都保留在会话中
 
-## See Also
+## 参见
 
-- [StopAgentRun Exception](/reference/tools/stop-agent-run)
-- [Exceptions & Retries Guide](/basics/tools/exceptions)
+- [StopAgentRun异常](/reference/tools/stop-agent-run)
+- [异常与重试指南](/basics/tools/exceptions)
 

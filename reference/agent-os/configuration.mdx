@@ -5,19 +5,19 @@ sidebarTitle: AgentOSConfig
 
 <Snippet file="agent-os-configuration-reference.mdx" />
 
-## Using a YAML Configuration File
+## 使用YAML配置文件
 
-You can also provide your AgentOS configuration via a YAML file.
+您也可以通过YAML文件提供AgentOS配置。
 
-You can define all the previously mentioned configuration options in the file:
+您可以在文件中定义所有前面提到的配置选项：
 
 ```yaml
-# List of models available in the AgentOS
+# AgentOS中可用的模型列表
 available_models:
   - <MODEL_STRING>
   ...
 
-# Configuration for the Chat page
+# 聊天页面的配置
 chat:
   quick_prompts:
     <AGENT_ID>:
@@ -28,7 +28,7 @@ chat:
     ...
 
 
-# Configuration for the Evals page
+# 评估页面的配置
 evals:
   available_models:
     - <MODEL_STRING>
@@ -44,7 +44,7 @@ evals:
     ...
 
 
-# Configuration for the Knowledge page
+# 知识页面的配置
 knowledge:
   display_name: <DISPLAY_NAME>
   dbs:
@@ -53,7 +53,7 @@ knowledge:
         display_name: <DISPLAY_NAME>
     ...
 
-# Configuration for the Memory page
+# 记忆页面的配置
 memory:
   display_name: <DISPLAY_NAME>
   dbs:
@@ -62,7 +62,7 @@ memory:
         display_name: <DISPLAY_NAME>
     ...
 
-# Configuration for the Session page
+# 会话页面的配置
 session:
   display_name: <DISPLAY_NAME>
   dbs:
@@ -71,7 +71,7 @@ session:
         display_name: <DISPLAY_NAME>
     ...
 
-# Configuration for the Metrics page
+# 指标页面的配置
 metrics:
   display_name: <DISPLAY_NAME>
   dbs:

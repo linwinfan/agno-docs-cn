@@ -1,55 +1,55 @@
 ---
 title: AgentOSClient
 sidebarTitle: AgentOSClient
-description: Python client for interacting with AgentOS API endpoints
+description: 用于与AgentOS API端点交互的Python客户端
 ---
 
-The `AgentOSClient` provides a convenient interface for interacting with a running AgentOS instance. It supports all AgentOS operations including running agents, teams, and workflows, managing sessions and memories, and searching knowledge bases.
+`AgentOSClient`提供了与运行中的AgentOS实例交互的便捷接口。它支持所有AgentOS操作，包括运行智能体、团队和工作流，管理会话和记忆，以及搜索知识库。
 
-## Basic Usage
+## 基本用法
 
 ```python
 from agno.client import AgentOSClient
 
-# Connect to AgentOS
+# 连接到AgentOS
 client = AgentOSClient(base_url="http://localhost:7777")
 
-# Get configuration
+# 获取配置
 config = await client.aget_config()
-print(f"Connected to: {config.name or config.os_id}")
-print(f"Available agents: {[a.id for a in config.agents]}")
+print(f"连接到: {config.name or config.os_id}")
+print(f"可用智能体: {[a.id for a in config.agents]}")
 ```
 
-## Parameters
+## 参数
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `base_url` | `str` | Required | Base URL of the AgentOS instance (e.g., `"http://localhost:7777"`) |
-| `timeout` | `float` | `60.0` | Request timeout in seconds |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `base_url` | `str` | 必需 | AgentOS实例的基础URL（例如，`"http://localhost:7777"`） |
+| `timeout` | `float` | `60.0` | 请求超时时间（秒） |
 
-## Methods
+## 方法
 
-### Discovery & Configuration
+### 发现和配置
 
 #### `aget_config`
 
-Get AgentOS configuration and metadata asynchronously.
+异步获取AgentOS配置和元数据。
 
 ```python
 config = await client.aget_config()
 ```
 
-**Returns:** `ConfigResponse` containing:
-- `os_id`: Unique identifier for the OS instance
-- `name`: Name of the OS instance
-- `agents`: List of registered agents
-- `teams`: List of registered teams
-- `workflows`: List of registered workflows
-- `interfaces`: List of available interfaces
+**返回:** 包含以下内容的`ConfigResponse`：
+- `os_id`: OS实例的唯一标识符
+- `name`: OS实例的名称
+- `agents`: 已注册智能体列表
+- `teams`: 已注册团队列表
+- `workflows`: 已注册工作流列表
+- `interfaces`: 可用接口列表
 
 #### `get_config`
 
-Synchronous version of `aget_config`.
+`aget_config`的同步版本。
 
 ```python
 config = client.get_config()
@@ -57,7 +57,7 @@ config = client.get_config()
 
 #### `list_agents`
 
-List all agents configured in the AgentOS instance.
+列出AgentOS实例中配置的所有智能体。
 
 ```python
 agents = await client.list_agents()
@@ -65,77 +65,77 @@ for agent in agents:
     print(f"{agent.id}: {agent.name}")
 ```
 
-**Returns:** `List[AgentSummaryResponse]`
+**返回:** `List[AgentSummaryResponse]`
 
 #### `aget_agent`
 
-Get detailed configuration for a specific agent.
+获取特定智能体的详细配置。
 
 ```python
 agent = await client.aget_agent(agent_id="my-agent")
-print(f"Name: {agent.name}")
-print(f"Model: {agent.model}")
-print(f"Tools: {agent.tools}")
+print(f"名称: {agent.name}")
+print(f"模型: {agent.model}")
+print(f"工具: {agent.tools}")
 ```
 
-**Parameters:**
-- `agent_id` (str): ID of the agent to retrieve
+**参数:**
+- `agent_id` (str): 要检索的智能体ID
 
-**Returns:** `AgentResponse`
+**返回:** `AgentResponse`
 
 #### `list_teams`
 
-List all teams configured in the AgentOS instance.
+列出AgentOS实例中配置的所有团队。
 
 ```python
 teams = await client.list_teams()
 ```
 
-**Returns:** `List[TeamSummaryResponse]`
+**返回:** `List[TeamSummaryResponse]`
 
 #### `aget_team`
 
-Get detailed configuration for a specific team.
+获取特定团队的详细配置。
 
 ```python
 team = await client.aget_team(team_id="my-team")
 ```
 
-**Parameters:**
-- `team_id` (str): ID of the team to retrieve
+**参数:**
+- `team_id` (str): 要检索的团队ID
 
-**Returns:** `TeamResponse`
+**返回:** `TeamResponse`
 
 #### `list_workflows`
 
-List all workflows configured in the AgentOS instance.
+列出AgentOS实例中配置的所有工作流。
 
 ```python
 workflows = await client.list_workflows()
 ```
 
-**Returns:** `List[WorkflowSummaryResponse]`
+**返回:** `List[WorkflowSummaryResponse]`
 
 #### `aget_workflow`
 
-Get detailed configuration for a specific workflow.
+获取特定工作流的详细配置。
 
 ```python
 workflow = await client.aget_workflow(workflow_id="my-workflow")
 ```
 
-**Parameters:**
-- `workflow_id` (str): ID of the workflow to retrieve
+**参数:**
+- `workflow_id` (str): 要检索的工作流ID
 
-**Returns:** `WorkflowResponse`
+**返回:** `WorkflowResponse`
 
 ---
 
-### Running Agents
+### 运行智能体
 
 #### `run_agent`
 
-Execute an agent run (non-streaming).
+执行智能体运行（非流式）。
 
 ```python
 result = await client.run_agent(
@@ -144,31 +144,31 @@ result = await client.run_agent(
     session_id="session-123",
     user_id="user-456",
 )
-print(f"Response: {result.content}")
+print(f"响应: {result.content}")
 print(f"Tokens: {result.metrics.total_tokens}")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `agent_id` | `str` | Required | ID of the agent to run |
-| `message` | `str` | Required | The message/prompt for the agent |
-| `session_id` | `Optional[str]` | `None` | Session ID for context persistence |
-| `user_id` | `Optional[str]` | `None` | User ID for the run |
-| `images` | `Optional[Sequence[Image]]` | `None` | Images to include |
-| `audio` | `Optional[Sequence[Audio]]` | `None` | Audio to include |
-| `videos` | `Optional[Sequence[Video]]` | `None` | Videos to include |
-| `files` | `Optional[Sequence[File]]` | `None` | Files to include |
-| `session_state` | `Optional[Dict]` | `None` | Session state dictionary |
-| `dependencies` | `Optional[Dict]` | `None` | Dependencies dictionary |
-| `metadata` | `Optional[Dict]` | `None` | Metadata dictionary |
-| `knowledge_filters` | `Optional[Dict]` | `None` | Filters for knowledge search |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `agent_id` | `str` | 必需 | 要运行的智能体ID |
+| `message` | `str` | 必需 | 智能体的消息/提示 |
+| `session_id` | `Optional[str]` | `None` | 用于上下文持久性的会话ID |
+| `user_id` | `Optional[str]` | `None` | 运行的用户ID |
+| `images` | `Optional[Sequence[Image]]` | `None` | 要包含的图像 |
+| `audio` | `Optional[Sequence[Audio]]` | `None` | 要包含的音频 |
+| `videos` | `Optional[Sequence[Video]]` | `None` | 要包含的视频 |
+| `files` | `Optional[Sequence[File]]` | `None` | 要包含的文件 |
+| `session_state` | `Optional[Dict]` | `None` | 会话状态字典 |
+| `dependencies` | `Optional[Dict]` | `None` | 依赖字典 |
+| `metadata` | `Optional[Dict]` | `None` | 元数据字典 |
+| `knowledge_filters` | `Optional[Dict]` | `None` | 知识搜索过滤器 |
 
-**Returns:** `RunOutput`
+**返回:** `RunOutput`
 
 #### `run_agent_stream`
 
-Stream an agent run response.
+流式传输智能体运行响应。
 
 ```python
 from agno.run.agent import RunContentEvent, RunCompletedEvent
@@ -180,16 +180,16 @@ async for event in client.run_agent_stream(
     if isinstance(event, RunContentEvent):
         print(event.content, end="", flush=True)
     elif isinstance(event, RunCompletedEvent):
-        print(f"\nRun ID: {event.run_id}")
+        print(f"\n运行ID: {event.run_id}")
 ```
 
-**Parameters:** Same as `run_agent`
+**参数:** 与`run_agent`相同
 
-**Yields:** `RunOutputEvent` (one of `RunStartedEvent`, `RunContentEvent`, `RunToolCallEvent`, `RunCompletedEvent`, etc.)
+**产生:** `RunOutputEvent`（`RunStartedEvent`、`RunContentEvent`、`RunToolCallEvent`、`RunCompletedEvent`等之一）
 
 #### `continue_agent_run`
 
-Continue a paused agent run with tool results.
+使用工具结果继续暂停的智能体运行。
 
 ```python
 from agno.models.response import ToolExecution
@@ -206,20 +206,20 @@ result = await client.continue_agent_run(
 )
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `agent_id` | `str` | Required | ID of the agent |
-| `run_id` | `str` | Required | ID of the run to continue |
-| `tools` | `List[ToolExecution]` | Required | Tool execution results |
-| `session_id` | `Optional[str]` | `None` | Session ID |
-| `user_id` | `Optional[str]` | `None` | User ID |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `agent_id` | `str` | 必需 | 智能体ID |
+| `run_id` | `str` | 必需 | 要继续的运行ID |
+| `tools` | `List[ToolExecution]` | 必需 | 工具执行结果 |
+| `session_id` | `Optional[str]` | `None` | 会话ID |
+| `user_id` | `Optional[str]` | `None` | 用户ID |
 
-**Returns:** `RunOutput`
+**返回:** `RunOutput`
 
 #### `cancel_agent_run`
 
-Cancel an agent run.
+取消智能体运行。
 
 ```python
 await client.cancel_agent_run(agent_id="my-agent", run_id="run-123")
@@ -227,11 +227,11 @@ await client.cancel_agent_run(agent_id="my-agent", run_id="run-123")
 
 ---
 
-### Running Teams
+### 运行团队
 
 #### `run_team`
 
-Execute a team run (non-streaming).
+执行团队运行（非流式）。
 
 ```python
 result = await client.run_team(
@@ -239,26 +239,26 @@ result = await client.run_team(
     message="Research the latest AI trends",
     user_id="user-123",
 )
-print(f"Response: {result.content}")
+print(f"响应: {result.content}")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `team_id` | `str` | Required | ID of the team to run |
-| `message` | `str` | Required | The message/prompt for the team |
-| `session_id` | `Optional[str]` | `None` | Session ID for context persistence |
-| `user_id` | `Optional[str]` | `None` | User ID for the run |
-| `images` | `Optional[Sequence[Image]]` | `None` | Images to include |
-| `audio` | `Optional[Sequence[Audio]]` | `None` | Audio to include |
-| `videos` | `Optional[Sequence[Video]]` | `None` | Videos to include |
-| `files` | `Optional[Sequence[File]]` | `None` | Files to include |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `team_id` | `str` | 必需 | 要运行的团队ID |
+| `message` | `str` | 必需 | 团队的消息/提示 |
+| `session_id` | `Optional[str]` | `None` | 用于上下文持久性的会话ID |
+| `user_id` | `Optional[str]` | `None` | 运行的用户ID |
+| `images` | `Optional[Sequence[Image]]` | `None` | 要包含的图像 |
+| `audio` | `Optional[Sequence[Audio]]` | `None` | 要包含的音频 |
+| `videos` | `Optional[Sequence[Video]]` | `None` | 要包含的视频 |
+| `files` | `Optional[Sequence[File]]` | `None` | 要包含的文件 |
 
-**Returns:** `TeamRunOutput`
+**返回:** `TeamRunOutput`
 
 #### `run_team_stream`
 
-Stream a team run response.
+流式传输团队运行响应。
 
 ```python
 from agno.run.team import RunContentEvent
@@ -271,11 +271,11 @@ async for event in client.run_team_stream(
         print(event.content, end="", flush=True)
 ```
 
-**Yields:** `TeamRunOutputEvent`
+**产生:** `TeamRunOutputEvent`
 
 #### `cancel_team_run`
 
-Cancel a team run.
+取消团队运行。
 
 ```python
 await client.cancel_team_run(team_id="my-team", run_id="run-123")
@@ -283,11 +283,11 @@ await client.cancel_team_run(team_id="my-team", run_id="run-123")
 
 ---
 
-### Running Workflows
+### 运行工作流
 
 #### `run_workflow`
 
-Execute a workflow run (non-streaming).
+执行工作流运行（非流式）。
 
 ```python
 result = await client.run_workflow(
@@ -295,23 +295,23 @@ result = await client.run_workflow(
     message="What are the benefits of Python?",
     user_id="user-123",
 )
-print(f"Response: {result.content}")
-print(f"Status: {result.status}")
+print(f"响应: {result.content}")
+print(f"状态: {result.status}")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `workflow_id` | `str` | Required | ID of the workflow to run |
-| `message` | `str` | Required | The message/prompt for the workflow |
-| `session_id` | `Optional[str]` | `None` | Session ID for context persistence |
-| `user_id` | `Optional[str]` | `None` | User ID for the run |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `workflow_id` | `str` | 必需 | 要运行的工作流ID |
+| `message` | `str` | 必需 | 工作流的消息/提示 |
+| `session_id` | `Optional[str]` | `None` | 用于上下文持久性的会话ID |
+| `user_id` | `Optional[str]` | `None` | 运行的用户ID |
 
-**Returns:** `WorkflowRunOutput`
+**返回:** `WorkflowRunOutput`
 
 #### `run_workflow_stream`
 
-Stream a workflow run response.
+流式传输工作流运行响应。
 
 ```python
 async for event in client.run_workflow_stream(
@@ -322,11 +322,11 @@ async for event in client.run_workflow_stream(
         print(event.content, end="", flush=True)
 ```
 
-**Yields:** `WorkflowRunOutputEvent`
+**产生:** `WorkflowRunOutputEvent`
 
 #### `cancel_workflow_run`
 
-Cancel a workflow run.
+取消工作流运行。
 
 ```python
 await client.cancel_workflow_run(workflow_id="my-workflow", run_id="run-123")
@@ -334,11 +334,11 @@ await client.cancel_workflow_run(workflow_id="my-workflow", run_id="run-123")
 
 ---
 
-### Memory Operations
+### 记忆操作
 
 #### `create_memory`
 
-Create a new user memory.
+创建新用户记忆。
 
 ```python
 memory = await client.create_memory(
@@ -346,22 +346,22 @@ memory = await client.create_memory(
     user_id="user-123",
     topics=["preferences", "ui"],
 )
-print(f"Created: {memory.memory_id}")
+print(f"已创建: {memory.memory_id}")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `memory` | `str` | Required | The memory content to store |
-| `user_id` | `str` | Required | User ID to associate with the memory |
-| `topics` | `Optional[List[str]]` | `None` | Topics to categorize the memory |
-| `db_id` | `Optional[str]` | `None` | Database ID to use |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `memory` | `str` | 必需 | 要存储的记忆内容 |
+| `user_id` | `str` | 必需 | 与记忆关联的用户ID |
+| `topics` | `Optional[List[str]]` | `None` | 用于分类记忆的主题 |
+| `db_id` | `Optional[str]` | `None` | 要使用的数据库ID |
 
-**Returns:** `UserMemorySchema`
+**返回:** `UserMemorySchema`
 
 #### `list_memories`
 
-List user memories with filtering and pagination.
+带过滤和分页的用户记忆列表。
 
 ```python
 memories = await client.list_memories(
@@ -373,30 +373,30 @@ for mem in memories.data:
     print(f"{mem.memory_id}: {mem.memory}")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `user_id` | `Optional[str]` | `None` | Filter by user ID |
-| `topics` | `Optional[List[str]]` | `None` | Filter by topics |
-| `search_content` | `Optional[str]` | `None` | Search within memory content |
-| `limit` | `int` | `20` | Number of memories per page |
-| `page` | `int` | `1` | Page number |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `user_id` | `Optional[str]` | `None` | 按用户ID过滤 |
+| `topics` | `Optional[List[str]]` | `None` | 按主题过滤 |
+| `search_content` | `Optional[str]` | `None` | 在记忆内容中搜索 |
+| `limit` | `int` | `20` | 每页记忆数量 |
+| `page` | `int` | `1` | 页码 |
 
-**Returns:** `PaginatedResponse[UserMemorySchema]`
+**返回:** `PaginatedResponse[UserMemorySchema]`
 
 #### `get_memory`
 
-Get a specific memory by ID.
+按ID获取特定记忆。
 
 ```python
 memory = await client.get_memory(memory_id="mem-123", user_id="user-123")
 ```
 
-**Returns:** `UserMemorySchema`
+**返回:** `UserMemorySchema`
 
 #### `update_memory`
 
-Update an existing memory.
+更新现有记忆。
 
 ```python
 updated = await client.update_memory(
@@ -407,11 +407,11 @@ updated = await client.update_memory(
 )
 ```
 
-**Returns:** `UserMemorySchema`
+**返回:** `UserMemorySchema`
 
 #### `delete_memory`
 
-Delete a specific memory.
+删除特定记忆。
 
 ```python
 await client.delete_memory(memory_id="mem-123", user_id="user-123")
@@ -419,11 +419,11 @@ await client.delete_memory(memory_id="mem-123", user_id="user-123")
 
 ---
 
-### Session Operations
+### 会话操作
 
 #### `create_session`
 
-Create a new session.
+创建新会话。
 
 ```python
 from agno.db.base import SessionType
@@ -434,25 +434,25 @@ session = await client.create_session(
     user_id="user-123",
     session_name="My Chat Session",
 )
-print(f"Session ID: {session.session_id}")
+print(f"会话ID: {session.session_id}")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `session_type` | `SessionType` | `SessionType.AGENT` | Type of session (AGENT, TEAM, WORKFLOW) |
-| `session_id` | `Optional[str]` | `None` | Optional session ID (auto-generated if not provided) |
-| `user_id` | `Optional[str]` | `None` | User ID to associate with the session |
-| `session_name` | `Optional[str]` | `None` | Human-readable session name |
-| `agent_id` | `Optional[str]` | `None` | Agent ID (for agent sessions) |
-| `team_id` | `Optional[str]` | `None` | Team ID (for team sessions) |
-| `workflow_id` | `Optional[str]` | `None` | Workflow ID (for workflow sessions) |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `session_type` | `SessionType` | `SessionType.AGENT` | 会话类型（AGENT, TEAM, WORKFLOW） |
+| `session_id` | `Optional[str]` | `None` | 可选会话ID（如未提供则自动生成） |
+| `user_id` | `Optional[str]` | `None` | 与会话关联的用户ID |
+| `session_name` | `Optional[str]` | `None` | 人类可读的会话名称 |
+| `agent_id` | `Optional[str]` | `None` | 智能体ID（用于智能体会话） |
+| `team_id` | `Optional[str]` | `None` | 团队ID（用于团队会话） |
+| `workflow_id` | `Optional[str]` | `None` | 工作流ID（用于工作流会话） |
 
-**Returns:** `AgentSessionDetailSchema`, `TeamSessionDetailSchema`, or `WorkflowSessionDetailSchema`
+**返回:** `AgentSessionDetailSchema`、`TeamSessionDetailSchema`或`WorkflowSessionDetailSchema`
 
 #### `get_sessions`
 
-List sessions with filtering and pagination.
+带过滤和分页的会话列表。
 
 ```python
 sessions = await client.get_sessions(
@@ -464,11 +464,11 @@ for session in sessions.data:
     print(f"{session.session_id}: {session.session_name}")
 ```
 
-**Returns:** `PaginatedResponse[SessionSchema]`
+**返回:** `PaginatedResponse[SessionSchema]`
 
 #### `get_session`
 
-Get a specific session by ID.
+按ID获取特定会话。
 
 ```python
 session = await client.get_session(
@@ -477,11 +477,11 @@ session = await client.get_session(
 )
 ```
 
-**Returns:** `AgentSessionDetailSchema`, `TeamSessionDetailSchema`, or `WorkflowSessionDetailSchema`
+**返回:** `AgentSessionDetailSchema`、`TeamSessionDetailSchema`或`WorkflowSessionDetailSchema`
 
 #### `get_session_runs`
 
-Get all runs for a specific session.
+获取特定会话的所有运行。
 
 ```python
 runs = await client.get_session_runs(session_id="session-123")
@@ -489,11 +489,11 @@ for run in runs:
     print(f"{run.run_id}: {run.content[:50]}...")
 ```
 
-**Returns:** `List[RunSchema | TeamRunSchema | WorkflowRunSchema]`
+**返回:** `List[RunSchema | TeamRunSchema | WorkflowRunSchema]`
 
 #### `rename_session`
 
-Rename a session.
+重命名会话。
 
 ```python
 session = await client.rename_session(
@@ -502,11 +502,11 @@ session = await client.rename_session(
 )
 ```
 
-**Returns:** Session detail schema
+**返回:** 会话详细信息模式
 
 #### `delete_session`
 
-Delete a specific session.
+删除特定会话。
 
 ```python
 await client.delete_session(session_id="session-123")
@@ -514,11 +514,11 @@ await client.delete_session(session_id="session-123")
 
 ---
 
-### Knowledge Operations
+### 知识操作
 
 #### `upload_knowledge_content`
 
-Upload content to the knowledge base.
+上传内容到知识库。
 
 ```python
 from agno.media import File
@@ -528,25 +528,25 @@ content = await client.upload_knowledge_content(
     description="Important documentation",
     file=File(content=b"...", filename="doc.pdf", mime_type="application/pdf"),
 )
-print(f"Content ID: {content.id}")
+print(f"内容ID: {content.id}")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `name` | `Optional[str]` | `None` | Content name |
-| `description` | `Optional[str]` | `None` | Content description |
-| `url` | `Optional[str]` | `None` | URL to fetch content from |
-| `file` | `Optional[File]` | `None` | File object to upload |
-| `text_content` | `Optional[str]` | `None` | Raw text content |
-| `reader_id` | `Optional[str]` | `None` | Reader to use for processing |
-| `chunker` | `Optional[str]` | `None` | Chunking strategy |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `name` | `Optional[str]` | `None` | 内容名称 |
+| `description` | `Optional[str]` | `None` | 内容描述 |
+| `url` | `Optional[str]` | `None` | 要获取内容的URL |
+| `file` | `Optional[File]` | `None` | 要上传的文件对象 |
+| `text_content` | `Optional[str]` | `None` | 原始文本内容 |
+| `reader_id` | `Optional[str]` | `None` | 用于处理的读取器 |
+| `chunker` | `Optional[str]` | `None` | 分块策略 |
 
-**Returns:** `ContentResponseSchema`
+**返回:** `ContentResponseSchema`
 
 #### `search_knowledge`
 
-Search the knowledge base.
+搜索知识库。
 
 ```python
 results = await client.search_knowledge(
@@ -554,23 +554,23 @@ results = await client.search_knowledge(
     limit=5,
 )
 for result in results.data:
-    print(f"Score: {result.score}")
-    print(f"Content: {result.content[:100]}...")
+    print(f"评分: {result.score}")
+    print(f"内容: {result.content[:100]}...")
 ```
 
-**Parameters:**
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `query` | `str` | Required | Search query string |
-| `max_results` | `Optional[int]` | `None` | Maximum results to return |
-| `filters` | `Optional[Dict]` | `None` | Filters to apply |
-| `search_type` | `Optional[str]` | `None` | Search type (vector, keyword, hybrid) |
+**参数:**
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `query` | `str` | 必需 | 搜索查询字符串 |
+| `max_results` | `Optional[int]` | `None` | 要返回的最大结果数 |
+| `filters` | `Optional[Dict]` | `None` | 要应用的过滤器 |
+| `search_type` | `Optional[str]` | `None` | 搜索类型（向量、关键词、混合） |
 
-**Returns:** `PaginatedResponse[VectorSearchResult]`
+**返回:** `PaginatedResponse[VectorSearchResult]`
 
 #### `list_knowledge_content`
 
-List all content in the knowledge base.
+列出知识库中的所有内容。
 
 ```python
 content = await client.list_knowledge_content(limit=20)
@@ -578,27 +578,27 @@ for item in content.data:
     print(f"{item.id}: {item.name}")
 ```
 
-**Returns:** `PaginatedResponse[ContentResponseSchema]`
+**返回:** `PaginatedResponse[ContentResponseSchema]`
 
 #### `get_knowledge_config`
 
-Get knowledge base configuration.
+获取知识库配置。
 
 ```python
 config = await client.get_knowledge_config()
-print(f"Readers: {config.readers}")
-print(f"Chunkers: {config.chunkers}")
+print(f"读取器: {config.readers}")
+print(f"分块器: {config.chunkers}")
 ```
 
-**Returns:** `KnowledgeConfigResponse`
+**返回:** `KnowledgeConfigResponse`
 
 ---
 
-### Trace Operations
+### 追踪操作
 
 #### `get_traces`
 
-List execution traces with filtering and pagination.
+带过滤和分页的执行追踪列表。
 
 ```python
 traces = await client.get_traces(
@@ -609,27 +609,27 @@ for trace in traces.data:
     print(f"{trace.trace_id}: {trace.status}")
 ```
 
-**Returns:** `PaginatedResponse[TraceSummary]`
+**返回:** `PaginatedResponse[TraceSummary]`
 
 #### `get_trace`
 
-Get detailed trace information.
+获取详细追踪信息。
 
 ```python
 trace = await client.get_trace(trace_id="trace-123")
-print(f"Duration: {trace.duration_ms}ms")
-print(f"Spans: {len(trace.spans)}")
+print(f"持续时间: {trace.duration_ms}ms")
+print(f"跨度: {len(trace.spans)}")
 ```
 
-**Returns:** `TraceDetail` or `TraceNode` (if span_id provided)
+**返回:** `TraceDetail`或`TraceNode`（如果提供了span_id）
 
 ---
 
-### Metrics Operations
+### 指标操作
 
 #### `get_metrics`
 
-Retrieve AgentOS metrics and analytics data.
+检索AgentOS指标和分析数据。
 
 ```python
 from datetime import date
@@ -640,23 +640,23 @@ metrics = await client.get_metrics(
 )
 ```
 
-**Returns:** `MetricsResponse`
+**返回:** `MetricsResponse`
 
 #### `refresh_metrics`
 
-Manually trigger recalculation of system metrics.
+手动触发系统指标的重新计算。
 
 ```python
 metrics = await client.refresh_metrics()
 ```
 
-**Returns:** `List[DayAggregatedMetrics]`
+**返回:** `List[DayAggregatedMetrics]`
 
 ---
 
-## Error Handling
+## 错误处理
 
-The client raises `RemoteServerUnavailableError` when the remote server is unavailable:
+当远程服务器不可用时，客户端会引发`RemoteServerUnavailableError`：
 
 ```python
 from agno.exceptions import RemoteServerUnavailableError
@@ -664,15 +664,15 @@ from agno.exceptions import RemoteServerUnavailableError
 try:
     config = await client.aget_config()
 except RemoteServerUnavailableError as e:
-    print(f"Server unavailable: {e.message}")
-    print(f"Base URL: {e.base_url}")
+    print(f"服务器不可用: {e.message}")
+    print(f"基础URL: {e.base_url}")
 ```
 
-For HTTP errors (4xx, 5xx), the client raises `httpx.HTTPStatusError`.
+对于HTTP错误（4xx, 5xx），客户端会引发`httpx.HTTPStatusError`。
 
-## Authentication
+## 认证
 
-To include authentication headers in requests, pass the `headers` parameter to any method:
+要在请求中包含认证头，请将`headers`参数传递给任何方法：
 
 ```python
 headers = {"Authorization": "Bearer your-token"}

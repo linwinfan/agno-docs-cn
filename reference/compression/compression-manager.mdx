@@ -1,63 +1,63 @@
 ---
-title: CompressionManager
-sidebarTitle: Compression Manager
+title: 压缩管理器
+sidebarTitle: 压缩管理器
 ---
 
-The `CompressionManager` is responsible for compressing tool call results to save context space while preserving critical information.
+`CompressionManager`负责压缩工具调用结果，以节省上下文空间同时保留关键信息。
 
-## CompressionManager Attributes
+## 压缩管理器属性
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `model` | `Optional[Model]` | `None` | Model used for compression |
-| `compress_tool_results` | `bool` | `True` | Flag to enable tool result compression |
-| `compress_tool_results_limit` | `Optional[int]` | `None` | Number of uncompressed tool results before compression triggers.|
-| `compress_token_limit` | `Optional[int]` | `None` | Number of tokens before compression triggers. |
-| `compress_tool_call_instructions` | `Optional[str]` | `None` | Custom prompt for compression. If not provided, uses the default compression prompt |
-| `stats` | `Dict[str, Any]` | `{}` | Tracks compression statistics |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `model` | `Optional[Model]` | `None` | 用于压缩的模型 |
+| `compress_tool_results` | `bool` | `True` | 启用工具结果压缩的标志 |
+| `compress_tool_results_limit` | `Optional[int]` | `None` | 触发压缩前未压缩工具结果的数量。|
+| `compress_token_limit` | `Optional[int]` | `None` | 触发压缩前的令牌数量。 |
+| `compress_tool_call_instructions` | `Optional[str]` | `None` | 压缩的自定义提示。如果未提供，则使用默认压缩提示 |
+| `stats` | `Dict[str, Any]` | `{}` | 跟踪压缩统计信息 |
 
-## CompressionManager Methods
+## 压缩管理器方法
 
 ### `should_compress(messages, tools, model) -> bool`
 
-Checks whether compression should be triggered based on configured thresholds.
+根据配置的阈值检查是否应触发压缩。
 
-**Parameters:**
-- `messages`: List of messages to check
-- `tools`: Optional list of tools for token counting
-- `model`: The Agent/Team model
+**参数：**
+- `messages`: 要检查的消息列表
+- `tools`: 用于令牌计数的可选工具列表
+- `model`: 智能体/团队模型
 
-**Returns:**
-- `bool`: True if either threshold is met
+**返回：**
+- `bool`: 如果任一阈值满足则为True
 
 ### `ashould_compress(messages, tools, model) -> bool`
 
-Checks whether compression should be triggered based on configured thresholds asynchronously.
+异步根据配置的阈值检查是否应触发压缩。
 
-**Parameters:**
-- `messages`: List of messages to check
-- `tools`: Optional list of tools for token counting
-- `model`: The Agent/Team model
+**参数：**
+- `messages`: 要检查的消息列表
+- `tools`: 用于令牌计数的可选工具列表
+- `model`: 智能体/团队模型
 
-**Returns:**
-- `bool`: True if either threshold is met
+**返回：**
+- `bool`: 如果任一阈值满足则为True
 
 ### `compress(messages: List[Message]) -> None`
 
-Compresses all uncompressed tool results.
+压缩所有未压缩的工具结果。
 
-**Parameters:**
-- `messages`: List of messages containing tool results to compress
+**参数：**
+- `messages`: 包含要压缩的工具结果的消息列表
 
-**Returns:**
-- `None`: Modifies messages in place, setting `compressed_content` on each tool message
+**返回：**
+- `None`: 就地修改消息，在每个工具消息上设置`compressed_content`
 
 ### `acompress(messages: List[Message]) -> None`
 
-Compresses all uncompressed tool results asynchronously.
+异步压缩所有未压缩的工具结果。
 
-**Parameters:**
-- `messages`: List of messages containing tool results to compress
+**参数：**
+- `messages`: 包含要压缩的工具结果的消息列表
 
-**Returns:**
-- `None`: Modifies messages in place, setting `compressed_content` on each tool message
+**返回：**
+- `None`: 就地修改消息，在每个工具消息上设置`compressed_content`

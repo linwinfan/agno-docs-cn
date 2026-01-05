@@ -1,47 +1,47 @@
 ---
-title: RemoteAgent
-sidebarTitle: RemoteAgent
-description: Execute agents hosted on a remote AgentOS instance
+title: 远程智能体
+sidebarTitle: 远程智能体
+description: 执行托管在远程AgentOS实例上的智能体
 ---
 
-`RemoteAgent` allows you to run agents that are hosted on a remote AgentOS instance. It provides the same interface as a local agent, making it easy to integrate remote agents into your applications or compose them into teams and workflows.
+`RemoteAgent`允许您运行托管在远程AgentOS实例上的智能体。它提供与本地智能体相同的接口，使集成远程智能体到您的应用程序或将它们组合成团队和工作流变得容易。
 
-## Installation
+## 安装
 
 ```bash
 pip install agno
 ```
 
-## Basic Usage
+## 基本用法
 
 ```python
 from agno.agent import RemoteAgent
 
-# Create a remote agent pointing to a remote AgentOS instance
+# 创建指向远程AgentOS实例的远程智能体
 agent = RemoteAgent(
     base_url="http://localhost:7777",
     agent_id="my-agent",
 )
 
-# Run the agent (async)
-response = await agent.arun("What is the capital of France?")
+# 运行智能体（异步）
+response = await agent.arun("法国的首都是什么？")
 print(response.content)
 ```
 
-## Parameters
+## 参数
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `base_url` | `str` | Required | Base URL of the remote AgentOS instance (e.g., `"http://localhost:7777"`) |
-| `agent_id` | `str` | Required | ID of the remote agent to execute |
-| `timeout` | `float` | `60.0` | Request timeout in seconds |
-| `config_ttl` | `float` | `300.0` | Time-to-live for cached configuration in seconds |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `base_url` | `str` | 必需 | 远程AgentOS实例的基础URL（例如，`"http://localhost:7777"`） |
+| `agent_id` | `str` | 必需 | 要执行的远程智能体ID |
+| `timeout` | `float` | `60.0` | 请求超时时间（秒） |
+| `config_ttl` | `float` | `300.0` | 缓存配置的生存时间（秒） |
 
-## Properties
+## 属性
 
 ### `id`
 
-Returns the agent ID.
+返回智能体ID。
 
 ```python
 print(agent.id)  # "my-agent"
@@ -49,7 +49,7 @@ print(agent.id)  # "my-agent"
 
 ### `name`
 
-Returns the agent's name from the remote configuration.
+从远程配置返回智能体名称。
 
 ```python
 print(agent.name)  # "My Agent"
@@ -57,7 +57,7 @@ print(agent.name)  # "My Agent"
 
 ### `description`
 
-Returns the agent's description from the remote configuration.
+从远程配置返回智能体描述。
 
 ```python
 print(agent.description)  # "A helpful assistant agent"
@@ -65,7 +65,7 @@ print(agent.description)  # "A helpful assistant agent"
 
 ### `role`
 
-Returns the agent's role from the remote configuration.
+从远程配置返回智能体角色。
 
 ```python
 print(agent.role)  # "assistant"
@@ -73,7 +73,7 @@ print(agent.role)  # "assistant"
 
 ### `tools`
 
-Returns the agent's tools as a list of dictionaries.
+以字典列表形式返回智能体工具。
 
 ```python
 tools = agent.tools
@@ -84,40 +84,40 @@ if tools:
 
 ### `db`
 
-Returns a `RemoteDb` instance if the agent has a database configured.
+如果智能体配置了数据库，则返回`RemoteDb`实例。
 
 ```python
 if agent.db:
-    print(f"Database ID: {agent.db.id}")
+    print(f"数据库ID: {agent.db.id}")
 ```
 
 ### `knowledge`
 
-Returns a `RemoteKnowledge` instance if the agent has knowledge configured.
+如果智能体配置了知识库，则返回`RemoteKnowledge`实例。
 
 ```python
 if agent.knowledge:
-    print("Agent has knowledge enabled")
+    print("智能体已启用知识库")
 ```
 
-## Methods
+## 方法
 
 ### `arun`
 
-Execute the remote agent asynchronously.
+异步执行远程智能体。
 
 ```python
-# Non-streaming
+# 非流式
 response = await agent.arun(
-    "Tell me about Python",
+    "告诉我关于Python的信息",
     user_id="user-123",
     session_id="session-456",
 )
 print(response.content)
 
-# Streaming
+# 流式
 async for event in agent.arun(
-    "Tell me a story",
+    "给我讲个故事",
     stream=True,
     user_id="user-123",
 ):
@@ -125,34 +125,34 @@ async for event in agent.arun(
         print(event.content, end="", flush=True)
 ```
 
-**Parameters:**
+**参数：**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `input` | `str \| List \| Dict \| Message \| BaseModel` | Required | The input message for the agent |
-| `stream` | `bool` | `False` | Whether to stream the response |
-| `user_id` | `Optional[str]` | `None` | User ID for the run |
-| `session_id` | `Optional[str]` | `None` | Session ID for context persistence |
-| `session_state` | `Optional[Dict]` | `None` | Session state dictionary |
-| `images` | `Optional[Sequence[Image]]` | `None` | Images to include |
-| `audio` | `Optional[Sequence[Audio]]` | `None` | Audio to include |
-| `videos` | `Optional[Sequence[Video]]` | `None` | Videos to include |
-| `files` | `Optional[Sequence[File]]` | `None` | Files to include |
-| `stream_events` | `Optional[bool]` | `None` | Whether to stream events |
-| `retries` | `Optional[int]` | `None` | Number of retries |
-| `knowledge_filters` | `Optional[Dict]` | `None` | Filters for knowledge search |
-| `add_history_to_context` | `Optional[bool]` | `None` | Add history to context |
-| `dependencies` | `Optional[Dict]` | `None` | Dependencies dictionary |
-| `metadata` | `Optional[Dict]` | `None` | Metadata dictionary |
-| `auth_token` | `Optional[str]` | `None` | JWT token for authentication |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `input` | `str \| List \| Dict \| Message \| BaseModel` | 必需 | 智能体的输入消息 |
+| `stream` | `bool` | `False` | 是否流式传输响应 |
+| `user_id` | `Optional[str]` | `None` | 运行的用户ID |
+| `session_id` | `Optional[str]` | `None` | 用于上下文持久性的会话ID |
+| `session_state` | `Optional[Dict]` | `None` | 会话状态字典 |
+| `images` | `Optional[Sequence[Image]]` | `None` | 要包含的图像 |
+| `audio` | `Optional[Sequence[Audio]]` | `None` | 要包含的音频 |
+| `videos` | `Optional[Sequence[Video]]` | `None` | 要包含的视频 |
+| `files` | `Optional[Sequence[File]]` | `None` | 要包含的文件 |
+| `stream_events` | `Optional[bool]` | `None` | 是否流式传输事件 |
+| `retries` | `Optional[int]` | `None` | 重试次数 |
+| `knowledge_filters` | `Optional[Dict]` | `None` | 知识搜索过滤器 |
+| `add_history_to_context` | `Optional[bool]` | `None` | 将历史添加到上下文 |
+| `dependencies` | `Optional[Dict]` | `None` | 依赖字典 |
+| `metadata` | `Optional[Dict]` | `None` | 元数据字典 |
+| `auth_token` | `Optional[str]` | `None` | 用于认证的JWT令牌 |
 
-**Returns:**
-- `RunOutput` when `stream=False`
-- `AsyncIterator[RunOutputEvent]` when `stream=True`
+**返回：**
+- 当`stream=False`时返回`RunOutput`
+- 当`stream=True`时返回`AsyncIterator[RunOutputEvent]`
 
 ### `acontinue_run`
 
-Continue a paused agent run with tool results.
+使用工具结果继续暂停的智能体运行。
 
 ```python
 from agno.models.response import ToolExecution
@@ -168,91 +168,91 @@ response = await agent.acontinue_run(
 )
 ```
 
-**Parameters:**
+**参数：**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `run_id` | `str` | Required | ID of the run to continue |
-| `updated_tools` | `List[ToolExecution]` | Required | Tool execution results |
-| `stream` | `bool` | `False` | Whether to stream the response |
-| `user_id` | `Optional[str]` | `None` | User ID |
-| `session_id` | `Optional[str]` | `None` | Session ID |
-| `auth_token` | `Optional[str]` | `None` | JWT token for authentication |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `run_id` | `str` | 必需 | 要继续的运行ID |
+| `updated_tools` | `List[ToolExecution]` | 必需 | 工具执行结果 |
+| `stream` | `bool` | `False` | 是否流式传输响应 |
+| `user_id` | `Optional[str]` | `None` | 用户ID |
+| `session_id` | `Optional[str]` | `None` | 会话ID |
+| `auth_token` | `Optional[str]` | `None` | 用于认证的JWT令牌 |
 
-**Returns:**
-- `RunOutput` when `stream=False`
-- `AsyncIterator[RunOutputEvent]` when `stream=True`
+**返回：**
+- 当`stream=False`时返回`RunOutput`
+- 当`stream=True`时返回`AsyncIterator[RunOutputEvent]`
 
 ### `cancel_run`
 
-Cancel a running agent execution.
+取消正在运行的智能体执行。
 
 ```python
 success = await agent.cancel_run(run_id="run-123")
 if success:
-    print("Run cancelled")
+    print("运行已取消")
 ```
 
-**Parameters:**
+**参数：**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `run_id` | `str` | Required | ID of the run to cancel |
-| `auth_token` | `Optional[str]` | `None` | JWT token for authentication |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `run_id` | `str` | 必需 | 要取消的运行ID |
+| `auth_token` | `Optional[str]` | `None` | 用于认证的JWT令牌 |
 
-**Returns:** `bool` - True if successfully cancelled
+**返回：** `bool` - 如果成功取消则为True
 
 ### `get_agent_config`
 
-Get the agent configuration from the remote server (always fetches fresh).
+从远程服务器获取智能体配置（始终获取最新配置）。
 
 ```python
 config = await agent.get_agent_config()
-print(f"Agent name: {config.name}")
-print(f"Model: {config.model}")
+print(f"智能体名称: {config.name}")
+print(f"模型: {config.model}")
 ```
 
-**Returns:** `AgentResponse`
+**返回：** `AgentResponse`
 
 ### `refresh_config`
 
-Force refresh the cached agent configuration.
+强制刷新缓存的智能体配置。
 
 ```python
 config = agent.refresh_config()
 ```
 
-**Returns:** `AgentResponse`
+**返回：** `AgentResponse`
 
-## Using in Teams
+## 在团队中使用
 
-Remote agents can be used as members of local teams:
+远程智能体可以用作本地团队的成员：
 
 ```python
 from agno.agent import RemoteAgent
 from agno.team import Team
 from agno.models.openai import OpenAIChat
 
-# Remote agent from another AgentOS instance
+# 来自另一个AgentOS实例的远程智能体
 researcher = RemoteAgent(
     base_url="http://research-server:7777",
     agent_id="researcher-agent",
 )
 
-# Local team with remote agent member
+# 带有远程智能体成员的本地团队
 team = Team(
-    name="Research Team",
+    name="研究团队",
     model=OpenAIChat(id="gpt-4o"),
     members=[researcher],
-    instructions="Coordinate research tasks",
+    instructions="协调研究任务",
 )
 
-response = await team.arun("Research AI trends")
+response = await team.arun("研究AI趋势")
 ```
 
-## Using in AgentOS Gateway
+## 在AgentOS网关中使用
 
-Remote agents can be registered in a local AgentOS to create a gateway:
+远程智能体可以在本地AgentOS中注册以创建网关：
 
 ```python
 from agno.agent import RemoteAgent
@@ -266,26 +266,26 @@ agent_os = AgentOS(
 )
 ```
 
-See [AgentOS Gateway](/agent-os/remote-execution/gateway) for more details.
+更多详情请参见[AgentOS网关](/agent-os/remote-execution/gateway)。
 
-## Error Handling
+## 错误处理
 
 ```python
 from agno.exceptions import RemoteServerUnavailableError
 
 try:
-    response = await agent.arun("Hello")
+    response = await agent.arun("你好")
 except RemoteServerUnavailableError as e:
-    print(f"Remote server unavailable: {e.message}")
+    print(f"远程服务器不可用: {e.message}")
 ```
 
-## Authentication
+## 认证
 
-For authenticated AgentOS instances, pass the `auth_token` parameter:
+对于需要认证的AgentOS实例，请传递`auth_token`参数：
 
 ```python
 response = await agent.arun(
-    "Hello",
+    "你好",
     auth_token="your-jwt-token",
 )
 ```

@@ -1,52 +1,52 @@
 ---
-title: "@hook Decorator"
-sidebarTitle: "@hook Decorator"
+title: "@hook 装饰器"
+sidebarTitle: "@hook 装饰器"
 ---
 
-The `@hook` decorator allows you to configure individual hook behavior. It can be applied to both pre-hooks and post-hooks.
+`@hook`装饰器允许您配置单个钩子的行为。它可以应用于预钩子和后钩子。
 
-## Import
+## 导入
 
 ```python
 from agno.hooks import hook
 ```
 
-## Parameters
+## 参数
 
-| Parameter            | Type   | Default | Description                                                                                         |
-| -------------------- | ------ | ------- | --------------------------------------------------------------------------------------------------- |
-| `run_in_background`  | `bool` | `False` | When `True`, the hook runs as a background task after the response is sent. Requires [AgentOS](/agent-os/overview). |
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `run_in_background` | `bool` | `False` | 当为`True`时，钩子在响应发送后作为后台任务运行。需要[AgentOS](/agent-os/overview)。 |
 
-## Usage
+## 使用方法
 
-### Background Execution
+### 后台执行
 
-Mark a hook to run in the background without blocking the API response:
+标记一个钩子在后台运行而不阻塞API响应：
 
 ```python
 from agno.hooks import hook
 
 @hook(run_in_background=True)
 async def log_analytics(run_output, agent):
-    """Runs after the response is sent to the user."""
+    """在响应发送给用户后运行。"""
     await store_metrics(run_output)
 ```
 
-### Combining with Regular Hooks
+### 与常规钩子结合
 
-You can mix background and regular hooks on the same agent:
+您可以在同一个智能体上混合使用后台和常规钩子：
 
 ```python
 from agno.hooks import hook
 
 def validate_output(run_output, agent):
-    """Runs synchronously, blocks response until complete."""
+    """同步运行，在完成前阻塞响应。"""
     if not run_output.content:
-        raise OutputCheckError("Empty response not allowed")
+        raise OutputCheckError("不允许空响应")
 
 @hook(run_in_background=True)
 async def send_notification(run_output, agent):
-    """Runs in background after response is sent."""
+    """在响应发送后在后台运行。"""
     await notify_user(run_output.content)
 
 agent = Agent(
@@ -55,19 +55,19 @@ agent = Agent(
 )
 ```
 
-## Important Notes
+## 重要说明
 
 <Warning>
-**Background execution requires AgentOS.** When running agents directly (not through AgentOS), hooks marked with `run_in_background=True` will execute synchronously.
+**后台执行需要AgentOS。** 当直接运行智能体（不通过AgentOS）时，标记为`run_in_background=True`的钩子将同步执行。
 </Warning>
 
 <Warning>
-**Background hooks cannot modify data.** Since background hooks run after the response is sent, any modifications to `run_input`, `run_output`, or other parameters won't affect the agent's processing. Use background mode only for logging, analytics, or notifications.
+**后台钩子不能修改数据。** 由于后台钩子在响应发送后运行，对`run_input`、`run_output`或其他参数的任何修改都不会影响智能体的处理。仅将后台模式用于日志记录、分析或通知。
 </Warning>
 
-## See Also
+## 参见
 
-- [Background Tasks Overview](/agent-os/background-tasks/overview)
-- [Pre-hooks Reference](/reference/hooks/pre-hooks)
-- [Post-hooks Reference](/reference/hooks/post-hooks)
+- [后台任务概述](/agent-os/background-tasks/overview)
+- [预钩子参考](/reference/hooks/pre-hooks)
+- [后钩子参考](/reference/hooks/post-hooks)
 

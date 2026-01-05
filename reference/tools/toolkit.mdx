@@ -1,41 +1,41 @@
 ---
-title: Toolkit
-sidebarTitle: Toolkit
-description: Reference for the Toolkit class.
+title: 工具包
+sidebarTitle: 工具包
+description: Toolkit类的参考文档。
 ---
 
-The `Toolkit` class provides a way to group and manage multiple tools (functions) together. It handles tool registration, filtering, caching, and execution control.
+`Toolkit`类提供了一种将多个工具（函数）分组和管理在一起的方法。它处理工具注册、过滤、缓存和执行控制。
 
-## Import
+## 导入
 
 ```python
 from agno.tools.toolkit import Toolkit
 ```
 
-## Constructor
+## 构造函数
 
-### Parameters
+### 参数
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `name` | `str` | A descriptive name for the toolkit. |
-| `tools` | `List[Callable]` | List of callable functions to include in the toolkit. |
-| `instructions` | `str` | Instructions for using the toolkit. Can be added to agent context. |
-| `add_instructions` | `bool` | Whether to add toolkit instructions to the agent's context. |
-| `include_tools` | `list[str]` | List of tool names to include from the toolkit. If specified, only these tools will be registered. |
-| `exclude_tools` | `list[str]` | List of tool names to exclude from the toolkit. These tools will not be registered. |
-| `requires_confirmation_tools` | `list[str]` | List of tool names that require user confirmation before execution. |
-| `external_execution_required_tools` | `list[str]` | List of tool names that will be executed outside of the agent loop. |
-| `stop_after_tool_call_tools` | `List[str]` | List of tool names that should stop the agent after execution. |
-| `show_result_tools` | `List[str]` | List of tool names whose results should be shown to the user. |
-| `cache_results` | `bool` | Enable in-memory caching of function results. |
-| `cache_ttl` | `int` | Time-to-live for cached results in seconds (default: 1 hour). |
-| `cache_dir` | `str` | Directory to store cache files. Defaults to system temp directory. |
-| `auto_register` | `bool` | Whether to automatically register all tools in the toolkit upon initialization. |
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `name` | `str` | 工具包的描述性名称。 |
+| `tools` | `List[Callable]` | 要包含在工具包中的可调用函数列表。 |
+| `instructions` | `str` | 使用工具包的说明。可以添加到智能体上下文中。 |
+| `add_instructions` | `bool` | 是否将工具包说明添加到智能体的上下文中。 |
+| `include_tools` | `list[str]` | 要从工具包中包含的工具名称列表。如果指定，只有这些工具会被注册。 |
+| `exclude_tools` | `list[str]` | 要从工具包中排除的工具名称列表。这些工具不会被注册。 |
+| `requires_confirmation_tools` | `list[str]` | 执行前需要用户确认的工具名称列表。 |
+| `external_execution_required_tools` | `list[str]` | 将在智能体循环之外执行的工具名称列表。 |
+| `stop_after_tool_call_tools` | `List[str]` | 执行后应停止智能体的工具名称列表。 |
+| `show_result_tools` | `List[str]` | 结果应显示给用户的工具名称列表。 |
+| `cache_results` | `bool` | 启用函数结果的内存缓存。 |
+| `cache_ttl` | `int` | 缓存结果的生存时间（秒）（默认：1小时）。 |
+| `cache_dir` | `str` | 存储缓存文件的目录。默认为系统临时目录。 |
+| `auto_register` | `bool` | 是否在初始化时自动注册工具包中的所有工具。 |
 
-## Usage Examples
+## 使用示例
 
-### Basic Toolkit
+### 基本工具包
 
 ```python
 from agno.tools.toolkit import Toolkit
@@ -48,11 +48,11 @@ class WebSearchTools(Toolkit):
         super().__init__(name="web_search_tools", tools=tools, **kwargs)
 
     def search_web(self, query: str) -> str:
-        """Search the web for information."""
-        return f"Searching for: {query}"
+        """搜索网络信息。"""
+        return f"正在搜索: {query}"
 ```
 
-### Toolkit with Instructions
+### 带说明的工具包
 
 ```python
 class CalculatorTools(Toolkit):
@@ -64,23 +64,23 @@ class CalculatorTools(Toolkit):
             self.divide,
         ]
 
-        instructions = "Use these tools to perform calculations. Always validate inputs before execution."
+        instructions = "使用这些工具执行计算。执行前始终验证输入。"
 
         super().__init__(name="calculator_tools", tools=tools, instructions=instructions, **kwargs)
-    
+
     def add(self, a: float, b: float) -> float:
-        """Add two numbers and return the result."""
+        """将两个数字相加并返回结果。"""
         return a + b
-    
+
     def subtract(self, a: float, b: float) -> float:
-        """Subtract two numbers and return the result."""
+        """将两个数字相减并返回结果。"""
         return a - b
-    
+
     def multiply(self, a: float, b: float) -> float:
-        """Multiply two numbers and return the result."""
+        """将两个数字相乘并返回结果。"""
         return a * b
-    
+
     def divide(self, a: float, b: float) -> float:
-        """Divide two numbers and return the result."""
+        """将两个数字相除并返回结果。"""
         return a / b
 ```
